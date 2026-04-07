@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-001.webp",
+      "caption": "Figure 1. Conventional RGB-D based methods often fail under highly dynamic scenes due to limited frame rate from common RGB-D cameras. Our EventTrack6D addresses this issue by reconstructing dual modalities, image and depth, between consecutive depth frames to bridge the gap with event data. This enables inference at finer temporal intervals and yields robust tracking over highly dynamic motion.",
+      "page": 1,
+      "index": 1,
+      "width": 496,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-002.webp",
+      "caption": "Table 2. Comparison of event-based 6D object pose tracking methods on Event6D dataset, evaluated against ground-truth poses at 120 FPS. The event camera operates asynchronously at high frame rates, while RGB or depth is only available at 30 FPS. Therefore, conventional RGB or RGB-D-based methods cannot be evaluated under the 120 FPS ground-truths. The runtime is measured on preprocessed data, with a patch size of 160 × 160 corresponding to the region of interest in FP. † denotes that the model is trained for event inputs and bracket (·) in FPS indicates the runtime when applied TensorRT.",
+      "page": 6,
+      "index": 2,
+      "width": 1012,
+      "height": 396
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-003.webp",
+      "caption": "Figure 8. Visualization of trigger signals for overall system.",
+      "page": 11,
+      "index": 3,
+      "width": 440,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-004.webp",
+      "caption": "Figure 9. The object assets used in the Event6D dataset. The object assets do not overlap between EventBlender6D (used for training), ensuring proper novel-object testing.",
+      "page": 11,
+      "index": 4,
+      "width": 479,
+      "height": 309
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-005.webp",
+      "caption": "Figure 13. Qualitative comparison on the Event6D drill object sequence. Although the event-based methods operate at intervals corresponding to 120 FPS, all visualizations are presented at the RGB frame rate of 30 FPS for consistency. † denotes that the model is trained with event inputs on the EventBlender6D dataset.",
+      "page": 25,
+      "index": 5,
+      "width": 1023,
+      "height": 905
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-006.webp",
+      "caption": "Figure 14. Qualitative comparison on the Event6D marker object sequence. Although the event-based methods operate at intervals corresponding to 120 FPS, all visualizations are presented at the RGB frame rate of 30 FPS for consistency.† denotes that the model is trained with event inputs on the EventBlender6D dataset.",
+      "page": 26,
+      "index": 6,
+      "width": 1025,
+      "height": 904
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-007.webp",
+      "caption": "Table 9. An overview of the proposed Event6D training set, which is released for future research and not used for training in our experiments. No. Frames denotes the number of 30 FPS RGB and depth frames; the 6D poses are provided at 120 FPS.",
+      "page": 21,
+      "index": 7,
+      "width": 1026,
+      "height": 806
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-008.webp",
+      "caption": "Table 10. An overview of the proposed Event6D test set. No. Frames denotes the number of 30 FPS RGB and depth frames; the 6D poses are provided at 120 FPS.",
+      "page": 21,
+      "index": 8,
+      "width": 1026,
+      "height": 343
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-009.webp",
+      "caption": "Figure 10. EventBlender6D samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses.",
+      "page": 22,
+      "index": 9,
+      "width": 979,
+      "height": 910
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-010.webp",
+      "caption": "Figure 7. Illustration of Hand-eye calibration. We denote the OptiTrack (motion-capture) world coordinate frame as O and the camera’s optical frame as C. The transformation from the OptiTrack frame to the camera frame is represented by TCO .",
+      "page": 10,
+      "index": 10,
+      "width": 462,
+      "height": 305
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-011.webp",
+      "caption": "Figure 2. Overview of our EventTrack6D. EventTrack6D consists of a dual-modal reconstruction module and a pose refinement module. It can perform 6D pose tracking over high-frequency event stream, despite the limited frame rate of depth images which results in missing depth information between time intervals τ = 0 and τ = t. To achieve this, the dual-modal reconstruction module takes as input the most recent depth frame D0, the event stream E0,t accumulated from that frame to the current time t where depth frame is missing, as well as the event stream Et−∆t,t from the most recent dual-modal reconstruction to the current time. From these inputs, it reconstructs the current intensity image It, and depth Dt. These reconstructed modalities are then used in a pose refinement module to estimate the 6D pose transformation from time t−∆t to t.",
+      "page": 3,
+      "index": 11,
+      "width": 1025,
+      "height": 527
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-012.webp",
+      "caption": "Figure 11. EventHO3D samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses.",
+      "page": 23,
+      "index": 12,
+      "width": 986,
+      "height": 890
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-013.webp",
+      "caption": "Figure 5. Qualitative depth-reconstruction results on depth-absent intervals. The future depth D1 is provided solely for reference and is not used by the method. Despite dynamic motion, our approach reconstructs depth images that preserve coherent object structure and align with the object motion, providing geometric guidance for downstream pose tracking.",
+      "page": 8,
+      "index": 13,
+      "width": 970,
+      "height": 296
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-014.webp",
+      "caption": "Table 4. Comparison on the EventHO3D dataset. † denotes that the model is trained for event inputs.",
+      "page": 8,
+      "index": 14,
+      "width": 487,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-015.webp",
+      "caption": "Figure 12. Event6D test samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses.",
+      "page": 24,
+      "index": 15,
+      "width": 993,
+      "height": 848
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28045v1/fig-016.webp",
+      "caption": "Figure 3. System designed for acquiring the Event6D dataset. The event camera, RGB-D camera, and motion capture system are all hardwaretriggered, temporally synchronized and calibrated.",
+      "page": 5,
+      "index": 16,
+      "width": 485,
+      "height": 311
+    }
+  ]
+}

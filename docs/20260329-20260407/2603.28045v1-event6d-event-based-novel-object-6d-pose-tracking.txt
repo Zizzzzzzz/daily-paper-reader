@@ -1,0 +1,632 @@
+Title: Event6D: Event-based Novel Object 6D Pose Tracking
+
+URL Source: https://arxiv.org/pdf/2603.28045v1
+
+Published Time: Tue, 31 Mar 2026 01:59:00 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+# Event6D: Event-based Novel Object 6D Pose Tracking 
+
+# Jae-Young Kang 1* Hoonehee Cho 1* Taeyeop Lee 1*
+
+# Minjun Kang 1 Bowen Wen 2 Youngho Kim 1 Kuk-Jin Yoon 1
+
+> 1
+
+KAIST 2NVIDIA 
+
+# Abstract 
+
+Event cameras provide microsecond latency, making them suitable for 6D object pose tracking in fast, dynamic scenes where conventional RGB and depth pipelines suffer from motion blur and large pixel displacements. We introduce EventTrack6D, an event-depth tracking framework that gen-eralizes to novel objects without object-specific training by reconstructing both intensity and depth at arbitrary times-tamps between depth frames. Conditioned on the most re-cent depth measurement, our dual reconstruction recovers dense photometric and geometric cues from sparse event streams. Our EventTrack6D operates at over 120 FPS and maintains temporal consistency under rapid motion. To support training and evaluation, we introduce a compre-hensive benchmark suite: a large-scale synthetic dataset for training and two complementary evaluation sets, in-cluding real and simulated event datasets. Trained exclu-sively on synthetic data, EventTrack6D generalizes effec-tively to real-world scenarios without fine-tuning, maintain-ing accurate tracking across diverse objects and motion patterns. Our method and datasets validate the effective-ness of event cameras for event-based 6D pose tracking of novel objects. Code and datasets are publicly available at 
+
+https://chohoonhee.github.io/Event6D .
+
+# 1. Introduction 
+
+Estimating 6D object pose is a fundamental problem in computer vision. Early 6D object pose estimation meth-ods focused on instance-level approaches [126, 141, 143], where models are trained and evaluated on specific object instances. Research then progressed to category-level pose estimation [65, 119, 128], enabling generalization across object categories. Recent studies have advanced toward novel object generalization [73, 91, 92] in the context of robotic applications [67], developing models that handle unseen objects. However, accurate pose estimation from a single frame is insufficient for real-world applications re-  
+
+> *Equal contribution
+> Figure 1. Conventional RGB-D based methods often fail under highly dynamic scenes due to limited frame rate from common RGB-D cameras. Our EventTrack6D addresses this issue by reconstructing dual modalities, image and depth, between consecutive depth frames to bridge the gap with event data. This enables inference at finer temporal intervals and yields robust tracking over highly dynamic motion.
+
+quiring temporal consistency and continuous tracking. This motivates 6D object pose tracking [99, 137, 140], which maintains consistent pose estimates across video sequences. Despite recent advances in novel object 6D pose track-ing, existing methods [64, 89, 93, 137] and datasets [3, 8, 9, 43, 51, 129] rely on RGB or depth modalities at conven-tional frame rates (up to 30 FPS), limiting their applicabil-ity to dynamic scenes with fast motions where motion blur and large pixel displacements degrade performance. This limitation motivates the need for robust 6D pose tracking methods in high-speed scenarios. Event cameras [32] emerged as a promising sensor for high-speed visual perception. Unlike conventional frame-based cameras [44, 58] that capture full images at fixed intervals, event cameras asynchronously record per-pixel brightness changes with microsecond temporal resolution, offering negligible motion blur, low latency, and high dy-namic range. Several works [27, 48, 105] have investi-gated event-based 6D pose tracking tasks. RGB-DE [27] pioneered this area by introducing a single-object track-                                                   
+
+> arXiv:2603.28045v1 [cs.CV] 30 Mar 2026 Table 1. Dataset Comparison. Overview of publicly available event-based 6D object pose datasets. All datasets include RGB, Event, and depth data. n/a indicates that the paper does not provide the corresponding information.
+> Dataset Events # Samples # Objects Event Annotation Motion 6D Pose Resolution Frequency (Hz) Annotation YCB-Ev [105] Real 13,851 21 1280 ×720 30 Static CosyPose [63]+ICG [116] E-POSE [48] Real 333,357 13 346 ×260 100 Moderate Registration [96]+ICP [7] RGB-DE [27] Real 2,500 1346 ×260 30 Dynamic Manual+ICP [7]
+> EventBlender6D (Ours) Synthetic 495,840 1033 640 ×480 60 Dynamic BlenderProc [23]
+> EventHO3D (Ours) Synthetic 103,462 5640 ×480 n/a Moderate Multi-view Opt. [46]
+> Event6D (Ours) Real 54,556 14 1280 ×720 120 Dynamic Motion Capture [31]
+
+ing dataset with an RGB-Depth-Event fusion method for instance-level 6D object pose tracking. However, their 6D pose annotations are limited to 30 Hz due to the RGB-D conventional frame rate. They show promising results by introducing RGB-Depth-Event fusion method for instance-level 6D object pose tracking. As summarized in Table 1, recent datasets, such as YCB-Ev [105] and E-Pose [48], in-troduce multi-object event-based 6D datasets but still re-main constrained to controlled settings with moderate or static object motion. Moreover, their annotation pipelines are limited in handling dynamic objects, as they rely on existing RGB-D 6D pose methods (CosyPose [63] and ICG [116], or point cloud registration [96] with refine-ments [7]), which struggle with highly dynamic motions. Existing 6D event datasets are still limited in both scale and motion diversity, which are crucial for developing general-izable tracking methods. To address these limitations, we propose EventTrack6D, an event-based 6D pose tracking framework that achieves robust tracking in high-speed scenarios and generalizes to novel unseen object instances without retraining. As shown in Fig. 1, our key idea is to reconstruct both intensity and depth at arbitrary timestamps between depth frames by leveraging event data conditioned on the most recent depth measurement. The reconstructed intensity and depth enable matching against CAD renderings, recovering photometric and geometric cues from sparse event data. This dual re-construction provides dense geometric and photometric in-formation for render-and-compare objectives [64, 137], al-lowing pose estimation at temporal resolutions beyond the native depth frame rate. EventTrack6D runs at over 120 FPS with a lightweight architecture and maintains robust tracking in highly dynamic scenes. Alongside our method, we introduce a comprehensive dataset suite: EventBlender6D for large-scale synthetic training (495k samples, 1k objects), Event6D (real-world, motion-captured) and EventHO3D (simulated event) for evaluation. By training exclusively on synthetic data, we demonstrate strong cross-domain generalization to real-world scenarios without fine-tuning. The core contributions can be summarized as follows: • We propose EventTrack6D, an event camera-based 6D object pose tracking framework that generalizes to novel objects without retraining. • We introduce a dual reconstruction approach that lever-ages event streams to reconstruct both intensity and depth between consecutive depth frames, which can be seam-lessly integrated with the downstream module in a render-and-compare paradigm. • We present large-scale synthetic and real-world event-based datasets (EventBlender6D, EventHO3D, and Event6D) for both training and evaluating event camera-based 6D object pose tracking (see Table 1). 
+
+# 2. Related Works 
+
+6D Object Pose Estimation and Refinement. 6D object pose estimation has been divided into instance-level [97, 126, 141], category-level [65, 66, 128], and novel object pose estimation [68, 92, 137]. To improve initial pose pre-dictions, pose refinement methods [64, 71, 88, 89, 144] have been developed for each setting. However, most existing methods use RGB or depth as inputs and are limited by the sensing speed of common cameras. Under large and fast motion, these cameras produce severe motion blur in RGB frames and large inter-frame displacements, signifi-cantly degrading the performance. 
+
+6D Object Pose Tracking. Classical 6DoF tracking, including keypoint based [94, 106, 107, 114, 123], edge based [18, 25, 47, 111, 115], and direct optimization meth-ods [6, 20, 84, 110, 120], struggles with textureless ob-jects, clutter, and generalization. This has motivated learn-ing based approaches [21, 33, 87, 133, 135], which often require large object specific datasets [2, 133]. Category-level [74, 127], model-based [53, 116, 140], and model-free trackers [134, 136] still depend on instance-level su-pervision, while recent work explores unseen object track-ing [26] and iterative refinement [64, 71, 88]. In this con-text [64, 93, 137], our EventTrack6D targets tracking of novel objects given CAD models and leverages event cam-eras for robustness under rapid and large motions. 
+
+Event-based Image Reconstruction. Event-based im-age reconstruction is a well-established topic in previous works [5, 19, 35, 59, 60, 90, 108, 131]. Recent work uses deep models to produce high-quality reconstructions [102, 103, 109, 139, 142], though supervised approaches typ-Figure 2. Overview of our EventTrack6D. EventTrack6D consists of a dual-modal reconstruction module and a pose refinement module. It can perform 6D pose tracking over high-frequency event stream, despite the limited frame rate of depth images which results in missing depth information between time intervals τ = 0 and τ = t. To achieve this, the dual-modal reconstruction module takes as input the most recent depth frame D0, the event stream E0,t          
+
+> accumulated from that frame to the current time twhere depth frame is missing, as well as the event stream Et−∆t,t from the most recent dual-modal reconstruction to the current time. From these inputs, it reconstructs the current intensity image It, and depth Dt. These reconstructed modalities are then used in a pose refinement module to estimate the 6D pose transformation from time t−∆tto t.
+
+ically require precisely aligned image–event pairs. Al-ternative paradigms have also been explored [29, 95, 98, 130], each introducing its own constraints. Notably, re-constructed images have been used for downstream tasks by leveraging dense photometric cues that sparse events lack [131, 132]. 
+
+Event-based Depth Reconstruction. Depth estimation us-ing event cameras has progressed rapidly [13, 49, 52, 56, 76, 150], yet many methods are too slow for real-time or struggle with absolute scale. Rather than regressing depth directly from events, we exploit motion cues in the event stream [39, 85, 112, 113, 125] and the high frame rate of event sensing [16, 34, 57]. Inspired by design principles of event-based video frame interpolation meth-ods [10, 15, 86, 118, 121, 122, 146, 149], we propose an event-driven depth extrapolation that predicts the current depth from incoming events and the latest depth frame. Un-like interpolation, our method does not use future frames. 
+
+Event-based 6D Pose Estimation. Event cameras pro-vide high-temporal-resolution and robustness to illumina-tion [14, 54], enabling event-only ego-motion [1, 60, 100, 124], stereo and visual–inertial fusion [11, 75, 77, 147], and globally optimized SLAM [12, 42, 83]. These strengths have motivated 6DoF pose estimation via geometric line tracking [40, 78, 80], hybrid event–RGB pipelines [72], marker-based LEDs [28, 82], and stereo for spacecraft [81]. Despite this progress, event-based 6D tracking remains con-strained by small, object-specific datasets collected in con-trolled settings [27, 48, 105] and a predominant focus on geometric formulations with few data-driven methods. 
+
+# 3. Approach 
+
+Problem Formulation. Given a CAD model of a rigid ob-ject and known camera intrinsics, our goal is to estimate the current object pose Tt = [ Rt | tt] in camera frame at an arbitrary time step t, where t is a normalized time in 
+
+[0 , 1) : τ = 0 corresponds to the timestamp of the most re-cent depth frame, and τ = 1 denotes the next depth frame in the future. Rt ∈ SO (3) and tt ∈ R3 represent its rotation and translation. We assume access to an initial pose estimate T0, asyn-chronous event data, E0,t = {ei = ( xi, p i, τ i) | 0 ≤ τi <t}, and depth measurement D0. Each event ei is defined by its pixel location xi = ( xi, y i)⊤, timestamp τi, and polarity 
+
+pi ∈ {− 1, 1}, indicating the sign of the brightness change. 
+
+Method Overview. To achieve robust tracking in dynamic scenarios, we increase the temporal frequency of pose up-dates. While prior methods [64, 134, 136, 137] typically infer poses only at timestamps where a depth frame is available and thereby constrained by the limited frame rate from a depth camera, EventTrack6D performs tracking up-dates at finer temporal intervals. As shown in Fig. 2, our framework enables inference at an arbitrary time t using two modules. The dual-modal reconstruction module pre-dicts the current depth from the most recent depth frame and intervening events, while simultaneously reconstruct-ing a dense intensity image. The pose-refinement module then uses the CAD model and the previous pose to esti-mate the pose at time t by matching against the recon-structed image and depth following a render-and-compare paradigm [63, 71, 93, 135, 137]. 
+
+3.1. Dual-modal Reconstruction 
+
+Given the most recent depth frame D0, the dual-modal re-construction module processes two separate event streams with distinct roles. The long-range stream E0,t , accumu-lated since D0, provides motion cues primarily for depth reconstruction. The short-range stream Et−∆t,t , collected over the most recent interval, focuses on fine temporal de-tails for intensity image reconstruction. Using these inputs, the module reconstructs the intensity image It and depth map Dt for the current timestamp when these images are missing due to their limited frame rate. The process is illus-trated in Fig. 2 (top-right). 
+
+Intensity Reconstruction. From the short-range event stream Et−∆t,t , we extract spatio–temporal features with an event encoder for image reconstruction ϕIE :
+
+F Et−∆t,t = ϕIE (Et−∆t,t ) .
+
+Then, we employ a ConvLSTM to aggregate temporal context and produce temporally integrated event features: 
+
+˜F Et−∆t,t , h t = ConvLSTM  F Et−∆t,t , h t−∆t
+
+ ,
+
+where ht−∆t is the hidden state propagated from the pre-vious time step. Finally, the image decoder ψIE fuses the aggregated event features to reconstruct the current inten-sity image: 
+
+It = ψIE( ˜F Et−∆t,t ).
+
+The recurrent hidden state ht is propagated to the next time step, serving as temporal memory for the subsequent dual-modal reconstruction. 
+
+Depth Reconstruction. Given the most recent depth frame 
+
+D0 and the long-range event stream E0,t , we first extract motion-related features using the event and depth encoders 
+
+ϕME and ϕMD : F E,M  
+
+> 0,t
+
+= ϕME (E0,t ) from the long-range events and F D,M  
+
+> 0
+
+= ϕMD (D0) from the depth frame. Then, we concatenate these motion-related features and apply a convolutional layer to generate the fused motion feature ˜F M 
+
+> 0,t
+
+. Next, the initial motion predictor, ψM , gen-erates a coarse motion field from the fused features as 
+
+M D 
+
+> 0,t
+
+= ψM( ˜F M 
+
+> 0,t
+
+). Using the initial motion field, we warp the previous depth features to the current time: 
+
+F D,M  
+
+> 0→t
+
+= Warp( F D,M  
+
+> 0
+
+, M D
+
+> 0,t
+
+). (1) We then compute a cost volume via a correlation layer [55, 117, 138] between the warped depth features and the fused motion feature: 
+
+C0,t = Corr 
+
+
+
+F D,M  
+
+> 0→t
+
+, ˜F M
+
+> 0,t
+
+
+
+. (2) Finally, we estimate a residual motion vector by con-catenating the cost volume, the initial motion field, and the fused motion feature, followed by a convolutional layer, to obtain the refined motion field, ˜M D
+
+> 0,t
+
+, by residual addition: 
+
+∆M D 
+
+> 0,t
+
+= Conv(Concat( C0,t , M D
+
+> 0,t
+
+, ˜F M 
+
+> 0,t
+
+)) ,
+
+˜M D 
+
+> 0,t
+
+= M D 
+
+> 0,t
+
++ ∆ M D
+
+> 0,t
+
+. (3) While the refined motion field enables temporal propa-gation of past depth information, geometric correction re-mains necessary to handle changes in 3D structure over time. To this end, we extract geometry-related features from long-range events and the depth frame using the en-coders ϕGE and ϕGD , producing F E,G  
+
+> 0,t
+
+= ϕGE (E0,t ) and 
+
+F D,G  
+
+> 0
+
+= ϕGD (D0). Using the refined motion field ˜M D
+
+> 0,t
+
+,we warp the geometry-related depth features to the current time: 
+
+F D,G  
+
+> 0→t
+
+= Warp( F D,G  
+
+> 0
+
+, ˜M D
+
+> 0,t
+
+). (4) Event cues F E,G  
+
+> 0,t
+
+capture long-range motion but are in-herently sparse and edge-dominated, which causes ambigu-ity for depth reconstruction in textureless regions or under large motion. To supply dense photometric context that en-codes correspondences and regularizes geometry, we also use the temporally integrated event features from the im-age reconstruction stage ˜F Et−∆t,t . We then combine F E,G 
+
+> 0,t
+
+with ˜F Et−∆t,t to reconcile changes in 3D structure over time. These representations are concatenated and refined, and the geometry module ψG produces the depth at time t:
+
+Dt = ψG(Concat( ˜F D,G  
+
+> 0→t
+
+, F D,G  
+
+> 0
+
+, F E,G  
+
+> 0,t
+
+, ˜F Et−∆t,t )) . (5) 
+
+3.2. 6D Pose Refinement 
+
+Dual-modal reconstruction predicts both the intensity im-age It and the depth map Dt at arbitrary timestamps. This allows pose tracking under large motion to be decomposed into a sequence of simpler subproblems with smaller mo-tion. 
+
+Tt =
+
+> N
+
+Y
+
+> k=1
+
+T k−1→k
+
+!
+
+T0, where N = t
+
+∆t . (6) Inspired by recent work in pose refinements [64, 137], the reconstructed intensity and depth images can be seam-lessly integrated into a pose-refinement module that adopts a CAD-based render-and-compare paradigm to generalize to novel objects without retraining, as long as the object CAD model is given at test time. We restrict pose updates to a region of interest (ROI) around the object. The crop is adapted from the previous pose estimate: its center is obtained by projecting the ob-ject origin onto the image plane, and its size is chosen to cover the object and its local context. Dual reconstruction is performed only within this ROI, reducing the computa-tional cost of modality alignment. The refinement module iteratively predicts a pose update that aligns rendered object views with the observed input. At each iteration, the current estimate is initialized from the previous pose, Tt = [ Rt | tt] ← [Rt−∆t | tt−∆t], and independently updated as 
+
+R+ 
+
+> t
+
+= ∆ R R t,t+ 
+
+> t
+
+= tt + ∆ t, where (∆ R, ∆t) = R Tt, I t, D t
+
+. (7) 
+
+It and Dt denote the predicted intensity image and depth map at time t, and R(·) is the refinement operator. 
+
+3.3. Objective Function 
+
+Dual-modal Reconstruction Loss. The reconstructed in-tensity image It and depth map Dt are supervised using ground-truth data. For the image reconstruction, we apply a perceptual loss, LPIPS [145], that encourages photometric consistency with the ground-truth image Igt t :
+
+Limg = LPIPS( It, I gt t ). (8) For depth reconstruction, we applied L1 loss as: 
+
+Ldepth = ∥Dt − Dgt t ∥1. (9) The overall reconstruction objective is a weighted combina-tion of both terms: 
+
+Lrecon = λI Limg + λD Ldepth , (10) where λI and λD balance the contributions of photometric and geometric supervision. 
+
+6D Pose Refinement Loss. Pose refinement is optimized using an L2 loss: 
+
+Lpose = λr ∥∆R − ∆R⋆∥2 + λt∥∆t − ∆t⋆∥2 (11) where ∆Rt, ∆t∗ are ground truth and λr , λt are weights. 
+
+# 4. Dataset Generation and Acquisition 
+
+4.1. EventBlender6D Dataset 
+
+We present EventBlender6D , the first large-scale synthetic dataset for event-based object pose estimation and tracking. We build our pipeline with BlenderProc [22], enabling high-frame-rate RGB rendering and accurate annotations using Google Scanned Objects [24]. An event simulator [101] is then applied to the rendered sequences to produce syn-thetic event streams. The objects synthesized in the Event-Blender6D dataset are disjoint from those in the evaluation datasets, Event6D and EventHO3D. RGB -D       
+
+> : Intel RealSense™ D435i
+> 1280 ×720 30 FPS
+> Event Camera
+> :Prophesee IMX636
+> 1280 ×720 ≥5000 FPS
+> OptiTrack
+> : 6 ×Primex 13
+> Figure 3. System designed for acquiring the Event6D dataset. The event camera, RGB-D camera, and motion capture system are all hardware-triggered, temporally synchronized and calibrated.
+
+4.2. Event6D Dataset 
+
+We propose Event6D dataset, a real-world event-based 6D object pose dataset. As shown in Fig. 3, motion capture sys-tem is employed to obtain accurate annotations. The RGB-D camera, event camera, and motion capture system are hardware-triggered, ensuring precise temporal synchroniza-tion. Event6D provides high-quality 6D pose ground truth at 120 FPS, enabling reliable benchmarking of event-based high-frame-rate 6D object pose tracking methods. The RGB and depth streams were recorded at 30 FPS, follow-ing existing datasets [4, 9, 105]. Our Event6D dataset in-cludes a subset of objects from YCB [8, 141] and HOGrasp-Net [17] datasets with existing CAD models. To incorporate novel objects, we captured real objects using a 3D scanner and generated corresponding CAD meshes. The dataset in-cludes diverse and challenging scenarios. Further details are provided in the supplementary material. 
+
+4.3. EventHO3D Dataset 
+
+The HO3D dataset [46] provides video sequences com-monly used for pose tracking evaluation. To assess the generalization of our method, we generate an event-based counterpart, EventHO3D, by simulating events using ESIM [101]. 
+
+# 5. Experiments 
+
+Experimental Setup. We train our model on the synthetic EventBlender6D dataset and evaluate it (without any ad-ditional training or fine-tuning) on the real Event6D and synthetic EventHO3D datasets under the novel object set-ting [51, 89, 137], where all evaluation objects are unseen during training. Following [137], we assume that only the first frame of 6D pose is provided and evaluate long-term tracking robustness without re-initialization. Evaluation is conducted for two different settings: 120 FPS and 30 FPS. In the 120 FPS setting, where RGB-D Table 2. Comparison of event-based 6D object pose tracking methods on Event6D dataset, evaluated against ground-truth poses at 120 FPS. The event camera operates asynchronously at high frame rates, while RGB or depth is only available at 30 FPS. Therefore, conventional RGB or RGB-D-based methods cannot be evaluated under the 120 FPS ground-truths. The runtime is measured on preprocessed data, with a patch size of 160 × 160 corresponding to the region of interest in FP. † denotes that the model is trained for event inputs and bracket (·) in FPS indicates the runtime when applied TensorRT.                                                                                                                                                                                                                                                                 
+
+> Approach E2VID [103] + MG [64] E2VID [103] + FP [137] ETAP [45] FP †[137] EventTrack6D (Ours)
+> Modality Event + Depth Event + Depth Event + Depth Event + Depth Event + Depth Metric ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR banana 0.00 0.00 0.17 24.92 9.65 25.38 6.09 1.54 7.11 13.99 1.70 9.43 43.46 16.26 41.83 bowl 4.43 0.00 17.41 46.20 0.57 77.11 48.20 1.25 75.21 2.70 0.38 8.98 54.86 0.34 85.65 cracker 0.00 0.00 0.03 36.65 28.42 42.05 1.17 1.04 1.31 45.53 27.28 60.42 74.65 62.44 89.19 drill 0.16 0.06 1.56 4.24 2.67 5.10 1.02 0.53 1.20 39.04 6.83 21.66 66.13 38.58 64.94 hammer 35.17 16.16 35.55 57.66 40.34 62.46 39.61 27.64 42.82 23.32 3.20 12.47 53.84 39.68 57.66 marker 12.04 0.83 17.32 0.17 0.17 0.17 0.17 0.17 0.17 12.33 1.02 8.44 62.36 28.01 65.92 mouse 2.10 0.43 10.74 25.48 3.31 63.32 0.13 0.13 0.36 8.60 0.81 9.89 34.54 4.93 70.48 mug 0.00 0.00 0.24 21.43 6.34 27.79 1.96 0.80 4.16 3.46 0.29 2.58 38.74 8.08 39.30 mustard 0.59 0.31 1.10 70.79 49.66 81.07 5.20 3.62 5.42 26.38 4.42 21.56 82.21 63.26 89.79 pitcher 12.83 4.52 17.70 72.35 43.29 74.51 8.44 5.12 8.19 58.15 17.66 47.99 71.47 42.86 81.02 scrub 3.93 1.26 3.98 76.67 54.53 82.57 1.21 1.01 1.44 61.01 22.19 46.54 84.55 65.97 91.63 spam 1.28 0.32 18.60 49.74 23.66 71.36 8.47 4.01 12.59 27.44 8.03 48.64 49.03 24.40 77.01 spatula 2.07 0.99 4.23 47.97 33.39 50.07 2.68 2.02 2.98 5.07 2.23 4.22 0.10 0.10 0.10 wine 0.18 0.18 0.27 0.18 0.18 1.23 0.18 0.18 0.19 16.66 0.94 19.87 17.87 0.48 26.21 MEAN 6.78 2.12 9.02 37.24 16.97 48.72 7.77 2.22 11.42 22.93 4.31 25.72 52.79 25.26 64.38
+> FPS (Hz) 10.92 79.37 1.56 108.70 50.19 (128.04)
+
+data (captured at 30 FPS) are unavailable, we compare our method against event-based baselines under high-frame-rate inference. For fair comparison with conventional RGB-D methods, we evaluate our approach at 30 FPS. 
+
+Evaluation Metrics. We report standard object pose met-rics including the area under the curve (AUC) of ADD and ADD-S [50, 141], as well as the Average Recall (AR) [91] of Visible Surface Discrepancy (VSD), Max-imum Symmetry-Aware Surface Distance (MSSD), and Maximum Symmetry-Aware Projection Distance (MSPD). Following previous studies [91, 137], we use a threshold of 0.1 times the object diameter for ADD and ADD-S, and varying thresholds for AR metrics. We measure in-ference time on an NVIDIA RTX A6000 GPU, enforcing CPU–GPU synchronization following prior work [37]. 
+
+Event-based Baselines. To the best of our knowledge, there are no existing learning–based event-driven methods for novel 6D object pose tracking. We therefore compare two categories of baselines: (1) frame-based methods us-ing event-to-image conversion and (2) event-based methods that operate directly on events. For the first category, we adapt state-of-the-art (SOTA) RGB-D-based 6D pose track-ing methods, MegaPose (MG) [64] and FoundationPose (FP) [137], using E2VID [102] to convert event streams into images compatible with their pipelines. For the second cat-egory, we use event-based baselines that operate directly on event and depth. ETAP [45] tracks query points sampled from the CAD surface and estimates the 6D pose by fitting a rigid transformation [7, 69]. In addition, we fine-tune FP on the EventBlender6D dataset to support event inputs. All event-based baselines support both event-only and event-depth input. Details are in the supplementary material. 
+
+RGB-based Baselines. We also compare against the RGB-D SOTA pose-tracking methods MegaPose and Foundation-Pose, under 30 FPS settings only. 
+
+5.1. Comparison on Event6D dataset 
+
+Evaluation under the 120 FPS setting. In Table 2, we evaluate baselines for event-based methods at 120 FPS. Since depth is captured at 30 FPS (every fourth frame), baselines use depth and events when available, and events only at intermediate frames. E2VID [102] + MG [64] and E2VID + FP [137] strug-gle with temporally sparse depth, leading to unstable pose tracking under rapid motion, as shown in Fig. 4. ETAP [45]-based point tracking with ICP [7] and PnP [69] also de-grades under dynamic motion and occlusion, which limits overall performance. For fine-tuned FP using event inputs, the modality mismatch between CAD renderings and event streams, together with intermittent depth measurements, re-sults in suboptimal performance. Our method reconstructs intensity and depth at arbitrary timestamps, producing CAD-aligned observations that en-able 6D pose tracking and robust performance across ob-jects. The model runs at 50 FPS without optimization and exceeds 120 FPS with TensorRT. 
+
+Evaluation under the 30 FPS setting. In this section, we compare our method against RGB-D pose tracking base-lines FP [137], and MG [64] at 30 FPS (Table 3), where RGB-D data are available. The event-based methods per-form pose tracking at 120 FPS with the same configuration as in Table 2, but the pose estimates are evaluated at 30 FPS. Consistent with 120 FPS results (Table 2), EventTrack6D outperforms other event-depth baselines. Moreover, our method surpasses strong RGB-D baselines, MG [64] and FP [137]. Both strong RGB-D baselines often fail when Table 3. Comparison of event-based 6D pose tracking methods on Event6D dataset at 30 FPS. All methods are evaluated at RGB/depth frame intervals for fair comparison with RGB-based methods. † denotes models trained on event inputs.                                                                                                                                                                                                                                                                                                              
+
+> Approach MG [64] FP [137] E2VID [103] + MG [64] E2VID [103] + FP [137] FP †[137] EventTrack6D (Ours)
+> Modality RGB + Depth RGB + Depth Event + Depth Event + Depth Event + Depth Event + Depth Metric ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR banana 24.87 11.78 22.56 20.52 10.23 17.61 0.00 0.00 0.26 16.32 5.64 14.91 24.96 2.11 15.39 35.68 13.58 33.21 bowl 1.13 0.47 2.08 36.14 0.97 21.18 0.78 0.00 11.04 48.43 1.07 73.95 3.80 0.38 10.31 63.19 1.41 88.18 cracker 5.45 2.66 5.68 32.05 24.65 40.10 0.00 0.00 0.15 69.29 52.49 79.59 53.20 34.33 64.55 76.40 65.88 90.06 drill 27.75 9.78 25.88 14.33 9.89 13.58 0.53 0.23 0.90 8.00 4.42 7.60 39.91 4.80 20.97 64.24 42.68 64.90 hammer 11.56 5.38 13.24 3.19 1.99 2.60 18.10 2.66 27.13 43.11 28.81 46.17 27.85 3.56 13.52 57.96 44.20 59.81 marker 7.55 1.24 5.23 6.31 2.86 6.84 2.57 0.68 6.51 51.38 19.04 50.19 14.05 1.37 8.41 49.94 23.68 49.28 mouse 0.00 0.00 0.72 1.04 0.52 0.92 0.81 0.00 6.13 26.25 3.85 57.37 10.82 1.23 10.58 34.30 4.06 70.95 mug 3.57 1.58 3.82 1.11 0.58 1.12 0.00 0.00 0.19 4.28 1.70 6.53 4.57 0.29 2.94 43.35 9.58 39.08 mustard 0.94 0.51 2.00 5.74 4.38 6.72 0.00 0.00 0.22 63.62 38.70 72.22 27.89 5.71 20.56 85.10 68.15 91.81 pitcher 20.39 12.38 20.69 55.66 40.23 59.25 0.93 0.00 8.28 69.00 37.25 69.72 63.28 23.83 51.28 77.81 54.42 85.17 scrub 4.60 2.30 5.32 5.76 4.40 5.22 2.25 0.49 2.24 76.20 53.88 82.02 67.73 31.41 53.54 89.65 77.70 94.10 spam 2.86 1.74 5.48 14.85 11.04 17.50 0.00 0.00 9.08 46.05 22.21 68.32 37.48 13.23 55.20 60.11 36.37 81.15 spatula 1.10 0.45 0.66 14.74 10.13 13.37 1.15 0.39 2.99 0.10 0.10 0.18 6.24 3.50 4.48 0.38 0.38 0.38 wine 1.07 0.00 0.80 0.73 0.73 0.73 0.73 0.73 0.47 0.36 0.18 2.43 14.68 1.51 19.12 1.65 0.73 1.80 MEAN 11.08 5.59 10.49 16.63 7.98 19.25 2.05 0.19 5.24 35.45 16.03 44.92 26.21 5.87 27.53 56.08 29.40 63.71
+
+Figure 4. Qualitative comparison of 6D object tracking at 120 FPS on the Event6D dataset. Original FoundationPose(FP) [137] assumes RGB-D input and thus cannot be applied to a high frame rate setting. Note that for τ = 0 .25 , 0.5, 0.75 , ours utilizes its reconstructed depth rather than sensor-captured depth. 
+
+faced with large inter-frame motion or severe motion blur, leading to unstable pose tracking. 
+
+Qualitative Results. Figure 4 shows 120 FPS pose-tracking results. The RGB-D baseline fails under large motions because it is unable to access depth frames for pose tracking due to limited frame rates. The hybrid E2VID [102]+FP [137] approach enables more frequent up-dates via image reconstruction but still degrades when depth is unavailable. In contrast, EventTrack6D reconstructs ob-servations at arbitrary timestamps, enabling robust tracking across diverse motion conditions. 
+
+5.2. Comparison on EventHO3D Dataset 
+
+We further evaluate the baselines on a different domain, the EventHO3D dataset, which differs from Event6D in both motion distributions and sensor settings, providing an addi-tional test of domain generalization. As shown in Table 4, EventTrack6D generalizes across datasets, even when trained solely on the synthetic Event-Blender6D dataset. For comparison, we also report results for other event-based baselines, evaluated under a 30-FPS protocol following Table 3. Because EventHO3D exhibits more moderate motion than Event6D, tracking failures are less frequent even when depth is missing at intermediate timesteps. Nevertheless, by jointly reconstructing intensity and depth, EventTrack6D outperforms all baselines. 
+
+5.3. Ablation Study and Analysis 
+
+Dual-modal Reconstruction. We conduct an ablation study on the 120 FPS Event6D dataset, as summarized in Table 5. In the baseline configuration, both depth and im-age reconstruction are removed: depth is used only when available at 30 FPS, and the refinement module is trained on EventBlenderProc to handle event inputs directly with-𝐷 0(Input)  𝐷 0.25  𝐷 0.5 𝐷 0.75  𝐷 1(reference)  𝑅𝐺𝐵 1(reference )𝑅𝐺𝐵 0(reference) Figure 5. Qualitative depth-reconstruction results on depth-absent intervals. The future depth D1 is provided solely for reference and is not used by the method. Despite dynamic motion, our approach reconstructs depth images that preserve coherent object structure and align with the object motion, providing geometric guidance for downstream pose tracking. Table 4. Comparison on the EventHO3D dataset. † denotes that the model is trained for event inputs.                                                                                                                                        
+
+> Method E2VID [103] + FP [137] FP †[137] EventTrack6D (Ours)
+> Modality Event + Depth Event + Depth Event + Depth Metric ADD-S ADD AR ADD-S ADD AR ADD-S ADD AR AP10 52.60 34.86 46.75 10.41 0.63 4.76 88.66 77.06 90.08 AP11 82.55 57.65 83.16 49.62 13.89 38.62 42.51 29.09 40.52 AP12 70.74 26.00 50.48 64.96 24.05 55.36 85.29 64.90 82.54 AP13 80.93 51.59 77.83 59.57 17.37 41.34 78.17 42.13 66.02 AP14 53.52 42.28 51.67 12.06 6.44 10.75 85.09 67.78 83.06 SM1 41.95 33.78 45.31 0.64 0.64 0.64 85.75 74.99 85.79 SB11 45.08 36.44 47.24 43.21 5.93 23.50 88.17 75.54 90.82 SB13 44.08 37.54 46.37 38.30 7.62 36.82 92.00 83.96 95.42 MPM10 65.58 55.11 70.13 36.48 9.92 23.80 40.31 33.21 43.03 MPM11 53.76 29.30 45.18 2.05 0.64 1.11 43.03 36.60 46.90 MPM12 32.73 25.99 32.98 58.35 12.83 43.96 43.94 38.27 46.78 MPM13 91.30 84.18 95.18 64.50 34.79 57.07 48.42 39.77 49.59 MPM14 35.33 29.31 34.63 36.14 2.27 11.25 43.08 34.79 45.46 MEAN 57.10 41.13 56.77 35.31 8.83 27.64 64.75 50.95 66.27
+
+Table 5. Ablation study of the dual-modal reconstruction. 
+
+Depth Recon. Image Recon. ADD-S ↑ ADD ↑ AR ↑
+
+18.45 3.29 20.07 
+
+✓ 28.67 4.75 29.08 
+
+✓ 30.53 13.79 44.99 
+
+✓ ✓ 52.79 25.26 64.38 
+
+out image reconstruction. This setup suffers from limited geometric information between sparse depth frames and a modality mismatch between CAD renderings and event ob-servations, ultimately leading to degraded performance. When only depth reconstruction is added, tracking at ar-bitrary timestamps becomes feasible by injecting geometric cues, yet training remains challenging due to the persistent mismatch between event inputs and CAD renderings. When only image reconstruction is considered, photometric align-ment improves, but the lack of continuous geometric infor-mation limits robustness under dynamic motion. In contrast, our dual-modal reconstruction produces ob-servations that align well with CAD renderings at arbi-trary timestamps, providing both geometric and photomet-
+
+Table 6. Ablation study of depth-reconstruction components. 
+
+Motion Vector Image Feature ADD-S ↑ ADD ↑ AR ↑
+
+36.03 17.52 43.60 
+
+✓ 42.26 19.32 48.99 
+
+✓ 41.88 17.61 50.54 
+
+✓ ✓ 52.79 25.26 64.38 
+
+ric cues, thereby achieving consistently superior perfor-mance across diverse motion conditions. 
+
+Depth Reconstruction. Table 6 summarizes ablations on the depth reconstruction module. Incorporating image fea-tures provides dense visual context that complements sparse event features, improving reconstruction by adding fore-ground and texture information. Motion vectors capture object-centric dynamics and enable accurate estimation of geometric changes under diverse motion patterns. Fusing image features with motion vectors improves depth predic-tions that more accurately represent real-world geometry. Figure 5 shows reconstruction results at intervals be-tween depth observations( τ = 0 , τ = 1 ). The module pro-duces depth maps that are consistent with available obser-vations and pixel-aligned with RGB images. Such realistic depth is input to the pose refinement stage and significantly enhances event-based 6D pose tracking. 
+
+# 6. Conclusion 
+
+In this paper, we explore the problem of event-based 6D ob-ject pose tracking. Due to the lack of large-scale datasets for training and evaluation, we introduce three datasets: EventBlender6D, EventHO3D, and Event6D. Moreover, we propose the EventTrack6D framework for novel 6D object pose tracking. Our efficient event-aware design processes 6D pose tracking at 128 FPS. Our experiments demonstrate strong generalization capability in 6D object pose track-ing tasks, effectively handling the unique characteristics of event cameras. We believe this work will foster further re-search on event-based perception and high-speed 6D pose tracking. Event6D: Event-based Novel Object 6D Pose Tracking 
+
+# Supplementary Material 
+
+In this supplemental document, we provide additional details about our datasets and the EventTrack6D method. Specifically, we provide • Details of the introduced EventBlender6D, EventHO3D, and Event6D datasets in Sections 7, 8, and 9. • Details of the object assets and evaluation protocol in Sec-tion 10. • Implementation details of the proposed method and other methods in Section 11. • Experiments on additional datasets and methods, along with further analyses, qualitative results, and video demonstrations, in Section 12. 
+
+# 7. EventBlender6D Dataset 
+
+EventBlender6D is a synthetic benchmark for 6D object pose estimation in dynamic scenarios, constructed at three difficulty levels (easy, medium, hard) according to the num-ber of objects present in each scene. The easy setting con-tains single-object scenes with 1,033 sequences, whereas the medium setting includes 2–4 objects per scene and 2,066 sequences featuring collisions and mutual occlusions. The hard setting further increases the complexity to 5–10 objects per scene with 1,033 sequences. Each sequence comprises 120 frames recorded at 60 fps, resulting in 2-second clips that capture the full evolution of the scene, from initial object placement to free fall under gravity and eventual rest. The dataset uses Google Scanned Objects (GSO) [24] with a balanced sampling strategy that ensures uniform rep-resentation across all models. Each object is assigned ran-domized material properties, including surface roughness and specular reflectance values between 0 and 1.0. Objects are initialized at random positions and orientations within the workspace, with collision checking to ensure valid start-ing configurations. The physics simulation uses realistic pa-rameters with mass, friction coefficient, and damping values for stable dynamics. Object motion is governed by realistic gravitational physics, where objects fall naturally, undergo collisions in multi-object scenes, and settle on the floor follow-ing physically-based dynamics. Camera motion follows a hemispherical orbital trajectory with azimuthal rotation completing 2.0 to 3.5 full revolutions per sequence, while elevation angles are constrained between 5° and 85°. The orbital radius is adaptively determined based on object bounding boxes, with scaling factors of 1.2–1.5 for easy mode and 1.5–2.0 for medium mode. Throughout the se-quence, the camera continuously tracks a dynamically up-dated point of interest positioned at the median location of all objects, ensuring that the workspace remains centered in the field of view as objects descend under gravity. To generate event data, we follow the protocol of video2events [36]. We first upsample the video frame rate using the method [104] described in their pipeline, and then synthesize events using ESIM [101]. Following prior work [45, 62], we additionally adapt the generated events by applying random contrast sensitivities sampled from 
+
+U(0 .16 , 0.34) .Dataset samples are provided in Fig. 10, and since the EventBlender6D data are rendered, the ground-truth 6D ob-ject poses are highly accurate. 
+
+# 8. EventHO3D Dataset 
+
+For the HO3D dataset [46], which consists of real-world markerless RGB-D hand–object interactions with 3D hand poses and 6D object poses obtained via sequence-level joint optimization, we generate event data using the same pipeline as EventBlender6D. Through this process, we con-struct the EventHO3D dataset. Note that EventHO3D is used only to assess the model’s generalization capability under diverse conditions, and none of its data are used for training. Examples from the EventHO3D dataset are illus-trated in Fig. 11. 
+
+# 9. Event6D Dataset 
+
+To acquire the Event6D dataset, we used three primary sensing systems: an RGB-D camera, an event camera, and an OptiTrack motion-capture system for providing ground-truth poses. To reliably collect data from these hetero-geneous sensors, two key procedures are required: cross-system calibration to align their coordinate frames, and time synchronization to ensure that all systems share a consistent temporal reference. 
+
+9.1. Calibration 
+
+9.1.1. Camera Parameter Calibration 
+
+Event cameras are inherently sparse and asynchronous, which makes their standalone calibration already challeng-ing. Calibrating them jointly with conventional cameras is even more difficult. To address this, following prior works, we convert event streams into dense, temporally aligned images using a pretrained event-to-image reconstruction model. As shown in Fig. 6, we reconstruct intensity im-ages from the raw events using E2VID [102], and perform calibration on these reconstructed frames. For the calibra-tion toolbox, we adopt Kalibr [30], which is robust to noisy RGB  E2VID Figure 6. Examples of the data used for camera calibration. 
+
+measurements and allows us to obtain both the intrinsic and extrinsic parameters of each camera. Through this process, we obtain depth that is aligned with the event camera. 
+
+9.1.2. Hand-Eye Calibration 
+
+Our objective is to estimate the 6D pose of each object in the camera coordinate frame. However, the OptiTrack motion-capture system provides measurements in its own world co-ordinate frame, which makes cross-system alignment essen-tial. To bridge this gap, we estimate the transformation from the OptiTrack world frame to the camera coordinate frame by directly aligning the 2D observations in the camera im-ages with the corresponding 3D points measured by the Op-tiTrack system. Specifically, we formulate the problem as a direct 2D–3D registration and solve it through a robust non-linear optimization procedure. This allows us to accurately map the OptiTrack world frame onto the camera coordinate frame and ensures that all subsequent 6D pose annotations are expressed consistently in the camera’s reference system. 
+
+Coordinate Frames. As shown in Fig. 7, we denote the OptiTrack (motion-capture) world coordinate frame by O
+
+and the camera’s optical frame by C. At each timestamp 
+
+tm, the OptiTrack system provides the 3D positions of the checkerboard corners POn (tm), where n indexes individual RGB      
+
+> Custom
+> Calibration Pattern
+> Optitrack
+> Z
+> X
+> Y
+> Z
+> X
+> Y
+> World
+> Camera
+> 𝑇 𝐶𝑂
+> Figure 7. Illustration of Hand-eye calibration. We denote the OptiTrack (motion-capture) world coordinate frame as Oand the camera’s optical frame as C. The transformation from the OptiTrack frame to the camera frame is represented by TCO .
+
+checkerboard corners. The camera simultaneously observes the same corners in the image plane, yielding the corre-sponding 2D measurements xmn .
+
+2D-3D Optimization. Our goal is to estimate the trans-formation from the OptiTrack world frame to the camera frame, 
+
+TCO =
+
+RCO tCO 
+
+0⊤ 1
+
+
+
+, (12) where RCO and tCO denote rotation and translation, re-spectively. Given camera intrinsics K, the predicted image projection of a 3D point is 
+
+ˆxmn = π  K T CO POn (tm) , (13) where π(·) denotes the perspective projection function. We estimate TCO by minimizing the total reprojection error: 
+
+min  
+
+> RCO ,tCO
+
+X
+
+> m,n
+
+∥xmn − ˆxmn (RCO , tCO )∥2 . (14) This non-linear least-squares problem is solved via Levenberg-Marquardt algorithm. 
+
+RANSAC-based Outlier Rejection. To handle noisy 2D detections from the camera coordinate, we adopt a RANSAC scheme before the final refinement. At each iter-ation, a minimal subset of 2D-3D correspondences is sam-pled to compute a candidate pose ˆTCO . The remaining cor-respondences are tested for inlier support: 
+
+xmn − ˆxmn ( ˆTCO ) < τ, (15) where τ is a reprojection error threshold. The hypothesis with the largest inlier set is retained, and the final pose esti-mate is obtained by solving (14) using only the inliers. 
+
+Ground-truth 6D Object Pose. The resulting optimized transformation TCO directly represents the camera pose with respect to the OptiTrack world coordinate frame. Since the object poses provided by OptiTrack are expressed in the OptiTrack world frame, we first transform them into the camera coordinate frame using TCO . However, the re-sulting object pose centers are not perfectly aligned with the true centers of the corresponding CAD models. To ad-dress this, we obtain an initial 6D object pose by combining FoundationPose [137] with masks generated by the Seg-ment Anything Model [61], and then manually refine this pose. We subsequently convert only this refined pose into the OptiTrack coordinate frame and use it as the ground-truth annotation. 
+
+9.2. Trigger System 
+
+To ensure that all data is captured in the same precise time domain, we employed a hardware trigger system to syn-chronize the acquisition times. The RGB-D camera used in our setup, the RealSense D435i, can internally generate Time   
+
+> Trigger Signal Trigger Signal RGB -D
+> Event
+> Exposure
+> time
+> OptiTrack
+> 30 FPS
+> 120 FPS Figure 8. Visualization of trigger signals for overall system.
+
+external trigger signals at 30 FPS. These signals are then re-ceived and processed by both the event camera and the Op-tiTrack system. As illustrated in Fig. 8, the RGB-D camera captures data at 30 FPS and simultaneously outputs a trig-ger signal. Based on this trigger, the event camera can seg-ment its event stream into slices, and the OptiTrack system can align its ground-truth acquisition with the same timing. Furthermore, OptiTrack can subdivide each external trig-ger interval into smaller segments using its internal multi-plier, enabling ground-truth capture at 120 FPS, which is four times faster than the RGB-D camera rate. 
+
+9.3. Dataset Details 
+
+We acquired the Event6D dataset such that each object ex-hibits dynamic, challenging, yet realistic motions. To this end, we designed the motions by imagining typical real-world usage of each object and mimicking the kinds of movements that would naturally occur. In our experiments, we only use the Event6D dataset as a test set and do not use the training split at all. However, Event6D differs from ex-isting datasets in two major aspects: (i) it includes challeng-ing and highly dynamic object motions, and (ii) it provides highly accurate ground-truth poses together with event and depth data. These aspects underscore the strengths of our Event6D dataset. Consequently, we also collected a train-ing split to facilitate future research. Detailed descriptions of the training and test sequences of the proposed Event6D dataset are provided in Table 9 and Table 10, respectively, and representative dataset samples are illustrated in Fig. 12. 
+
+# 10. Object Assets and Novel Object Evaluation 
+
+Object Assets. For object assets, EventBlender6D consists of Google Scan Objects (GSO) [24], which provides 1033 high-quality 3D scanned models with realistic textures. The Event6D dataset consists of a subset of HOGrasp [17] and Yale-CMU-Berkeley (YCB) dataset [8], while HO3D con-sists of a subset of the YCB [8] dataset, as shown in Fig. 9. For novel object pose estimation evaluation, we ensure that 
+
+> Figure 9. The object assets used in the Event6D dataset. The object as-sets do not overlap between EventBlender6D (used for training), ensuring proper novel-object testing.
+
+the training and test sets are strictly disjoint. Specifically, the objects used in EventBlender6D (training) do not over-lap with those in Event6D and EventHO3D (test), enabling rigorous evaluation of generalization to unseen objects. In total, our dataset comprises 1047 unique object instances across diverse categories, including household items, tools, and objects relevant to manipulation. 
+
+Object Instance Split for Train and Test. To evaluate novel object pose estimation capabilities, we maintain strict separation between training and evaluation objects. The 1033 GSO objects in EventBlender6D serve as the train-ing set, while Event6D and EventHO3D provide test sce-narios with completely unseen objects from HOGrasp and YCB datasets. This split ensures that models cannot rely on object-specific priors learned during training and must gen-eralize to novel geometric and appearance characteristics. 
+
+CAD Model Acquisition. CAD models for GSO objects are directly obtained from the official repository with their provided high-quality meshes. For YCB objects, we use the standardized CAD models from the official YCB Object and Model Set. HOGrasp object meshes are either obtained from the original dataset or reconstructed using structure-from-motion techniques when high-quality CAD models are unavailable. All meshes are preprocessed to ensure con-sistent coordinate frames, metric scale, and watertight ge-ometry for physics simulation and rendering. Fig. 9 shows representative object assets from the Event6D dataset, il-lustrating the diversity of geometric complexity and visual appearance in our evaluation benchmark. 
+
+# 11. Implementation Details 
+
+11.1. EventTrack6D 
+
+For the event representation used in dual-modal reconstruc-tion, we adopt a voxel grid [38, 102, 148] with a bin size of 5 for both the image and depth modalities. For training, we use two NVIDIA RTX A6000 GPUs and adopt a modular training strategy to improve stability. To effectively lever-age prior knowledge learned from existing datasets, we ini-tialize the image reconstruction module from a pretrained checkpoint [102] and similarly initialize the refiner using a pretrained model [137]. Specifically, we first train the dual-modal reconstruction as separate modules, with the image reconstruction module frozen, and then fine-tune the en-tire pipeline in an end-to-end manner, except for the LSTM parameters in the image reconstruction module, which are not further trained since they are not designed for sequen-tial data. We train our model using only the easy difficulty level of the EventBlender6D dataset, which already provide sufficient complexity and diversity for robust generalization across various scenarios. 
+
+11.2. Event-based Baselines 
+
+11.2.1. Implementation Details of Each Model E2VID + MegaPose (MG). MegaPose (MG) [64] performs pose tracking on RGB or RGB-D images. We bridge the gap between event streams and image-based tracking by converting events to intensity images using E2VID [102]. We use the pretrained MegaPose checkpoint, which has been trained on a diverse collection of datasets. 
+
+E2VID + FoundationPose (FP). FoundationPose (FP) [137] is a state-of-the-art RGB-D pose tracking method. Following the original implementation, we set the number of iterations in the FP pose refiner to 2. To enable event-based tracking, we employ E2VID [102] to reconstruct intensity images from event streams. These reconstructed images are fed into FP’s RGB-D tracking pipeline, serving as our baseline configuration. We utilize the FP checkpoint that has been pretrained on a large and diverse collection of datasets. 
+
+ETAP. We consider a hybrid formulation that combines the pre-trained event-based point tracking [45] with a rigid transformation–based update. Given the pose estimate from the previous timestamp, Tt−∆t, we assume that the CAD model of the object is placed at the estimated pose, and then 
+
+n points are uniformly sampled from its 3D surface. These 3D points, Xt−∆t = {Xi = ( xi, y i, z i)}ni=1 are then pro-jected onto the current event frame, resulting 2D pixel co-ordinates xt−∆t = {xi = KXi}ni=1 , where K represents a projection matrix of the event camera. We track the pro-jected points using the event-based point tracker ETAP [45], and denote the tracked 2D points as ˜xt. Depending on the availability of depth measurements, the final pose is com-puted using either a P nP [70] formulation or an ICP refine-ment [7]. At time steps where depth measurements are available, the 3D coordinate of a tracked 2D point can be recov-ered from the depth map. Its depth is obtained by sam-pling the depth map Dt at the tracked pixel location: dit =
+
+Dt(uit, v it). The 3D coordinate is then computed by back-projection: 
+
+Xit = ditK−1 ˜xit, (16) where ˜xit = [ uit, v it, 1] ⊤ is the tracked 2D point in homoge-neous coordinates and K denotes the camera intrinsic ma-trix. We align the previous 3D point cloud with the current observation using an ICP-based registration step. 
+
+∆Tt−∆t,t = ICP( Xt−∆t, Xt) (17) 
+
+Tt = ∆ Tt−∆t,t Tt−∆t (18) During time steps where no depth measurement is avail-able, typically the interval between two consecutive depth inputs, we apply a P nP-based 2D–3D matching between the current 2D points and previously observed 3D points. 
+
+Tt = P nP( Xt−∆t, ˜xt) (19) 
+
+Event-based FoundationPose. Since there are no existing learning-based event-driven methods that generalize well to novel objects, we train an adapted version of Foundation-Pose (FP) [137] that takes event data as input to serve as a strong event-based baseline. We build the training pipeline on top of the publicly available official implementation of FP, modifying the input interface to accept event voxel grids instead of RGB images. The network is initialized from the pretrained FP checkpoint, and training is carried out on the EventBlender6D dataset, using the same setup as for our method. 
+
+11.2.2. Experimental Details at 120 FPS 
+
+Unlike RGB-based models, the event-based baselines can perform inference at a higher temporal resolution, operat-ing at 120 FPS as in our main experiments, rather than being limited to the 30 FPS of the depth stream. For MegaPose, FoundationPose, and our event-based adaptation of FP, we observe that they can still run without depth by masking the depth input with zeros. Based on this, we feed recon-structed images from E2VID in intervals where depth is not available and provide the depth input at timestamps where depth measurements are present. For the ETAP baseline, we use ICP-based tracking when depth is available, and fall back to a P nP-based pose update when only reconstructed image information is present. 
+
+# 12. Additional Experiments 
+
+12.1. Experiments on Other Datasets 
+
+In addition to EventHO3D and Event6D, we further evalu-ate the trained model on the YCB-Ev dataset [105], com-paring our proposed EventTrack6D with the RGB+Depth-based FoundationPose (FP). Since the ground-truth (GT) Table 7. Experiments on the YCB-Ev dataset.        
+
+> Methods FP [137] EventTrack6D (Ours)
+> Modality RGB+Depth Event+Depth AR ↑5.82 17.87
+
+annotations in YCB-Ev are generated using an RGB-D–based method, they can exhibit temporal inconsisten-cies within some sequences. To mitigate this issue, we ex-clude such sequences from our evaluation. As shown in Ta-ble 7, our method achieves higher quantitative scores than FP. However, we believe that these gains may not solely be attributed to the merits of our approach, but are also influ-enced by the fact that YCB-Ev does not employ hardware-level triggering, which can lead to misalignment between the different sensor streams. For this reason, we do not include the YCB-Ev results in the main paper and instead report them here for completeness. We also considered conducting additional experiments on E-POSE [48] and RGB-DE [27], but were unable to do so because full public access to the necessary data is cur-rently not available. In contrast, our Event6D dataset pro-vides accurate ground-truth annotations using a motion cap-ture system and ensures precise time synchronization across different modalities at the hardware level. This design high-lights the reliability of Event6D as a benchmark, and we plan to maintain and release it as a well-curated public re-source for the community. 
+
+12.2. Initialization Sensitivity 
+
+Our method is designed to recover from rotation errors up to 20° and translation errors up to half the object diame-ter. Table 8 evaluates robustness to first-frame pose errors by applying ∆ rotation and translation perturbations. Our method remains reliable within approximately 10 ◦ and 10 cm.                                     
+
+> Table 8. Performance changes resulting from adding errors to the first-frame pose. ∆0 ◦and ∆0 cm indicate that no error was added.
+> ∆0 ◦&∆0 cm ∆3 ◦&∆3 cm ∆5 ◦&∆5 cm ∆10 ◦&∆10 cm ∆15 ◦&∆15 cm ADD-S ADD ADD-S ADD ADD-S ADD ADD-S ADD ADD-S ADD 52.79 25.26 50.74 23.75 51.30 23.69 50.08 23.38 5.19 1.81
+
+12.3. Experiments with Other Existing Methods 
+
+We first clarify that our task focuses on Novel Object 6D Pose Tracking , where the model must track previ-ously unseen objects during inference. Methods that rely on instance-level training do not fall within this scope. For example, RGB-D-E [27] methods are typically trained on a specific object instance and therefore do not exhibit the level of object generalization required for our setting. LOPET [79] also presents challenges for our evaluation pro-tocol. The method assumes line-based geometric priors and requires the target object to consist predominantly of lin-ear structures. As illustrated in Fig. 9, many objects in our benchmark have curved or complex geometries, mak-ing it difficult to apply LOPET in a principled way. In ad-dition, LOPET requires an initial line specification, which cannot be reliably provided for curved objects. Although EDOPT [41] is not learning-based, it is capable of han-dling unseen objects and represents a valuable feature-based approach. However, our Event6D dataset contains objects moving at an average speed of 2,m/s, and, as noted in the official implementation, EDOPT is sensitive to rapid mo-tion. In our experiments, the tracker quickly diverged under this dynamic setting, and we were therefore unable to obtain stable results suitable for reporting. Given these considerations, we include the event-based FoundationPose [137] as a comparison method. Founda-tionPose has recently demonstrated strong generalization capabilities across novel objects and diverse scenarios. To ensure a fair and meaningful comparison within our event-based framework, we train an event-driven version of Foun-dationPose and use it as a competitive baseline in our eval-uation. 
+
+12.4. Qualitative Results 
+
+We provide additional qualitative results comparing the pro-posed EventTrack6D with several strong baselines: the state-of-the-art RGB-D tracker FoundationPose (FP) [137], an E2VID [102] + FP pipeline, and an event-adapted vari-ant of FP that operates on event and depth inputs. As can be seen in Figures 13 and 14, RGB-D-based FP quickly loses track of the object once the motion becomes large and highly dynamic. Moreover, using only E2VID for image reconstruction still provides insufficient geometric informa-tion, E2VID + FP often leading to additional tracking fail-ures. The event-adapted FP variant is able to roughly fol-low the object motion, but it struggles to estimate the cor-rect object scale and frequently produces inaccurate bound-aries. In contrast, the proposed EventTrack6D accurately recovers the object pose even under highly dynamic mo-tion, where RGB-D-based approaches face significant chal-lenges. These results highlight that our method offers robust 6D tracking for novel objects in event-driven settings, pro-viding a strong foundational baseline for future research on event-based object pose tracking. 
+
+12.5. Video Demo in Dynamic Motion 
+
+We additionally provide qualitative video results extracted from the test set to demonstrate that our method operates reliably over the time dimension. The accompanying demo includes highly dynamic and extreme motions in realistic scenes. Furthermore, we present additional videos recorded without the motion-capture system’s IR markers to show-case performance in even more realistic and challenging scenarios. As can be seen in these videos, the proposed method remains stable even under such extreme conditions, whereas RGB-D–based approaches often struggle to main-tain accurate tracking. 
+
+# 13. Acknowledgments 
+
+This work was supported by the National Research Foun-dation of Korea(NRF) grant funded by the Korea gov-ernment(MSIT) (RS-2026-25473963), the InnoCORE pro-gram of the Ministry of Science and ICT(26-InnoCORE-01), and the InnoCORE program of the Ministry of Science and ICT(N10250156). 
+
+# References 
+
+[1] Shrutarv Awasthi, Anas Gouda, Sven Franke, J´ erˆ ome Ruti-nowski, Frank Hoffmann, and Moritz Roidl. Mtevent: A multi-task event camera dataset for 6d pose estimation and moving object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,pages 5102–5110, 2025. 3 [2] Seunghyeok Back, Joosoon Lee, Kangmin Kim, Heeseon Rho, Geonhyup Lee, Raeyoung Kang, Sangbeom Lee, Sangjun Noh, Youngjin Lee, Taeyeop Lee, et al. Grasp-clutter6d: A large-scale real-world dataset for robust per-ception and grasping in cluttered scenes. IEEE Robotics and Automation Letters , 2025. 2 [3] Prithviraj Banerjee, Sindi Shkodrani, Pierre Moulon, Shreyas Hampali, Fan Zhang, Jade Fountain, Edward Miller, Selen Basol, Richard Newcombe, Robert Wang, et al. Introducing hot3d: An egocentric dataset for 3d hand and object tracking. arXiv preprint arXiv:2406.09598 ,2024. 1 [4] Prithviraj Banerjee, Sindi Shkodrani, Pierre Moulon, Shreyas Hampali, Shangchen Han, Fan Zhang, Linguang Zhang, Jade Fountain, Edward Miller, Selen Basol, et al. Hot3d: Hand and object tracking in 3d from egocentric multi-view videos. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 7061–7071, 2025. 5 [5] Patrick Bardow, Andrew J Davison, and Stefan Leuteneg-ger. Simultaneous optical flow and intensity estimation from an event camera. In Proceedings of the IEEE con-ference on computer vision and pattern recognition , pages 884–892, 2016. 2 [6] Selim Benhimane and Ezio Malis. Real-time image-based tracking of planes using efficient second-order min-imization. In 2004 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)(IEEE Cat. No. 04CH37566) , pages 943–948. IEEE, 2004. 2 [7] Paul J Besl and Neil D McKay. Method for registration of 3-d shapes. In Sensor fusion IV: control paradigms and data structures , pages 586–606. Spie, 1992. 2, 6, 4 [8] Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srini-vasa, Pieter Abbeel, and Aaron M Dollar. The ycb object and model set: Towards common benchmarks for manip-ulation research. In 2015 international conference on ad-vanced robotics (ICAR) , pages 510–517. IEEE, 2015. 1, 5, 3[9] Yu-Wei Chao, Wei Yang, Yu Xiang, Pavlo Molchanov, Ankur Handa, Jonathan Tremblay, Yashraj S Narang, Karl Van Wyk, Umar Iqbal, Stan Birchfield, et al. Dexycb: A benchmark for capturing hand grasping of objects. In Pro-ceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 9044–9053, 2021. 1, 5 [10] Jingxi Chen, Brandon Y Feng, Haoming Cai, Tianfu Wang, Levi Burner, Dehao Yuan, Cornelia Fermuller, Christo-pher A Metzler, and Yiannis Aloimonos. Repurposing pre-trained video diffusion models for event-based video inter-polation. In Proceedings of the Computer Vision and Pat-tern Recognition Conference , pages 12456–12466, 2025. 3 [11] Peiyu Chen, Weipeng Guan, and Peng Lu. Esvio: Event-based stereo visual inertial odometry. IEEE Robotics and Automation Letters , 8(6):3661–3668, 2023. 3 [12] Yang Chen and Lin Zhang. Gre-slam: 6-dof pure event-based slam with semi-dense depth recovery assisted bundle adjustment. In Proceedings of the 2025 International Con-ference on Multimedia Retrieval , pages 90–98, 2025. 3 [13] Hoonhee Cho, Jae-Young Kang, and Kuk-Jin Yoon. Tem-poral event stereo via joint learning with stereoscopic flow. In European Conference on Computer Vision , pages 294– 314. Springer, 2024. 3 [14] Hoonhee Cho, Taewoo Kim, Yuhwan Jeong, and Kuk-Jin Yoon. A benchmark dataset for event-guided human pose estimation and tracking in extreme conditions. Advances in Neural Information Processing Systems , 37:134826– 134840, 2024. 3 [15] Hoonhee Cho, Taewoo Kim, Yuhwan Jeong, and Kuk-Jin Yoon. Tta-evf: Test-time adaptation for event-based video frame interpolation via reliable pixel and sample estima-tion. In Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pages 25701–25711, 2024. 3 [16] Hoonhee Cho, Jae-young Kang, Youngho Kim, and Kuk-Jin Yoon. Ev-3dod: Pushing the temporal boundaries of 3d object detection with event cameras. In Proceedings of the Computer Vision and Pattern Recognition Conference ,pages 27197–27210, 2025. 3 [17] Woojin Cho, Jihyun Lee, Minjae Yi, Minje Kim, Taeyun Woo, Donghwan Kim, Taewook Ha, Hyokeun Lee, Je-Hwan Ryu, Woontack Woo, et al. Dense hand-object (ho) graspnet with full grasping taxonomy and dynamics. In 
+
+European Conference on Computer Vision , pages 284–303. Springer, 2024. 5, 3 [18] Andrew I Comport, Eric Marchand, Muriel Pressigout, and Francois Chaumette. Real-time markerless tracking for augmented reality: the virtual visual servoing framework. 
+
+IEEE Transactions on visualization and computer graph-ics , 12(4):615–628, 2006. 2 [19] Matthew Cook, Luca Gugelmann, Florian Jug, Christoph Krautz, and Angelika Steger. Interacting maps for fast vi-sual interpretation. In The 2011 International Joint Con-ference on Neural Networks , pages 770–776. IEEE, 2011. 2[20] Alberto Crivellaro and Vincent Lepetit. Robust 3d track-ing with descriptor fields. In Proceedings of the IEEE con-ference on computer vision and pattern recognition , pages 3414–3421, 2014. 2 [21] Xinke Deng, Arsalan Mousavian, Yu Xiang, Fei Xia, Tim-othy Bretl, and Dieter Fox. Poserbpf: A rao–blackwellized particle filter for 6-d object pose tracking. IEEE Transac-tions on Robotics , 37(5):1328–1342, 2021. 2 [22] Maximilian Denninger, Martin Sundermeyer, Dominik Winkelbauer, Dmitry Olefir, Tomas Hodan, Youssef Zidan, Mohamad Elbadrawy, Markus Knauer, Harinandan Katam, and Ahsan Lodhi. Blenderproc: Reducing the reality gap with photorealistic rendering. In 16th Robotics: Science and Systems, RSS 2020, Workshops , 2020. 5 [23] Maximilian Denninger, Dominik Winkelbauer, Martin Sundermeyer, Wout Boerdijk, Markus Wendelin Knauer, Klaus H Strobl, Matthias Humt, and Rudolph Triebel. Blenderproc2: A procedural pipeline for photorealistic ren-dering. Journal of Open Source Software , 8(82):4901, 2023. 2 [24] Laura Downs, Anthony Francis, Nate Koenig, Brandon Kinman, Ryan Hickman, Krista Reymann, Thomas B McHugh, and Vincent Vanhoucke. Google scanned objects: A high-quality dataset of 3d scanned household items. In 
+
+2022 International Conference on Robotics and Automa-tion (ICRA) , pages 2553–2560. Ieee, 2022. 5, 1, 3 [25] Tom Drummond and Roberto Cipolla. Real-time visual tracking of complex structures. IEEE Transactions on Pattern Analysis & Machine Intelligence , 24(07):932–946, 2002. 2 [26] Yuming Du, Yang Xiao, Michael Ramamonjisoa, Vincent Lepetit, et al. Pizza: A powerful image-only zero-shot zero-cad approach to 6 dof tracking. In 2022 International Con-ference on 3D Vision (3DV) , pages 515–525. IEEE, 2022. 2[27] Etienne Dubeau, Mathieu Garon, Benoit Debaque, Raoul de Charette, and Jean-Franc ¸ois Lalonde. Rgb-de: Event camera calibration for fast 6-dof object tracking. In 2020 IEEE International Symposium on Mixed and Augmented Reality (ISMAR) , pages 127–135. IEEE, 2020. 1, 2, 3, 5 [28] Gerald Ebmer, Adam Loch, Minh Nhat Vu, Roberto Mecca, Germain Haessig, Christian Hartl-Nesic, Markus Vincze, and Andreas Kugi. Real-time 6-dof pose estimation by an event-based camera using active led markers. In Proceed-ings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 8137–8146, 2024. 3 [29] Gereon Fox, Xingang Pan, Ayush Tewari, Mohamed El-gharib, and Christian Theobalt. Unsupervised event-based video reconstruction. In Proceedings of the IEEE/CVF Win-ter Conference on Applications of Computer Vision , pages 4179–4188, 2024. 3 [30] Paul Furgale, Joern Rehder, and Roland Siegwart. Unified temporal and spatial calibration for multi-sensor systems. In 2013 IEEE/RSJ International Conference on Intelligent Robots and Systems , pages 1280–1286. IEEE, 2013. 1 [31] Joshua S Furtado, Hugh HT Liu, Gilbert Lai, Herve Lacheray, and Jason Desouza-Coelho. Comparative anal-ysis of optitrack motion capture systems. In Advances in Motion Sensing and Control for Robotic Applications: Selected Papers from the Symposium on Mechatronics, Robotics, and Control (SMRC’18)-CSME International Congress 2018, May 27-30, 2018 Toronto, Canada , pages 15–31. Springer, 2019. 2 [32] Guillermo Gallego, Tobi Delbr¨ uck, Garrick Orchard, Chiara Bartolozzi, Brian Taba, Andrea Censi, Stefan Leutenegger, Andrew J Davison, J¨ org Conradt, Kostas Daniilidis, et al. Event-based vision: A survey. IEEE Trans-actions on Pattern Analysis and Machine Intelligence , 44 (1):154–180, 2020. 1 [33] Mathieu Garon and Jean-Franc ¸ois Lalonde. Deep 6-dof tracking. IEEE transactions on visualization and computer graphics , 23(11):2410–2418, 2017. 2 [34] Daniel Gehrig and Davide Scaramuzza. Low-latency au-tomotive vision with event cameras. Nature , 629(8014): 1034–1040, 2024. 3 [35] Daniel Gehrig, Henri Rebecq, Guillermo Gallego, and Davide Scaramuzza. Asynchronous, photometric feature tracking using events and frames. In Proceedings of the European Conference on Computer Vision (ECCV) , pages 750–765, 2018. 2 [36] Daniel Gehrig, Mathias Gehrig, Javier Hidalgo-Carri´ o, and Davide Scaramuzza. Video to events: Recycling video datasets for event cameras. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 3586–3595, 2020. 1 [37] Mathias Gehrig and Davide Scaramuzza. Recurrent vision transformers for object detection with event cameras. In 
+
+Proceedings of the IEEE/CVF conference on computer vi-sion and pattern recognition , pages 13884–13893, 2023. 6 [38] Mathias Gehrig, Willem Aarents, Daniel Gehrig, and Da-vide Scaramuzza. Dsec: A stereo event camera dataset for driving scenarios. IEEE Robotics and Automation Letters ,6(3):4947–4954, 2021. 3 [39] Mathias Gehrig, Mario Millh¨ ausler, Daniel Gehrig, and Da-vide Scaramuzza. E-raft: Dense optical flow from event cameras. In 2021 International Conference on 3D Vision (3DV) , pages 197–206. IEEE, 2021. 3 [40] Arren Glover, Luna Gava, Zhichao Li, and Chiara Bar-tolozzi. Edopt: Event-camera 6-dof dynamic object pose tracking. In 2024 IEEE International Conference on Robotics and Automation (ICRA) , pages 18200–18206. IEEE, 2024. 3 [41] Arren Glover, Luna Gava, Zhichao Li, and Chiara Bar-tolozzi. Edopt: Event-camera 6-dof dynamic object pose tracking. In 2024 IEEE International Conference on Robotics and Automation (ICRA) , pages 18200–18206. IEEE, 2024. 5 [42] Weipeng Guan, Fuling Lin, Peiyu Chen, and Peng Lu. Deio: Deep event inertial odometry. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,pages 4606–4615, 2025. 3 [43] Andrew Guo, Bowen Wen, Jianhe Yuan, Jonathan Trem-blay, Stephen Tyree, Jeffrey Smith, and Stan Birchfield. Handal: A dataset of real-world manipulable object cate-gories with pose annotations, affordances, and reconstruc-tions. In 2023 IEEE/RSJ International Conference on In-telligent Robots and Systems (IROS) , pages 11428–11435. IEEE, 2023. 1 [44] Hussein Haggag, Mohammed Hossny, Despina Filippidis, Douglas Creighton, Saeid Nahavandi, and Vinod Puri. Measuring depth accuracy in rgbd cameras. In 2013, 7th international conference on signal processing and commu-nication systems (ICSPCS) , pages 1–7. IEEE, 2013. 1 [45] Friedhelm Hamann, Daniel Gehrig, Filbert Febryanto, Kostas Daniilidis, and Guillermo Gallego. Etap: Event-based tracking of any point. In Proceedings of the Com-puter Vision and Pattern Recognition Conference , pages 27186–27196, 2025. 6, 1, 4 [46] Shreyas Hampali, Mahdi Rad, Markus Oberweger, and Vin-cent Lepetit. Honnotate: A method for 3d annotation of hand and object poses. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,pages 3196–3206, 2020. 2, 5, 1 [47] Chris Harris and Carl Stennett. Rapid-a video rate object tracker. In BMVC , page 3, 1990. 2 [48] Oussama Abdul Hay, Xiaoqian Huang, Abdulla Ayyad, Es-lam Sherif, Randa Almadhoun, Yusra Abdulrahman, Lak-mal Seneviratne, Abdulqader Abusafieh, and Yahya Zweiri. E-pose: A large scale event camera dataset for object pose estimation. Scientific data , 12(1):245, 2025. 1, 2, 3, 5 [49] Javier Hidalgo-Carri´ o, Daniel Gehrig, and Davide Scara-muzza. Learning monocular dense depth from events. In 
+
+2020 International Conference on 3D Vision (3DV) , pages 534–542. IEEE, 2020. 3 [50] Stefan Hinterstoisser, Vincent Lepetit, Slobodan Ilic, Stefan Holzer, Gary Bradski, Kurt Konolige, and Nassir Navab. Model based training, detection and pose estimation of texture-less 3d objects in heavily cluttered scenes. In Asian conference on computer vision , pages 548–562. Springer, 2012. 6 [51] Tomas Hodan, Martin Sundermeyer, Yann Labbe, Van Nguyen Nguyen, Gu Wang, Eric Brachmann, Bertram Drost, Vincent Lepetit, Carsten Rother, and Jiri Matas. Bop challenge 2023 on detection segmentation and pose estimation of seen and unseen rigid objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5610–5619, 2024. 1, 5 [52] Chenming Hu, Junjie Jiang, Yaohui Li, Mingyuan Sun, and Zheng Fang. Ede-distill: Boosting event-based monocular depth estimation performance via knowledge distillation. 
+
+IEEE Robotics and Automation Letters , 2025. 3 [53] Jan Issac, Manuel W¨ uthrich, Cristina Garcia Cifuentes, Jeannette Bohg, Sebastian Trimpe, and Stefan Schaal. Depth-based object tracking using a robust gaussian filter. In 2016 IEEE international conference on robotics and au-tomation (ICRA) , pages 608–615. IEEE, 2016. 2 [54] Yuhwan Jeong, Hoonhee Cho, and Kuk-Jin Yoon. To-wards robust event-based networks for nighttime via un-paired day-to-night event translation. In European Confer-ence on Computer Vision , pages 286–306. Springer, 2024. 3[55] Rico Jonschkowski, Austin Stone, Jonathan T Barron, Ariel Gordon, Kurt Konolige, and Anelia Angelova. What mat-ters in unsupervised optical flow. In European conference on computer vision , pages 557–572. Springer, 2020. 4 [56] Jae-Young Kang, Hoonhee Cho, and Kuk-Jin Yoon. Tem-poral stereo matching from event cameras via joint learning with stereoscopic flow. IEEE Transactions on Pattern Anal-ysis and Machine Intelligence , 2025. 3 [57] Jae-Young Kang, Hoonhee Cho, and Kuk-Jin Yoon. Un-leashing the temporal potential of stereo event cameras for continuous-time 3d object detection. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,pages 6869–6881, 2025. 3 [58] Leonid Keselman, John Iselin Woodfill, Anders Grunnet-Jepsen, and Achintya Bhowmik. Intel realsense stereo-scopic depth cameras. In Proceedings of the IEEE con-ference on computer vision and pattern recognition work-shops , pages 1–10, 2017. 1 [59] Hanme Kim, Ankur Handa, Ryad Benosman, Sio-Hoi Ieng, and Andrew J Davison. Simultaneous mosaicing and track-ing with an event camera. J. Solid State Circ , 43:566–576, 2008. 2 [60] Hanme Kim, Stefan Leutenegger, and Andrew J Davison. Real-time 3d reconstruction and 6-dof tracking with an event camera. In European conference on computer vision ,pages 349–364. Springer, 2016. 2, 3 [61] Alexander Kirillov, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao, Spencer Whitehead, Alexander C Berg, Wan-Yen Lo, et al. Segment anything. In Proceedings of the IEEE/CVF international conference on computer vision , pages 4015–4026, 2023. 2 [62] Simon Klenk, Marvin Motzet, Lukas Koestler, and Daniel Cremers. Deep event visual odometry. In 2024 Inter-national conference on 3D vision (3DV) , pages 739–749. IEEE, 2024. 1 [63] Yann Labb´ e, Justin Carpentier, Mathieu Aubry, and Josef Sivic. Cosypose: Consistent multi-view multi-object 6d pose estimation. In European conference on computer vi-sion , pages 574–591. Springer, 2020. 2, 4 [64] Yann Labb´ e, Lucas Manuelli, Arsalan Mousavian, Stephen Tyree, Stan Birchfield, Jonathan Tremblay, Justin Carpen-tier, Mathieu Aubry, Dieter Fox, and Josef Sivic. Mega-pose: 6d pose estimation of novel objects via render & com-pare. arXiv preprint arXiv:2212.06870 , 2022. 1, 2, 3, 4, 6, 7[65] Taeyeop Lee, Byeong-Uk Lee, Myungchul Kim, and In So Kweon. Category-level metric scale object shape and pose estimation. IEEE Robotics and Automation Letters , 6(4): 8575–8582, 2021. 1, 2 [66] Taeyeop Lee, Jonathan Tremblay, Valts Blukis, Bowen Wen, Byeong-Uk Lee, Inkyu Shin, Stan Birchfield, In So Kweon, and Kuk-Jin Yoon. Tta-cope: Test-time adaptation for category-level object pose estimation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 21285–21295, 2023. 2 [67] Taeyeop Lee, Gyuree Kang, Bowen Wen, Youngho Kim, Seunghyeok Back, In So Kweon, David Hyunchul Shim, and Kuk-Jin Yoon. Delta: Demonstration and language-guided novel transparent object manipulation. arXiv preprint arXiv:2510.05662 , 2025. 1 [68] Taeyeop Lee, Bowen Wen, Minjun Kang, Gyuree Kang, In So Kweon, and Kuk-Jin Yoon. Any6d: Model-free 6d pose estimation of novel objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 11633–11643, 2025. 2 [69] Vincent Lepetit, Francesc Moreno-Noguer, and Pascal Fua. Ep n p: An accurate o (n) solution to the p n p problem. 
+
+International Journal of Computer Vision , 81(2):155–166, 2009. 6 [70] Vincent Lepetit, Francesc Moreno-Noguer, and Pascal Fua. Epnp: An accurate o (n) solution to the p n p problem. Inter-national Journal of Computer Vision , 81(2):155–166, 2009. 4[71] Yi Li, Gu Wang, Xiangyang Ji, Yu Xiang, and Dieter Fox. Deepim: Deep iterative matching for 6d pose estimation. In Proceedings of the European conference on computer vi-sion (ECCV) , pages 683–698, 2018. 2, 4 [72] Zhichao Li, Arren Glover, Chiara Bartolozzi, and Lorenzo Natale. 6-dof object tracking with event-based optical flow and frames. In 2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 18880– 18887. IEEE, 2025. 3 [73] Jiehong Lin, Lihua Liu, Dekun Lu, and Kui Jia. Sam-6d: Segment anything model meets zero-shot 6d object pose es-timation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 27906– 27916, 2024. 1 [74] Yunzhi Lin, Jonathan Tremblay, Stephen Tyree, Patricio A Vela, and Stan Birchfield. Keypoint-based category-level object pose tracking from an rgb sequence with uncertainty estimation. In 2022 International Conference on Robotics and Automation (ICRA) , pages 1258–1264. IEEE, 2022. 2 [75] Daqi Liu, Alvaro Parra, and Tat-Jun Chin. Spatiotemporal registration for event-based visual odometry. In Proceed-ings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4937–4946, 2021. 3 [76] Xu Liu, Xiaopeng Fan, Jianing Li, Dianze Li, Wei Zhang, Zhengyu Ma, and Yonghong Tian. High-rate monocu-lar depth estimation via cross frame-rate collaboration of frames and events. International Journal of Computer Vi-sion , 133(10):7332–7351, 2025. 3 [77] Zhe Liu, Dianxi Shi, Ruihao Li, Yi Zhang, and Shaowu Yang. T-esvo: improved event-based stereo visual odome-try via adaptive time-surface and truncated signed distance function. Advanced Intelligent Systems , 5(9):2300027, 2023. 3 [78] Zibin Liu, Banglei Guan, Yang Shang, Shunkun Liang, Zhenbao Yu, and Qifeng Yu. Optical flow-guided 6dof ob-ject pose tracking with an event camera. In Proceedings of the 32nd ACM International Conference on Multimedia ,pages 6501–6509, 2024. 3 [79] Zibin Liu, Banglei Guan, Yang Shang, Qifeng Yu, and Lau-rent Kneip. Line-based 6-dof object pose estimation and tracking with an event camera. IEEE Transactions on Im-age Processing , 33:4765–4780, 2024. 5 [80] Zibin Liu, Banglei Guan, Yang Shang, Qifeng Yu, and Lau-rent Kneip. Line-based 6-dof object pose estimation and tracking with an event camera. IEEE Transactions on Im-age Processing , 33:4765–4780, 2024. 3 [81] Zibin Liu, Banglei Guan, Yang Shang, Yifei Bian, Pengju Sun, and Qifeng Yu. Stereo event-based, 6-dof pose track-ing for uncooperative spacecraft. IEEE Transactions on Geoscience and Remote Sensing , 63:1–13, 2025. 3 [82] Adam Loch, Germain Haessig, and Markus Vincze. Event-based high-speed low-latency fiducial marker tracking. In Fifteenth International Conference on Machine Vision (ICMV 2022) , pages 323–330. SPIE, 2023. 3 [83] Xiuyuan Lu, Yi Zhou, Junkai Niu, Sheng Zhong, and Shao-jie Shen. Event-based visual inertial velometer. arXiv preprint arXiv:2311.18189 , 2023. 3 [84] Bruce D Lucas and Takeo Kanade. An iterative image reg-istration technique with an application to stereo vision. In 
+
+IJCAI’81: 7th international joint conference on Artificial intelligence , pages 674–679, 1981. 2 [85] Xinglong Luo, Ao Luo, Zhengning Wang, Chunyu Lin, Bing Zeng, and Shuaicheng Liu. Efficient meshflow and optical flow estimation from event cameras. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19198–19207, 2024. 3 [86] Yongrui Ma, Shi Guo, Yutian Chen, Tianfan Xue, and Jin-wei Gu. Timelens-xl: Real-time event-based video frame interpolation with large motion. In European Conference on Computer Vision , pages 178–194. Springer, 2024. 3 [87] Mateusz Majcher and Bogdan Kwolek. 3d model-based 6d object pose tracking on rgb images using particle filtering and heuristic optimization. In Proceedings of the 15th In-ternational Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications , pages 690—-697, 2020. 2 [88] Sungphill Moon, Hyeontae Son, Dongcheol Hur, and Sang-wook Kim. Genflow: Generalizable recurrent flow for 6d pose refinement of novel objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10039–10049, 2024. 2 [89] Sungphill Moon, Hyeontae Son, Dongcheol Hur, and Sang-wook Kim. Co-op: Correspondence-based novel object pose estimation. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 11622–11632, 2025. 1, 2, 5 [90] Gottfried Munda, Christian Reinbacher, and Thomas Pock. Real-time intensity-image reconstruction for event cameras using manifold regularisation. International Journal of Computer Vision , 126(12):1381–1393, 2018. 2 [91] Nguyen Van Nguyen, Tyree Stephen, Guo Andrew, Fourmy Mederic, Gouda Anas, Lee Taeyeop, Moon Sungphill, Son Hyeontae, Ranftl Lukas, Tremblay Jonathan, et al. Bop challenge 2024 on model-based and model-free 6d object pose estimation. arXiv preprint arXiv:2504.02812 , 2025. 1, 6 [92] Van Nguyen Nguyen, Thibault Groueix, Mathieu Salz-mann, and Vincent Lepetit. Gigapose: Fast and robust novel object pose estimation via one correspondence. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9903–9913, 2024. 1, 2 [93] Van Nguyen Nguyen, Christian Forster, Sindi Shkodrani, Vincent Lepetit, Bugra Tekin, Cem Keskin, and Tomas Ho-dan. Gotrack: Generic 6dof object pose refinement and tracking. arXiv preprint arXiv:2506.07155 , 2025. 1, 2, 4 [94] Mustafa ¨Ozuysal, Vincent Lepetit, Franc ¸ois Fleuret, and Pascal Fua. Feature harvesting for tracking-by-detection. In 
+
+European conference on computer vision , pages 592–605. Springer, 2006. 2 [95] Federico Paredes-Vall´ es and Guido CHE De Croon. Back to event basics: Self-supervised learning of image recon-struction for event cameras via photometric constancy. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 3446–3455, 2021. 3 [96] Jaesik Park, Qian-Yi Zhou, and Vladlen Koltun. Colored point cloud registration revisited. In Proceedings of the IEEE International Conference on Computer Vision , pages 143–152, 2017. 2 [97] Sida Peng, Yuan Liu, Qixing Huang, Xiaowei Zhou, and Hujun Bao. Pvnet: Pixel-wise voting network for 6dof pose estimation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 4561–4570, 2019. 2 [98] Stefano Pini, Guido Borghi, and Roberto Vezzani. Learn to see by events: Color frame synthesis from event and rgb cameras. arXiv preprint arXiv:1812.02041 , 2018. 3 [99] Georgy Ponimatkin, Martin C´ ıfka, Tom´ aˇ s Souˇ cek, M´ ed´ eric Fourmy, Yann Labb´ e, Vladimir Petrik, and Josef Sivic. 6D Object Pose Tracking in Internet Videos for Robotic Ma-nipulation. In The Thirteenth International Conference on Learning Representations , 2025. 1 [100] Henri Rebecq, Timo Horstsch¨ afer, Guillermo Gallego, and Davide Scaramuzza. Evo: A geometric approach to event-based 6-dof parallel tracking and mapping in real time. IEEE Robotics and Automation Letters , 2(2):593– 600, 2016. 3 [101] Henri Rebecq, Daniel Gehrig, and Davide Scaramuzza. Esim: an open event camera simulator. In Conference on robot learning , pages 969–982. PMLR, 2018. 5, 1 [102] Henri Rebecq, Ren´ e Ranftl, Vladlen Koltun, and Davide Scaramuzza. Events-to-video: Bringing modern computer vision to event cameras. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,pages 3857–3866, 2019. 2, 6, 7, 1, 3, 4, 5 [103] Henri Rebecq, Ren´ e Ranftl, Vladlen Koltun, and Davide Scaramuzza. High speed and high dynamic range video with an event camera. IEEE Transactions on Pattern Anal-ysis and Machine Intelligence , 43(6):1964–1980, 2019. 2, 6, 7, 8 [104] Fitsum Reda, Janne Kontkanen, Eric Tabellion, Deqing Sun, Caroline Pantofaru, and Brian Curless. Film: Frame interpolation for large motion. In European Conference on Computer Vision , pages 250–266. Springer, 2022. 1 [105] Pavel Rojtberg and Thomas P¨ ollabauer. Ycb-ev 1.1: Event-vision dataset for 6dof object pose estimation. In European Conference on Computer Vision , pages 1–13. Springer, 2024. 1, 2, 3, 5, 4 [106] Edward Rosten and Tom Drummond. Fusing points and lines for high performance tracking. In Tenth IEEE Interna-tional Conference on Computer Vision (ICCV’05) Volume 1, pages 1508–1515. Ieee, 2005. 2 [107] Ethan Rublee, Vincent Rabaud, Kurt Konolige, and Gary Bradski. Orb: An efficient alternative to sift or surf. In 
+
+2011 International conference on computer vision , pages 2564–2571. Ieee, 2011. 2 [108] Cedric Scheerlinck, Nick Barnes, and Robert Mahony. Continuous-time intensity estimation using event cameras. In Asian Conference on Computer Vision , pages 308–324. Springer, 2018. 2 [109] Cedric Scheerlinck, Henri Rebecq, Daniel Gehrig, Nick Barnes, Robert Mahony, and Davide Scaramuzza. Fast im-age reconstruction with an event camera. In Proceedings of the IEEE/CVF winter conference on applications of com-puter vision , pages 156–163, 2020. 2 [110] Byung-Kuk Seo and Harald Wuest. A direct method for robust model-based 3d object tracking from a monocular rgb image. In European conference on computer vision ,pages 551–562. Springer, 2016. 2 [111] Byung-Kuk Seo, Hanhoon Park, Jong-Il Park, Stefan Hin-terstoisser, and Slobodan Ilic. Optimal local searching for fast and robust textureless 3d object tracking in highly clut-tered backgrounds. IEEE transactions on visualization and computer graphics , 20(1):99–110, 2013. 2 [112] Yichen Shen, Yijin Li, Shuo Chen, Guanglin Li, Zhaoyang Huang, Hujun Bao, Zhaopeng Cui, and Guofeng Zhang. Blinktrack: Feature tracking over 80 fps via events and im-ages. In Proceedings of the IEEE/CVF International Con-ference on Computer Vision , pages 9298–9308, 2025. 3 [113] Shintaro Shiba, Yoshimitsu Aoki, and Guillermo Gallego. Secrets of event-based optical flow. In European Confer-ence on Computer Vision , pages 628–645. Springer, 2022. 3[114] Iryna Skrypnyk and David G Lowe. Scene modelling, recognition and tracking with invariant image features. In 
+
+Third IEEE and ACM international symposium on mixed and augmented reality , pages 110–119. IEEE, 2004. 2 [115] Manuel Stoiber, Martin Pfanne, Klaus H Strobl, Rudolph Triebel, and Alin Albu-Sch¨ affer. Srt3d: A sparse region-based 3d object tracking approach for the real world. Inter-national Journal of Computer Vision , 130(4):1008–1030, 2022. 2 [116] Manuel Stoiber, Martin Sundermeyer, and Rudolph Triebel. Iterative corresponding geometry: Fusing region and depth for highly efficient 3d tracking of textureless objects. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 6855–6865, 2022. 2 [117] Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz. Pwc-net: Cnns for optical flow using pyramid, warping, and cost volume. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 8934–8943, 2018. 4 [118] Lei Sun, Christos Sakaridis, Jingyun Liang, Peng Sun, Jiezhang Cao, Kai Zhang, Qi Jiang, Kaiwei Wang, and Luc Van Gool. Event-based frame interpolation with ad-hoc de-blurring. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 18043– 18052, 2023. 3 [119] Meng Tian, Marcelo H Ang Jr, and Gim Hee Lee. Shape prior deformation for categorical 6d object pose and size estimation. In European Conference on Computer Vision ,pages 530–546. Springer, 2020. 1 [120] Xuhui Tian, Xinran Lin, Fan Zhong, and Xueying Qin. Large-displacement 3d object tracking with hybrid non-local optimization. In European Conference on Computer Vision , pages 627–643. Springer, 2022. 2 [121] Stepan Tulyakov, Daniel Gehrig, Stamatios Georgoulis, Julius Erbach, Mathias Gehrig, Yuanyou Li, and Davide Scaramuzza. Time lens: Event-based video frame interpo-lation. In Proceedings of the IEEE/CVF conference on com-puter vision and pattern recognition , pages 16155–16164, 2021. 3 [122] Stepan Tulyakov, Alfredo Bochicchio, Daniel Gehrig, Sta-matios Georgoulis, Yuanyou Li, and Davide Scaramuzza. Time lens++: Event-based frame interpolation with para-metric non-linear flow and multi-scale fusion. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 17755–17764, 2022. 3 [123] Luca Vacchetti, Vincent Lepetit, and Pascal Fua. Stable real-time 3d tracking using online and offline information. 
+
+IEEE Transactions on Pattern Analysis and Machine Intel-ligence , 26(10):1385–1391, 2004. 2 [124] Antoni Rosinol Vidal, Henri Rebecq, Timo Horstschaefer, and Davide Scaramuzza. Ultimate slam? combining events, images, and imu for robust visual slam in hdr and high-speed scenarios. IEEE Robotics and Automation Letters , 3 (2):994–1001, 2018. 3 [125] Zhexiong Wan, Jianqin Luo, Yuchao Dai, and Gim Hee Lee. Event-aided dense and continuous point tracking: Ev-erywhere and anytime. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 7936– 7946, 2025. 3 [126] Chen Wang, Danfei Xu, Yuke Zhu, Roberto Mart´ ın-Mart´ ın, Cewu Lu, Li Fei-Fei, and Silvio Savarese. Densefusion: 6d object pose estimation by iterative dense fusion. In Pro-ceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 3343–3352, 2019. 1, 2 [127] Chen Wang, Roberto Mart´ ın-Mart´ ın, Danfei Xu, Jun Lv, Cewu Lu, Li Fei-Fei, Silvio Savarese, and Yuke Zhu. 6-pack: Category-level 6d pose tracker with anchor-based keypoints. In 2020 IEEE International Conference on Robotics and Automation (ICRA) , pages 10059–10066. IEEE, 2020. 2 [128] He Wang, Srinath Sridhar, Jingwei Huang, Julien Valentin, Shuran Song, and Leonidas J Guibas. Normalized object coordinate space for category-level 6d object pose and size estimation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 2642–2651, 2019. 1, 2 [129] Jikai Wang, Qifan Zhang, Yu-Wei Chao, Bowen Wen, Xi-aohu Guo, and Yu Xiang. Ho-cap: A capture system and dataset for 3d reconstruction and pose tracking of hand-object interaction. arXiv preprint arXiv:2406.06843 , 2024. 1[130] Lin Wang, Yo-Sung Ho, Kuk-Jin Yoon, et al. Event-based high dynamic range image and very high frame rate video generation using conditional generative adversarial networks. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10081– 10090, 2019. 3 [131] Lin Wang, Yujeong Chae, and Kuk-Jin Yoon. Dual transfer learning for event-based end-task prediction via pluggable event to image translation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 2135– 2145, 2021. 2, 3 [132] Lin Wang, Tae-Kyun Kim, and Kuk-Jin Yoon. Joint frame-work for single image reconstruction and super-resolution with an event camera. IEEE Transactions on Pattern Anal-ysis and Machine Intelligence , 44(11):7657–7673, 2021. 3 [133] Long Wang, Shen Yan, Jianan Zhen, Yu Liu, Maojun Zhang, Guofeng Zhang, and Xiaowei Zhou. Deep active contours for real-time 6-dof object tracking. In Proceed-ings of the IEEE/CVF International Conference on Com-puter Vision , pages 14034–14044, 2023. 2 [134] Bowen Wen and Kostas Bekris. Bundletrack: 6d pose track-ing for novel objects without instance or category-level 3d models. In 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 8067–8074. IEEE, 2021. 2, 3 [135] Bowen Wen, Chaitanya Mitash, Baozhang Ren, and Kostas E Bekris. se (3)-tracknet: Data-driven 6d pose track-ing by calibrating image residuals in synthetic domains. In 2020 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) , pages 10367–10373. IEEE, 2020. 2, 4 [136] Bowen Wen, Jonathan Tremblay, Valts Blukis, Stephen Tyree, Thomas M¨ uller, Alex Evans, Dieter Fox, Jan Kautz, and Stan Birchfield. Bundlesdf: Neural 6-dof tracking and 3d reconstruction of unknown objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 606–617, 2023. 2, 3 [137] Bowen Wen, Wei Yang, Jan Kautz, and Stan Birchfield. Foundationpose: unified 6d pose estimation and tracking of novel objects. In 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 17868—-17879, 2024. 1, 2, 3, 4, 5, 6, 7, 8 [138] Bowen Wen, Matthew Trepte, Joseph Aribido, Jan Kautz, Orazio Gallo, and Stan Birchfield. Foundationstereo: Zero-shot stereo matching. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 5249– 5260, 2025. 4 [139] Wenming Weng, Yueyi Zhang, and Zhiwei Xiong. Event-based video reconstruction using transformer. In Proceed-ings of the IEEE/CVF International Conference on Com-puter Vision , pages 2563–2572, 2021. 2 [140] Manuel Wuthrich, Peter Pastor, Mrinal Kalakrishnan, Jean-nette Bohg, and Stefan Schaal. Probabilistic object track-ing using a range camera. In 2013 IEEE/RSJ Interna-tional Conference on Intelligent Robots and Systems , pages 3195—-3202, 2013. 1, 2 [141] Yu Xiang, Tanner Schmidt, Venkatraman Narayanan, and Dieter Fox. Posecnn: A convolutional neural network for 6d object pose estimation in cluttered scenes. arXiv preprint arXiv:1711.00199 , 2017. 1, 2, 5, 6 [142] Zeyu Xiao and Xinchao Wang. Event-based video super-resolution via state space models. In Proceedings of the Computer Vision and Pattern Recognition Conference ,pages 12564–12574, 2025. 2 [143] Sergey Zakharov, Ivan Shugurov, and Slobodan Ilic. Dpod: 6d pose object detector and refiner. In Proceedings of the IEEE/CVF international conference on computer vision ,pages 1941–1950, 2019. 1 [144] Sergey Zakharov, Ivan Shugurov, and Slobodan Ilic. Dpod: 6d pose object detector and refiner. In Proceedings of the IEEE/CVF international conference on computer vision ,pages 1941–1950, 2019. 2 [145] Richard Zhang, Phillip Isola, Alexei A Efros, Eli Shecht-man, and Oliver Wang. The unreasonable effectiveness of deep features as a perceptual metric. In Proceedings of the IEEE conference on computer vision and pattern recogni-tion , pages 586–595, 2018. 5 [146] Xiang Zhang and Lei Yu. Unifying motion deblurring and frame interpolation with events. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 17765–17774, 2022. 3 [147] Yi Zhou, Guillermo Gallego, and Shaojie Shen. Event-based stereo visual odometry. IEEE Transactions on Robotics , 37(5):1433–1450, 2021. 3 [148] Alex Zihao Zhu, Liangzhe Yuan, Kenneth Chaney, and Kostas Daniilidis. Unsupervised event-based learning of optical flow, depth, and egomotion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 989–997, 2019. 3 [149] Juanjuan Zhu, Zhexiong Wan, and Yuchao Dai. Video frame prediction from a single image and events. In Pro-ceedings of the AAAI Conference on Artificial Intelligence (AAAI) , number 7, pages 7748–7756, 2024. 3 [150] Jinjing Zhu, Tianbo Pan, Zidong Cao, Yexin Liu, James T Kwok, and Hui Xiong. Depth any event stream: Enhanc-ing event-based monocular depth estimation via dense-to-sparse distillation. In Proceedings of the IEEE/CVF In-ternational Conference on Computer Vision , pages 5146– 5155, 2025. 3 Table 9. An overview of the proposed Event6D training set, which is released for future research and not used for training in our experiments. No. Frames 
+
+denotes the number of 30 FPS RGB and depth frames; the 6D poses are provided at 120 FPS. 
+
+Sequence Name No. Frames Description 
+
+Train Sequences 
+
+banana 001 351 The banana is moved by applying a translation at an appropriate speed. banana 002 294 The banana is dynamically moved in all directions and orientations across 6-DoF. banana 003 320 The banana is rapidly moved while varying its depth. banana 004 291 The banana is moved rapidly by applying both rotation and translation. bowl 001 193 The bowl is moved rapidly with translation and then rotated to include diverse motions. bowl 002 168 The bowl is rapidly translated in multiple directions while its depth is quickly varied. bowl 003 166 The bowl is rapidly rotated. clamp 001 244 The clamp is rapidly rotated at various angles to include motion across all axes. clamp 002 328 The clamp undergoes rapid combined rotational and translational motion as it is thrown and caught. cracker 001 266 The cracker box is first translated rapidly and then rotated to enrich its motion. cracker 002 226 The cracker box exhibits strong, rapid rotation, with translation occurring simultaneously. cracker 003 142 The cracker box undergoes a throw-and-catch motion with rapidly and continuously varying depth. cracker 004 162 The cracker box is repeatedly passed between both hands to generate dynamic motion. drill 001 493 The drill undergoes rapid movement across diverse motion patterns. drill 002 408 The drill is manipulated with abrupt, forceful movements, mimicking real drilling on various objects. drill 003 164 The drill, placed among many objects, performs rotation-heavy motions that mimic drilling. hammer 001 119 The hammer is repeatedly rotated by 180 ◦ and driven through large translational motion. marker 001 201 The marker is held in hand and moved rapidly with translational motion. marker 002 160 The marker is held in hand and moved with larger, faster translational motion. mouse 001 257 The mouse used for computers is held in hand and moved rapidly in various directions. mug 001 205 The mug is moved rapidly with combined rotation and translation. mug 002 178 The mug undergoes fast rotation and rapid motion, including collisions with another cup in a cheers gesture. mustard 001 215 The mustard case undergoes rapid shaking and is translated over bowls. pitcher 001 289 The pitcher is moved with rapid rotation, intermittently passed back and forth between both hands. pitcher 002 291 The pitcher is used to rapidly pour water into multiple cups and bowls. pitcher 003 493 The pitcher is used to rapidly pour water into multiple cups and bowls. pudding 001 151 The pudding box undergoes extremely fast rotation while being moved. pudding 002 270 The pudding box is spun at very high speed while being moved and placed on multiple bowls. pudding 003 364 The pudding box is placed inside a bowl and shaken rapidly. pudding 004 271 The pudding box moves with very fast translation and rotation, intermittently switching the holding hand. scrub 001 271 The scrub cleanser bottle is rapidly translated and used to dispense cleanser onto multiple bottles. scrub 002 261 The scrub cleanser bottle is held by its end and rotated widely with occasional hand switching. spam 001 661 The spam can undergoes repeated rotations with varying depth, while the holding hand is switched. spam 002 221 The spam can shows translation-dominant motion with repeated hand-to-hand throwing. spatula 001 224 The spatula starts with fast motion and then performs cooking-like rotations perpendicular to the plane. spatula 002 261 The spatula is driven quickly in a shaking motion, as if mixing something. wine 001 190 The wine glass is moved dynamically with rotation-dominant motion at various angles, then placed on several bowls. Total 9,769 
+
+Table 10. An overview of the proposed Event6D test set. No. Frames denotes the number of 30 FPS RGB and depth frames; the 6D poses are provided at 120 FPS.                                   
+
+> Sequence Name No. Frames Description
+> Test Sequences
+> banana 301 The banana is held by its stem and moved dynamically with both translation and rotation around that axis. bowl 261 The bowl is moved with varying depth and rotated to reveal diverse viewpoints. cracker 308 The cracker box is rotated through various angles and exchanged between both hands. drill 431 The drill is moved quickly in a fixing-like action, performed at multiple orientations with repeated 180 ◦angle changes. hammer 246 The hammer rapidly executes smashing motions as if breaking an object. marker 146 The marker is rapidly moved with translation-dominant motion. mouse 192 The mouse is held in hand and rapidly moved with rotation. mug 347 The mug is grasped at the top and driven through wide and varied rotations. mustard 196 The mustard bottle is tossed between both hands and moved back and forth over several bowls. pitcher 562 The pitcher is rapidly rotated in one hand and then thrown and caught between both hands. scrub 276 The scrub cleanser bottle undergoes multi-angle rotation while being moved with varying depth. spam 204 The spam can undergoes dynamic 6-DoF movement involving both translation and rotation. spatula 263 The spatula moves rapidly and includes stirring or flipping motions as in real cooking. wine 137 The wine glass is rotated around the camera’s z-axis while undergoing depth variation. Total 3,870 (a) 000074 (b) 000102
+
+𝑇 Figure 10. EventBlender6D samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses. (a) SM1 
+
+𝑇 
+
+> (a) AP12
+
+Figure 11. EventHO3D samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses. (a) mug 
+
+𝑇 (b) scrub Figure 12. Event6D test samples visualized as temporal streams of RGB, event, depth, and corresponding 6D object poses. FoundationPose 
+
+(RGB+Depth )𝑇  E2VID+FoundationPose 
+
+(Event+Depth )
+
+FoundationPose †
+
+(Event+Depth )
+
+EventTrack6D 
+
+(Event+Depth )Figure 13. Qualitative comparison on the Event6D drill object sequence. Although the event-based methods operate at intervals corresponding to 120 FPS, all visualizations are presented at the RGB frame rate of 30 FPS for consistency. † denotes that the model is trained with event inputs on the EventBlender6D dataset. FoundationPose 
+
+(RGB+Depth )𝑇  E2VID+FoundationPose 
+
+(Event+Depth )
+
+FoundationPose †
+
+(Event+Depth )
+
+EventTrack6D 
+
+(Event+Depth )Figure 14. Qualitative comparison on the Event6D marker object sequence. Although the event-based methods operate at intervals corresponding to 120 FPS, all visualizations are presented at the RGB frame rate of 30 FPS for consistency. † denotes that the model is trained with event inputs on the EventBlender6D dataset.
