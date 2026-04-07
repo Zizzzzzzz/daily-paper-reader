@@ -25,3 +25,35 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: EV CAM
+      description: 查找事件相机（Event-based Camera）相关的学术论文
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: event camera
+          keyword_cn: 事件相机
+          query: event-based camera vision and sensors
+      intent_queries:
+        - query: state of the art in event based vision research
+          query_cn: 事件视觉研究的最新进展
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-04-07T07:34:09.213Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
