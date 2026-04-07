@@ -1,0 +1,499 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-07T20:07:51.666680+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 11,
+    "deep_cap": 6,
+    "deep_selected": 11,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2603.27913v1",
+      "source": "arxiv",
+      "title": "Spatial Orthogonal Refinement for Robust RGB-Event Visual Object Tracking",
+      "abstract": "Robust visual object tracking (VOT) remains challenging in high-speed motion scenarios, where conventional RGB sensors suffer from severe motion blur and performance degradation. Event cameras, with microsecond temporal resolution and high dynamic range, provide complementary structural cues that can potentially compensate for these limitations. However, existing RGB-Event fusion methods typically treat event data as dense intensity representations and adopt black-box fusion strategies, failing to explicitly leverage the directional geometric priors inherently encoded in event streams to rectify degraded RGB features. To address this limitation, we propose SOR-Track, a streamlined framework for robust RGB-Event tracking based on Spatial Orthogonal Refinement (SOR). The core SOR module employs a set of orthogonal directional filters that are dynamically guided by local motion orientations to extract sharp and motion-consistent structural responses from event streams. These responses serve as geometric anchors to modulate and refine aliased RGB textures through an asymmetric structural modulation mechanism, thereby explicitly bridging structural discrepancies between two modalities. Extensive experiments on the large-scale FE108 benchmark demonstrate that SOR-Track consistently outperforms existing fusion-based trackers, particularly under motion blur and low-light conditions. Despite its simplicity, the proposed method offers a principled and physics-grounded approach to multi-modal feature alignment and texture rectification. The source code of this paper will be released on https://github.com/Event-AHU/OpenEvTracking",
+      "authors": [
+        "Dexing Huang",
+        "Shiao Wang",
+        "Fan Zhang",
+        "Xiao Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-29T23:54:31+00:00",
+      "link": "https://arxiv.org/pdf/2603.27913v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Robust RGB-Event visual object tracking using event cameras",
+      "llm_evidence_cn": "使用事件相机进行鲁棒的RGB-事件视觉目标跟踪",
+      "llm_evidence": "使用事件相机进行鲁棒的RGB-事件视觉目标跟踪",
+      "canonical_evidence": "使用事件相机进行鲁棒的RGB-事件视觉目标跟踪",
+      "llm_tldr_en": "Proposes SOR-Track to fuse RGB and event data for robust tracking in high-speed scenarios.",
+      "llm_tldr_cn": "提出SOR-Track框架，融合RGB和事件数据以实现高速场景下的鲁棒跟踪。",
+      "llm_tldr": "提出SOR-Track框架，融合RGB和事件数据以实现高速场景下的鲁棒跟踪。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28008v1",
+      "source": "arxiv",
+      "title": "Energy-Aware Imitation Learning for Steering Prediction Using Events and Frames",
+      "abstract": "In autonomous driving, relying solely on frame-based cameras can lead to inaccuracies caused by factors like long exposure times, high-speed motion, and challenging lighting conditions. To address these issues, we introduce a bio-inspired vision sensor known as the event camera. Unlike conventional cameras, event cameras capture sparse, asynchronous events that provide a complementary modality to mitigate these challenges. In this work, we propose an energy-aware imitation learning framework for steering prediction that leverages both events and frames. Specifically, we design an Energy-driven Cross-modality Fusion Module (ECFM) and an energy-aware decoder to produce reliable and safe predictions. Extensive experiments on two public real-world datasets, DDD20 and DRFuser, demonstrate that our method outperforms existing state-of-the-art (SOTA) approaches. The codes and trained models will be released upon acceptance.",
+      "authors": [
+        "Hu Cao",
+        "Jiong Liu",
+        "Xingzhuo Yan",
+        "Rui Song",
+        "Yan Xia",
+        "Walter Zimmer",
+        "Guang Chen",
+        "Alois Knoll"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-30T03:58:47+00:00",
+      "link": "https://arxiv.org/pdf/2603.28008v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "introduces event camera as a bio-inspired vision sensor for steering prediction",
+      "llm_evidence_cn": "引入事件相机作为仿生视觉传感器用于转向预测",
+      "llm_evidence": "引入事件相机作为仿生视觉传感器用于转向预测",
+      "canonical_evidence": "引入事件相机作为仿生视觉传感器用于转向预测",
+      "llm_tldr_en": "Proposes an energy-aware imitation learning framework fusing event and frame data for autonomous steering.",
+      "llm_tldr_cn": "提出一种结合事件相机与帧相机的能量感知模仿学习框架，用于自动驾驶转向预测。",
+      "llm_tldr": "提出一种结合事件相机与帧相机的能量感知模仿学习框架，用于自动驾驶转向预测。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28045v1",
+      "source": "arxiv",
+      "title": "Event6D: Event-based Novel Object 6D Pose Tracking",
+      "abstract": "Event cameras provide microsecond latency, making them suitable for 6D object pose tracking in fast, dynamic scenes where conventional RGB and depth pipelines suffer from motion blur and large pixel displacements. We introduce EventTrack6D, an event-depth tracking framework that generalizes to novel objects without object-specific training by reconstructing both intensity and depth at arbitrary timestamps between depth frames. Conditioned on the most recent depth measurement, our dual reconstruction recovers dense photometric and geometric cues from sparse event streams. Our EventTrack6D operates at over 120 FPS and maintains temporal consistency under rapid motion. To support training and evaluation, we introduce a comprehensive benchmark suite: a large-scale synthetic dataset for training and two complementary evaluation sets, including real and simulated event datasets. Trained exclusively on synthetic data, EventTrack6D generalizes effectively to real-world scenarios without fine-tuning, maintaining accurate tracking across diverse objects and motion patterns. Our method and datasets validate the effectiveness of event cameras for event-based 6D pose tracking of novel objects. Code and datasets are publicly available at https://chohoonhee.github.io/Event6D.",
+      "authors": [
+        "Jae-Young Kang",
+        "Hoonehee Cho",
+        "Taeyeop Lee",
+        "Minjun Kang",
+        "Bowen Wen",
+        "Youngho Kim",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-30T05:11:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.28045v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Event-based 6D object pose tracking using event cameras",
+      "llm_evidence_cn": "使用事件相机进行基于事件的6D物体姿态跟踪",
+      "llm_evidence": "使用事件相机进行基于事件的6D物体姿态跟踪",
+      "canonical_evidence": "使用事件相机进行基于事件的6D物体姿态跟踪",
+      "llm_tldr_en": "Introduces EventTrack6D for high-speed 6D pose tracking using event streams and depth frames.",
+      "llm_tldr_cn": "引入EventTrack6D，利用事件流和深度帧实现高速6D姿态跟踪。",
+      "llm_tldr": "引入EventTrack6D，利用事件流和深度帧实现高速6D姿态跟踪。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28045v2",
+      "source": "arxiv",
+      "title": "Event6D: Event-based Novel Object 6D Pose Tracking",
+      "abstract": "Event cameras provide microsecond latency, making them suitable for 6D object pose tracking in fast, dynamic scenes where conventional RGB and depth pipelines suffer from motion blur and large pixel displacements. We introduce EventTrack6D, an event-depth tracking framework that generalizes to novel objects without object-specific training by reconstructing both intensity and depth at arbitrary timestamps between depth frames. Conditioned on the most recent depth measurement, our dual reconstruction recovers dense photometric and geometric cues from sparse event streams. Our EventTrack6D operates at over 120 FPS and maintains temporal consistency under rapid motion. To support training and evaluation, we introduce a comprehensive benchmark suite: a large-scale synthetic dataset for training and two complementary evaluation sets, including real and simulated event datasets. Trained exclusively on synthetic data, EventTrack6D generalizes effectively to real-world scenarios without fine-tuning, maintaining accurate tracking across diverse objects and motion patterns. Our method and datasets validate the effectiveness of event cameras for event-based 6D pose tracking of novel objects. Code and datasets are publicly available at https://chohoonhee.github.io/Event6D.",
+      "authors": [
+        "Jae-Young Kang",
+        "Hoonhee Cho",
+        "Taeyeop Lee",
+        "Minjun Kang",
+        "Bowen Wen",
+        "Youngho Kim",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-30T05:11:57+00:00",
+      "link": "https://arxiv.org/pdf/2603.28045v2",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Event-based 6D object pose tracking in fast dynamic scenes",
+      "llm_evidence_cn": "快速动态场景下的基于事件的6D物体姿态追踪",
+      "llm_evidence": "快速动态场景下的基于事件的6D物体姿态追踪",
+      "canonical_evidence": "快速动态场景下的基于事件的6D物体姿态追踪",
+      "llm_tldr_en": "Introduces EventTrack6D for high-speed 6D object tracking using event cameras and dual reconstruction.",
+      "llm_tldr_cn": "引入EventTrack6D框架，利用事件相机和双重重建技术实现高速6D物体追踪。",
+      "llm_tldr": "引入EventTrack6D框架，利用事件相机和双重重建技术实现高速6D物体追踪。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28159v1",
+      "source": "arxiv",
+      "title": "Event-Based Method for High-Speed 3D Deformation Measurement under Extreme Illumination Conditions",
+      "abstract": "Background: Large engineering structures, such as space launch towers and suspension bridges, are subjected to extreme forces that cause high-speed 3D deformation and compromise safety. These structures typically operate under extreme illumination conditions. Traditional cameras often struggle to handle strong light intensity, leading to overexposure due to their limited dynamic range.   Objective: Event cameras have emerged as a compelling alternative to traditional cameras in high dynamic range and low-latency applications. This paper presents an integrated method, from calibration to measurement, using a multi-event camera array for high-speed 3D deformation monitoring of structures in extreme illumination conditions.   Methods: Firstly, the proposed method combines the characteristics of the asynchronous event stream and temporal correlation analysis to extract the corresponding marker center point. Subsequently, the method achieves rapid calibration by solving the Kruppa equations in conjunction with a parameter optimization framework. Finally, by employing a unified coordinate transformation and linear intersection, the method enables the measurement of 3D deformation of the target structure.   Results: Experiments confirmed that the relative measurement error is below 0.08%. Field experiments under extreme illumination conditions, including self-calibration of a multi-event camera array and 3D deformation measurement, verified the performance of the proposed method.   Conclusions: This paper addressed the critical limitation of traditional cameras in measuring high-speed 3D deformations under extreme illumination conditions. The experimental results demonstrate that, compared to other methods, the proposed method can accurately measure 3D deformations of structures under harsh lighting conditions, and the relative error of the measured deformation is less than 0.1%.",
+      "authors": [
+        "Banglei Guan",
+        "Yifei Bian",
+        "Zibin Liu",
+        "Haoyang Li",
+        "Xuanyu Bai",
+        "Taihang Lei",
+        "Bin Li",
+        "Yang Shang",
+        "Qifeng Yu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-30T08:25:09+00:00",
+      "link": "https://arxiv.org/pdf/2603.28159v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "event cameras for high-speed 3D deformation measurement in extreme light",
+      "llm_evidence_cn": "事件相机用于极端光照条件下的高速三维变形测量",
+      "llm_evidence": "事件相机用于极端光照条件下的高速三维变形测量",
+      "canonical_evidence": "事件相机用于极端光照条件下的高速三维变形测量",
+      "llm_tldr_en": "Uses event camera arrays for high-speed 3D monitoring under extreme illumination and high dynamic range.",
+      "llm_tldr_cn": "利用事件相机阵列在极端光照和高动态范围下进行高速三维变形监测。",
+      "llm_tldr": "利用事件相机阵列在极端光照和高动态范围下进行高速三维变形监测。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "dynamic vision sensor DVS technology and applications",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2603.28429v1",
+      "source": "arxiv",
+      "title": "AceleradorSNN: A Neuromorphic Cognitive System Integrating Spiking Neural Networks and DynamicImage Signal Processing on FPGA",
+      "abstract": "The demand for high-speed, low-latency, and energy-efficient object detection in autonomous systems -- such as advanced driver-assistance systems (ADAS), unmanned aerial vehicles (UAVs), and Industry 4.0 robotics -- has exposed the limitations of traditional Convolutional Neural Networks (CNNs). To address these challenges, we have developed AceleradorSNN, a third-generation artificial intelligence cognitive system. This architecture integrates a Neuromorphic Processing Unit (NPU) based on Spiking Neural Networks (SNNs) to process asynchronous data from Dynamic Vision Sensors (DVS), alongside a dynamically reconfigurable Cognitive Image Signal Processor (ISP) for RGB cameras. This paper details the hardware-oriented design of both IP cores, the evaluation of surrogate-gradienttrained SNN backbones, and the real-time streaming ISP architecture implemented on Field-Programmable Gate Arrays (FPGA).",
+      "authors": [
+        "Daniel Gutierrez",
+        "Ruben Martinez",
+        "Leyre Arnedo",
+        "Antonio Cuesta",
+        "Soukaina El Hamry"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR",
+        "cs.AI"
+      ],
+      "published": "2026-03-30T13:37:09+00:00",
+      "link": "https://arxiv.org/pdf/2603.28429v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Neuromorphic system processing asynchronous data from Dynamic Vision Sensors (DVS)",
+      "llm_evidence_cn": "处理来自动态视觉传感器（DVS）异步数据的类脑系统",
+      "llm_evidence": "处理来自动态视觉传感器（DVS）异步数据的类脑系统",
+      "canonical_evidence": "处理来自动态视觉传感器（DVS）异步数据的类脑系统",
+      "llm_tldr_en": "Presents a neuromorphic FPGA accelerator for SNNs processing DVS data for efficient object detection.",
+      "llm_tldr_cn": "提出一种基于FPGA的类脑加速器，用于处理DVS数据以实现高效目标检测。",
+      "llm_tldr": "提出一种基于FPGA的类脑加速器，用于处理DVS数据以实现高效目标检测。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "dynamic vision sensor DVS technology and applications",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.03685v1",
+      "source": "arxiv",
+      "title": "DSERT-RoLL: Robust Multi-Modal Perception for Diverse Driving Conditions with Stereo Event-RGB-Thermal Cameras, 4D Radar, and Dual-LiDAR",
+      "abstract": "In this paper, we present DSERT-RoLL, a driving dataset that incorporates stereo event, RGB, and thermal cameras together with 4D radar and dual LiDAR, collected across diverse weather and illumination conditions. The dataset provides precise 2D and 3D bounding boxes with track IDs and ego vehicle odometry, enabling fair comparisons within and across sensor combinations. It is designed to alleviate data scarcity for novel sensors such as event cameras and 4D radar and to support systematic studies of their behavior. We establish unified 3D and 2D benchmarks that enable direct comparison of characteristics and strengths across sensor families and within each family. We report baselines for representative single modality and multimodal methods and provide protocols that encourage research on different fusion strategies and sensor combinations. In addition, we propose a fusion framework that integrates sensor specific cues into a unified feature space and improves 3D detection robustness under varied weather and lighting.",
+      "authors": [
+        "Hoonhee Cho",
+        "Jae-Young Kang",
+        "Yuhwan Jeong",
+        "Yunseo Yang",
+        "Wonyoung Lee",
+        "Youngho Kim",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-04T11:03:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.03685v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Dataset with stereo event cameras for 2D/3D bounding boxes and track IDs",
+      "llm_evidence_cn": "包含立体事件相机的2D/3D边界框和跟踪ID数据集",
+      "llm_evidence": "包含立体事件相机的2D/3D边界框和跟踪ID数据集",
+      "canonical_evidence": "包含立体事件相机的2D/3D边界框和跟踪ID数据集",
+      "llm_tldr_en": "A multi-modal driving dataset featuring stereo event cameras to support object detection and tracking research.",
+      "llm_tldr_cn": "一个包含立体事件相机的高质量多模态驾驶数据集，支持目标检测与跟踪研究。",
+      "llm_tldr": "一个包含立体事件相机的高质量多模态驾驶数据集，支持目标检测与跟踪研究。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04618v1",
+      "source": "arxiv",
+      "title": "Biologically Inspired Event-Based Perception and Sample-Efficient Learning for High-Speed Table Tennis Robots",
+      "abstract": "Perception and decision-making in high-speed dynamic scenarios remain challenging for current robots. In contrast, humans and animals can rapidly perceive and make decisions in such environments. Taking table tennis as a typical example, conventional frame-based vision sensors suffer from motion blur, high latency and data redundancy, which can hardly meet real-time, accurate perception requirements. Inspired by the human visual system, event-based perception methods address these limitations through asynchronous sensing, high temporal resolution, and inherently sparse data representations. However, current event-based methods are still restricted to simplified, unrealistic ball-only scenarios. Meanwhile, existing decision-making approaches typically require thousands of interactions with the environment to converge, resulting in significant computational costs. In this work, we present a biologically inspired approach for high-speed table tennis robots, combining event-based perception with sample-efficient learning. On the perception side, we propose an event-based ball detection method that leverages motion cues and geometric consistency, operating directly on asynchronous event streams without frame reconstruction, to achieve robust and efficient detection in real-world rallies. On the decision-making side, we introduce a human-inspired, sample-efficient training strategy that first trains policies in low-speed scenarios, progressively acquiring skills from basic to advanced, and then adapts them to high-speed scenarios, guided by a case-dependent temporally adaptive reward and a reward-threshold mechanism. With the same training episodes, our method improves return-to-target accuracy by 35.8%. These results demonstrate the effectiveness of biologically inspired perception and decision-making for high-speed robotic systems.",
+      "authors": [
+        "Ziqi Wang",
+        "Jingyue Zhao",
+        "Xun Xiao",
+        "Jichao Yang",
+        "Yaohua Wang",
+        "Shi Xu",
+        "Lei Wang",
+        "Huadong Dai"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-04-06T12:10:34+00:00",
+      "link": "https://arxiv.org/pdf/2604.04618v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "biologically inspired event-based perception for high-speed robots",
+      "llm_evidence_cn": "受生物启发的事件感知方法用于高速机器人",
+      "llm_evidence": "受生物启发的事件感知方法用于高速机器人",
+      "canonical_evidence": "受生物启发的事件感知方法用于高速机器人",
+      "llm_tldr_en": "Explores event-based perception for high-speed robot table tennis to overcome motion blur and latency.",
+      "llm_tldr_cn": "探索用于高速乒乓球机器人的事件感知方法，以克服运动模糊和高延迟问题。",
+      "llm_tldr": "探索用于高速乒乓球机器人的事件感知方法，以克服运动模糊和高延迟问题。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04834v1",
+      "source": "arxiv",
+      "title": "E-VLA: Event-Augmented Vision-Language-Action Model for Dark and Blurred Scenes",
+      "abstract": "Robotic Vision-Language-Action (VLA) models generalize well for open-ended manipulation, but their perception is fragile under sensing-stage degradations such as extreme low light, motion blur, and black clipping. We present E-VLA, an event-augmented VLA framework that improves manipulation robustness when conventional frame-based vision becomes unreliable. Instead of reconstructing images from events, E-VLA directly leverages motion and structural cues in event streams to preserve semantic perception and perception-action consistency under adverse conditions. We build an open-source teleoperation platform with a DAVIS346 event camera and collect a real-world synchronized RGB-event-action manipulation dataset across diverse tasks and illumination settings. We also propose lightweight, pretrained-compatible event integration strategies and study event windowing and fusion for stable deployment. Experiments show that even a simple parameter-free fusion, i.e., overlaying accumulated event maps onto RGB images, could substantially improve robustness in dark and blur-heavy scenes: on Pick-Place at 20 lux, success increases from 0% (image-only) to 60% with overlay fusion and to 90% with our event adapter; under severe motion blur (1000 ms exposure), Pick-Place improves from 0% to 20-25%, and Sorting from 5% to 32.5%. Overall, E-VLA provides systematic evidence that event-driven perception can be effectively integrated into VLA models, pointing toward robust embodied intelligence beyond conventional frame-based imaging. Code and dataset will be available at https://github.com/JJayzee/E-VLA.",
+      "authors": [
+        "Jiajun Zhai",
+        "Hao Shi",
+        "Shangwei Guo",
+        "Kailun Yang",
+        "Kaiwei Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.MM",
+        "cs.RO",
+        "eess.IV"
+      ],
+      "published": "2026-04-06T16:35:57+00:00",
+      "link": "https://arxiv.org/pdf/2604.04834v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Event-augmented Vision-Language-Action model using DAVIS346 event camera",
+      "llm_evidence_cn": "使用DAVIS346事件相机的事件增强型视觉-语言-动作模型",
+      "llm_evidence": "使用DAVIS346事件相机的事件增强型视觉-语言-动作模型",
+      "canonical_evidence": "使用DAVIS346事件相机的事件增强型视觉-语言-动作模型",
+      "llm_tldr_en": "E-VLA leverages event streams to improve robotic manipulation robustness in dark and blurred scenes.",
+      "llm_tldr_cn": "E-VLA利用事件流提高了机器人在黑暗和模糊场景下的操作鲁棒性。",
+      "llm_tldr": "E-VLA利用事件流提高了机器人在黑暗和模糊场景下的操作鲁棒性。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Event Cameras Based Multimodal Large Model",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.02331v1",
+      "source": "arxiv",
+      "title": "EventHub: Data Factory for Generalizable Event-Based Stereo Networks without Active Sensors",
+      "abstract": "We propose EventHub, a novel framework for training deep-event stereo networks without ground truth annotations from costly active sensors, relying instead on standard color images. From these images, we derive either proxy annotations and proxy events through state-of-the-art novel view synthesis techniques, or simply proxy annotations when images are already paired with event data. Using the training set generated by our data factory, we repurpose state-of-the-art stereo models from RGB literature to process event data, obtaining new event stereo models with unprecedented generalization capabilities. Experiments on widely used event stereo datasets support the effectiveness of EventHub and show how the same data distillation mechanism can improve the accuracy of RGB stereo foundation models in challenging conditions such as nighttime scenes.",
+      "authors": [
+        "Luca Bartolomei",
+        "Fabio Tosi",
+        "Matteo Poggi",
+        "Stefano Mattoccia",
+        "Guillermo Gallego"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-02T17:59:59+00:00",
+      "link": "https://arxiv.org/pdf/2604.02331v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Generalizable event-based stereo networks and data factory",
+      "llm_evidence_cn": "通用的基于事件的立体视觉网络与数据工厂",
+      "llm_evidence": "通用的基于事件的立体视觉网络与数据工厂",
+      "canonical_evidence": "通用的基于事件的立体视觉网络与数据工厂",
+      "llm_tldr_en": "Presents EventHub, a framework to train event-based stereo networks using standard images without active sensors.",
+      "llm_tldr_cn": "提出EventHub框架，利用标准图像训练具有强泛化能力的事件立体视觉网络。",
+      "llm_tldr": "提出EventHub框架，利用标准图像训练具有强泛化能力的事件立体视觉网络。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.04117v1",
+      "source": "arxiv",
+      "title": "Efficient Onboard Spacecraft Pose Estimation with Event Cameras and Neuromorphic Hardware",
+      "abstract": "Reliable relative pose estimation is a key enabler for autonomous rendezvous and proximity operations, yet space imagery is notoriously challenging due to extreme illumination, high contrast, and fast target motion. Event cameras provide asynchronous, change-driven measurements that can remain informative when frame-based imagery saturates or blurs, while neuromorphic processors can exploit sparse activations for low-latency, energy-efficient inferences. This paper presents a spacecraft 6-DoF pose-estimation pipeline that couples event-based vision with the BrainChip Akida neuromorphic processor. Using the SPADES dataset, we train compact MobileNet-style keypoint regression networks on lightweight event-frame representations, apply quantization-aware training (8/4-bit), and convert the models to Akida-compatible spiking neural networks. We benchmark three event representations and demonstrate real-time, low-power inference on Akida V1 hardware. We additionally design a heatmap-based model targeting Akida V2 and evaluate it on Akida Cloud, yielding improved pose accuracy. To our knowledge, this is the first end-to-end demonstration of spacecraft pose estimation running on Akida hardware, highlighting a practical route to low-latency, low-power perception for future autonomous space missions.",
+      "authors": [
+        "Arunkumar Rathinam",
+        "Jules Lecomte",
+        "Jost Reelsen",
+        "Gregor Lenz",
+        "Axel von Arnim",
+        "Djamila Aouada"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-04-05T13:31:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.04117v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Spacecraft pose estimation using event cameras and neuromorphic hardware",
+      "llm_evidence_cn": "结合事件相机与神经形态硬件的航天器姿态估计",
+      "llm_evidence": "结合事件相机与神经形态硬件的航天器姿态估计",
+      "canonical_evidence": "结合事件相机与神经形态硬件的航天器姿态估计",
+      "llm_tldr_en": "Proposes an efficient spacecraft pose estimation pipeline using event-based vision and neuromorphic processors.",
+      "llm_tldr_cn": "提出了一种结合事件视觉和神经形态处理器的低功耗航天器姿态估计流水线。",
+      "llm_tldr": "提出了一种结合事件视觉和神经形态处理器的低功耗航天器姿态估计流水线。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2603.28023v1",
+      "source": "arxiv",
+      "title": "SegRGB-X: General RGB-X Semantic Segmentation Model",
+      "abstract": "Semantic segmentation across arbitrary sensor modalities faces significant challenges due to diverse sensor characteristics, and the traditional configurations for this task result in redundant development efforts. We address these challenges by introducing a universal arbitrary-modal semantic segmentation framework that unifies segmentation across multiple modalities. Our approach features three key innovations: (1) the Modality-aware CLIP (MA-CLIP), which provides modality-specific scene understanding guidance through LoRA fine-tuning; (2) Modality-aligned Embeddings for capturing fine-grained features; and (3) the Domain-specific Refinement Module (DSRM) for dynamic feature adjustment. Evaluated on five diverse datasets with different complementary modalities (event, thermal, depth, polarization, and light field), our model surpasses specialized multi-modal methods and achieves state-of-the-art performance with a mIoU of 65.03%. The codes will be released upon acceptance.",
+      "authors": [
+        "Jiong Liu",
+        "Yingjie Xu",
+        "Xingcheng Zhou",
+        "Rui Song",
+        "Walter Zimmer",
+        "Alois Knoll",
+        "Hu Cao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-03-30T04:32:11+00:00",
+      "link": "https://arxiv.org/pdf/2603.28023v1",
+      "tags": [
+        "keyword:EV CAM",
+        "query:EV CAM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Evaluated on datasets with event modality",
+      "llm_evidence_cn": "在包含事件模态的数据集上进行了评估",
+      "llm_evidence": "在包含事件模态的数据集上进行了评估",
+      "canonical_evidence": "在包含事件模态的数据集上进行了评估",
+      "llm_tldr_en": "A universal semantic segmentation framework that unifies multiple modalities including event cameras.",
+      "llm_tldr_cn": "一种通用的语义分割框架，统一了包括事件相机在内的多种模态。",
+      "llm_tldr": "一种通用的语义分割框架，统一了包括事件相机在内的多种模态。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,696 @@
+Title: Event-Based Method for High-Speed 3D Deformation Measurement under Extreme Illumination Conditions
+
+URL Source: https://arxiv.org/pdf/2603.28159v1
+
+Published Time: Tue, 31 Mar 2026 02:10:23 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# Event-Based Method for High-Speed 3D Deformation Measurement under Extreme Illumination Conditions 
+
+## Banglei Guan 1,2 , Yifei Bian 1,2* , Zibin Liu 1,2 , Haoyang Li 1,2 ,Xuanyu Bai 1,2 , Taihang Lei 1,2 , Bin Li 1,2 , Yang Shang 1,2 ,Qifeng Yu 1,2 1College of Aerospace Science and Engineering, National University of Defense Technology, Changsha 410073, China. 
+
+2Hunan Provincial Key Laboratory of Image Measurement and Vision Navigation, Changsha 410073, China. *Corresponding author(s). E-mail(s): bianyifei18@nudt.edu.cn; 
+
+Abstract Background Large engineering structures, such as space launch towers and suspension bridges, are subjected to extreme forces that cause high-speed 3D deformation and compromise safety. These structures typically operate under extreme illumination conditions. Traditional cameras often struggle to handle strong light intensity, leading to overexposure due to their limited dynamic range. 
+
+Objective Event cameras have emerged as a compelling alternative to tradi-tional cameras in high dynamic range and low-latency applications. This paper presents an integrated method, from calibration to measurement, using a multi-event camera array for high-speed 3D deformation monitoring of structures in extreme illumination conditions. 
+
+Methods Firstly, the proposed method combines the characteristics of the asynchronous event stream and temporal correlation analysis to extract the corresponding marker center point. Subsequently, the method achieves rapid calibration by solving the Kruppa equations in conjunction with a parameter opti-mization framework. Finally, by employing a unified coordinate transformation and linear intersection, the method enables the measurement of 3D deformation of the target structure. 
+
+1   
+
+> arXiv:2603.28159v1 [cs.CV] 30 Mar 2026 Results Experiments confirmed that the relative measurement error is below 0.08 %. Field experiments under extreme illumination conditions, including self-calibration of a multi-event camera array and 3D deformation measurement, verified the performance of the proposed method.
+> Conclusions This paper addressed the critical limitation of traditional cameras in measuring high-speed 3D deformations under extreme illumination conditions. The experimental results demonstrate that, compared to other methods, the pro-posed method can accurately measure 3D deformations of structures under harsh lighting conditions, and the relative error of the measured deformation is less than 0.1 %.
+> Keywords: event camera, extreme illumination condition, 3D deformation, marker extraction, self-calibration, multi-camera system
+
+# 1 Introduction 
+
+Large engineering structures, such as space launch towers [1] and suspension bridges [2–4], exhibit high-speed 3D deformations under extreme mechanical loading, which compromise structural safety. The structures typically operate under extreme illumination conditions[5–7]. Camera-based optical measurement methods are widely employed in structural health monitoring and various other fields [8]. Nevertheless, traditional cameras are susceptible to overexposure and related issues under extreme lighting conditions. These issues are attributable to hardware sensor limitations. As a result, the precision of structural deformation measurements may be compromised. More recently, event cameras have been explored as a potential sensor to address the issues above. The event camera is an innovative, dynamic vision sensor inspired by biological visual mechanisms [9, 10]. In contrast to traditional cameras that capture images at a fixed frame rate, event cameras feature pixels that respond asynchronously to changes in logarithmic luminosity [11, 12]. When the absolute difference between the current logarithmic intensity and the one at the time of the most recent event exceeds a predefined threshold, the ”event” is triggered. Event cameras offer several advantages, including a high dynamic range ( ∼ 140dB), high temporal resolution, low latency ( ∼ 1μs), and very low power consumption, making them suitable for deployment in real-time field-based photogrammetry [13, 14]. Currently, studies using event cameras for measuring structural deformation have yielded promising results. Structural deformation optical measurement based on asyn-chronous sparse event stream can be mainly divided into the following three forms: (1) global deformation measurement based on event stream. Lai et al. [15] utilized event cameras to measure structural deformation and proposed a new sparse identi-fication framework based on physical information, enabling vibration monitoring and mechanical analysis of beams. This method requires prior knowledge of the potential dynamics of the monitored structure and is currently only applicable to simpler struc-tures that do not utilize cooperative markers. It only uses event cameras to monitor structural deformation and is not suitable when the ambient light brightness is low. (2) Deformation measurement of structural key nodes based on event stream. Lv et 2Fig. 1 Flow diagram of the event-based measurement method for high-speed 3D deformation under extreme illumination conditions. 
+
+al. [16] proposed a structural plane vibration frequency detection method based on event cameras and developed two algorithms for vibration frequency detection using event stream: tag tracking and event counting, achieving high-precision measurement of vibration frequencies in the range of 10-190 Hz. However, the measurement results are related to the amplitude. As the amplitude decreases, the frequency measurement error increases. When the amplitude is less than 3 pixels, the frequency measurement error exceeds 30%, making the measurement results unreliable. However, to achieve 3D deformation measurement of structural key points,the first step is to extract the corresponding marker centers from asynchronous event streams. (3) Fusion measure-ment of event stream and other optical measurement methods. Zhu et al. [17] combined event cameras with digital speckle technology to observe blinking markers through event cameras, and then measured the strain of the structure using digital image cor-relation (DIC), achieving high-speed deformation measurement. However, this method requires spraying the marker on the surface of the structure, and the quality of the speckle affects the error of DIC [18, 19]. Cheng et al. [20–22] introduced a novel method based on CT imaging for measuring structural deformation. Compared to event cam-eras that can measure macroscopic structural deformation, their approach enables the analysis of particle-scale kinematics within materials, which is crucial to facilitate the development and validation of advanced discrete element models for crushable soils that incorporate realistic particle shapes. In summary, existing methods for measuring 3D structural deformation are currently limited. To apply event cameras to applications such as the aforementioned photogrammet-ric tasks, precise calibration of the multi-event camera system constitutes an essential prerequisite [23–25]. Calibration methods for traditional cameras can be classified into two categories: photogrammetric calibration and self-calibration [26–29]. Photogram-metric calibration utilizes a precise calibration object with a known 3D geometry. It establishes geometric correspondences between 3D markers and their two-dimensional projections to calculate the intrinsics and extrinsics [23, 26]. Such methods require expensive calibration instrumentation and an elaborate setup [30]. By moving a cam-era within a static environment, if the same camera takes images with fixed intrinsics, correspondences across three frames are sufficient to ascertain both intrinsics and extrinsics [31–33]. Nevertheless, the inherent characteristics of multi-event camera 3systems pose challenges in feature extraction and temporal synchronization [24]. Con-sequently, traditional camera calibration methods are not directly suitable for event cameras. The commonly used event camera calibration methods currently include motion-driven calibration methods [34–37] and methods utilizing dynamic illumination objects [38–40]. Motion-driven calibration methods confront challenges. The move-ment of the calibration object inevitably leads to the original events being sparse and messy. This compromises calibration precision. Meanwhile, in field environments, the use of large calibration board, blinking screens, or pre defined flashing patterns presents practical challenges related to portability and operational flexibility. Mean-while, calibrating event cameras via custom-fabricated, bulky, dynamic illumination object apparatuses proves cumbersome. To solve the aforementioned issues, this paper presents an integrated method, from calibration to measurement, using a multi-event camera array for high-speed 3D defor-mation monitoring of structures in harsh outdoor lighting environments. The flow diagram of the paper is shown in Fig. 1. The blinking light emitting diode (LED) marker moves quickly across the fields of view, enabling accurate and fast extrac-tion from the asynchronous event stream. A temporal correlation analysis framework is developed to identify synchronized marker positions across devices. Corresponding points from multiple event cameras have been successfully extracted without addi-tional constraints. Moreover, calibration parameters are found by solving Kruppa constraint equations, while parameter optimization minimizes reprojection errors. The method yields rapid calibration for multi-camera arrays. Ultimately, our approach enables high-speed 3D deformation measurement through the robust integration of multiple event cameras. The contributions of this paper include: 
+
+• We propose an integrated method—from calibration to measurement—using a multi-event camera array, in which a LED marker serves both for calibrating the camera array and for measuring structural deformation, thereby enabling high-speed 3D deformation monitoring under extreme illumination conditions. 
+
+• We propose a marker center extraction method suitable for both camera cali-bration and high-speed 3D structural deformation measurement. By leveraging asynchronous event streams and spatiotemporal correlation analysis, the method enables accurate corresponding point extraction from event data captured by multiple cameras without additional constraints. 
+
+• We propose a fast self-calibration method for a multi-event camera system by solv-ing the Kruppa constraint equations in conjunction with a parameter optimization framework that minimizes reprojection errors. In contrast to traditional methods, it achieves rapid calibration in field environments. The rest of this paper is organized as follows. Section 2 presents the proposed methods. Section 3 then demonstrates the detailed experimental results and discussion. The paper concludes in Section 4. 
+
+# 2 Method 
+
+This section presents a comprehensive method for high-speed 3D deformation measure-ment in extreme illumination conditions—from camera calibration to measurement. 4Section 2.1 introduces a LED marker design suitable for both event camera array cal-ibration and deformation measuring, along with its extraction method. Building on marker extraction, Section 2.2 describes a fast calibration method for the event camera array. Once camera intrinsics and extrinsics are obtained, Section 2.3 outlines spe-cific adaptations for marker extraction in deformation measurement and subsequently presents the method for structural deformation measurement. 
+
+## 2.1 Marker Center Point Extraction 
+
+The distribution of the event clusters E in the spatiotemporal domain can be approx-imately modeled as a two-dimensional Gaussian distribution N (μ, Σ), characterized by the following probability density function as Eq. (1): 
+
+f (x) = 12π  |Σ|1/2 exp 
+
+h
+
+−1/2 ( x − μ)T Σ−1(x − μ)
+
+i
+
+, x = ( x, y ), (1) where the Gaussian mean μ describes the location of the event clusters and can be replaced with its estimated value as Eq. (2): 
+
+μ = x = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+xi, (2) where n represents the total number of events in a cluster. The covariance matrix is a second-order square matrix that describes the shape and size of the event cluster, as expressed in Eq. (3): Σ = 
+
+ σ2 
+
+> x
+
+σxy 
+
+σyx σ2
+
+> y
+
+
+
+(3) The LED marker has a spherical design, producing a typical circular shape on the projection plane of the camera, so σxy = σyx = 0. Accumulate m events and calculate the centroid of these events. High-frequency blinking markers trigger events intensively through active changes in light intensity. When extracting the marker center point, the positional information from a single event is insufficient to reflect changes in the marker position. Therefore, a fixed number of events is accumulated, and the positions of the event clusters are extracted as the marker center point. At this stage, the timestamp of an individual event does not accurately represent the time at which the center point is extracted. If n events are accumulated to extract the marker center point, the time tc can be represented as Eq. (4): 
+
+tc = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ti, (4) where ti represents the timestamp of each accumulated event, and tc is the time to extract the marker center points. Event stream data differs from traditional image frames because it is asynchronous and sparse. A single event provides minimal information, and extracting the center 5of the marker requires accumulating and processing multiple events. At specific pixel locations, a change in brightness triggers an event in two event cameras. The timing of these output events does not match the exact time of real brightness changes in the physical world. There is a delay in the arrival of changes in light intensity at the pixel position. Additionally, spatial aliasing can also affect the timing of events, making it impossible to match multiple event camera pixels based on the exact timing of the output events.  
+
+> Fig. 2 Corresponding points extraction from event streams generated by various event cameras.
+
+This paper explores the use of temporal correlation to achieve high-precision matching of multi-event cameras and extract corresponding points, as illustrated in Fig. 2. Event camera 1 extracts the marker center ( xi, y i) at time t1, and camera 2 extracts ( xj , y j ) at t2. Assuming the time threshold is tth :
+
+|t1 − t2| ≤ tth , (5) then it is considered that ( xi, y i) and ( xj , y j ) are the corresponding points as the markers. The time threshold tth serves to establish correspondences between event streams. Its value depends on factors such as the marker’s velocity and the synchro-nization accuracy of the event cameras. Usually, a very small time threshold, on the order of 10 −8 seconds, is required to ensure precise matching of corresponding points. Due to differing requirements between calibration and measurement tasks, the marker extraction process differs during deformation measurement, as detailed in Section 2.3. 
+
+## 2.2 Fast Self Calibration of Multi-Event Camera System 
+
+Assume there are m event cameras and n object points xj = [ Xj , Y j , Z j , 1] ⊤
+
+, j =1, . . . , n . The correspondence between the pixel positions of object points and their corresponding events xj = [ uj , v j , 1] ⊤
+
+, j = 1 , ..., n can be obtained from the pin-hole imaging model. Event camera calibration involves calculating the scale factor s
+
+and specific parameters of the camera projection matrix M. Express the relationship 6between all cameras and points using Eq. (6) [28]: 
+
+Ws =
+
+
+
+s11
+
+u11
+
+v11
+
+1
+
+ · · · s1
+
+> n
+
+u1
+
+> n
+
+v1
+
+> n
+
+1
+
+
+
+... ... ...
+
+sm
+
+> 1
+
+um
+
+> 1
+
+vm
+
+> 1
+
+1
+
+ · · · smn
+
+umn
+
+vmn
+
+1
+
+
+
+=
+
+
+
+Ml
+
+...
+
+Mm
+
+
+
+> 3m×4
+
+[X1 · · · Xn]4×n = MX , (6) where Ws are called measurement matrix, M = [ M1, ..., Mm]⊤ is camera matrix, and 
+
+X = [ X1 · · · Xn] is structure matrix. If there are enough known coordinates [ u, v, 1] ⊤
+
+of the pixels and scale factors s, the matrix Ws can be decomposed into M and X [28]. Assuming all initial scale factor values are 1, obtain the initial value of Ws. Perform SVD decomposition on Ws:
+
+Ws = UDV ⊤ (7) For an ideal situation, the rank of the measurement matrix Ws is 4. However, due to data errors, the rank of Ws is not 4. Therefore, rank 4 correction is applied to the decomposition result of Ws as the best approximation of the measurement matrix: 
+
+dWs = U bDV ⊤, (8) where bD is the matrix obtained by taking zeros for all elements of D except for the first four diagonal elements. Therefore, the photographic reconstruction of the camera matrix is: ˜M = [ ˜M1, . . . , ˜Mm]T = U ˜D⊤ (9) The projective reconstruction of the structural matrix is: 
+
+eX = [ eX1 · · · eXn] = V⊤ (10) Reproject the results of the photographic reconstruction of the structural matrix and the camera matrix to obtain new estimates for each scale factor. Substitute the new scale factor to calculate the measurement matrix, repeat the above steps until convergence, and obtain the projection reconstruction result of the spatial target point. If the event camera collects data from directions j0 and j1 respectively, there exists the Kruppa equation as follows: 
+
+FCF ⊤ = s[ej1]×C [ej1]⊤× , (11) where s is the scaling factor, F is the basic matrix of two directional cameras, and ej1
+
+is the homogeneous coordinate of the image poles of the event camera collecting event 7data in the j1 direction. C = KK ⊤, K is the parameter matrix inside the camera. [ej1]× is an antisymmetric matrix defined by the vector ej1 = [ ej1,0ej1,1ej1,2]⊤:[ej1]× =
+
+ 0 −ej1,2 ej1,1
+
+ej1,2 0 −ej1,0
+
+−ej1,1 ej1,0 0
+
+ (12) Keep the camera’s internal parameters unchanged. Suppose the initial value of the camera’s principal point is taken at the center of the image plane, and the initial values of the equivalent focal length in the horizontal and vertical directions are the same, denoted as f . In that case, the only internal parameter to be solved is the equivalent focal length f . At this point, the equivalent focal length f can be easily solved from the Kruppa equation. 
+
+FCF ⊤ = s
+
+ 0 −ej1,2 ej1,1
+
+ej1,2 0 −ej1,0
+
+−ej1,1 ej1,0 0
+
+
+
+f 2 + C2 
+
+> x
+
+CxCy Cx
+
+CxCy f 2 + C2 
+
+> y
+
+Cy
+
+Cx Cy 1
+
+ 0 −ej1,2 ej1,1
+
+ej1,2 0 −ej1,0
+
+−ej1,1 ej1,0 0
+
+
+
+> ⊤
+
+(13) Expanding the equation to obtain Eq. (14). 
+
+FCF T = sD = s
+
+ D11 D12 D13 
+
+D21 D22 D23 
+
+D31 D32 D33 
+
+ , (14) Dividing the first two columns by the third column can eliminate the scaling factor 
+
+s, thereby obtaining a system of linear equations about f 2 and obtaining the equivalent focal length f .Due to the possibility that the projection reconstruction results may differ from the real camera parameters and target structure by a 3D projection transformation, for any 4 × 4 nonsingular matrix H, the projection reconstruction results fM and eX, as well as the Euclidean reconstruction results cM and bX, satisfy the following conditions: 
+
+Ws = fM eX = fMHH −1 eX = cM bX, (15) To further obtain the Euclidean reconstruction result that describes the true target structure from the projection reconstruction result, H should satisfy cM = MH and 
+
+bX = H−1X.8According to the central perspective projection relationship, the Euclidean recon-struction form of the camera matrix at the j orientation should be: 
+
+cMj = fMj H = Kj
+
+ Rj Tj
+
+ , (16) where Kj is the internal parameter matrix of the event camera at the j orientation, and Rj , Tj are the rotation matrix and translation vector of the event camera at the 
+
+j orientation Rewrite the 4 × 4 H as 
+
+H =  H11 h12 
+
+ , (17) where H11 is a 4 × 3 order matrix composed of the first three columns of H elements, and h12 is the last column of H, thus obtaining: 
+
+fMj H11 = Kj Rj (18) The transpose on both sides of the equal sign is: 
+
+H⊤ 
+
+> 11
+
+fM⊤ 
+
+> j
+
+= R⊤ 
+
+> j
+
+K⊤ 
+
+> j
+
+(19) Since the rotation matrix Rj is a unit orthogonal matrix, there are: 
+
+fMj H11 H⊤ 
+
+> 11
+
+fM⊤ 
+
+> j
+
+= Kj RR ⊤ 
+
+> j
+
+K⊤ 
+
+> j
+
+= Kj K⊤ 
+
+> j
+
+(20) If G = H11 HT
+
+> 11
+
+, then G is a 4 × 4 symmetric matrix, and H is a 4 × 3 matrix. Therefore, by performing SVD decomposition on G:
+
+G = A
+
+
+
+σ0
+
+σ1
+
+σ2
+
+0
+
+ A⊤
+
+= A
+
+
+
+√σ0 √σ1 √σ2
+
+0
+
+
+
+√σ0 √σ1 √σ2
+
+0
+
+
+
+> ⊤
+
+A⊤ (21) If A11 is a 4 × 3 matrix composed of the first three columns of elements A, we can obtain: 
+
+H11 = A11 
+
+
+
+√σ0 √σ1 √σ2
+
+ (22) 9If any point in X is taken as the origin of Euclidean coordinates, then: 
+
+ 0 0 0 1 ⊤ = H−1 eXi0 (23) So the last column h12 is: 
+
+h12 = eXi0 (24) Thus, the H matrix was obtained. Substitute the H matrix and projection recon-struction results fM and eX into Eq. (15) to obtain the 3D coordinates of the event camera parameters and target feature points, as well as the Euclidean reconstruction results cM and bX. The self-calibration result lacks scale information. First, compute the projection scale factor. Taking event camera c as the center, let the scale factor for all known corresponding point pairs p projected onto this event camera be scp = 1. For another event camera i, if it shares sufficient corresponding point pairs with event camera c to compute a unique fundamental matrix, the scale factor sip for event camera i can be calculated using Eq. (25) [28]: 
+
+sip =
+
+ eic × uip
+
+ ×  Fic ucp
+
+
+
+eic × uip 
+
+> 2
+
+scp, (25) where Fic denotes the fundamental matrix, eic represents the epipole, and ucp and 
+
+uip indicate the projected pixel coordinates on event camera c and event camera i,respectively. Next, the projection structure is optimized using Bundle Adjustment. From Eq. (6), the projection relationship of a 3D point onto the camera coordinate system is expressed in matrix form as: 
+
+sj uj = K exp( ξ∧)Xj , (26) where uj represents the projection of the 3D point on the camera, and exp( ξ∧) denotes the camera’s extrinsic parameters. Due to unknown camera poses and noise in observed points, this equation contains errors. Summing these errors, a least squares problem is formulated to find the optimal camera pose that minimizes the total error, as shown in Eq. (27): 
+
+ξ∗ = arg min 
+
+> ξ
+
+12
+
+> n
+
+X
+
+> j=1
+
+uj − 1
+
+sj
+
+K exp( ξ∧)Xj
+
+> 22
+
+(27) According to subsection 2.2, the measurement matrix is decomposed to obtain pro-jective reconstruction results for the camera matrix and structure matrix. Euclidean reconstruction is then applied to recover the true camera parameters. Next, outlier projection points are removed. Despite the robustness of the pro-posed cooperative marker extraction method, outliers may persist due to factors such as irrelevant background clutter, specular reflections causing high-frequency marker halo artifacts, and sensor-induced noise (e.g., background or thermal noise). These outliers degrade calibration accuracy or may even cause failure. The proposed method 10 eliminates outliers by computing epipolar geometric errors and reprojection errors of dynamic markers. For the extracted point sequences from two cameras, the epipolar lines are robustly estimated using the random sample consensus (RANSAC) seven-point algorithm [41]. Let K1 and K2 denote the intrinsic parameter matrices of camera 1 and camera 2, respectively, and R, t represent the geometric transformation parameters (rotation and translation) from camera 1 to camera 2. The fundamental matrix F between the cameras is computed as: 
+
+F = K−⊤  
+
+> 2
+
+[t]×RK −11 (28) The fundamental matrix F contains 7 degrees of freedom, requiring at least 7 matched feature pairs for estimation. Let u1 and u2 be the homogeneous coordinates of a 3D point projected onto event camera 1 and 2, respectively. The epipolar line l2
+
+on camera 2 is derived from Fu 1 = [ A, B, C ]T , yielding the equation: 
+
+Au + Bv + C = 0 (29) A distance threshold dh is defined for outlier rejection. Points violating the following condition are discarded: 
+
+|uT 
+
+> 2
+
+Fu 1|√A2 + B2 > d h, (30) where points u1 and u2 are identified as outliers and removed. Let ξth denote the reprojection error threshold for projected points on each camera. If the optimized reprojection error satisfies: 
+
+ξ∗ > ξ th , (31) then the corresponding projected point is classified as an outlier and discarded. Finally, the distortion parameters are estimated. First, the dynamic markers are reconstructed using the linear camera parameters obtained from previous steps. These 3D-2D correspondences are fed into a standard method to compute the camera dis-tortion parameters. The linear self-calibration is repeated using the corrected point coordinates, iterating until the desired accuracy is achieved. The summary of the calibration algorithm steps is shown in Table 1. The complexity of the nonlinear model gradually increases during iteration. How-ever, the distortion parameter estimation may fail if the markers are unevenly distributed in the camera’s field of view or excessive outliers persist in marker extrac-tion. In that case, reducing the nonlinear model complexity and restricting the number of free parameters is advisable. For instance, when solving for the principal point, the estimation becomes unstable if markers are clustered on one side of the image. In such cases, halting distortion parameter computation and fixing the principal point at the image center is preferable. While this may result in higher final reprojection errors, forcing erroneous nonlinear parameter estimates could compromise geometric consistency. 11 Table 1 Calibration algorithm. 
+
+Input Corresponding points for each camera P, Iteration count i, Initial value of camera projection matrix MOutput Intrinsic parameters K, extrinsic parameters R, T
+
+1 Calculate scale factor 2 Optimize the projection structure using the bundle adjustment method 3 Decompose the measurement matrix to obtain the projection recon-struction of the camera matrix and structure matrix 4 Perform Euclidean reconstruction to obtain camera parameters 5 By calculating the reprojection errors of polar geometry and dynamic landmark points, outlier projection points are eliminated 6 Solving distortion parameters 7 Repeat steps 1-5 to obtain the optimal camera parameters. When the average reprojection error of all points in each camera is less than the given threshold or reaches the maximum number of iterations, the iteration is terminated 
+
+The self-calibration process iteratively refines camera parameters until the mean reprojection error across all points falls below a predefined threshold or the maximum iteration count is reached, thereby completing the self-calibration of the event camera. 
+
+## 2.3 3D Deformation Measurement Utilizing Multi-event Cameras 
+
+To enable high-speed deformation measurements of structures under harsh lighting conditions, robust marker extraction must first be achieved. This requires not only suppressing interference from ambient background noise to ensure marker extraction accuracy, but also applying specialized processing—as outlined in Section 2.1—to the event stream generated by rapidly moving markers. As is seen in Eq. (2), the compu-tation of the marker center coordinates requires simultaneous processing of n events. To ensure accurate extraction of rapidly moving markers, the value of n is governed by Eq. (32): 
+
+n = f (ν, v ) (32) where ν is the blinking frequency of the LED marker, and v represents its velocity. The value of n increases with the LED marker’s blinking frequency and decreases with its displacement rate. Consequently, calibration uses a lower blinking frequency to prior-itize speed. In deformation measurement, the movement speed of markers is generally higher, and in order to distinguish them from events caused by structure movement, the blinking frequency needs to be higher. The specific value of n is dynamically determined based on these experimental conditions. The fast self-calibration method in Section 2.2 enables rapid estimation of camera pose relative to the world coordinate system. For deformation measurement applica-tions, careful selection of the world coordinate system is essential, necessitating an 12 Fig. 3 Reference coordinate system transformation. 
+
+initial transformation of the reference coordinate system. As is seen in Fig. 3, the world coordinate system is defined as Ow − XwYwZw. Meanwhile, the camera coor-dinate system of camera 1 is O1 − Xc1Yc1Zc1, and the camera coordinate system of camera 1 and camera 2 are O2 − Xc2Yc2Zc2 and O3 − Xc3Yc3Zc3, respectively. Among them, the rotation matrix and the direction vectors from the world coordinate system to O1 − Xc1Yc1Zc1 are R01 and T01 ; similarly, the direction vectors to O2 − Xc2Yc2Zc2
+
+and O3 − Xc3Yc3Zc3 are R02 , T02 and R03 , T03 , respectively. To simplify the calculation process, we choose the coordinate system of camera 1 as the reference coordinate system. At this point, we need to separately calculate the rotation matrix and translation vector of camera 2’s coordinate system and camera 3’s coordinate system relative to camera 1’s coordinate system, as is seen in Eq. (33) and Eq. (34): 
+
+R12 = R02 · R⊤
+
+> 01
+
+, R13 = R03 · R⊤
+
+> 01
+
+, (33) 
+
+T12 = T02 − R12 · T01 , T13 = T03 − R13 · T01 , (34) where R12 represents the direct rotation from camera 1 to camera 2, and T12 is the offset of camera 2’s origin relative to camera 1. Similarly, R13 represents the direct rotation from camera 1 to camera 3, and T13 is the offset of camera 3’s origin relative to camera 1. The planar intersection algorithm leverages knowledge of geometry to determine the geometric relationship between the camera, the imaging plane, and the target. The first camera coordinate system is defined as O1 − Xc1Yc1Zc1, and the corresponding image frame as o1 − u1v1. Similarly, the second camera coordinate system and the corresponding image frame coordinate system are defined separately as O2 −Xc2Yc2Zc2
+
+and o2 − u2v2. The third camera coordinate system and the corresponding image frame coordinate system are defined separately as O3 − Xc3Yc3Zc3 and o3 − u3v3. In the absence of an inclinometer to determine the spatial attitude of the camera, it is 13 assumed that the left camera coordinate system is the reference coordinate system. Thus, coordinates of the points on the left and right camera imaging planes can be expressed using Eq. (35): 
+
+Zc1
+
+ u1
+
+v1
+
+1
+
+ = M
+
+
+
+XYZ
+
+1
+
+ , Zc2
+
+ u2
+
+v2
+
+1
+
+ = N
+
+
+
+XYZ
+
+1
+
+ , Z c3
+
+ u3
+
+v3
+
+1
+
+ = P
+
+
+
+XYZ
+
+1
+
+ , (35) where Zc1, Zc2 and Zc3 represent the projections of the distance from the object points to the optical center in the direction of the optical axis. ( u1, v 1), ( u2, v 2)and ( u3, v 3)are the ideal image coordinates of the image points on the each camera image frames, respectively. ( X, Y, Z ) represents the world coordinates of the object point. M is the projection matrix of the first camera, while N is the projection matrix of the second camera. P represents the projection matrix of the third camera. The matrix M, N
+
+and P can be obtained from the Eq. (36): 
+
+M = A1
+
+ I 00⊤ 1
+
+
+
+, N = A2
+
+R12 T12 
+
+0⊤ 1
+
+
+
+, P = A3
+
+R13 T13 
+
+0⊤ 1
+
+
+
+, (36) where A1, A2 and A3 are the intrinsic parameter matrices of the each camera, respec-tively. I is a 3 ×3 identity matrix. R12 , T12 and R13 , T13 can be obtained by Eq. (33) and Eq. (34). It is possible to measure the 3D position ( X, Y, Z ) of markers by combining Eq. (2), Eq. (32) and Eq. (35): 
+
+Zc1
+
+n M−1
+
+
+
+> n
+
+P
+
+> i=1
+
+u1inP
+
+> i=1
+
+v1i
+
+1
+
+ = Zc2
+
+n N−1
+
+
+
+> n
+
+P
+
+> i=1
+
+u2inP
+
+> i=1
+
+v2i
+
+1
+
+ = Zc3
+
+n P−1
+
+
+
+> n
+
+P
+
+> i=1
+
+u3inP
+
+> i=1
+
+v3i
+
+1
+
+ =
+
+
+
+XYZ
+
+1
+
+ , (37) 
+
+# 3 Experiments 
+
+To verify the proposed method, experiments were conducted as shown in Fig. 4. Fig. 4(a) displays the blinking LED marker setup, used for calibration and defor-mation measurement. The spherical marker has a 5cm outer diameter. Its frequency controller sets the LED between 1-100 kHz and adjusts the duty cycle. Empirical test-ing determined a 250 Hz frequency and 40% duty cycle as optimal for camera event stream quality. As is seen in Fig. 4(b), three event cameras formed an array in the experiment. The model of the camera is Prophete EVK4 (resolution 1280 × 720 pixels), and the camera is equipped with a lens with a focal length of 12 mm . Three cameras can collect data synchronously. The event cameras were mounted on tripods. The baseline distance between camera 1 and camera 2 is 4.64m, and the baseline distance between camera 2 and camera 3 is 4.54m. 14 (a) Blinking LED marker. (b) Configuration of the multi-event camera array.  
+
+> Fig. 4 Experimental configuration.
+
+## 3.1 Fast Self-calibration of the Multi-event Camera Array 
+
+Prior to structural deformation measurements, calibrate the event camera array depicted in Fig. 4(b). Use the dynamic high-frequency blinking LED marker to move in the public field of view of the event camera system and create a dynamic calibration field. Then, use a synchronized multi-event camera array to collect spatiotemporal information of the marker. Once the markers are extracted via the proposed method, proceed to calibrate the camera array. In the experiment, the initial camera intrinsics ( fx, f y ) is set as (1600 , 1600), and (Cx, C y ) is set as (639 .5, 359 .5). The optical center can be assumed to be located at the center of the image, and the tilt factor of the camera is 0. Set the initial distortion parameter to 0. Set the maximum number of iterations to 20 or stop iterating when the average of all reprojections for each camera is less than 0.3 pixels. The results of calibrating the internal parameters of the event cameras using the proposed method are shown in Table 2.  
+
+> Table 2 Calibration results of each camera intrinsics.
+
+Extrinsics Event camera 1 Event camera 2 Event camera 3 (fx, f y ) (1778.5077, 1772.3397) (1756.2173, 1757.6988) (1816.1340, 1809.6153) (Cx, C y ) (639.5, 359.5) (639.5, 359.5) (639.5, 359.5) (k1, k 2) (-0.05359, 0.33899) (-0.09119, 0.38824) (-0.11437, 0.91938) (p1, p 2) (-0.00157, -0.00479) (0.00149, -0.00318) (-0.00144, 0.00497) 
+
+The definition of the world coordinate system is random. However, it is hoped that the defined world coordinate system can simplify the calculation process and lend practical significance to the calculated parameters. We set the coordinate system of camera 2 as the reference coordinate system. Then, the extrinsics of camera 1 and camera 3 were calibrated separately. The results are shown in Table 3. The translation vector here represents the relative positional relationship between the cameras and does not have any actual physical scale meaning. 15 Table 3 Calibration results of each camera extrinsics.                  
+
+> Extrinsics Event camera 2 Event camera 1 Event camera 3
+> R
+> 1 0 0 0 1 0 0 0 1
+> 0.99267 0.00302 0.06502 0.01514 0.86947 −0.50846
+> −0.09079 0 .51537 0.85804
+> 0.97156 0.09647 0.02984 0.00481 0.29765 −0.93251
+> −0.11474 0 .95562 0.30323
+> 
+> T
+> 000
+> 0.2224
+> −0.8944
+> −0.3881
+> 0.1517
+> −0.5671
+> −0.8096
+> 
+
+The mean and standard deviation of the reprojection error for each event camera calibration are shown in Fig. 5. The average reprojection error of event camera 1 is 0.27 pixels, with a standard deviation of 0.18 pixels, while the average reprojection error of event camera 2 is 0.28 pixels, with a standard deviation of 0.21 pixels. Additionally, the average reprojection error of event camera 3 is 0.22 pixels, with a standard deviation of 0.17 pixels. The reprojection error of the camera is less than 0.3 pixels.  
+
+> Fig. 5 Mean and standard deviation of reprojection error for each event camera.
+
+Fig. 6 shows the reconstructed 3D coordinates of the marker points after remov-ing outliers based on the event camera’s calibration parameters, as well as the event camera’s position and optical axis direction. The results indicate that the optical axis direction of the relative position of the event camera is consistent with the actual experiment. To validate the calibration accuracy of our method, we conduct the verifica-tion experiment. The actual baseline distance between cameras is used to scale the self-calibration results. A checkerboard with a square size of 50mm was employed. The board was gently moved within the event camera’s field of view, allowing the camera to capture events triggered by the motion of the checkerboard edges. Based on the cal-ibration parameters obtained by our method, the real-world coordinates of each corner are reconstructed via spatial intersection, as is seen in Fig. 7. The distances between selected corners are then measured and compared to their known physical dimen-sions. Because the edge features of the checkerboard observed by the event camera are not sharply defined, corner-extraction errors significantly affect the measurements. To mitigate this, multiple sets of data are collected and averaged. The actual measurement results are shown in Table 4 and Table 5. 16 Fig. 6 Reprojection error and 3D reconstruction results of inliers and camera positions. 
+
+Fig. 7 Actual distance measurement results of corner points. 
+
+Table 4 Actual distance measurement results of camera 1 and camera 2. 
+
+Actual distance (mm) Camera 1 and Camera 2 intersect (mm) Absolute error (mm) Relative error 150 149.39 0.61 0.41% 200 201.76 1.76 0.88% 250 245.20 4.80 1.90% 300 299.47 0.53 0.18% 
+
+Table 5 Actual distance measurement results of camera 2 and camera 3. 
+
+Actual distance (mm) Camera 1 and Camera 2 intersect (mm) Absolute error (mm) Relative error 150 150.31 0.31 0.21% 200 201.69 1.69 0.84% 250 251.32 1.32 0.53% 300 302.32 2.32 0.77% 
+
+17 As shown in the table above, when measuring the distance between two adjacent corners, the result is more sensitive to extraction errors at each corner, leading to a larger relative error. As the measured distance between corners increases, the relative error decreases. For a corner spacing of 300mm, the relative difference between the triangulation results from camera 1 and camera 2 and those from camera 2 and camera 3 is less than 1%. These experimental results confirm that the proposed self-calibration method meets the required accuracy. 
+
+## 3.2 High-Speed Deformation Measurement under Extreme Illumination Conditions 
+
+To verify the performance of the proposed method for deformation measurement under extreme illumination conditions, the emulation experiment was first conducted. Under the same observational conditions, employ a traditional optical camera and an event camera to capture LED marker imagery independently. The result is shown in Fig. 8. In Fig. 8(a), set the exposure time to 50 milliseconds and adjust the aperture to the minimum. At this point, there are still obvious overexposed areas in the image, making it impossible to extract marker features from the image. Accumulate the event stream into event frames at intervals of 1/30 s, as shown in Fig. 8(b). Clear symbol features are still visible in the event frames. This experiment demonstrates that the method proposed in this paper can accurately measure the 3D structural deformation under extreme illumination conditions, surpassing the capabilities of traditional cameras.   
+
+> (a) Optical camera captures images. (b) Event camera captures the event stream.
+> Fig. 8 Imaging experiment under extreme illumination conditions.
+
+To validate measurement accuracy in the absence of known ground-truth struc-tural deformation values, an emulation experiment was conducted. Two markers are mounted at both ends of a 1000.0 mm pole, and the distance between markers is measured using the camera array presented in this paper. The LED marker was con-figured to blink at a frequency of 250 Hz. The marker center points were extracted by the proposed method, the measured maximum distance between the two markers was 999 .2mm, yielding an absolute error of 0 .8mm and a relative error of 0.08% compared 18 to the truth value. The experimental results demonstrate that the proposed method achieves the required measurement accuracy. Finally, we measured the high-speed deformation under extreme illumination con-ditions. Field environments exhibit highly heterogeneous illumination, characterized by alternating direct sunlight and shadow. Mount the LED marker on a tower posi-tioned centrally within the camera array’s field of view. Operate the LED marker at 250 Hz with synchronized pulse-width modulation, while applying mechanical excita-tion to the tower via sustained rapid oscillation. The multi-event camera array then quantifies the 3D displacement of LED markers using high-speed photogrammetry.   
+
+> (a) 3D deformation measurement.
+> (b) Component in the X-axis.
+> (c) Component in the Y-axis. (d) Component in the Z-axis.
+> Fig. 9 Deformation measurement results.
+
+3D deformation measurements of the tower structure were obtained through spatial intersection using the multi-event camera array, with results shown in Fig. 9. The 3D deformation trajectory is seen in Fig. 9(a), which exhibits a maximum amplitude of 18.2 mm. Fig. 9(b) shows the projection of the deformation in the X-axis direction, while Fig. 9(c) and Fig. 9(d) show the projections of the deformation in the Y-axis and Z-axis directions, respectively. The method described in this paper can accurately track the markers and achieve high-speed 3D deformation measurements of structures under extreme illumination conditions. Through the experiments mentioned above, the effectiveness of the entire methodology and workflow of the method, leveraging a synchronized multi-camera array, has been validated. 19 4 Conclusion 
+
+This paper addresses the critical limitation of conventional cameras in measuring high-speed 3D deformation under extreme illumination. We present an integrated calibration to measurement method based on a multi-event camera array for monitor-ing structural deformation under extreme illumination conditions. The method first extracts corresponding marker centers by leveraging the asynchronous characteristics of the event stream combined with temporal correlation analysis. Camera calibra-tion is then achieved efficiently through Kruppa equation solving integrated with a parameter optimization framework. Finally, 3D deformation under extreme lighting is reconstructed via unified coordinate transformation and linear intersection. Exper-imental results confirm that our method has advantages in accurately measuring 3D structural deformation under harsh illumination. The method offers a flexible and practical solution for field-based structural monitoring in challenging outdoor lighting. An inherent limitation of self-calibration is its inability to recover the absolute scale. To resolve this in practice, imposing an external metric constraint, such as a known baseline distance, is necessary. 
+
+# Acknowledgements 
+
+This research has been supported by the Hunan Provincial Natural Science Foundation for Excellent Young Scholars under Grant 2023JJ20045, and the National Natural Science Foundation of China under Grant 12372189. 
+
+# Declarations 
+
+Conflict of Interests The authors declare that they have no known competing finan-cial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Data Availability Data underlying the results presented in this paper are not pub-licly available at this time but may be obtained from the authors upon reasonable request. 
+
+# CRediT authorship contribution statement 
+
+Banglei Guan : Investigation, Supervision, Methodology, Writing – review & editing. 
+
+Yifei Bian : Investigation, Software, Methodology, Writing – original draft. 
+
+Zibin Liu : Investigation, Software. 
+
+Haoyang Li : Investigation, Formal analysis. 
+
+Xuanyu Bai : Investigation, Validation. 
+
+Taihang Lei : Investigation, Formal analysis. 
+
+Bin Li : Investigation, Formal analysis. 
+
+Yang Shang : Supervision, Methodology, Writing –review & editing. 
+
+Qifeng Yu : Supervision, Methodology. 20 References 
+
+[1] Han, H., L, D.S., Zhang, G.D., Zhao, J.B., Cui, L., Fan, H., Li, G.X., Wang, M.H.: A reconfigurable mobile launch pad for multiple launchers. Aerospace China, 73–80 (2021) [2] He, Z.G., Li, W.T., Salehi, H., Zhang, H., Zhou, H.Y., Jiao, P.C.: Integrated structural health monitoring in bridge engineering. Automation in Construction, 104168 (2022) [3] Bartels, J., Guendogdu, B., Herrmann, R., Marx, S.: Acceleration sensors for structural health monitoring of engineering structures under the influence of environmental factors at low frequencies. Bautechnik, 1 (2024) [4] E., J., A., G., G., J.M., S., J., V., G., G., J.: Ultrasound-based structural health monitoring methodology employing active and passive techniques. Engineering Failure Analysis, 107077 (2023) [5] Zhai, G.H., Liang, Y.B., Tan, Z.S., Wang, S.R.: Development of an iterative otsu method for vision-based structural displacement measurement under low-light conditions. Measurement, 114182 (2024) [6] S., S., D., K., S., A.: A systematic review of convolutional neural network-based structural condition assessment techniques. Engineering Structures, 111347 (2021) [7] Hu, L.L., Bao, Y., Sun, Z., Meng, X.L., Tang, C., D.L., Z.: Outlier detection based on nelder-mead simplex robust kalman filtering for trustworthy bridge structural health monitoring. Remote Sensing, 2385 (2023) [8] Su, Z.L., Pan, J.Y., Zhang, S.Q., Wu, S., Yu, Q.F., Zhang, D.S.: Characterizing dynamic deformation of marine propeller blades with stroboscopic stereo digital image correlation. Mechanical Systems and Signal Processing. 162 , 108072 (2021) [9] Guillermo, G., Tobi, D., Garrick, O., Chiara, B., Brian, T., Andrea, C., Ste-fan, L., J.D., A., Jorg, C., Kostas, D., Davide, S.: Event-based vision: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence. 44 (1), 154–180 (2022) [10] Shi, C.Y., Wei, B.Y., Wang, X.C., Liu, H.X., Zhang, Y.B., Li, W.Z., Song, N.F., Jin, J.: Polarity-focused denoising for event cameras. IEEE Transactions on Circuits and Systems for Video Technology, 4370–4383 (2025) [11] Gallego, G., Rebecq, H., Scaramuzza, D.: A unifying contrast maximization framework for event cameras. In: IEEE/CVF International Conference on Com-puter Vision. IEEE, Salt Lake City (2018) 21 [12] Tobi, D.: Frame-free dynamic digital vision. In: Proceedings of Intl. Symp. on Secure-Life Electronics, Advanced Electronics for Quality Life and Society. Citeseer, Tokyo (2008) [13] Liu, Z.B., Guan, B.L., Shang, Y., Bian, Y.F., Sun, P.J., Yu, Q.F.: Stereo event-based, 6-dof pose tracking for uncooperative spacecraft. IEEE Transactions on Geoscience and Remote Sensing. 63 , 1–13 (2025) [14] Lagorce, X., Meyer, C., Ieng, S.H.: Asynchronous event-based multikernel algo-rithm for high-speed visual features tracking. IEEE Transactions on Neural Networks and Learning Systems. 8(8), 1710–1720 (2015) [15] Lai, Z., Alzugaray, I., Chli, M., Chatzi, E.: Full-field structural monitoring using event cameras and physics-informed sparse identification(article). Mechanical Systems and Signal Processing, 106905 (2020) [16] Lv, Y., Zhou, L., Liu, Z., Zhang, H.: Structural vibration frequency monitoring based on event camera. Measurement Science and Technology, 085007 (2024) [17] Zhu, C., Gao, Z., Xue, W., Tu, H., Zhang, Q.: High-speed deformation measure-ment with event-based cameras. Experimental Mechanics, 987–994 (2023) [18] Wei, K., Wei, G., Shao, X.X., Jin, D.P., He, X.Y.: An experimental method for stereo-dic measurement of large-scale thin-film structures. Experimental Mechanics, 1–7 (2024) [19] Pan, B., Yu, L.P., Wu, D.F.: High-accuracy 2d digital image correlation mea-surements with bilateral telecentric lenses: error analysis and experimental verification. Experimental Mechanics, 1719–1733 (2013) [20] Z., C., J.F., W.: A particle-tracking method for experimental investigation of kinematics of sand particles under triaxial compression. Powder Technology 328 ,436–451 (2018) [21] Z., C., J.F., W.: Quantification of the strain field of sands based on x-ray micro-tomography: A comparison between a grid-based method and a mesh-based method. Powder Technology 344 , 314–334 (2019) [22] Z., C., J.F., W.: An investigation of the breakage behaviour of a pre-crushed carbonate sand under shear using x-ray micro-tomography. Engineering Geology 
+
+293 , 106286 (2021) [23] Yiannis, A., Patrick, B.: Complete calibration of a multi-camera network. In: Proceedings IEEE Workshop on Omnidirectional Vision. IEEE, Hilton Head (2000) [24] Jiao, J.H., Chen, F.Y., Wei, H.X., Wu, J., Liu, M.: Lce-calib: Automatic 22 lidar-frame/event camera extrinsic calibration with a globally optimal solution. IEEE/ASME Transactions on Mechatronics. 28 (5), 1–12 (2023) [25] Mohammed, S., Abdulla, A., Muhammad, H., Daniel, G., Abdelqader, A., Lak-mal, S., Davide, S., Yahya, Z.: E-calib: A fast, robust and accurate calibration toolbox for event cameras. IEEE Transactions on Image Processing. 33 , 1 (2024) [26] Zhang, Z.Y.: Flexible camera calibration by viewing a plane from unknown ori-entations. In: Proceedings of the Seventh IEEE International Conference on Computer Vision. IEEE, Kerkyra (1999) [27] Zhang, Z.Y.: A flexible new technique for camera calibration. IEEE Transactions on Pattern Analysis and Machine Intelligence. 22 (11), 1330–1334 (2000) [28] Svoboda, T., Martinec, D., Tom´ a, P.: A convenient multicamera self-calibration for virtual environments. Presence: Teleoperators and Virtual Environments. 14 ,407–422 (2005) [29] Liu, Y., Lv, Z., Zhang, Q., Zhao, J., Fang, Z., Gao, Z., Su, Y.: Comparison study of three camera calibration methods considering the calibration board quality and 3d measurement accuracy. Experimental Mechanics, 289–307 (2023) [30] Hartley, R.I.: Projective reconstruction and invariants from multiple images. IEEE Transactions on Pattern Analysis and Machine Intelligence. 16 (10), 1036–1041 (1994) [31] Ma, S.D.: A self-calibration technique for active vision systems. IEEE Transac-tions on Robotics and Automation. 12 (1), 114–120 (1996) [32] Faugeras, O.D., Luong, Q.T., S.J., M.: Camera self-calibration: Theory and exper-iments. In: European Conference on Computer Vision. Springer, Santa Margherita Ligure (1992) [33] Stephen, J.M., Olivier, D.F.: A theory of self-calibration of a moving camera. International Journal of Computer Vision. 8(2), 123–151 (1992) [34] Muglikar, M., Gehrig, M., Gehrig, D., Scaramuzza, D.: How to calibrate your event camera. In: IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops. IEEE, Nashville (2021) [35] Huang, K., Wang, Y.F., Kneip, L.: Dynamic event camera calibration. In: IEEE/RSJ International Conference on Intelligent Robots and Systems. IEEE, Prague (2021) [36] Hu, R., Kogler, J., Gelautz, M., Lin, M., Xia, Y.Q.: A dynamic calibration frame-work for the event-frame stereo camera system. IEEE Robotics and Automation Letters. 9(12), 11465–11472 (2024) 23 [37] S., M., A., A., H., M., G., D., A., A., S., L., S., D., Z., Y.: E-calib: A fast, robust and accurate calibration toolbox for event cameras. IEEE Transactions on Image Processing, 1 (2024) [38] Manuel, J.D., ´Angel, J., Gabriel, J., Cristina, C., Enrique, C., Alejandro, L.: Bio-inspired stereo vision calibration for dynamic vision sensors. IEEE Access. 7,138415–138425 (2019) [39] Wang, Y.Q., He, S.Y., Fei, Y.F., Liu, X.J.: Motion-error-free calibration of event camera systems using a flashing target. Optics Express. 32 (15), 26833–26845 (2024) [40] Gossard, T., Ziegler, A., Kolmar, L., Tebbe, J., Zell, A.: ewand: An extrinsic calibration framework for wide baseline frame-based and event-based camera sys-tems. In: IEEE International Conference on Robotics and Automation. IEEE, Yokohama (2024) [41] Richard, H., Andrew, Z.: Multiple View Geometry in Computer Vision, Second Edition. Cambridge University Press, Cambridge (2003) 24
