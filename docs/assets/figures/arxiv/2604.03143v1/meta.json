@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-001.webp",
+      "caption": "Figure 7. Collective KV Cache reuse for a three-agent AllGather round. Left: each agent’s prompt contains a private section and the same shared blocks in different orders. Right: vLLM computes all three from scratch (T1); per-request PIC processes each request independently (T2); TokenDance groups them and shares the RoPE and important-position selection work across the group (T3), paying the reuse overhead once per round.",
+      "page": 6,
+      "index": 1,
+      "width": 504,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-002.webp",
+      "caption": "Figure 14. Accuracy evaluation across eight scenarios from GenerativeAgents (IDs 1–4) and AgentSociety (IDs 5–8). Each bar shows the number of simulation rounds completed before the first output divergence between TokenDance and vLLM (prefix caching, temperature = 0). The relative difference Δ is annotated above each pair. Workload ID mapping: 1 = Meet and Greet, 2 = Valentine’s Day Party, 3 = Election Discussions, 4 = Winning the Election, 5 = Information Outbreak, 6 = Pre-Landfall Activity, 7 = Hurricane, 8 = Economic Stabilization. Three scenarios show zero divergence; the remaining differences are attributable to the underlying PIC method, not to TokenDance.",
+      "page": 11,
+      "index": 2,
+      "width": 504,
+      "height": 262
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-003.webp",
+      "caption": "Figure 1. The All-Gather prompt structure. All agents receive the same output blocks (𝑂), but the blocks appear at different positions because each prompt has its own private history (𝐻 ) and may use a different block order. This structure arises in any multi-agent application that follows the All-Gather pattern.",
+      "page": 2,
+      "index": 3,
+      "width": 504,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-004.webp",
+      "caption": "Figure 12. Redundancy characterization of recovered KV Caches across agents in a single GenerativeAgents round. Left: compression ratio (full cache size divided by Masterplus-diff size). Right: average number of 32-token blocks that differ between a Mirror and its Master. The 14B model achieves higher compression because cache tensors per token are larger while the number of differing blocks stays similar.",
+      "page": 10,
+      "index": 4,
+      "width": 504,
+      "height": 254
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-005.webp",
+      "caption": "Figure 11. Collective KV Cache reuse speedup over serial (per-request) PIC recovery for varying agent counts (3, 5, 10, 15, 20) and QPS levels on the GenerativeAgents workload. The peak speedup of 2.57× occurs at 10 agents and 𝑄𝑃𝑆 = 1. All configurations exceed 1.0× across the full QPS range, confirming that collective reuse is consistently beneficial.",
+      "page": 10,
+      "index": 5,
+      "width": 504,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-006.webp",
+      "caption": "Figure 4. Per-request PIC reuse (top) vs. TokenDance’s collective reuse (bottom). Existing PIC methods process each agent’s shared blocks independently, repeating RoPE rotation and important-position selection 𝑁 times. TokenDance groups the 𝑁 requests and performs these operations once for the round.",
+      "page": 3,
+      "index": 6,
+      "width": 504,
+      "height": 637
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-007.webp",
+      "caption": "Figure 5. TokenDance Overview. A round-aware prompt interface preserves block boundaries so the runtime can identify shared content; collective KV Cache reuse amortizes the reuse cost across all agents in the round; diff-aware storage with fused restore compresses per-agent KV Caches to only the inter-agent differences.",
+      "page": 4,
+      "index": 7,
+      "width": 504,
+      "height": 383
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-008.webp",
+      "caption": "Figure 10. Scaling capacity overview across two workloads (GenerativeAgents, AgentSociety) and two models (Qwen2.5-7B, Qwen2.5-14B). Left panels: round latency vs. agent count at 𝑄𝑃𝑆 = 10; the dashed line marks the 1500 ms SLO. Right panels: maximum number of agents that stay below the SLO at each QPS level. TokenDance (orange) consistently supports more agents than all baselines across the full QPS range.",
+      "page": 9,
+      "index": 8,
+      "width": 1052,
+      "height": 426
+    },
+    {
+      "url": "assets/figures/arxiv/2604.03143v1/fig-009.webp",
+      "caption": "Figure 6. Example of TokenDance’s round-aware prompt interface. Each prompt is composed of a private history block and a shared set of output blocks, with reserved separator tokens (<TTSEP>) in between.",
+      "page": 5,
+      "index": 9,
+      "width": 504,
+      "height": 315
+    }
+  ]
+}

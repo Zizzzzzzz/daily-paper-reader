@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-001.webp",
+      "caption": "Table 3. Performance and Efficiency Comparison on Referring and Reasoning Segmentation Benchmarks. Our WISE models drastically reduce token overhead (#Tok) while improving or maintaining accuracy (cIoU) across all benchmarks compared to the Seg-Zero and brevity-focused reward shaping methods (L1-Exact, L1-Max (Aggarwal & Welleck, 2025)). The sub-rows show the token reduction factor (× ↓) and the absolute performance change (∆) against the Seg-Zero.",
+      "page": 6,
+      "index": 1,
+      "width": 1008,
+      "height": 248
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-002.webp",
+      "caption": "Table 7. Effect of Inference Strategies. While the default WISE setting (+τc − τd) offers substantial compression, the targeted brevity prompt in WISE-S achieves the optimal efficiency-accuracy balance.",
+      "page": 7,
+      "index": 2,
+      "width": 498,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-003.webp",
+      "caption": "Figure 4. Distribution of Reasoning Token Length. The KDE plot illustrates the dramatic reduction in both length and variance. WISE-S (green) demonstrates a tightly concentrated preference for conciseness compared to the long-tailed Seg-Zero baseline (purple).",
+      "page": 7,
+      "index": 3,
+      "width": 468,
+      "height": 319
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-004.webp",
+      "caption": "Figure 7. Analysis of Failure Cases: Semantic Fidelity amidst Grounding Errors. These examples illustrate instances where the model fails to produce an accurate mask (Low IoU). Crucially, however, the Concise Rationale (τc) remains a faithful summary of the Detailed Explanation (τd). (a) In the top example, both τc and τd correctly identify the semantic topic but struggle to ground the abstract concept to specific pixels. (b) In the bottom example, both rationales exhibit circular logic without identifying distinct visual attributes. This indicates that the failures stem from the underlying limitations of the base model’s spatial grounding capabilities or reasoning loops, rather than information loss caused by the WISE-S compression mechanism.",
+      "page": 13,
+      "index": 4,
+      "width": 963,
+      "height": 1165
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-005.webp",
+      "caption": "Figure 5. Qualitative Comparison. Given a complex instruction, Seg-Zero produces a convoluted, 132-token rationale and fails. In contrast, WISE-S generates a concise, correct reasoning chain, successfully identifying the target with a fraction of the cost.",
+      "page": 8,
+      "index": 5,
+      "width": 964,
+      "height": 328
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-006.webp",
+      "caption": "Figure 2. Overview of the WISE framework. During training (orange), the reasoning model Freason generates a structured sequence: concise rationale (τc), answer (A), and detailed explanation (τd). The process is optimized via GRPO using a hierarchical reward, notably including a self-distillation term (Rdistill) that aligns τc with τd while enforcing brevity. The segmentation model Fseg remains frozen. At inference (blue), τd is omitted and a brevity prompt (Tb) is added to ensure highly efficient reasoning.",
+      "page": 4,
+      "index": 6,
+      "width": 963,
+      "height": 306
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-007.webp",
+      "caption": "Figure 6. Success Case Study Examples. The figures demonstrate how WISE-S acts as a sufficient statistic. (a) Shows the model efficiently identifying an object by its function (“take small sips”) without verbose description. (b) Shows the model correctly filtering out spatial redundancy to focus on discriminative visual attributes (“red and white obstacle”).",
+      "page": 12,
+      "index": 7,
+      "width": 968,
+      "height": 1359
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-008.webp",
+      "caption": "Table 1. Comparison with state-of-the-art methods on the Zeroshot ReasonSeg benchmark. WISE-7B and WISE-7B-S significantly outperform prior methods. ∗We re-evaluate with their official checkpoints. †Results reported in the original paper using different checkpoints.",
+      "page": 5,
+      "index": 8,
+      "width": 492,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02040v1/fig-009.webp",
+      "caption": "Table 2. Comparison with state-of-the-art methods on the Referring Expression Segmentation benchmark. Our models achieve competitive or superior performance against specialized methods while being more general.",
+      "page": 5,
+      "index": 9,
+      "width": 462,
+      "height": 304
+    }
+  ]
+}

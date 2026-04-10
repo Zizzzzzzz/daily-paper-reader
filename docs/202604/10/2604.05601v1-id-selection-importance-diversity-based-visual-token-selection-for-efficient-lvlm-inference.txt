@@ -1,0 +1,421 @@
+Title: ID-Selection: Importance-Diversity Based Visual Token Selection for Efficient LVLM Inference
+
+URL Source: https://arxiv.org/pdf/2604.05601v1
+
+Published Time: Wed, 08 Apr 2026 00:46:33 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# ID-Selection: Importance-Diversity Based Visual Token Selection for Efficient LVLM Inference 
+
+# Zhaohong Huang 1,∗, Wenjing Liu 1,∗, Yuxin Zhang 1, Fei Chao 1, Rongrong Ji 11Xiamen University, 361005, P.R. China. 
+
+# Abstract 
+
+Recent advances have explored visual token pruning to accelerate the inference of large vision-language models (LVLMs). However, existing methods often struggle to bal-ance token importance and diversity: importance-based methods tend to retain redundant tokens, whereas diversity-based methods may overlook informative ones. This trade-off becomes especially problematic under high reduction ra-tios, where preserving only a small subset of visual tokens is critical. To address this issue, we propose ID-Selection, a simple yet effective token selection strategy for efficient LVLM inference. The key idea is to couple importance es-timation with diversity-aware iterative selection: each to-ken is first assigned an importance score, after which high-scoring tokens are selected one by one while the scores of similar tokens are progressively suppressed. In this way, ID-Selection preserves informative tokens while reducing redundancy in a unified selection process. Extensive ex-periments across 5 LVLM backbones and 16 main bench-marks demonstrate that ID-Selection consistently achieves superior performance and efficiency, especially under ex-treme pruning ratios. For example, on LLaVA-1.5-7B, ID-Selection prunes 97.2% of visual tokens, retaining only 16 tokens, while reducing inference FLOPs by over 97% and preserving 91.8% of the original performance, all without additional training. 
+
+# 1. Introduction 
+
+In recent years, Large Vision-Language Models (LVLMs) have become a prominent research focus in the multimodal community [3, 20]. These models typically consist of a visual encoder [30, 39], a projector, and a large language model (LLM). The visual encoder extracts image features, which are then mapped by the projector into the seman-tic space of the LLM [2, 34] as visual tokens. These vi-sual tokens are concatenated with instruction tokens and 
+
+> *Equal contribution.
+
+All Tokens 
+
+ID-Selection 
+
+VisPruner 
+
+DivPrune 
+
+FasterVLM 
+
+Figure 1. t-SNE visualization of the distribution of 16 selected tokens on POPE [18] using different methods. ”All Tokens” rep-resents the original token distribution of LLaVA-1.5-7B [20]. Red dashed boxes highlight dispersed tokens that are harder to identify and are often informative for downstream understanding. 
+
+fed into the LLM to generate responses. Although LVLMs have demonstrated impressive performance across a variety of multimodal tasks [14, 33], they require converting vi-sual inputs into lengthy token sequences. This significantly increases the inference cost of the model, particularly for high-resolution images [4, 21] and multi-frame videos [19]. For instance, Qwen-2.5-VL [4] handles as many as 16,384 tokens, which is significantly longer than the length of typ-ical text-only sequences. To address this challenge, recent works [1, 6, 16, 40] have introduced token pruning strategies to reduce the in-ference cost of LVLMs by decreasing the number of visual tokens. The core of token pruning lies in the selection of to-kens, which should yield the highest reduction ratio with the lowest compromise in performance. To achieve this, exist-ing methods can be roughly divided into two groups, which we discuss respectively below. 
+
+Importance-based Selection: These methods typically define an importance criterion for each visual token to quan-tify its contribution, retaining the most ”important” ones while discarding the rest. For example, FastV [6] assumes that visual tokens with low cross-modal attention scores in-teract weakly with the instruction and removes them first. 1
+
+> arXiv:2604.05601v1 [cs.CV] 7 Apr 2026
+
+FasterVLM [40], in contrast, retains tokens with higher 
+
+[CLS] attention scores, which are assumed to encode more valuable visual cues. Although these methods can identify informative tokens, they tend to favor tokens from locally dense regions in the feature space. As shown in Figure 1, when only 16 tokens are retained, many selected tokens cluster in highly similar regions, resulting in noticeable re-dundancy, while more dispersed yet informative tokens are often overlooked. 
+
+Diversity-based Selection: Another line of work aims to eliminate redundant tokens by selecting the most dissim-ilar ones, thereby ensuring diversity among the retained to-kens. For example, DART [36] retains tokens with low du-plication based on visual feature similarity. DivPrune [1] iteratively selects tokens that maximize the minimum pair-wise distance within the selected subset. As shown in Fig-ure 1, although these methods can produce a more dispersed distribution of selected tokens, the retained tokens do not always correspond to the most informative visual content, such as salient visual tokens with high [CLS] attention scores. As a result, they may preserve visually diverse yet less useful tokens, while overlooking those that are more critical for LLM understanding. To sum up, for efficient inference in LVLMs, both to-ken importance and diversity are essential to achieve opti-mal performance under high reduction ratios. While previ-ous efforts such as VisPruner [41] and CDPruner [42] have attempted to combine these two factors, they still suffer from different limitations. VisPruner [41] evaluates impor-tance and diversity in a disjoint manner by merging inde-pendently selected subsets, and thus fails to jointly balance the two during selection, as shown in Figure 1. In contrast, CDPruner [42] formulates token selection as a conditional DPP-based [17] subset selection problem. Although effec-tive, its selection process is relatively more complex, which may limit its practicality in efficient inference scenarios. Therefore, how to effectively balance token importance and diversity in a simple yet effective manner remains an open challenge for efficient LVLM inference. To address these limitations, we propose ID-Selection, a simple yet effective token selection strategy that balances importance and diversity for efficient LVLM inference. The key idea is to couple importance estimation with diversity-aware iterative selection: each visual token is first assigned an importance score, after which high-scoring tokens are se-lected one by one while the scores of the remaining tokens are updated through a distance-aware suppression function. Specifically, tokens that are more similar to the selected one receive stronger suppression, whereas those farther away are affected less, enabling the model to progressively reduce redundancy without discarding informative yet distinct to-kens. As shown in Figure 1, this mechanism helps retain informative tokens in more dispersed regions of the fea-ture space, including those highlighted by the red dashed boxes, which are often overlooked by existing methods. Since each step only involves a lightweight matrix oper-ation, our method introduces negligible additional infer-ence overhead. Extensive experiments on 5 LVLM back-bones and 16 benchmarks demonstrate its strong effective-ness and generality. For example, on LLaVA-1.5-7B [20], ID-Selection retains only 16 tokens, reducing visual tokens by 97.2% and inference FLOPs by over 97% , while still preserving 91.8% of the original performance without ad-ditional training. 
+
+# 2. Related works 
+
+2.1. Large Vision-Language Models 
+
+Recent advances [3, 33] in Large Vision-Language Models (LVLMs) have significantly improved the integration of vi-sual and linguistic modalities. For example, LLaVA [20] enhances the reasoning ability of large language models on complex tasks such as visual question answering [24, 32] and visual reasoning [22] by combining the CLIP visual en-coder [30] with the LLaMA language decoder [34]. How-ever, LVLMs still suffer from hallucination issues [12], especially on fine-grained vision-language tasks such as TextVQA [32]. Recent work [21, 25] attempts to mitigate this by increasing input image resolution to provide finer visual details. In addition, to further expand the applica-tion scope of LVLMs, Video-LLaVA [19] introduces video understanding capabilities by processing sequential visual frames. Yet, both high-resolution images and multi-frame inputs lead to longer visual token sequences, which signifi-cantly increase the computational overhead. Therefore, de-veloping efficient LVLMs has become an increasingly ur-gent challenge. 
+
+2.2. Visual Token Pruning 
+
+Images often exhibit more redundancy than text [7]. As a result, many works have attempted to optimize the infer-ence of LVLMs by reducing the number of visual tokens, with a core focus on token selection. Existing methods can be broadly categorized into two groups: importance-based selection and diversity-based selection. Importance-based selection assigns an importance score to each token, retaining those with higher scores while pruning the rest. FastV [6] is a pioneering work in this category, pruning to-kens with low cross-modal attention after the second layer of the LLM. Subsequently, some methods [31, 38, 40] pro-pose using [CLS] attention scores as importance metrics. However, these approaches often retain redundant tokens, leading to performance degradation under high reduction ratios. In contrast, diversity-based methods [1, 36] prune visual tokens by maximizing dissimilarity between tokens. For instance, DivPrune [1] formulates the subset selection 2Large Language Model 
+
+# Vision Encoder 
+
+# Projector Text Encoder 
+
+# ID-Selection Tokenizer 
+
+# Image or V ideo 
+
+# Language Instruction 
+
+Diversity-based 
+
+Score Update 
+
+Importance-based 
+
+Token Selection 
+
+Diversity-based 
+
+Score Update 
+
+Importance-based 
+
+Token Selection  
+
+> High Similarity
+> Low Similarity Figure 2. Overview of ID-Selection. Each token is assigned an importance score. For the LLaVA series [19–21], we adopt a unified score (Eq. (6)) that combines visual saliency ( [CLS] attention [40]) and instruction relevance (Eq. (4)). Tokens with high scores are iteratively selected while suppressing similar ones to maintain diversity, until the token budget is reached, and the remaining tokens are pruned.
+
+as a Max-Min Diversity Problem [29]. However, these paradigms may lead to suboptimal performance by over-looking informative yet similar visual tokens. Recent ef-forts [41, 42] have sought to integrate both factors. Nev-ertheless, they remain limited by suboptimal performance or efficiency during inference. In this work, we propose ID-Selection, a token selection method that balances im-portance and diversity. We first identify informative tokens based on their importance scores and suppress the scores of similar tokens to encourage diversity. Notably, our method maintains competitive performance under high reduction ra-tios. 
+
+# 3. Method 
+
+3.1. Revisiting Visual Token Pruning of LVLMs 
+
+A typical LVLM consists of three components: a vi-sual encoder, a projector, and a Large Language Model (LLM). Given an input image, the visual encoder, typ-ically a pretrained Transformer [35] such as CLIP [30], transforms it into a sequence of visual patches, Hv =[h[cls ]; h1 
+
+> img
+
+, h2 
+
+> img
+
+, . . . , hnimg ] ∈ R(n+1) ×d, where n de-notes the number of image patches and d is the out-put dimension of the visual encoder. The projector then maps these visual patches into the embedding space of the LLM [2, 20], yielding visual tokens ˜Hv ∈ R(n+1) ×D ,where D is the input dimension of the LLM. Finally, the visual tokens are concatenated with instruction tokens and fed into the LLM to generate the response. While LVLMs excel at multimodal understanding, their inference efficiency is hindered by the large number of vi-sual tokens, which substantially increases computational cost. To alleviate this burden, recent efforts [1, 6, 36, 40] have proposed token pruning strategies that improve effi-ciency by reducing the number of visual tokens. A com-mon paradigm is to assign each token an importance score and retain only the most important ones. Such scores are typically derived from either the global attention of the vi-sual encoder or the cross-modal attention within the LLM. The global attention is usually computed by transform-ing visual patches Hv into query Q, key K, and value 
+
+V through three weight matrices W Q, W K , and W V ∈
+
+Rd×d, respectively: 
+
+Q = Hv W Q, K = Hv W K , V = Hv W V . (1) Then, the scaled dot-product attention is calculated as 
+
+A = Softmax QK ⊤
+
+√d
+
+!
+
+. (2) Here, A ∈ RB×N ×N , where B is the batch size and N
+
+is the visual sequence length. For the LLaVA family [19– 21], the first row of A corresponds to the attention from the 
+
+[CLS] token to all visual tokens, denoted as S[CLS] = A[: 
+
+, 0, :] .In contrast, cross-modal attention [6, 43] is typically computed between all visual tokens and the last instruc-tion token in the early layers of the LLM. Given the in-put sequence X = [ xsys ; ximg ; xstr ] ∈ Rl×D, the model 3Q: What is the brand of this camera?    
+
+> Visual Saliency Instruction Relevance Unified Importance Figure 3. Visualization of visual saliency ( [CLS] Attention [40]), instruction relevance (Eq. (4)), and unified importance scores (Eq. (6)) of LLaVA-1.5-7B [20] on TextVQA [32]. Red indicates higher scores, while blue indicates lower scores.
+
+transforms it into the query Qstr = xlast str W Q and the key 
+
+Kimg = ximg W K . The cross-modal attention is then computed as 
+
+Scross = Softmax Qstr KTimg 
+
+√d
+
+!
+
+, (3) where l denotes the length of the input sequence, including the system tokens, visual tokens, and instruction tokens. Although importance-based methods can effectively identify informative visual tokens, they often retain tokens that are highly similar to each other, leading to substantial redundancy and performance degradation under high prun-ing ratios. To address this issue, recent studies [1, 36] have shifted toward diversity-based selection, which favors sub-sets with lower mutual similarity. However, by emphasizing diversity alone, these methods may overlook informative to-kens, such as instruction-relevant objects, and therefore still yield suboptimal performance. 
+
+3.2. ID-Selection 
+
+In this paper, we introduce ID-Selection, a token selection method that reduces the inference cost of LVLMs by re-taining a subset of visual tokens that are both informative and diverse. The core of ID-Selection is a sequential score-updating process that couples importance estimation with diversity-aware iterative selection. Specifically, each visual token is first assigned an importance score to identify infor-mative candidates. The method then iteratively selects the token with the highest current score and updates the scores of the remaining tokens according to their similarity to the selected one, so that redundant tokens are progressively de-prioritized during selection. In this way, ID-Selection pre-serves informative tokens while reducing redundancy in a unified iterative process. The overall framework is illus-trated in Figure 2. 
+
+Importance estimation. As discussed in Sec. 3.1, in-formative visual tokens are commonly identified using ei-ther global attention or cross-modal attention. The former 
+
+Algorithm 1 ID-Selection  
+
+> 1:
+
+Input: initial scores S, visual tokens ˜Hv , target token number T 
+
+> 2:
+
+Initialize: selected index set R ← ∅  
+
+> 3:
+
+while |R| < T do  
+
+> 4:
+
+i ← arg max j Sj 
+
+> 5:
+
+R ← R ∪ { i} 
+
+> 6:
+
+Compute distances d(i, j ) between ˜Hiv and all re-maining tokens ˜Hjv with j̸ = i (Eq. (7))  
+
+> 7:
+
+Compute suppression weights wij (Eq. (8))  
+
+> 8:
+
+Update scores for all j̸ = i: Sj ← Sj − wij · Si 
+
+> 9:
+
+Set Si ← −∞ to prevent reselection  
+
+> 10:
+
+end while  
+
+> 11:
+
+Output: retain tokens indexed by R and prune the oth-ers captures visually salient tokens with rich contextual infor-mation during visual encoding, whereas the latter highlights tokens that exhibit strong visual–instruction interactions in the early layers of the LLM. Accordingly, we instantiate token importance differently depending on the underlying LVLM architecture. For LLaVA-family models [19–21], we consider three importance estimators. The first is the cross-modal attention from the last instruction token in the early LLM layers, fol-lowing FastV [6]. The second is the [CLS] attention from the visual encoder, which reflects visual saliency. The third is a unified importance score that integrates visual saliency and instruction relevance, providing a more holistic crite-rion for identifying informative tokens. Specifically, we measure visual saliency using the 
+
+[CLS] attention S[CLS] ∈ RB×N . Inspired by [42], we further measure instruction relevance by computing the co-sine similarity between the instruction feature Ht ∈ Rd and the visual embeddings Hv , formulated as: 
+
+St = Hv · Ht
+
+∥Hv ∥ · ∥ Ht∥ . (4) Here, the instruction feature Ht is extracted from a text encoder paired with the LVLM visual encoder, such as CLIP [30] or SigLIP [39]. We then apply min-max nor-malization to St ∈ RB×N :
+
+˜St = St − min( St)max( St) − min( St) . (5) The unified importance score S ∈ RB×N is obtained by element-wise multiplication: 
+
+S = ˜St × S[CLS] . (6) 4As illustrated in Figure 3, visual saliency and instruction relevance emphasize different yet complementary regions. Their combination allows the unified importance score to better highlight regions that are both visually salient and relevant to the input question, thereby providing a more bal-anced criterion for identifying informative visual tokens. For architectures without a paired text encoder, such as Qwen2.5-VL [4] and InternVL2.5 [8], the unified score in Eq. (6) is not applicable. In such cases, we use the cross-modal attention from the last instruction token as the default importance estimator. 
+
+Diversity-aware iterative selection. While importance-based selection can identify informative tokens, it often retains highly similar ones, resulting in substantial redun-dancy. To alleviate this issue, we propose a diversity-aware iterative selection strategy that preserves informative tokens while progressively suppressing redundant ones. Specifi-cally, we initialize an empty selection set R. At each step, we select the token with the highest current score among the remaining candidates and add it to R. We then update the scores of the remaining tokens according to their similarity to the selected one, so that tokens that are more redundant receive lower scores in subsequent steps. Formally, let the currently selected token be ˜Hiv and the remaining unselected tokens be ˜Hjv , where j̸ = i. We first compute the cosine distance between ˜Hiv and each ˜Hjv :
+
+d(i, j ) = 1 − ˜Hiv · ˜Hjv
+
+˜Hiv · ˜Hjv
+
+. (7) Smaller distances indicate that two tokens are more similar, and thus more likely to be redundant. To suppress such redundancy in a soft and distance-aware manner, we define the suppression weight as 
+
+wij = exp  −γ · d(i, j )2 , (8) where γ controls how quickly the suppression decays with distance. As a result, tokens that are more similar to the se-lected one receive stronger suppression, whereas those far-ther away are affected less. Finally, we update the score of each remaining token by subtracting a weighted influence from the selected token: 
+
+Sj ← Sj − wij · Si. (9) This process is repeated until the target number of tokens is selected, after which the remaining tokens are pruned. Notably, each iteration only involves similarity computation and score update over the remaining candidates, resulting in a low per-step cost. The detailed selection process is sum-marized in Algorithm 1. 
+
+3.3. Complexity Analysis 
+
+At each iteration, ID-Selection selects the token with the highest current score, computes its similarity to the remain-ing candidates, and updates their scores accordingly. As-suming the original number of visual tokens is N and the number of retained tokens is T , each iteration incurs O(N )
+
+cost, yielding an overall complexity of O(N T ). In prac-tice, since T ≪ N under high pruning ratios, the additional overhead is small. Moreover, ID-Selection only involves lightweight similarity computation and score update, with-out requiring matrix inversion or global subset optimization, making it especially suitable for high-compression scenar-ios. 
+
+# 4. Experiment 
+
+4.1. Experimental Settings 
+
+Datasets and Baselines. We conduct extensive experi-ments on 16 benchmarks spanning image understanding, fine-grained document understanding, and video question answering. Specifically, for image understanding, we eval-uate on 9 standard benchmarks covering visual question an-swering [10, 11, 13, 24, 32], hallucination evaluation [18], and visual reasoning [9, 22]. For fine-grained visual un-derstanding, we additionally evaluate on 4 text-oriented benchmarks: DocVQA [27], InfoVQA [28], ChartQA [26], and OCRBench [23]. Finally, we validate our method on 3 video question answering benchmarks: TGIF [15], MSVD [5], and MSRVTT [37]. To assess the effec-tiveness of ID-Selection, we compare it with 9 state-of-the-art token pruning methods, including FastV [6], FasterVLM [40], SparseVLM [43], PruMerge [31], Vi-sionZip [38], DART [36], DivPrune [1], VisPruner [41], and CDPruner [42]. 
+
+Implementation Details. ID-Selection is a plug-and-play, training free method that can be seamlessly inte-grated into existing LVLMs. We implement it on sev-eral widely used open-source LVLMs, including LLaVA-1.5 [20], LLaVA-Next [21], Video-LLaVA [19], Qwen2.5-VL [4], and InternVL2.5 [8]. For the LLaVA family, we evaluate three importance estimators: the [CLS] atten-tion from the visual encoder [30], the cross-modal attention from the second layer of the LLM (Eq. (3)), and the uni-fied importance score defined in Eq. (6). For Qwen2.5-VL and InternVL2.5, we use the cross-modal attention from the second layer of the LLM (Eq. (3)) as the default importance estimator. The hyperparameter γ in Eq. (8) is fixed to 20 across all experiments. 
+
+4.2. Quantitative Evaluation 
+
+Results on LLaVA-1.5. Table 1 compares ID-Selection with competitive baselines on 9 multimodal benchmarks using LLaVA-1.5-7B [20]. Our method consistently out-5Table 1. Comparison with previous approaches on LLaVA-1.5-7B [20] across 9 image understanding benchmarks. The highest score is denoted in bold . Average are computed by calculating the mean accuracy across all 9 datasets. †: importance from LLM second-layer cross-modal attention (Eq. (3)); ‡: importance from visual encoder [CLS] attention [30]; §: importance from the unified score in Eq. (6). 
+
+Method Venue VQA V2 GQA VizWiz SQA IMG VQA Text POPE MME MMB MMB CN Average 
+
+Upper Bound, All 576 Tokens (100%) 
+
+LLaVA-1.5-7B [20] CVPR’24 78.5 62.0 50.0 69.5 58.2 85.9 1862 64.3 58.3 100.0% 
+
+Retain 64 Tokens ( ↓ 88.9%) 
+
+FastV [6] ECCV’24 55.0 46.1 50.8 51.1 47.8 48.0 1256 48.0 52.7 76.7% FasterVLM [40] ArXiv’24 72.6 55.0 53.2 68.9 55.3 76.8 1659 61.3 55.2 94.5% SparseVLM [43] ICML’25 68.2 52.7 50.1 62.2 51.8 75.1 1505 56.2 46.1 87.3% PruMerge [31] ICCV’25 67.4 54.9 52.9 68.6 53.0 77.4 1549 59.3 51.0 91.4% VisionZip [38] CVPR’25 72.4 55.1 52.9 69.0 55.5 77.0 1690 60.1 55.4 94.5% DivPrune [1] CVPR’25 74.1 57.5 53.6 68.0 54.5 85.5 1622 60.1 52.3 95.1% DART [36] EMNLP’25 71.3 54.7 53.5 69.3 54.7 73.8 1765 59.5 54.0 94.0% VisPruner [41] ICCV’25 72.7 55.4 53.3 69.1 55.8 80.4 1699 61.3 55.1 95.4% CDPruner [42] NeurIPS’25 75.4 58.6 53.4 68.1 55.3 87.5 1688 61.1 53.2 96.6% ID-Selection † Ours 76.2 59.9 53.5 68.7 56.5 83.6 1783 61.8 54.2 97.6 %ID-Selection ‡ Ours 75.2 58.1 54.1 68.0 55.7 85.3 1658 61.0 52.4 96.0% ID-Selection § Ours 75.3 58.2 53.9 68.7 56.0 86.0 1734 61.3 55.8 97.5% 
+
+Retain 32 Tokens ( ↓ 94.4%) 
+
+FastV [6] ECCV’24 43.4 41.5 51.7 42.6 42.5 32.5 1090 37.8 33.2 63.6% FasterVLM [40] ArXiv’24 67.6 51.7 53.0 69.2 53.9 68.8 1594 58.3 52.6 90.5% SparseVLM [43] ICML’25 58.6 48.3 51.9 57.3 46.1 67.9 1294 51.4 40.6 79.1% PruMerge [31] ICCV’25 54.9 51.1 52.8 68.5 50.6 70.9 1503 56.8 47.0 86.2% VisionZip [38] CVPR’25 67.1 51.8 52.9 68.8 53.1 68.7 1532 57.7 50.3 89.3% DivPrune [1] CVPR’25 71.2 54.9 53.3 68.6 52.9 81.5 1577 57.6 49.1 92.1% DART [36] EMNLP’25 67.1 52.9 52.5 69.3 52.2 69.1 1532 58.5 50.0 89.4% VisPruner [41] ICCV’25 67.7 52.2 53.0 69.2 53.9 72.7 1568 58.4 52.7 91.0% CDPruner [42] NeurIPS’25 73.6 57.0 53.1 69.5 53.2 87.9 1657 59.6 49.6 94.7% ID-Selection † Ours 72.9 55.6 53.3 69.7 55.5 75.4 1691 60.9 52.1 94.2% ID-Selection ‡ Ours 72.8 54.9 53.5 68.9 54.8 79.2 1618 60.7 52.3 93.9% ID-Selection § Ours 73.9 56.8 53.8 68.6 55.0 84.7 1695 60.7 52.8 95.7% 
+
+Retain 16 Tokens ( ↓ 97.2%) 
+
+FasterVLM [40] ArXiv’24 61.0 47.5 50.9 67.8 51.1 55.7 1418 53.4 45.7 82.7% DivPrune [1] CVPR’25 65.4 51.4 51.5 69.1 49.8 68.8 1498 54.5 44.5 86.2% DART [36] EMNLP’25 61.1 48.7 51.8 69.5 48.3 49.1 1414 50.5 41.2 80.6% VisPruner [41] ICCV’25 60.2 47.4 50.3 67.5 50.3 55.6 1434 50.3 40.8 80.8% CDPruner [42] NeurIPS’25 70.0 55.4 52.8 68.9 50.0 86.4 1555 57.8 43.6 90.9% ID-Selection † Ours 64.9 50.4 52.8 70.7 52.5 57.5 1451 57.2 47.1 86.2% ID-Selection ‡ Ours 68.1 52.2 52.8 68.9 52.6 73.8 1538 58.2 49.8 90.1% ID-Selection § Ours 70.4 53.9 53.3 68.1 53.0 79.7 1570 58.8 50.0 91.8% 
+
+performs existing approaches under various pruning ratios. For example, at an 88.9% pruning ratio, FastV [6], which directly performs top-k selection based on cross-modal at-tention, suffers a 23.3% performance drop. In contrast, ID-Selection, built on the same importance cue but with a more effective selection strategy, incurs only a 2.4% decrease and surpasses the state-of-the-art CDPruner [42]. Notably, even with only 16 visual tokens, ID-Selection with the unified importance metric still retains 91.8% of the original perfor-mance. These results show that balancing importance and diversity enables ID-Selection to remain robust under ex-treme pruning. 
+
+Results on LLaVA-Next. Table 2 further evaluates our method on the high-resolution LLaVA-Next-7B [21]. We report results at pruning ratios of 88.9% and 94.4%. ID-Selection consistently achieves the best overall perfor-mance across both settings. In particular, ID-Selection with 
+
+[CLS] attention retains 95.0% of the original performance 6Table 2. Comparison with previous approaches on LLaVA-Next-7B [21] across 9 image understanding benchmarks. The highest score is denoted in bold . Average are computed by calculating the mean accuracy across all 9 datasets. †: importance from LLM second-layer cross-modal attention (Eq. (3)); ‡: importance from visual encoder [CLS] attention [30]; §: importance from the unified score in Eq. (6). 
+
+Method Venue VQA V2 GQA VizWiz SQA IMG VQA Text POPE MME MMB MMB CN Average 
+
+Upper Bound, All 2880 Tokens (100%) 
+
+LLaVA-Next-7B [21] CVPR’24 81.8 64.2 57.6 70.1 61.3 86.5 1851 67.4 60.6 100.0% 
+
+Retain 320 Tokens ( ↓ 88.9%) 
+
+FastV [6] ECCV’24 72.9 55.9 53.1 62.8 55.7 71.7 1661 61.6 51.9 88.7% FasterVLM [40] ArXiv’24 75.8 58.5 57.0 68.3 57.9 80.4 1661 63.8 55.4 93.7% SparseVLM [43] ICML’25 74.6 57.9 54.2 67.2 56.5 76.9 1688 63.1 54.5 91.9% PruMerge [31] ICCV’25 75.3 58.8 57.7 68.1 54.0 79.5 1710 63.0 55.6 93.2% VisionZip [38] CVPR’25 76.2 58.9 56.2 67.5 58.8 82.3 1702 63.3 55.6 94.2% DART [36] EMNLP’25 75.7 59.5 56.8 67.5 57.6 81.0 1744 64.2 55.7 94.3% DivPrune [1] CVPR’25 77.2 61.1 55.6 67.7 56.2 84.7 1755 63.9 55.7 94.9% VisPruner [41] ICCV’25 76.4 59.4 57.5 68.1 59.0 81.3 1781 64.1 56.0 95.2% CDPruner [42] NeurIPS’25 78.4 61.6 55.8 67.8 57.4 87.2 1799 65.5 55.7 96.2% ID-Selection † Ours 78.0 60.6 56.1 68.1 56.3 85.3 1700 62.5 53.4 94.2% ID-Selection ‡ Ours 78.2 61.0 57.4 68.7 58.1 85.3 1753 65.4 57.6 96.5% ID-Selection § Ours 78.7 61.2 55.4 68.3 58.4 86.4 1817 65.4 56.8 96.6% 
+
+Retain 160 Tokens ( ↓ 94.4%) 
+
+FasterVLM [40] ArXiv’24 71.7 55.3 56.6 67.2 56.9 75.8 1643 60.5 52.7 90.4% DivPrune [1] CVPR’25 75.0 59.4 56.0 67.3 54.2 80.2 1703 62.9 55.1 92.8% DART [36] EMNLP’25 72.5 56.8 56.7 67.8 54.9 75.3 1670 62.0 53.6 91.1% VisPruner [41] ICCV’25 72.8 56.7 57.5 69.0 57.0 74.9 1663 61.0 52.7 91.4% CDPruner [42] NeurIPS’25 76.7 60.8 55.2 67.5 55.4 86.8 1713 64.2 53.8 94.2% ID-Selection † Ours 76.2 59.4 55.7 67.2 54.7 82.7 1645 60.8 51.1 91.8% ID-Selection ‡ Ours 76.2 59.5 57.0 67.7 57.2 83.1 1751 63.7 57.4 95.0% ID-Selection § Ours 76.8 60.2 56.2 68.0 57.6 85.0 1756 63.7 55.7 95.1% 
+
+even when only 5.6% of the tokens are kept, outperforming both CDPruner [42] and VisPruner [41]. 
+
+Results on Video-LLaVA. Video-LLaVA [19] has demonstrated strong baseline performance in video under-standing by extracting 8 frames from each video and con-verting them into 2048 visual tokens. However, this token representation is highly redundant. As shown in Table 3, ID-Selection reduces the number of visual tokens to 128 or 256 while still outperforming strong baselines. These re-sults demonstrate that ID-Selection can effectively preserve informative tokens even in video understanding. Following previous work [41], we report results on the first 1,000 sam-ples of each benchmark due to commercial API limitations. 
+
+Results on Qwen2.5-VL. Beyond the LLaVA series, we further validate the generality of ID-Selection on Qwen2.5-VL-7B [4]. As shown in Table 4, ID-Selection achieves the best overall performance across all 5 image understand-ing benchmarks under both token reduction ratios. At a 77.8% reduction ratio, it retains 97.9% of the original per-formance, outperforming FastV and DART by 4.8% and 
+
+3.6% , respectively. When the reduction ratio is further in-creased to 88.9%, ID-Selection still preserves 92.6% of the full-model performance, maintaining a clear advantage over both baselines. We further evaluate Qwen2.5-VL on 4 text-focused benchmarks, where preserving fine-grained textual cues is particularly challenging. As reported in Table 5, ID-Selection consistently outperforms the competing methods across all datasets and both pruning ratios. Notably, un-der the more aggressive 88.9% reduction ratio, FastV re-tains only 53.4% of the original performance, whereas ID-Selection still preserves 70.5% , demonstrating a substan-tially stronger ability to retain dense textual information un-der extreme compression. 
+
+Results on InternVL2.5. We further validate the archi-tectural adaptability of ID-Selection on InternVL2.5-8B [8]. As shown in the bottom halves of Table 4 and Table 5, ID-Selection consistently achieves the best overall perfor-mance across both general and text-focused benchmarks. On the 5 general image understanding benchmarks in Ta-ble 4, ID-Selection retains 96.4% and 93.5% of the original performance at token reduction ratios of 77.8% and 88.9%, respectively, slightly surpassing the competing methods in both settings. Its advantage becomes more pronounced on text-focused benchmarks. As shown in Table 5, under the 7Table 3. Comparison of Video-LLaVA’s performance [19] on 3 video understanding benchmarks [5, 15, 37]. The highest score is denoted in bold . ‡: importance from visual encoder [CLS] attention [30]; 
+
+§: importance from the unified score in Eq. (6). 
+
+Method TGIF MSVD MSRVTT Average 
+
+AccScore AccScore Acc Score Acc Score 
+
+Upper Bound, All 2048 Tokens (100%) 
+
+Video-LLaVA 19.8 2.53 70.5 3.93 57.5 3.50 100% 100% 
+
+Retain 256 Tokens ( ↓ 87.5%) 
+
+FastV [6] 15.7 2.51 67.3 3.92 52.9 3.38 88.9% 98.5% FasterVLM [40]15.5 2.41 69.0 3.92 55.3 3.42 90.8% 97.6% DivPrune [1] 14.8 2.40 71.6 3.98 56.9 3.52 91.8% 98.9% VisPruner [41] 14.3 2.39 70.2 3.95 56.0 3.44 89.7% 97.8% CDPruner [42] 15.6 2.42 71.1 3.97 57.7 3.52 93.3% 99.1% 
+
+ID-Selection ‡ 17.0 2.46 70.7 3.96 56.2 3.48 94.6% 99.1% 
+
+ID-Selection § 17.3 2.46 69.9 3.94 57.1 3.49 95.3%99.1% 
+
+Retain 128 Tokens ( ↓ 93.75%) 
+
+FastV [6] 14.1 2.38 64.7 3.79 50.9 3.29 83.8% 94.8% FasterVLM [40]13.8 2.36 68.1 3.87 52.0 3.34 85.6% 95.7% DivPrune [1] 13.7 2.38 71.2 3.96 57.1 3.51 89.8% 98.4% VisPruner [41] 13.4 2.36 71.2 3.97 54.7 3.45 87.9% 97.6% CDPruner [42] 13.8 2.37 70.8 3.94 57.2 3.48 89.9% 97.8% ID-Selection ‡ 14.6 2.41 70.4 3.94 56.1 3.45 90.4% 98.0% 
+
+ID-Selection § 14.4 2.38 70.6 3.94 57.0 3.49 90.7%98.0% 
+
+Table 4. Comparison of Qwen2.5-VL-7B’s and InternVL2.5-8B’s performance [4, 8] on 5 image understanding benchmarks [9, 18, 22, 24, 32]. The highest score is denoted in bold . †: importance from LLM second-layer cross-modal attention (Eq. (3)). 
+
+Method VQA Text POPE MMB SQA IMG MME Average 
+
+Qwen2.5-VL-7B 77.7 86.0 83.9 76.6 2330 100% 
+
+Token Reduction Ratio = 77.8% 
+
+FastV [6] 75.2 77.6 80.6 74.0 2000 93.1% DART [36] 72.0 78.5 79.8 75.2 2193 94.3% ID-Selection † 76.0 84.1 82.1 77.1 2217 97.9% 
+
+Token Reduction Ratio = 88.9% 
+
+FastV [6] 70.8 68.6 73.8 72.0 1798 86.0% DART [36] 67.1 73.5 74.1 72.6 2009 88.2% ID-Selection † 73.8 78.1 80.0 75.5 1942 92.6% 
+
+InternVL2.5-8B 79.3 90.5 84.4 98.0 2324 100.0% 
+
+Token Reduction Ratio = 77.8% 
+
+FastV [6] 73.5 89.6 80.5 95.3 2253 96.3% DART [36] 74.2 89.2 80.0 93.8 2220 95.6% ID-Selection † 75.9 90.5 80.9 94.4 2189 96.4% 
+
+Token Reduction Ratio = 88.9% 
+
+FastV [6] 60.7 86.8 75.8 88.8 2048 88.2% DART [36] 66.7 83.2 75.0 89.4 2002 88.5% ID-Selection † 70.1 89.5 78.8 92.7 2147 93.5% 
+
+Table 5. Comparison of Qwen2.5-VL-7B’s and InternVL2.5-8B’s performance [4, 8] on 4 text-focused image understanding bench-marks [23, 26–28]. The highest score is denoted in bold . †: im-portance from LLM second-layer cross-modal attention (Eq. (3)). 
+
+Method Chart OCR Doc Info Average 
+
+Qwen2.5-VL-7B 84.0 83.8 95 81 100.0% 
+
+Token Reduction Ratio = 77.8% 
+
+FastV [6] 65.4 58.7 79 54 74.4% DART [36] 53.2 58.8 60 40 61.5% ID-Selection † 72.4 72.8 86 60 84.4% 
+
+Token Reduction Ratio = 88.9% 
+
+FastV [6] 43.0 42.8 60 39 53.4% DART [36] 37.4 44.2 41 31 44.7% ID-Selection † 60.7 62.0 76 45 70.5% 
+
+InternVL2.5-8B 84.1 80.3 92 69 100.0% 
+
+Token Reduction Ratio = 77.8% 
+
+FastV [6] 65.2 56.4 59 40 67.5% DART [36] 65.0 59.9 58 39 67.8% ID-Selection † 73.2 60.2 68 44 74.9% 
+
+Token Reduction Ratio = 88.9% 
+
+FastV [6] 38.2 36.2 38 31 44.2% DART [36] 42.7 44.3 38 31 48.0% ID-Selection † 64.2 49 51 34 60.5% 
+
+severe 88.9% reduction ratio, ID-Selection retains 60.5% 
+
+of the original performance, compared with only 44.2% for FastV and 48.0% for DART. These results show that the proposed selection strategy generalizes well beyond the LLaVA family and remains ef-fective even on architectures without a paired text encoder. 
+
+Efficiency analysis. To evaluate the efficiency of ID-Selection, we compare it with prior pruning methods on the high-resolution LLaVA-Next-7B model in terms of the-oretical FLOPs, total evaluation time on the POPE bench-mark, and KV Cache usage. All experiments are conducted on a single NVIDIA A800-80GB GPU. As shown in Ta-ble 6, under an 88.9% pruning ratio, ID-Selection achieves nearly a 10 × reduction in FLOPs, a 2.5 × speed-up in to-tal evaluation time, and over 89% KV Cache reduction compared with the full model. Moreover, ID-Selection runs faster than CDPruner [42] while achieving the same FLOPs and KV Cache savings, indicating that its itera-tive score-suppression mechanism introduces lower practi-cal overhead. We also observe that incorporating the text encoder for the unified importance score brings only neg-ligible extra cost, as reflected by the close total evaluation time of ID-Selection ‡ and ID-Selection §.
+
+4.3. Ablation Studies 
+
+We conduct ablation studies of ID-Selection on GQA [13] and TextVQA [32] using LLaVA-1.5-7B [20], where only 16 visual tokens are retained. 8Table 6. Efficiency comparisons on the POPE benchmark [18] us-ing LLaVA-Next-7B [21] under an 88.9% pruning ratio. We report the theoretical FLOPs, actual runtime, and the KV Cache. ‡: im-portance from visual encoder [CLS] attention [30]; §: importance from the unified score in Eq. (6). 
+
+Method FLOPs (T) ↓ Total Time (s) ↓ KV Cache ↓
+
+LLaVA-Next-7B 20.8 (1.0 ×) 2294 (1.0 ×) 1510 MB FastV 3.3 (6.3 ×) 1097 (2.1 ×) 168 MB DivPrune 2.1 (9.9 ×) 992 (2.3 ×) 160 MB CDPruner 2.1 (9.9 ×) 1010 (2.3 ×) 160 MB ID-Selection ‡ 2.1 (9.9 ×) 916 (2.5 ×) 160 MB ID-Selection § 2.1 (9.9 ×) 910 (2.5 ×) 160 MB 
+
+Ablation of Iterative Selection. We first study the effect of the proposed diversity-aware iterative selection by com-paring ID-Selection with top-k selection under the same im-portance estimator. Specifically, FastV [6] corresponds to top-k selection based on the last-token cross-modal atten-tion, while FasterVLM [40] corresponds to top-k selection based on the [CLS] attention. Compared with these base-lines, ID-Selection † and ID-Selection ‡ further introduce it-erative score suppression on top of the same importance es-timators. As shown in Tables 1 and 2, ID-Selection consis-tently outperforms FastV and FasterVLM under the same token budgets. These results indicate that the performance gain comes not only from the importance metric itself, but also from the proposed iterative selection mechanism. 
+
+Ablation of Unified Importance. We then study the ef-fect of different importance estimators by comparing Vi-sual Saliency ( [CLS] Attention), Instruction Relevance (last-token cross-modal attention), and Unified Importance (Eq. (6)), as shown in Figure 4. Visual saliency per-forms better on TextVQA [32], where fine-grained visual understanding is crucial, whereas instruction relevance is more effective on GQA [13], where the question provides stronger semantic guidance. These results indicate that re-lying solely on visual or textual cues is insufficient. By inte-grating both, the unified importance score provides a more balanced criterion for identifying informative tokens across diverse tasks. 
+
+Effect of γ. Finally, we study the parameter γ in Eq. (8), which controls the strength of distance-aware suppression. As shown in Figure 5, performance consistently improves as γ increases and gradually saturates afterward. This sug-gests that stronger suppression helps remove redundant to-kens more effectively, while the saturation behavior indi-cates that redundancy mainly exists among highly similar tokens. TextVQA GQA    
+
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> Scores
+> 47.5
+> 51.1 51.8
+> 45.9
+> 52.1 51.8
+> Visual Saliency Instruction Relevance Unified Importance
+
+Figure 4. Ablation of Unified Importance. 1 5 10 15 20 25 30         
+
+> 48
+> 50
+> 52
+> 54
+> Performance (%)
+> 47.4%
+> 50.5%
+> 52.7% 52.8% 53.0% 52.7% 52.8%
+> 47.9%
+> 52.0%
+> 53.7% 53.8% 53.9% 53.8% 53.7%
+> TextVQA
+> GQA
+
+Figure 5. Ablation study on γ in Eq. (8) 
+
+# 5. Conclusion 
+
+In this paper, we propose ID-Selection, a training-free token selection method for efficient LVLM inference. By cou-pling importance estimation with diversity-aware iterative selection, ID-Selection preserves informative visual tokens while progressively suppressing redundant ones. Extensive experiments on 16 datasets and 5 LVLMs, covering im-age understanding, video understanding, and text-rich doc-ument understanding, demonstrate that ID-Selection con-sistently achieves strong performance under various prun-ing ratios, especially in extreme compression scenarios. Moreover, ID-Selection significantly improves inference ef-ficiency while introducing negligible additional overhead. Our results suggest that simple yet effective iterative score suppression offers a practical and general solution for effi-cient LVLM inference. 
+
+# References 
+
+[1] Saeed Ranjbar Alvar, Gursimran Singh, Mohammad Akbari, and Yong Zhang. Divprune: Diversity-based visual token pruning for large multimodal models. In CVPR , 2025. 1, 2, 3, 4, 5, 6, 7, 8 
+
+9[2] Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, et al. Qwen technical report. arXiv preprint arXiv:2309.16609 , 2023. 1, 3 [3] Jinze Bai, Shuai Bai, Shusheng Yang, Shijie Wang, Sinan Tan, Peng Wang, Junyang Lin, Chang Zhou, and Jingren Zhou. Qwen-vl: A frontier large vision-language model with versatile abilities. arXiv preprint arXiv:2308.12966 , 2023. 1, 2[4] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun Tang, et al. Qwen2. 5-vl technical report. arXiv preprint arXiv:2502.13923 , 2025. 1, 5, 7, 8 [5] David Chen and William B Dolan. Collecting highly paral-lel data for paraphrase evaluation. In Proceedings of the 49th annual meeting of the association for computational linguis-tics: human language technologies , 2011. 5, 8 [6] Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Junyang Lin, Chang Zhou, and Baobao Chang. An image is worth 1/2 tokens after layer 2: Plug-and-play inference acceleration for large vision-language models. In ECCV , 2024. 1, 2, 3, 4, 5, 6, 7, 8, 9 [7] Mengzhao Chen, Mingbao Lin, Ke Li, Yunhang Shen, Yongjian Wu, Fei Chao, and Rongrong Ji. Cf-vit: A general coarse-to-fine method for vision transformer. In Proceed-ings of the AAAI conference on artificial intelligence , pages 7042–7052, 2023. 2 [8] Zhe Chen, Weiyun Wang, Yue Cao, Yangzhou Liu, Zhang-wei Gao, Erfei Cui, Jinguo Zhu, Shenglong Ye, Hao Tian, Zhaoyang Liu, et al. Expanding performance boundaries of open-source multimodal models with model, data, and test-time scaling. arXiv preprint arXiv:2412.05271 , 2024. 5, 7, 8[9] Chaoyou Fu, Peixian Chen, Yunhang Shen, Yulei Qin, Mengdan Zhang, Xu Lin, Jinrui Yang, Xiawu Zheng, Ke Li, Xing Sun, et al. Mme: A comprehensive evaluation bench-mark for multimodal large language models. arXiv preprint arXiv:2306.13394 , 2023. 5, 8 [10] Yash Goyal, Tejas Khot, Douglas Summers-Stay, Dhruv Ba-tra, and Devi Parikh. Making the v in vqa matter: Elevating the role of image understanding in visual question answer-ing. In CVPR , 2017. 5 [11] Danna Gurari, Qing Li, Abigale J Stangl, Anhong Guo, Chi Lin, Kristen Grauman, Jiebo Luo, and Jeffrey P Bigham. Vizwiz grand challenge: Answering visual questions from blind people. In CVPR , 2018. 5 [12] Qidong Huang, Xiaoyi Dong, Pan Zhang, Bin Wang, Con-ghui He, Jiaqi Wang, Dahua Lin, Weiming Zhang, and Nenghai Yu. Opera: Alleviating hallucination in multi-modal large language models via over-trust penalty and retrospection-allocation. In CVPR , 2024. 2 [13] Drew A Hudson and Christopher D Manning. Gqa: A new dataset for real-world visual reasoning and compositional question answering. In CVPR , 2019. 5, 8, 9 [14] Aaron Hurst, Adam Lerer, Adam P Goucher, Adam Perel-man, Aditya Ramesh, Aidan Clark, AJ Ostrow, Akila Weli-hinda, Alan Hayes, Alec Radford, et al. Gpt-4o system card. 
+
+arXiv preprint arXiv:2410.21276 , 2024. 1 [15] Yunseok Jang, Yale Song, Youngjae Yu, Youngjin Kim, and Gunhee Kim. Tgif-qa: Toward spatio-temporal reasoning in visual question answering. In CVPR , 2017. 5, 8 [16] Pengfei Jiang, Hanjun Li, Linglan Zhao, Fei Chao, Ke Yan, Shouhong Ding, and Rongrong Ji. Visa: Group-wise visual token selection and aggregation via graph summarization for efficient mllms inference. In ACM MM , 2025. 1 [17] Alex Kulesza, Ben Taskar, et al. Determinantal point pro-cesses for machine learning. Foundations and Trends® in Machine Learning , 2012. 2 [18] Yifan Li, Yifan Du, Kun Zhou, Jinpeng Wang, Wayne Xin Zhao, and Ji-Rong Wen. Evaluating object hallucina-tion in large vision-language models. arXiv preprint arXiv:2305.10355 , 2023. 1, 5, 8, 9 [19] Bin Lin, Yang Ye, Bin Zhu, Jiaxi Cui, Munan Ning, Peng Jin, and Li Yuan. Video-llava: Learning united visual repre-sentation by alignment before projection. In ENNLP , 2024. 1, 2, 3, 4, 5, 7, 8 [20] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. NeurIPS , 2023. 1, 2, 3, 4, 5, 6, 8 [21] Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee. Llavanext: Improved reasoning, ocr, and world knowledge, 2024. 1, 2, 3, 4, 5, 6, 7, 9 [22] Yuan Liu, Haodong Duan, Yuanhan Zhang, Bo Li, Songyang Zhang, Wangbo Zhao, Yike Yuan, Jiaqi Wang, Conghui He, Ziwei Liu, et al. Mmbench: Is your multi-modal model an all-around player? In ECCV , 2024. 2, 5, 8 [23] Yuliang Liu, Zhang Li, Mingxin Huang, Biao Yang, Wenwen Yu, Chunyuan Li, Xu-Cheng Yin, Cheng-Lin Liu, Lianwen Jin, and Xiang Bai. Ocrbench: On the hidden mystery of ocr in large multimodal models. Science China Information Sciences , 67(12):220102, 2024. 5, 8 [24] Pan Lu, Swaroop Mishra, Tanglin Xia, Liang Qiu, Kai-Wei Chang, Song-Chun Zhu, Oyvind Tafjord, Peter Clark, and Ashwin Kalyan. Learn to explain: Multimodal reasoning via thought chains for science question answering. NeurIPS ,2022. 2, 5, 8 [25] Gen Luo, Yiyi Zhou, Yuxin Zhang, Xiawu Zheng, Xi-aoshuai Sun, and Rongrong Ji. Feast your eyes: Mixture-of-resolution adaptation for multimodal large language models. In ICLR , 2025. 2 [26] Ahmed Masry, Do Xuan Long, Jia Qing Tan, Shafiq Joty, and Enamul Hoque. Chartqa: A benchmark for question answer-ing about charts with visual and logical reasoning. 2022. 5, 8[27] Minesh Mathew, Dimosthenis Karatzas, and CV Jawahar. Docvqa: A dataset for vqa on document images. 2021. 5 [28] Minesh Mathew, Viraj Bagal, Rub` en Tito, Dimosthenis Karatzas, Ernest Valveny, and CV Jawahar. Infographicvqa. 2022. 5, 8 [29] Daniel Cosmin Porumbel, Jin-Kao Hao, and Fred Glover. A simple and effective algorithm for the maxmin diversity problem. Annals of Operations Research , 2011. 3 [30] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, 
+
+10 Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-ing transferable visual models from natural language super-vision. In Int. Conf. Mach. Intell. , 2021. 1, 2, 3, 4, 5, 6, 7, 8, 9[31] Yuzhang Shang, Mu Cai, Bingxin Xu, Yong Jae Lee, and Yan Yan. Llava-prumerge: Adaptive token reduction for efficient large multimodal models. ICCV , 2025. 2, 5, 6, 7 [32] Amanpreet Singh, Vivek Natarajan, Meet Shah, Yu Jiang, Xinlei Chen, Dhruv Batra, Devi Parikh, and Marcus Rohrbach. Towards vqa models that can read. In CVPR ,2019. 2, 4, 5, 8, 9 [33] Gemini Team, Rohan Anil, Sebastian Borgeaud, Jean-Baptiste Alayrac, Jiahui Yu, Radu Soricut, Johan Schalkwyk, Andrew M Dai, Anja Hauth, Katie Millican, et al. Gemini: a family of highly capable multimodal models. arXiv preprint arXiv:2312.11805 , 2023. 1, 2 [34] Hugo Touvron, Thibaut Lavril, Gautier Izacard, Xavier Martinet, Marie-Anne Lachaux, Timoth´ ee Lacroix, Baptiste Rozi` ere, Naman Goyal, Eric Hambro, Faisal Azhar, et al. Llama: Open and efficient foundation language models. 
+
+arXiv preprint arXiv:2302.13971 , 2023. 1, 2 [35] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszko-reit, Llion Jones, Aidan N Gomez, Łukasz Kaiser, and Illia Polosukhin. Attention is all you need. NeurIPS , 2017. 3 [36] Zichen Wen, Yifeng Gao, Shaobo Wang, Junyuan Zhang, Qintong Zhang, Weijia Li, Conghui He, and Linfeng Zhang. Stop looking for important tokens in multimodal language models: Duplication matters more. EMNLP , 2025. 2, 3, 4, 5, 6, 7, 8 [37] Jun Xu, Tao Mei, Ting Yao, and Yong Rui. Msr-vtt: A large video description dataset for bridging video and language. In 
+
+CVPR , 2016. 5, 8 [38] Senqiao Yang, Yukang Chen, Zhuotao Tian, Chengyao Wang, Jingyao Li, Bei Yu, and Jiaya Jia. Visionzip: Longer is better but not necessary in vision language models. In 
+
+CVPR , 2025. 2, 5, 6, 7 [39] Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer. Sigmoid loss for language image pre-training. In ICCV , 2023. 1, 4 [40] Qizhe Zhang, Aosong Cheng, Ming Lu, Zhiyong Zhuo, Minqi Wang, Jiajun Cao, Shaobo Guo, Qi She, and Shang-hang Zhang. [cls] attention is all you need for training-free visual token pruning: Make vlm inference faster. arXiv preprint arXiv:2412.01818 , 2024. 1, 2, 3, 4, 5, 6, 7, 8, 9 [41] Qizhe Zhang, Aosong Cheng, Ming Lu, Renrui Zhang, Zhiy-ong Zhuo, Jiajun Cao, Shaobo Guo, Qi She, and Shanghang Zhang. Beyond text-visual attention: Exploiting visual cues for effective token pruning in vlms. ICCV , 2025. 2, 3, 5, 6, 7, 8 [42] Qizhe Zhang, Mengzhen Liu, Lichen Li, Ming Lu, Yuan Zhang, Junwen Pan, Qi She, and Shanghang Zhang. Beyond attention or similarity: Maximizing conditional diversity for token pruning in mllms. NeurIPS , 2025. 2, 3, 4, 5, 6, 7, 8 [43] Yuan Zhang, Chun-Kai Fan, Junpeng Ma, Wenzhao Zheng, Tao Huang, Kuan Cheng, Denis Gudovskiy, Tomoyuki Okuno, Yohei Nakata, Kurt Keutzer, et al. Sparsevlm: Vi-sual token sparsification for efficient vision-language model inference. Int. Conf. Mach. Intell. , 2025. 3, 5, 6, 7 
+
+11

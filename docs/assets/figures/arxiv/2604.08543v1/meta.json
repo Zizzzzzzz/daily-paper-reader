@@ -1,0 +1,142 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-001.webp",
+      "caption": "Figure 1. Rethinking event-based egocentric 3D human pose estimation. (a) Previous methods [25, 26] capture temporal information only through a single previous event frame stored in the frame buffer leading to jitter and drift. (b) Our E-3DPSM approach models motion as a continuous event-driven state evolution, fusing delta and direct 3D human pose updates, thereby achieving real-time and temporally stable 3D reconstruction and significantly outperforming prior approaches in the 3D accuracy.",
+      "page": 1,
+      "index": 1,
+      "width": 495,
+      "height": 466
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-002.webp",
+      "caption": "Figure 4. Qualitative comparison of our method with prior approaches. We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Left: EE3D-R (real dataset). Right: EE3D-W (in-the-wild). Red: Predicted pose. Green: Ground truth.",
+      "page": 6,
+      "index": 2,
+      "width": 1031,
+      "height": 283
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-003.webp",
+      "caption": "Table 1. Quantitative comparisons on EE3D-R and EE3D-W.",
+      "page": 6,
+      "index": 3,
+      "width": 487,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-004.webp",
+      "caption": "Figure 6. Pose drift over time. Comparison of learned fusion (Eq. (15)), direct pose only (Eq. (8)), and naive fusion (Eq. (11)) across temporal sequence length. Naive fusion leads to rapidly increasing drift, whereas our learned fusion effectively mitigates this drift, maintaining stable accuracy over time.",
+      "page": 11,
+      "index": 4,
+      "width": 486,
+      "height": 285
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-005.webp",
+      "caption": "Figure 10. Our real-time viewer. Screenshot of our iPad-viewer showing the live event stream, reference RGB view, and the predicted 3D skeleton rendered in real time. Note that there is a transmission delay of 3–5 poses.",
+      "page": 15,
+      "index": 5,
+      "width": 496,
+      "height": 822
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-006.webp",
+      "caption": "Figure 5. We plot the per-frame all-joint average displacement (Eq. (24)) for EE3D-R (top) and EE3D-W (bottom).",
+      "page": 7,
+      "index": 6,
+      "width": 489,
+      "height": 448
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-007.webp",
+      "caption": "Table 2. Occlusion-only quantitative comparison on EE3D-R and EE3D-W. Evaluation is performed only on occluded joints.",
+      "page": 7,
+      "index": 7,
+      "width": 487,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-008.webp",
+      "caption": "Figure 8. We plot the improvement in MPJPE obtained by increasing the duration of temporal history k, showing how a longer past context yields larger gains for occluded lower body joints.",
+      "page": 14,
+      "index": 8,
+      "width": 474,
+      "height": 416
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-009.webp",
+      "caption": "Figure 12. The per-frame average end-effector joint displacements (Eq. (24)) for EE3D-W. Zoom recommended.",
+      "page": 18,
+      "index": 9,
+      "width": 496,
+      "height": 821
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-010.webp",
+      "caption": "Figure 11. The per-frame average end-effector joint displacements (Eq. (24)) for EE3D-R. Zoom recommended.",
+      "page": 18,
+      "index": 10,
+      "width": 496,
+      "height": 821
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-011.webp",
+      "caption": "Figure 2. Overview of the proposed E-3DPSM approach for monocular egocentric 3D human pose estimation. Incoming raw events e are converted into LNES frames Lt and processed by the Spatiotemporal Pose Encoder Module (SPEM, Sec. 4.1), as depicted in Fig. 3. The output of SPEM Ft is passed to the Pose Regression Module (PRM, Sec. 4.2), which estimates both the direct 3D poses PD t and the 3D delta poses P∆ t between consecutive LNES frames. These delta poses naturally correspond to the observed events (i.e., changes in the 2D LNES space). Finally, the 3D pose deltas are fused with the direct 3D pose using a learned pose fusion mechanism (a neural Kalmanstyle filter) to obtain the final 3D poses Pt. The predicted 3D pose Pt is supervised using absolute ground-truth 3D poses (L3D) and ground-truth 3D pose differences (L∆), respectively. At each timestep t, SPEM updates and propagates its latent state Zt bidirectionally (the “←→” symbol), whereas PRM propagates its fused pose state Xt causally (the “−→” symbol) to the next timestep. During training, SPEM operates bidirectionally (non-causal) to exploit the full temporal context, while at inference, it can run in either causal (real-time) or non-causal mode. For visualisation purposes, the differences between P1 and P2 and the corresponding L1 and L2 are exaggerated.",
+      "page": 4,
+      "index": 11,
+      "width": 1029,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-012.webp",
+      "caption": "Figure 3. Architecture of SPEM, combining multi-stage convolutional encoding, SSM blocks, deformable attention, and a jointquery decoder for temporally-aware pose features.",
+      "page": 4,
+      "index": 12,
+      "width": 494,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-013.webp",
+      "caption": "Figure 13. Per-action qualitative comparison of our method with prior approaches on EE3D-W (challenging sequences). We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Red: Predicted pose. Green: Ground truth.",
+      "page": 19,
+      "index": 13,
+      "width": 1017,
+      "height": 1099
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-014.webp",
+      "caption": "Table 14. Per-joint quantitative comparison for EE3D-R and EE3D-W datasets.",
+      "page": 17,
+      "index": 14,
+      "width": 1036,
+      "height": 577
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-015.webp",
+      "caption": "Figure 14. Per-action qualitative comparison of our method with prior approaches on EE3D-R (walk and further challenging sequences). We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Red: Predicted pose. Green: Ground truth.",
+      "page": 20,
+      "index": 15,
+      "width": 1017,
+      "height": 1121
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-016.webp",
+      "caption": "Table 13. Per-action quantitative results for the EE3D-R and EE3D-W datasets.",
+      "page": 16,
+      "index": 16,
+      "width": 1026,
+      "height": 467
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08543v1/fig-017.webp",
+      "caption": "Table 12. Quantitative results for occlusion-only end-effector joints for the EE3D-R and EE3D-W datasets.",
+      "page": 16,
+      "index": 17,
+      "width": 1022,
+      "height": 690
+    }
+  ]
+}

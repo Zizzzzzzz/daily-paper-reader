@@ -1,0 +1,1117 @@
+Title: E-3DPSM: A State Machine for Event-Based Egocentric 3D Human Pose Estimation
+
+URL Source: https://arxiv.org/pdf/2604.08543v1
+
+Published Time: Fri, 10 Apr 2026 01:28:18 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# E-3DPSM: A State Machine for Event-Based Egocentric 3D Human Pose Estimation 
+
+## Mayur Deshmukh 1,2 Hiroyasu Akada 1 Helge Rhodin 1,3 Christian Theobalt 1 Vladislav Golyanik 11MPI for Informatics, SIC 2Saarland University, SIC 3Bielefeld University 
+
+## Abstract 
+
+Event cameras offer multiple advantages in monocular ego-centric 3D human pose estimation from head-mounted de-vices, such as millisecond temporal resolution, high dy-namic range, and negligible motion blur. Existing methods effectively leverage these properties, but suffer from low 3D estimation accuracy, insufficient in many applications (e.g., immersive VR/AR). This is due to the design not being fully tailored towards event streams (e.g., their asynchronous and continuous nature), leading to high sensitivity to self-occlusions and temporal jitter in the estimates. This pa-per rethinks the setting and introduces E-3DPSM, an event-driven continuous pose state machine for event-based ego-centric 3D human pose estimation. E-3DPSM aligns con-tinuous human motion with fine-grained event dynamics; it evolves latent states and predicts continuous changes in 3D joint positions associated with observed events, which are fused with direct 3D human pose predictions, leading to sta-ble and drift-free final 3D pose reconstructions. E-3DPSM runs in real-time at 80 Hz on a single workstation and sets a new state of the art in experiments on two benchmarks, improving accuracy by up to 19% (MPJPE) and temporal stability by up to 2.7×. See our project page for the source code and trained models 1.
+
+## 1. Introduction 
+
+Egocentric 3D human pose estimation from head-mounted devices (HMDs) is a key capability for immersive VR/AR applications such as real-time avatar control, fitness track-ing, telepresence, and hands-free interfaces. By capturing motion directly from the wearer’s perspective, it removes the need for external cameras and constrained capture en-vironments. Yet, fast camera motion and frequent self-occlusions also add new algorithmic challenges. Recent RGB-based egocentric 3D pose estimation meth-ods [1–3, 14, 16, 17, 23, 24, 27, 29, 35, 36, 38–40, 44, 45, 
+
+> 1
+
+https://4dqv.mpi-inf.mpg.de/E-3DPSM/ Heatmap to           
+
+> 3D Lifting
+> Update
+> state 𝑋 𝑡 −1
+> Refine
+> state 𝑋 𝑡
+> Pose state 𝑋 𝑡 −1
+> Pose Fusion
+> Pose state 𝑋 𝑡
+> 3D Delta Pose 3D Direct Pose
+> Predicted 3D Pose
+> Spatial
+> Features
+> Predicted 3D Pose
+> 2D Heatmaps
+> (a) Previous work s(b) Ours
+> Spatial Features
+> SSM
+> (Temporal Features)
+> Update latent
+> state 𝑍 𝑡
+> Frame Buffer
+> Confidence
+> Map
+> Body
+> Segmentation
+> 𝐶 𝑡
+> ෨𝐿 𝑡 −1
+> ෠𝐿 𝑡 ෠𝐿 𝑡
+> Spatiotemporal Modelling Pose Regression Module
+
+Figure 1. Rethinking event-based egocentric 3D human pose estimation. (a) Previous methods [25, 26] capture temporal in-formation only through a single previous event frame stored in the frame buffer leading to jitter and drift. (b) Our E-3DPSM approach models motion as a continuous event-driven state evo-lution, fusing delta and direct 3D human pose updates, thereby achieving real-time and temporally stable 3D reconstruction and significantly outperforming prior approaches in the 3D accuracy. 
+
+47] achieve accurate results in controlled, well-lit environ-ments, but struggle under real-world conditions. Low light causes underexposure and sensor noise, rapid head motion leads to blur, and continuous streaming of high-resolution video imposes heavy bandwidth and power demands on wearable devices. As a viable alternative in challenging conditions, event cameras offer millisecond-level temporal resolution and high dynamic range. The recently introduced EventEgo3D [25, 26] is the first method for egocentric and real-time 3D human pose esti-mation from a single head-mounted event camera. Com-pared to third-person captures [41], humans remain cen-tred and scale-consistent across input frames in egocentric 1
+
+> arXiv:2604.08543v1 [cs.CV] 9 Apr 2026
+
+views. These properties reduce background variability and make egocentric event streams particularly suitable for con-tinuous 3D reconstruction of fast human motions. While EventEgo3D can capture 3D human poses at high temporal resolutions, its overall accuracy is considered low in many practical scenarios. We believe the reasons are in its archi-tecture (Fig. 1-(a)): First, EventEgo3D predicts direct 3D poses, models temporal information using only the previous event frame stored in the frame buffer through short-term feature propagation across event frames and, hence, does not fully exploit the asynchronous, continuous, and change-driven nature of event data. This often leads to jitter, drift, and substantial 3D errors under self-occlusions. Moreover, the reliance on 2D heatmaps introduces quantisation errors [46], and segmentation masks that need to be predicted at test time can serve as an additional source of inaccuracies. This paper fundamentally rethinks egocentric event-based 3D human pose estimation with the overarching goal of improving the 3D estimation accuracy. Our key insights are threefold: 1) Since events inherently encode changes in the 2D observation space, they should correspond to and induce changes in the 3D space. The changes in the rel-ative 3D joint locations, which we refer to as delta poses, are accumulated into smooth and robust 3D trajectories and fused with direct 3D predictions. This principle is visu-alised in Fig. 1-(b) and can be compared with the simulta-neous prediction of 3D locations and sparse 3D scene flow. 2) Second—as events observe changes in the 2D space con-tinuously (in the sense that their temporal resolution is sub-stantially higher than what is required to capture the fastest human motions)—we formulate the prediction task as a continuous process, where 3D motion continuously evolves in response to asynchronous events. We demonstrate that state space modelling [9, 50] is naturally suitable for con-tinuous prediction of 3D human poses using event streams. 3) Additional supervision with object-background segmen-tation masks and intermediate 2D heatmaps inherited from RGB-based vision [25, 26] can be avoided. A neural archi-tecture can learn to extract all intermediate features and rep-resentations necessary for 3D human pose estimation with a reduced set of pre-defined design choices. All these insights are reflected in our new approach, 
+
+Event-based 3D Pose State Machine (E-3DPSM) , which treats egocentric event-based 3D human pose estimation as a continuous temporal process. E-3DPSM maintains a la-tent state that evolves with the observed motion. Each in-coming set of events (LNES [31]) updates this internal state, which encodes the current pose, its uncertainty, and the learned spatiotemporal context. Predicted 3D delta changes correspond to event-level variations and (along with the evolving latent state, accumulating motion cues over time) produce temporally consistent 3D poses. To further mit-igate drift and temporally stabilise 3D reconstruction, we introduce a learnable Kalman-filter-inspired fusion module that adaptively integrates global and delta predictions. In the absence of events, the latent state retains the last esti-mate, eliminating the need for explicit caching mechanisms used in the previous approaches [25, 26]. In summary, the technical contributions of this paper are as follows: • E-3DPSM , the first state machine architecture that main-tains a continuous 3D human pose state aligned with the asynchronous dynamics of event streams, enabling real-time tracking at 80 Hz on our hardware (Sec. 4); • A spatiotemporal pose encoder that fuses spatial motion cues with long-range temporal dependencies, leveraging deformable attention and bidirectional state-space mod-elling to remain robust under occlusion and rapid motion; • A learnable neural module that dynamically balances di-rect and delta predictions, mitigating drift and ensuring smooth trajectories even under sparse and noisy events. 
+
+E-3DPSM achieves state-of-the-art results on two ego-centric event benchmarks, reducing MPJPE and PA-MPJPE by ∼19% , and jitter by up to 2.7× compared to the previous state of the art [25, 26] (Sec. 5). 
+
+## 2. Related Work 
+
+Egocentric 3D Human Pose Estimation. Egocentric 3D human pose estimation has gained traction with the rise of VR/AR applications requiring full-body 3D motion re-covery from head-mounted cameras. Early works such as EgoCap [29] used a stereo fisheye capture setup and global pose estimation using off-the-shelf SLAM, while xR-EgoPose [35] and SelfPose [36] handled monocular set-tings. Later methods addressed calibration and improved 3D global pose estimation from HMD views [38, 39] as well as whole-body pose refinement with diffusion mod-els [40]. To study a variety of settings with challeng-ing human poses and self-occlusions, UnrealEgo [1] and UnrealEgo2 [2] projects introduced large-scale synthetic datasets and stereo architectures, with algorithmic improve-ments shown by Ego3DPose [17] (a two-path network) and EgoTap [16] (a grid ViT). Further works explored rear-mounted cameras [3], fisheye-based self-supervision [23], motion priors, reinforcement learning, and spatio-temporal transformers [14, 24, 27, 45, 47]. Despite this progress, RGB-based methods remain reliant on frame-based pro-cessing and often suffer from issues such as blur, low-light sensitivity, and high bandwidth demands. In contrast, event cameras offer high temporal resolution and robustness in challenging observation conditions, but require fundamen-tally different (and often new) neural architecture designs. 
+
+Event-Based 3D Human Pose Estimation. The first event-based methods for 3D human pose estimation used exocen-tric views. EventCap [43] demonstrated high-speed monoc-ular 3D motion capture by tracking a 3D human body tem-plate using a monocular event stream in a series of optimi-2sation problems, and EventHPE [49] jointly estimated 3D poses and shapes from events using a two-stage neural net-work trained on the DHP19 dataset [5]. EventEgo3D [25] and EventEgo3D++ [26] introduced egocentric event-based 3D human pose estimation. Their architecture includes two branches, i.e., 1) an encoder-decoder to convert events into 2D heat maps and lift them to 3D poses, and 2) an event stream segmentation module to filter out background events. This method predominantly adopts components from RGB-based methods (i.e., not specifically tailored to event streams) and does not reach the accuracy required in many applications with HMDs (suffers from temporal jit-ter). In contrast, we rethink the problem and tailor all design choices to the egocentric event-based setting. The works by Gehrig et al. [8] and Zubic et al. [50] pro-posed a recurrent ViT and a state-space model (SSM) for event-based object detection, while PRE-Mamba [30] intro-duced an SSM for event stream deraining. Lang et al. [21] used a Mamba-type SSM for context-aware fusion of RGB and event features in 3D human pose estimation. SSMs are also widely used in problems with RGB and point cloud inputs [22]. Inspired by all these insights, we bring SSMs to the realm of event-based dynamic 3D vision and formu-late egocentric 3D human pose estimation as a continuous dynamic process. By adopting a neural SSM, we explic-itly model temporal evolution and inter-frame pose differ-ences, leading to substantially improved accuracy and tem-poral consistency over prior event-based methods. This al-lows us to avoid event segmentation masks and intermediate 2D heatmaps [25, 26] as potential sources of inaccuracies. 
+
+## 3. Preliminaries 
+
+Event Cameras. Event cameras are bio-inspired sensors that record per-pixel brightness changes asynchronously in-stead of capturing full image frames at fixed rates. A pixel 
+
+(x, y ) generates an event e = (x, y, t, p ) whenever the change in log intensity I exceeds a threshold C, with po-larity p ∈ {− 1, 1} denoting the sign of the change: 
+
+∆I(x, y, t ) = |I(x, y, t ) − I(x, y, t − ∆t)| ≥ C. (1) This results in sparse and high-temporal-resolution data, which is well-suited for fast motion and dynamic scenes. 
+
+LNES Representation. Given a set of events ei =(xi, y i, t i, p i) collected within a time window of T ms, we construct a Locally Normalised Event Surface (LNES) [31] 
+
+L ∈ R192 ×256 ×2, with two separate channels for positive and negative polarities. Each event is normalised relative to the start time t0 of the temporal window, i.e., 
+
+L(xi, y i, p i) = ti − t0
+
+T , (2) so that recent events map to values close to 1.0 and older ones decay toward 0.0. This encodes both the spatial loca-tion and temporal freshness of events, yielding a dense 2D grid compatible with standard neural architectures. 
+
+State-Space Models (SSMs) provide a structured way to model long-range temporal dependencies in sequential data. An SSM maintains a latent state Zt ∈ Rd that evolves over time according to a linear recurrence, while mapping inputs to outputs via learnable projections: 
+
+Zt+1 = AZ t + Bxt, Yt = CZ t, (3) where xt is the input at timestep t, Yt is the output, and 
+
+A, B, C are learned matrices. Unlike recurrent networks, SSMs use an equivalent convolutional form that enables ef-ficient parallel training while preserving the ability to run causally at inference. Recent variants such as S4 [10] and S5 [34] layers stabilise training through spectral or band-limiting constraints, making them particularly effective for long-sequence modelling tasks. We use event-specific S5 layers, similar to Zubic et al. [50], to capture long-term tem-poral context in event streams as a 3D reconstruction cue. 
+
+## 4. The E-3DPSM Approach 
+
+E-3DPSM estimates temporally consistent 3D human poses from a monocular egocentric event camera equipped with a fisheye lens in three stages; see Fig. 2. First, the incoming raw event stream is converted into N LNES frames {Lt}Nt=1 
+
+of length T ms. Next, the Spatiotemporal Pose Encoder Module (SPEM, Sec. 4.1) extracts temporally aware, joint-specific features by combining a multi-stage convolutional pyramid, per-stage deformable attention for spatial reason-ing, and event-specialised SSM (S5) layers for temporal modelling, followed by a joint-query transformer decoder that reads the deepest-stage tokens. Finally, the Pose Re-gression Module (PRM, Sec. 4.2) predicts a direct 3D pose 
+
+PD 
+
+> t
+
+∈ RJ×3 and a delta pose P∆ 
+
+> t
+
+∈ RJ×3, with the number of joints J=16 . A lightweight learned fusion module com-bines Pt−1 and P∆ 
+
+> t
+
+, while using PD 
+
+> t
+
+as a global anchor, yielding the final temporally consistent 3D joints Pt.
+
+4.1. Spatiotemporal Pose Encoder Module (SPEM) 
+
+SPEM transforms LNES event frames into rich, temporally-aware and joint-specific representations. It is composed of a multi-stage convolutional encoder, spatially adaptive deformable attention blocks, state-space model blocks for long-term temporal reasoning, and a joint-query trans-former decoder. Fig. 3 provides details. 
+
+Convolutional Feature Encoding. Each input LNES frame Lt ∈ R192 ×256 ×2 is first passed through a strided convolution, producing F0 
+
+> t
+
+∈ R96 ×128 ×16 . The encoder then processes the features through four hierarchical stages. At stages s ∈ { 1, . . . , 4}, we apply two residual blocks and a downsampling convolution, and obtain 
+
+Fst = Conv 
+
+
+
+ResBlock (2) 
+
+> s
+
+ ResBlock (1)  
+
+> s
+
+(Fs−1 
+
+> t
+
+)
+
+, (4) 3Spatio temporal 
+
+Pose Encoder 
+
+Direct 
+
+Pose Regressor 
+
+Learned 
+
+Pose Fusion 
+
+Spatio temporal 
+
+Pose Encoder 
+
+Delta 
+
+Pose Regressor 
+
+Direct 
+
+Pose Regressor 
+
+Learned 
+
+Pose Fusion 
+
+Pose 
+
+Embedding   
+
+> Predicted Pose at 𝑡 1
+> Spatio temporal Pose
+> Encoder Module ( Sec. 4.1 )
+> Pose Regression Module ( Sec. 4.2 )
+
+ℒ3𝐷    
+
+> Predicted Pose at 𝑡 2
+> GT Pose at 𝑡 1
+> GT Pose at 𝑡 2
+
+ℒ3𝐷 
+
+> Event Representation
+> (Sec. 3 )
+
+𝒕 𝟏 
+
+𝒕 𝟐 
+
+𝑷 𝟏 
+
+> 𝑫
+
+𝑷 𝟐 
+
+> 𝑫
+
+𝑷 𝟏 
+
+𝑷 𝟏 
+
+𝑷 𝟐 
+
+𝑬 𝟏 
+
+𝑭 𝟏 
+
+𝑭 𝟐 
+
+𝑳 𝟏 
+
+𝑳 𝟐 
+
+𝒁 𝟏 
+
+𝒁 𝟐 
+
+𝑿 𝟏 
+
+𝑿 𝟐 
+
+𝑷 𝟐 
+
+> 𝚫
+
+ℒΔ 
+
+> −−
+
+Figure 2. Overview of the proposed E-3DPSM approach for monocular egocentric 3D human pose estimation. Incoming raw events 
+
+e are converted into LNES frames Lt and processed by the Spatiotemporal Pose Encoder Module (SPEM, Sec. 4.1), as depicted in Fig. 3. The output of SPEM Ft is passed to the Pose Regression Module (PRM, Sec. 4.2), which estimates both the direct 3D poses PDt and the 3D delta poses P∆ 
+
+> t
+
+between consecutive LNES frames. These delta poses naturally correspond to the observed events (i.e., changes in the 2D LNES space). Finally, the 3D pose deltas are fused with the direct 3D pose using a learned pose fusion mechanism (a neural Kalman-style filter) to obtain the final 3D poses Pt. The predicted 3D pose Pt is supervised using absolute ground-truth 3D poses ( L3D ) and ground-truth 3D pose differences ( L∆), respectively. At each timestep t, SPEM updates and propagates its latent state Zt bidirectionally (the “ ←→ ” symbol), whereas PRM propagates its fused pose state Xt causally (the “ −→ ” symbol) to the next timestep. During training, SPEM operates bidirectionally (non-causal) to exploit the full temporal context, while at inference, it can run in either causal (real-time) or non-causal mode. For visualisation purposes, the differences between P1 and P2 and the corresponding L1 and L2 are exaggerated. ResBlock  
+
+> Conv2d
+> Layer Norm
+> Deformable
+> Attention
+> Layer Norm
+> GeGLU
+> Linear
+> 𝑆 𝑡 −1
+> 192  × 𝐻
+> 32  × 𝑊
+> 32
+> 192  × 𝐻
+> 32  × 𝑊
+> 32
+> 128  × 𝐻
+> 16  × 𝑊
+> 16
+> 64  × 𝐻
+> 8 × 𝑊
+> 8
+> Encoder Block
+> Encoder Block
+> Encoder Block
+> Encoder Block
+> SSM
+> 𝑆 𝑡 −1 𝑆 𝑡
+> 32  × 𝐻
+> 4 × 𝑊
+> 4
+> SSM
+> Joint Query
+> Decoder
+> 𝐹 𝑡
+> 32  × 𝐻
+> 4 × 𝑊
+> 4
+> 𝑆 𝑡
+> ResBlock
+> Stage 3 Stage 4 Stage 2 Stage 1
+> 𝐿 𝑡
+
+Figure 3. Architecture of SPEM , combining multi-stage convo-lutional encoding, SSM blocks, deformable attention, and a joint-query decoder for temporally-aware pose features. 
+
+where “Conv” denotes a 3 × 3 convolution with stride 2 that reduces spatial resolution, and each ResBlock [12] is a two-convolution residual unit with BatchNorm and SiLU [6]. 
+
+Deformable Attention for Spatial Reasoning. Inspired by recent egocentric pose estimation methods [2, 44] that use deformable attention [48] to adaptively focus on pose-critical regions under occlusions and motion, we incorpo-rate a deformable attention block at the end of each stage to refine features at every timestep. We first flatten the feature map Fst ∈ RHs×W s×Cs
+
+into a sequence of feature tokens 
+
+Tst ∈ R(HsW s)×Cs
+
+, and then compute 
+
+Fst = DeformAttn  Tst , Tst , Rs
+
+ ∈ R(HsW s)×Cs
+
+, (5) where Hs, W s, and Cs are stage-dependent. The ref-erence points Rs are initialised on a normalised uniform grid and optimised end-to-end. In this setup, Tst acts as query, key, and value, so that each token attends to it-self and its neighbours through learned deformable offsets. Deformable attention shifts sampling toward joint-critical neighbourhoods, allowing tokens to attend to relevant body parts under strong egocentric (fisheye lens) distortions. 
+
+SSM for Bidirectional Temporal Modelling. While spa-tial reasoning is handled within each frame, modelling mo-tion over time is critical, especially under occlusions. For this, we insert S5 layers [50], a recent state-space model (SSM) variant specialised for event streams, at selected en-coder stages ˆs ∈ { 2, 4} to aggregate long-range temporal context independently at every spatial location (H ˆs, W ˆs).Let Fˆs 
+
+> 1: N
+
+= [ Fˆs
+
+> 1
+
+, . . . , FˆsN ] ∈ R(H ˆsW ˆs)×N ×C ˆs
+
+denote the per-location feature sequence at stage ˆs. The SSM layer transforms this sequence and returns temporally refined fea-tures eF with an internal state Z as follows: 
+
+eFˆs 
+
+> 1: N
+
+, and Zˆst = SSM ˆs(Fˆs 
+
+> 1: N
+
+). (6) We use the band-limited S5 variant [50] (bandlimit set as 
+
+0.5), placed after the downsampling stage. During training, SSM layers are evaluated in parallel over full sequences us-ing their convolutional form, and we run them bidirection-ally to expose past and future context. At inference, we can 4switch to causal forward-only updates with recurrent state propagation by carrying internal state Zˆs across timesteps, which enables real-time deployment without future frames. 
+
+Joint Query Decoder . After temporal modelling, we ex-tract joint-specific features using a lightweight transformer decoder layer [37]. We follow existing works [2, 44] and define a set of J learnable joint query embeddings U =
+
+{u1, . . . , u16 } ⊂ R192 . These queries act as joint-identity tokens, allowing the decoder to consistently associate each query with a specific 3D body joint across timesteps. At each timestep t, we flatten the output from the encoder’s last stage eF4 
+
+> t
+
+∈ R6×8×192 to memory tokens Mt ∈ R48 ×192 ,and decode joint-aware features using: 
+
+Ft = TransformerDecoder (U, Mt) ∈ R16 ×192 . (7) The decoder attends each joint query to spatial memory, enabling it to learn both joint appearance and contextual interactions between joints (e.g., elbow-wrist alignment). Subsequently, these final representations Ft ∈ R16 ×192 are passed to PRM (Sec. 4.2) for pose prediction. 
+
+4.2. Pose Regression Module (PRM) 
+
+Following joint-aware spatiotemporal encoding, our PRM estimates temporally consistent 3D joint positions across all LNES frames. It consists of three components: 1) a direct pose regressor for initial predictions, 2) a delta pose regres-sor to track motion across time, and 3) a learnable module that adaptively fuses both estimates into a unified 3D pose. 
+
+Direct Pose Regression . At each timestep t, we apply a lightweight MLP head to each joint query token output by the transformer decoder Ft ∈ R16 ×192 to predict the 3D position of each joint directly: 
+
+PD 
+
+> t
+
+= MLP Direct (Ft) ∈ R16 ×3. (8) The prediction at t = 1 initialises our fusion module, and subsequent estimates act as an anchor used to mitigate drift when necessary, as determined adaptively by the fusion module. This branch serves as an intermediate prediction for stabilisation rather than a standalone regression target. 
+
+Delta Pose Regression . To regress the relative offset be-tween the current and previous frames Lt and Lt−1, we in-troduce a delta pose regressor. At each subsequent timestep 
+
+t > 1, we concatenate the current joint token Ft ∈ R16 ×192 
+
+with an embedding Et−1 of the previous pose, and then ap-ply a lightweight MLP head: 
+
+Et−1 = MLP pose-emb (Pt−1) ∈ R16 ×64 , and (9) 
+
+P∆ 
+
+> t
+
+= MLP ∆([ Ft; Et−1]) ∈ R16 ×3. (10) Since event streams encode changes rather than absolute in-tensities, predicting relative 3D joint displacements is of-ten more aligned with the input modality and forms an eas-ier regression target than absolute 3D positions. The deltas capture short-term motion cues that remain structured over time and are, therefore, especially helpful in situations with high-speed motion and occlusions, where absolute positions can fluctuate more significantly. 
+
+Learned Pose Fusion . To obtain the final pose for t > 1,a naive approach would be a simple addition of the direct pose from the previous timestep with the current delta pose: 
+
+Pt = PD 
+
+> t−1
+
++ P∆ 
+
+> t
+
+. (11) This would lead to error accumulation over time, espe-cially when delta estimates are noisy or when direct pre-dictions suffer from transient uncertainty (see App. B). To mitigate this adaptively, we introduce a learnable fusion module, implemented as a differentiable Kalman-style fil-ter [11, 15, 20]. This module adaptively weighs the current delta update against the predicted direct pose to produce a more stable and accurate final pose. At each timestep t > 1,the module receives: 1) P∆ 
+
+> t
+
+∈ R48 ×1 as a motion update, and 2) PD 
+
+> t
+
+∈ R48 ×1 as an observation. We treat this process as a fusion problem, i.e., we fuse these two measurements to compute a corrected 3D pose estimate where we main-tain a latent internal state Xt ∈ R48 ×1 corresponding to the current estimate of the full pose, and a covariance matrix 
+
+Σt ∈ R48 ×48 encoding the uncertainty in the estimate. 
+
+1. Motion Update (Prediction Step) : First, we predict the new internal state based on the previous state Xt−1 and P∆ 
+
+> t
+
+:
+
+Xt = A · Xt−1 + B · P∆ 
+
+> t
+
+. (12) Here, A ∈ R48 ×48 is a state transition matrix modelling temporal dynamics, and B ∈ R48 ×48 modulates the effect of P∆ 
+
+> t
+
+. We also update the prediction uncertainty: 
+
+Σt|t−1 = A · Σt−1 · A⊤ + Q, (13) where Q ∈ R48 ×48 is the learned process noise covariance, capturing uncertainty in the motion model and delta update. 
+
+2. Measurement Update (Correction Step) : Next, we in-corporate the direct pose observation PD 
+
+> t
+
+to refine the pre-dicted state. We compute the Kalman gain Kt ∈ R48 ×48 ,which balances the confidence between the motion predic-tion and the observation: 
+
+Kt = Σt|t−1 · H⊤ ·  H · Σt|t−1 · H⊤ + R−1 . (14) Here, H ∈ R48 ×48 is the observation matrix (identity in our case), and R ∈ R48 ×48 is the learned observation noise covariance, representing uncertainty in the direct pose pre-diction. We then correct the internal state using the residual, i.e., difference between observation and prediction: 
+
+Pt = Xt + Kt ·  PD 
+
+> t
+
+− H · Xt
+
+ . (15) To reflect the reduced uncertainty after fusion, we update the state covariance using the Joseph form [4], which pro-vides a numerically stable update and guarantees the posi-tive semi-definiteness of the resulting covariance matrix: 
+
+Σt = ( I−Kt ·H)·Σt|t−1 ·(I−Kt ·H)⊤ +Kt ·R·K⊤ 
+
+> t
+
+. (16) 5EventEgo3D++ EgoPoseFormer  EventEgo3D  Ours Egocentric Events  EventEgo3D++ EgoPoseFormer  EventEgo3D  Ours Egocentric Events Reference View Reference View Figure 4. Qualitative comparison of our method with prior approaches. We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Left: EE3D-R (real dataset). Right: EE3D-W (in-the-wild). Red: Predicted pose. Green: Ground truth. Table 1. Quantitative comparisons on EE3D-R and EE3D-W .
+
+EE3D-R MPJPE ↓ PA-MPJPE ↓ esmooth ↓
+
+EgoPoseFormer [44] 151.66 96.99 66.50 EventEgo3D [25] 110.39 84.52 27.06 EventEgo3D++ [26] 103.28 77.06 22.93 
+
+Ours (Causal) 84.45 62.64 8.40 
+
+Ours (Non-Causal) 81.32 60.21 6.65 EE3D-W MPJPE ↓ PA-MPJPE ↓ esmooth ↓
+
+EgoPoseFormer [44] 220.40 130.45 79.23 EventEgo3D [25] 195.50 108.20 45.29 EventEgo3D++ [26] 172.43 98.41 40.87 
+
+Ours (Causal) 158.86 93.46 23.57 
+
+Ours (Non-Causal) 155.82 90.85 22.65 
+
+In practice, A, B, H are fixed as identities, while Q and R
+
+are learned once during training and remain constant at in-ference, i.e., they are not frame-dependent but shared across both the motion and measurement updates. Rather than re-lying on fixed noise assumptions, we learn both the process uncertainty (associated with the model update) and the ob-servation uncertainty (associated with the direct pose pre-diction) in an end-to-end manner. Even though Q and R are constant at inference, learning them end-to-end provides the fusion module with calibrated priors on how much to trust delta pose changes versus direct pose estimates, thereby re-ducing drift and improving stability under occlusions (see Tab. 2). Rather than generic temporal smoothing, it per-forms reliability-aware integration of direct and delta pre-dictions, akin to sensor fusion in classical filtering, which yields more accurate and stable 3D poses. 
+
+4.3. Loss Functions 
+
+To supervise our model, we employ a multi-term loss func-tion that balances absolute accuracy, temporal coherence, anatomical plausibility, and projection consistency: 
+
+Ltotal = λ3D L3D + λ∆L∆ + λ2D L2D 
+
++ λBL LBL + λBA LBA . (17) In our experiments, we set the loss weights as follows: 
+
+λ3D =λ∆=λ2D =0 .01 and λBL =λBA =10 −3.
+
+Delta Pose Loss ( L∆). To help the model in capturing fine-grained temporal dynamics, we supervise delta pose predic-tions with ground-truth inter-frame joint displacements: 
+
+L∆ = 1(N − 1) J
+
+> N
+
+X
+
+> t=2
+> J
+
+X
+
+> j=1
+
+P∆ 
+
+> t,j
+
+− P∆gt 
+
+> t,j
+> 2
+
+, (18) where P∆ 
+
+> t
+
+= Pt − Pt−1. This encourages the model to learn consistent frame-to-frame motion and supports our temporal fusion strategy. 
+
+3D ( L3D ) and 2D ( L2D ) Pose Losses. We use mean-squared error on 3D joints and their 2D projections obtained with operator Π( ·) [32] : 
+
+L∗ = 1
+
+N J 
+
+> N
+
+X
+
+> t=1
+> J
+
+X
+
+> j=1
+
+ˆPpred  
+
+> t,j
+
+− ˆPgt 
+
+> t,j
+> 2
+
+, (19) where ˆP is the supervision target defined as 
+
+ˆP =
+
+(
+
+Pt,j , for L3D ,
+
+Π( Pt,j ), for L2D .
+
+Bone Length Loss ( LBL ). To preserve human body propor-tions, we compute an L1-loss on the predicted and ground-truth bone lengths. For each bone pair (i, j ) ∈ B of kine-matic structure [13], the bone vectors are as follows: 
+
+b(i,j ) 
+
+> t
+
+= Ppred  
+
+> t,i
+
+− Ppred  
+
+> t,j
+
+, ˜b(i,j ) 
+
+> t
+
+= Pgt  
+
+> t,i
+
+− Pgt  
+
+> t,j
+
+; and (20) 
+
+LBL = 1
+
+N |B| 
+
+> N
+
+X
+
+> t=1
+
+X
+
+> (i,j )∈B
+
+b(i,j ) 
+
+> t2
+
+− ˜b(i,j ) 
+
+> t2
+
+, (21) which stabilises joint distances, especially under occlusion. 
+
+Bone Orientation Loss ( LBA ). To maintain anatomically plausible limb directions, we minimise the cosine distance 60 5 10 15 20 25 30 35 40             
+
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Avg. Displacement (mm)
+> 0510 15 20 25 30 35 40
+> Time step
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> Avg. Displacement (mm)
+> Ground Truth Ours EventEgo3D++ EventEgo3D EgoPoseFormer
+
+Figure 5. We plot the per-frame all-joint average displacement (Eq. (24)) for EE3D-R (top) and EE3D-W (bottom). 
+
+between predicted and ground-truth bone vectors: 
+
+LBA = 1
+
+N |B| 
+
+> N
+
+X
+
+> t=1
+
+X
+
+> (i,j )∈B
+
+1 − b(i,j ) 
+
+> t
+
+· ˜b(i,j )
+
+> t
+
+b(i,j ) 
+
+> t2
+
+˜b(i,j ) 
+
+> t2
+
+ .
+
+(22) This complements the bone length loss by regularising the angular configurations of limbs. 
+
+## 5. Experiments 
+
+We conduct extensive experiments on the event-based ego-centric benchmarks, demonstrating the accuracy and robust-ness of E-3DPSM (Sec. 5.2). We also perform ablations to analyse the influence of each component (Sec. 5.3). 
+
+5.1. Experimental Setting 
+
+Datasets. We use two datasets: EE3D-R [25], a real-world dataset captured in a laboratory, and EE3D-W [26], a real-world in-the-wild dataset. We follow the official data splits. See App. A for data pre-processing details. 
+
+Evaluation Metrics. We report Mean Per Joint Posi-tion Error (MPJPE) and Procrustes-Aligned MPJPE (PA-MPJPE) [18] (both in mm), consistent with our baselines. To measure temporal stability, we use esmooth [33] (in mm), which compares per-frame joint displacement magnitudes: 
+
+esmooth = 1(N − 1) J
+
+> N
+
+X
+
+> t=2
+> J
+
+X
+
+> j=1
+
+dgt  
+
+> t,j
+
+− dpred  
+
+> t,j
+
+, with (23) dt,j = ∥Pt,j − Pt−1,j ∥2 . (24) 
+
+Baselines and Evaluation Protocol. We compare against EventEgo3D [25], EventEgo3D++ [26], and the recent 
+
+Table 2. Occlusion-only quantitative comparison on EE3D-R and EE3D-W . Evaluation is performed only on occluded joints. 
+
+EE3D-R MPJPE ↓ PA-MPJPE ↓
+
+EgoPoseFormer [44] 110.18 55.64 EventEgo3D [25] 86.90 50.93 EventEgo3D++ [26] 88.43 49.53 
+
+Ours (Causal) 67.49 41.85 
+
+Ours (Non-Causal) 64.69 40.10 EE3D-W MPJPE ↓ PA-MPJPE ↓
+
+EgoPoseFormer [44] 173.01 113.67 EventEgo3D [25] 159.04 84.84 EventEgo3D++ [26] 147.42 77.64 
+
+Ours (Causal) 135.84 73.19 
+
+Ours (Non-Causal) 134.72 72.29 
+
+RGB-based state-of-the-art method EgoPoseFormer [44], in which the input layer is adjusted to process LNES frames. To ensure a fair comparison and report esmooth , all baselines are evaluated on continuous test sequences 2. We do not re-set internal states in our method, consistent with its continu-ous SSM formulation. Two inference strategies are consid-ered: causal , where SPEM uses only the current and past frames, and non-causal , where it accesses all N frames. 
+
+Implementation and Training. We implement E-3DPSM 
+
+in PyTorch [28] with the event-S5 layer [50]. Unlike pre-vious works [25, 26], our model requires no pre-training on EE3D-S [25] (synthetic data). The ground-truth 3D pose at the most recent event in each window of T =20 ms is used for supervision, with N =40 poses. Smaller T improve the delta regressor’s sensitivity to fine-grained motion. All modules are optimised end-to-end with Adam [19], with the batch size of 32 . We train for 15 epochs on EE3D-R with a learning rate η = 10 −3, and then fine-tune for 10 
+
+epochs on EE3D-W with η = 10 −4. The training is non-causal, with the SPEM having access to the full N -frame se-quence. It takes 34 hours on four A40 GPUs, while testing is performed on one A40 in the quantitative experiments. 3D pose update rate of 80 Hz is reached on a single A6000, and a more lightweight NVIDIA 3050Ti supports 52 Hz. 
+
+5.2. Main Results 
+
+Tab. 1 compares our approach with prior methods [25, 26, 44] on the EE3D-R [25] and EE3D-W [26] benchmarks. Across all three metrics, E-3DPSM in the causal mode (sup-porting real-time inference) consistently outperforms exist-ing approaches, achieving 8% and 19% reduction in MPJPE on EE3D-W and EE3D-R, respectively, and between 1.7×
+
+and 2.7× lower esmooth . The metrics are even slightly bet-ter for the non-causal mode. While non-causal inference attains the highest overall accuracy, the causal variant per-forms comparably, even though the model is trained non-causally, demonstrating strong generalisation and suitabil-ity for real-time deployment. Qualitative results in Fig. 4 
+
+> 2originally, the baselines use a random data loading strategy
+
+7Table 3. Ablation study on the EE3D-R dataset evaluating the impact of each component of our E-3DPSM approach.                                  
+
+> SPEM (Sec. 4.1) MPJPE ↓PA-MPJPE ↓esmooth ↓
+> w/o SSM Blocks 118.53 87.48 16.94 Single SSM Block (Stage 4) 90.18 66.06 7.84 w/o Deformable Attention 88.27 64.98 7.71
+> PRM (Sec. 4.2) MPJPE ↓PA-MPJPE ↓esmooth ↓
+> w/o Fusion Module 141.22 84.17 10.14 Direct Pose Only 91.26 65.43 17.22 Static Fusion (Non-learned) 88.31 65.63 9.93
+> Ours (full model) 84.45 62.64 8.40
+
+further highlight these improvements: While prior meth-ods struggle with occluded regions, particularly lower-body joints (bottom-left)—and often fail even on simple poses such as standing (bottom-right) in EE3D-W—our predic-tions remain consistent and anatomically plausible. A de-tailed per-joint and per-action breakdown of these results is provided in App. D.2. We attribute these improvements to the synergy be-tween our delta-based motion regression and learnable fu-sion. PRM models 3D motion as deltas aligned with the event stream’s change-based nature, while the fusion module anchors global stability through adaptive integra-tion with direct pose estimates. This design reduces drift, smooths trajectories, and lowers esmooth , as visualised in the representative jitter plots for walk and kick motions (Fig. 5). Furthermore, the SPEM enhances robustness to self-occlusion through bidirectional SSM-based temporal modelling. The occlusion-only evaluation (Tab. 2) shows that our method achieves the lowest average error across all occluded joints, indicating improved robustness under par-tial or self-occlusion. A more detailed breakdown, includ-ing end-effector analysis and evaluation protocol, is pro-vided in App. D.3. Additionally, we compare our approach against Kalman-smoothed baselines (see App. D.1). Even when the re-sults of prior methods are additionally post-processed with Kalman filtering, our model maintains significantly lower MPJPE and esmooth , confirming that the improvements stem from our architectural design rather than Kalman smooth-ing. Overall, E-3DPSM consistently achieves state-of-the-art performance in event-based egocentric 3D pose estima-tion, combining high temporal consistency, robustness to occlusions, and practical real-time applicability. 
+
+5.3. Ablation Study 
+
+We next perform an ablation study by disabling or modi-fying individual modules on EE3D-R to quantify the roles of temporal modelling, spatial selectivity, and pose fusion design, as shown in Tab. 3. 
+
+SPEM. Removing all SSM blocks results in a purely spa-tial baseline, which severely degrades accuracy and smooth-ness, while using a single SSM block (only at stage four) also degrades accuracy and smoothness, confirming the im-portance of early-stage temporal modelling. Disabling de-formable attention further reduces performance, highlight-ing the need for spatial adaptivity in egocentric views. 
+
+PRM. Without the fusion module, simply adding the cur-rent delta pose to the previous pose according to Eq. (11) causes severe drift and the worst overall performance, con-firming that corrective fusion is essential for the accuracy of the full model. Using only the direct pose regressor yields poor esmooth , as fine motion encoded in deltas is ignored. A static Kalman-style fusion improves stability, but underper-forms our adaptive fusion, demonstrating that task-specific, learnable noise weighting is crucial for robust integration of delta and direct 3D poses across diverse actions. Our full framework achieves the best overall perfor-mance, validating the effectiveness of our design choices. We also perform additional ablations on the training strat-egy (App. E.1), the state reset strategy (App. E.2), the use of different event representations (App. E.3), and the inference event frequency (App. E.4). 
+
+## 6. Conclusion 
+
+Our real-time formulation of event-based egocentric 3D hu-man pose estimation as a continuous state evolution prob-lem demonstrated superior results in the extensive exper-iments compared to EventEgo3D++ [26]. While MPJPE and PA-MPJPE reduced by up to 19% in the causal pre-diction mode, the smoothness error improved by 2.7× on EE3D-R and almost 1.7× on EE3D-W. The improvements are slightly greater in the non-causal operation mode. The largest accuracy gains have been observed for lower-body joints in occlusion-heavy actions such as crawling and crouching, where prior methods struggled and our 
+
+E-3DPSM produced significantly more stable and anatomi-cally consistent predictions. We attribute all these improve-ments to the avoidance of event segmentation maps and in-termediate 2D heatmaps, as well as our design choices that are natural for and tailored to event streams and that were validated in the ablation study, i.e., bidirectional SSM (in-tegrating long-range motion cues even when events were sparse or missing), deformable attention, learned fusion of delta and directly regressed 3D poses. As event-based 3D human pose estimation is a nascent research field, E-3DPSM is not without limitations, such as sensitivity to strong occlusions and highly dynamic environ-ments, as further discussed in App. H. All in all, we believe the design principles and insights gained in this work can benefit many other problems in event-based 3D vision. 
+
+Acknowledgment. This work was partially supported by the Nakajima Foundation scholarship. 8Author Contributions. MD: implementation, re-finement of the concept, draft writing and editing, visualisations and the video; HA: supervision and draft editing; HR: supervision and draft editing; CT: lab infrastructure; VG: method conceptualisation, project coordination, supervision, draft writing and editing. 
+
+## References 
+
+[1] Hiroyasu Akada, Jian Wang, Soshi Shimada, Masaki Taka-hashi, Christian Theobalt, and Vladislav Golyanik. Un-realego: A new dataset for robust egocentric 3d human mo-tion capture. In European Conference on Computer Vision (ECCV) , 2022. 1, 2 [2] Hiroyasu Akada, Jian Wang, Vladislav Golyanik, and Chris-tian Theobalt. 3d human pose perception from egocentric stereo videos. In Computer Vision and Pattern Recognition (CVPR) , 2024. 2, 4, 5 [3] Hiroyasu Akada, Jian Wang, Vladislav Golyanik, and Chris-tian Theobalt. Bring your rear cameras for egocentric 3d hu-man pose estimation. In International Conference on Com-puter Vision (ICCV) , 2025. 1, 2 [4] Richard S. Bucy and Peter D. Joseph. Filtering for Stochas-tic Processes with Applications to Guidance . AMS Chelsea Publishing, 2nd edition, 2005. 5 [5] Enrico Calabrese, Gemma Taverni, Christopher Awai East-hope, Sophie Skriabine, Federico Corradi, Luca Longinotti, Kynan Eng, and Tobi Delbruck. Dhp19: Dynamic vision sensor 3d human pose dataset. In Computer Vision and Pat-tern Recognition (CVPR) Workshops , 2019. 3 [6] Stefan Elfwing, Eiji Uchibe, and Kenji Doya. Sigmoid-weighted linear units for neural network function approxima-tion in reinforcement learning. Neural networks , 107:3–11, 2018. 4 [7] Daniel Gehrig, Antonio Loquercio, Konstantinos G. Derpa-nis, and Davide Scaramuzza. End-to-end learning of rep-resentations for asynchronous event-based data. In Interna-tional Conference on Computer Vision (ICCV) , 2019. 13 [8] Mathias Gehrig and Davide Scaramuzza. Recurrent vision transformers for object detection with event cameras. In 
+
+Computer Vision and Pattern Recognition (CVPR) , 2023. 3, 13 [9] Albert Gu, Isys Johnson, Karan Goel, Khaled Saab, Tri Dao, Atri Rudra, and Christopher R´ e. Combining recurrent, con-volutional, and continuous-time models with linear state-space layers. In Advances in Neural Information Processing Systems (NeurIPS) , 2021. 2 [10] Albert Gu, Karan Goel, and Christopher Re. Efficiently mod-eling long sequences with structured state spaces. In Inter-national Conference on Learning Representations (ICLR) ,2022. 3 [11] Tuomas Haarnoja, Anurag Ajay, Sergey Levine, and Pieter Abbeel. Backprop kf: learning discriminative deterministic state estimators. In Advances in Neural Information Process-ing Systems (NeurIPS) , 2016. 5 [12] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Computer Vision and Pattern Recognition (CVPR) , 2016. 4 [13] Catalin Ionescu, Dragos Papava, Vlad Olaru, and Cristian Sminchisescu. Human3.6m: Large scale datasets and pre-dictive methods for 3d human sensing in natural environ-ments. Pattern Analysis and Machine Intelligence (PAMI) ,36(7):1325–39, 2014. 6 [14] Hao Jiang and Vamsi Krishna Ithapu. Egocentric Pose Es-timation from Human Vision Span. In International Confer-ence on Computer Vision (ICCV) , 2021. 1, 2 [15] Rudolph E. Kalman. A new approach to linear filtering and prediction problems. J. Fluids Eng. , 82(1):35–45, 1960. 5 [16] Taeho Kang and Youngki Lee. Attention-propagation net-work for egocentric heatmap to 3d pose lifting. In Confer-ence on Computer Vision and Pattern Recognition (CVPR) ,2024. 1, 2 [17] Taeho Kang, Kyungjin Lee, Jinrui Zhang, and Youngki Lee. Ego3dpose: Capturing 3d cues from binocular egocentric views. In SIGGRAPH Asia Conference Papers , 2023. 1, 2[18] David G. Kendall. A survey of the statistical theory of shape. 
+
+Statistical Science , 4(2):87–99, 1989. 7 [19] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization. In International Conference on Learning Representations (ICLR) , 2015. 7 [20] Alina Kloss, Georg Martius, and Jeannette Bohg. How to train your differentiable filter. Autonomous Robots , 45(4): 561–578, 2021. 5 [21] Bo Lang and Mooi Choo Chuah. Event-guided fusion-mamba for context-aware 3d human pose estimation. In Pro-ceedings of the Winter Conference on Applications of Com-puter Vision (WACV) , pages 950–960, 2025. 3 [22] Jiuming Liu, Jinru Han, Lihao Liu, Angelica I. Aviles-Rivero, Chaokang Jiang, Zhe Liu, and Hesheng Wang. Mamba4d: Efficient 4d point cloud video understanding with disentangled spatial-temporal state space models. In Confer-ence on Computer Vision and Pattern Recognition (CVPR) ,2025. 3 [23] Yuxuan Liu, Jianxin Yang, Xiao Gu, Yijun Chen, Yao Guo, and Guang-Zhong Yang. Egofish3d: Egocentric 3d pose es-timation from a fisheye camera via self-supervised learning. 
+
+IEEE Transactions on Multimedia (TMM) , 2023. 1, 2 [24] Zhengyi Luo, Ryo Hachiuma, Ye Yuan, and Kris Kitani. Dynamics-regulated kinematic policy for egocentric pose es-timation. In Advances in Neural Information Processing Sys-tems (NeurIPS) , 2021. 1, 2 [25] Christen Millerdurai, Hiroyasu Akada, Jian Wang, Diogo Luvizon, Christian Theobalt, and Vladislav Golyanik. Even-tego3d: 3d human motion capture from egocentric event streams. In Computer Vision and Pattern Recognition (CVPR) , 2024. 1, 2, 3, 6, 7, 11, 12, 14, 16, 17, 19, 20 [26] Christen Millerdurai, Hiroyasu Akada, Jian Wang, Diogo Luvizon, Alain Pagani, Didier Stricker, Christian Theobalt, and Vladislav Golyanik. Eventego3d++: 3d human motion capture from a head-mounted event camera. International Journal of Computer Vision (IJCV) , 2025. 1, 2, 3, 6, 7, 8, 11, 12, 14, 16, 17, 19, 20 
+
+9[27] Jinman Park, Kimathi Kaai, Saad Hossain, Norikatsu Sumi, Sirisha Rambhatla, and Paul Fieguth. Domain-guided spatio-temporal self-attention for egocentric 3d pose estimation. In Conference on Knowledge Discovery and Data Mining (KDD) , 2023. 1, 2 [28] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury, Gregory Chanan, Trevor Killeen, Zem-ing Lin, Natalia Gimelshein, Luca Antiga, Alban Desmai-son, Andreas Kopf, Edward Yang, Zachary DeVito, Mar-tin Raison, Alykhan Tejani, Sasank Chilamkurthy, Benoit Steiner, Lu Fang, Junjie Bai, and Soumith Chintala. Py-torch: An imperative style, high-performance deep learning library. In Advances in Neural Information Processing Sys-tems (NeurIPS) , 2019. 7 [29] Helge Rhodin, Christian Richardt, Dan Casas, Eldar Insafut-dinov, Mohammad Shafiei, Hans-Peter Seidel, Bernt Schiele, and Christian Theobalt. Egocap: egocentric marker-less mo-tion capture with two fisheye cameras. ACM Transactions on Graphics (TOG) , 2016. 1, 2 [30] Ciyu Ruan, Ruishan Guo, Zihang Gong, Jingao Xu, Wenhan Yang, and Xinlei Chen. Pre-mamba: A 4d state space model for ultra-high-frequent event camera deraining. In Interna-tional Conference on Computer Vision (ICCV) , 2025. 3 [31] Viktor Rudnev, Vladislav Golyanik, Jiayi Wang, Hans-Peter Seidel, Franziska Mueller, Mohamed Elgharib, and Christian Theobalt. Eventhands: Real-time neural 3d hand pose esti-mation from an event stream. In International Conference on Computer Vision (ICCV) , 2021. 2, 3, 11, 13 [32] Davide Scaramuzza. Omnidirectional camera. In Computer vision: A reference guide , pages 900–909. Springer, 2021. 6 [33] Soshi Shimada, Vladislav Golyanik, Weipeng Xu, and Chris-tian Theobalt. Physcap: Physically plausible monocular 3d motion capture in real time. Transactions on Graphics (TOG) , 2020. 7 [34] Jimmy T.H. Smith, Andrew Warrington, and Scott Linder-man. Simplified state space layers for sequence modeling. In International Conference on Learning Representations (ICLR) , 2023. 3 [35] Denis Tome, Patrick Peluse, Lourdes Agapito, and Hernan Badino. xR-EgoPose: Egocentric 3D Human Pose From an HMD Camera. In International Conference on Computer Vision (ICCV) , 2019. 1, 2 [36] Denis Tome, Thiemo Alldieck, Patrick Peluse, Gerard Pons-Moll, Lourdes Agapito, Hernan Badino, and Fernando de la Torre. Selfpose: 3d egocentric pose estimation from a head-set mounted camera. Pattern Analysis and Machine Intelli-gence (PAMI) , 45(6):6794 – 6806, 2023. 1, 2 [37] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszko-reit, Llion Jones, Aidan N Gomez, Lukasz Kaiser, and Illia Polosukhin. Attention is all you need. In Advances in Neural Information Processing Systems (NeurIPS) , 2017. 5 [38] Jian Wang, Lingjie Liu, Weipeng Xu, Kripasindhu Sarkar, and Christian Theobalt. Estimating egocentric 3d human pose in global space. In International Conference on Com-puter Vision (ICCV) , 2021. 1, 2 [39] Jian Wang, Lingjie Liu, Weipeng Xu, Kripasindhu Sarkar, Diogo Luvizon, and Christian Theobalt. Estimating egocen-tric 3d human pose in the wild with external weak supervi-sion. Conference on Computer Vision and Pattern Recogni-tion (CVPR) , 2022. 2 [40] Jian Wang, Zhe Cao, Diogo Luvizon, Lingjie Liu, Kri-pasindhu Sarkar, Danhang Tang, Thabo Beeler, and Chris-tian Theobalt. Egocentric whole-body motion capture with fisheyevit and diffusion-based motion refinement. In Confer-ence on Computer Vision and Pattern Recognition (CVPR) ,2024. 1, 2 [41] Ziyun Wang, Ruijun Zhang, Zi-Yan Liu, Yufu Wang, and Kostas Daniilidis. Continuous-time human motion field from event cameras. In International Conference on Computer Vision (ICCV) , 2025. 1 [42] Ximea MU050CR-SY. https : / / www . ximea . com / products / miniature - compact / ximu -smallest - industrial - usb - cameras / sony -imx675- usb3- color- ximu- smallest- camera ,2025. 14 [43] Lan Xu, Weipeng Xu, Vladislav Golyanik, Marc Haber-mann, Lu Fang, and Christian Theobalt. Eventcap: Monoc-ular 3d capture of high-speed human motions using an event camera. In Computer Vision and Pattern Recognition (CVPR) , 2020. 2 [44] Chenhongyi Yang, Anastasia Tkach, Shreyas Hampali, Lin-guang Zhang, Elliot J Crowley, and Cem Keskin. Egopose-former: A simple baseline for stereo egocentric 3d human pose estimation. In European Conference on Computer Vi-sion (ECCV) , 2024. 1, 4, 5, 6, 7, 12, 16, 17, 19, 20 [45] Ye Yuan and Kris Kitani. Ego-pose estimation and forecast-ing as real-time pd control. In International Conference on Computer Vision (ICCV) , 2019. 1, 2 [46] Feng Zhang, Xiatian Zhu, Hanbin Dai, Mao Ye, and Ce Zhu. Distribution-aware coordinate representation for human pose estimation. In Computer Vision and Pattern Recognition (CVPR) , 2020. 2 [47] Dongxu Zhao, Zhen Wei, Jisan Mahmud, and Jan-Michael Frahm. EgoGlass: Egocentric-View Human Pose Estima-tion From an Eyeglass Frame. In International Conference on 3D Vision (3DV) , 2021. 1, 2 [48] Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, and Jifeng Dai. Deformable detr: Deformable transformers for end-to-end object detection. In International Conference on Learning Representations (ICLR) , 2021. 4 [49] Shihao Zou, Chuan Guo, Xinxin Zuo, Sen Wang, Hu Xiao-qin, Shoushun Chen, Minglun Gong, and Li Cheng. Even-thpe: Event-based 3d human pose and shape estimation. In 
+
+International Conference on Computer Vision (ICCV) , 2021. 3[50] Nikola Zubic, Mathias Gehrig, and Davide Scaramuzza. State space models for event cameras. In Conference on Computer Vision and Pattern Recognition (CVPR) , 2024. 2, 3, 4, 7 
+
+10 E-3DPSM: A State Machine for Event-Based Egocentric 3D Human Pose Estimation 
+
+# Supplementary Material 
+
+## Table of Contents: 
+
+• Appendix A : Dataset Preprocessing • Appendix B : Pose Drift under Naive Fusion • Appendix C : Model Efficiency • Appendix D : Additional Evaluations • Appendix E : Additional Ablations • Appendix F : Head-mounted Device and Real-time Demo • Appendix G : Past Only Gain Analysis • Appendix H : Limitations 
+
+## A. Dataset Preprocessing 
+
+EE3D-R [25] and EE3D-W [26] datasets provide contin-uous event streams without natural frame boundaries. To make them suitable for training, we discretise the streams into fixed temporal windows of 20 ms. Within each window, we group events into batches of ≈8 · 10 3, which provides a balanced trade-off between temporal resolution and data compactness. For each discretised segment, we generate a frame-based LNES [31] event representation that preserves polarity and temporal ordering. By creating these represen-tations beforehand, rather than during training, we ensure consistent frame counts across the continuous streams, and this greatly improves the efficiency of data loading. 
+
+## B. Pose Drift under Naive Fusion 
+
+In the naive fusion approach, the 3D pose at each timestep is obtained by adding the predicted pose from the previous timestep to the current delta pose; see Eq. (11). While sim-ple, it leads to the accumulation of errors over time, espe-cially when delta pose estimates are noisy or when pose pre-dictions suffer from transient uncertainties. This error ac-cumulation results in increasing drift, causing the predicted poses to deviate from the ground truth as the sequence pro-gresses. As shown in Fig. 6, the MPJPE steadily increases under naive fusion, highlighting the drift. In contrast, the direct pose method fluctuates due to its reliance on inde-pendent predictions at each timestep, resulting in less con-sistent performance. On the other hand, our learned fusion approach remains stable and produces a consistently lower error than both the naive fusion and direct pose methods, ef-fectively mitigating drift and preserving accuracy over time. 
+
+## C. Model Efficiency 
+
+We evaluate the efficiency of our approach compared to the baselines in terms of parameter count, FLOPs, GPU mem-1 3 5 7 9 
+
+> Time step t
+> 60
+> 80
+> 100
+> 120
+> 140
+> MPJPE [mm]
+> Learned Fusion (Eq. 15)
+> Direct Pose Only (Eq. 8)
+> Naive Fusion (Eq. 11)
+
+Figure 6. Pose drift over time. Comparison of learned fusion (Eq. (15)), direct pose only (Eq. (8)), and naive fusion (Eq. (11)) across temporal sequence length. Naive fusion leads to rapidly increasing drift, whereas our learned fusion effectively mitigates this drift, maintaining stable accuracy over time. 
+
+ory requirement, and 3D pose update rate. As shown in Tab. 5, our E-3DPSM incurs moderately higher computa-tional cost than existing (more lightweight) baselines, yet remains within the same order of magnitude and achieves real-time performance on a single NVIDIA A6000 GPU. In Tab. 6, we report a detailed per-module computational re-quirement breakdown of our method, highlighting the pri-mary contributors. Our design strikes a favourable balance that enables substantial improvements in accuracy and sta-bility while preserving real-time responsiveness. It demon-strates that robustness under challenging motion and occlu-sion can be achieved without sacrificing deployment feasi-bility. 
+
+## D. Additional Evaluations 
+
+D.1. Comparison with Kalman-Smoothed Baselines 
+
+In our method, the Kalman filter is a learned module used for pose fusion inside the network, rather than a post-hoc smoothing step. For fairness, we also apply inference-time Kalman filtering (KF) to prior baselines, where it serves only as an external temporal smoother. This experiment reveals that our improvements cannot be attributed simply to filtering, but to the way fusion is integrated and trained within the architecture. As shown in Tab. 4, our approach achieves substantially lower MPJPE and smoother predic-tions compared to Kalman-smoothed baselines. These re-sults confirm that the gains primarily arise from our design for learned pose fusion and temporal modelling, which can-11 Table 4. Comparison with Kalman-smoothed baselines on the EE3D-R dataset. We apply inference-time Kalman filtering (KF) to prior methods to rule out post-hoc smoothing as the main rea-son for improvements. Our method achieves substantially lower MPJPE and esmooth , demonstrating that the performance is due to the proposed architecture and not filtering in post-processing.                      
+
+> Method MPJPE ↓PA-MPJPE ↓esmooth ↓
+> EgoPoseFormer [44] with KF 144.27 92.32 37.11 EventEgo3D [25] with KF 107.23 82.54 15.78 EventEgo3D++ [26] with KF 100.98 75.57 13.98
+> Ours (Causal) 84.45 62.64 8.40
+> Ours (Non-Causal) 81.32 60.21 6.65
+
+Table 5. Model efficiency comparison in terms of parameters, FLOPs, GPU memory, and 3D pose update rate in Hz (measured on a single NVIDIA A6000 GPU).                         
+
+> Method Params ↓FLOPs ↓GPU Memory ↓Pose Update Rate ↑
+> EgoPoseFormer [44] 14.1 M 5.5 G 82 MB 130 EventEgo3D [25] 1.25 M 416.84 M 25 MB 139
+> EventEgo3D++ [26] 1.25 M 416.84 M 25 MB 139
+> Ours 6.64 M 8.16 G 74 MB 80
+
+Table 6. Detailed module-wise FLOPs breakdown. 
+
+Modules FLOPs 
+
+CNN Layers 7.05 G Deformable Attention 0.89 G SSM 0.06 G Query Decoder 0.15 G Pose Heads 10 −3 GFusion 10 −4 G
+
+Total 8.16 G 
+
+not be replaced by external filtering applied after prediction. 
+
+D.2. Per-Joint and Per-Action Evaluation 
+
+We report detailed per-joint and per-action results on EE3D-R [25] and EE3D-W [26] datasets. For each dataset, we provide MPJPE and PA-MPJPE per body part together with the mean across joints, as summarised in Tab. 14. Overall, the trends mirror the aggregate findings in the main paper. Improvements are consistent across nearly all joints, with particularly large gains on distal joints such as wrists, an-kles, and feet, which are challenging due to fast motion and frequent self-occlusions. We further break down performance by action classes in Tab. 13 using the same metrics. The results demon-strate consistent gains across diverse activities, including dance, sports, and highly articulated motions; see Figs 13 and 14. Notably, the improvements are most pronounced in occlusion-prone actions such as kicking, crawling, and crouching. Additionally, the jitter plots of the end effector 
+
+Table 7. Training strategy ablation on the EE3D-R dataset. We compare causal (forward) vs. non-causal (bidirectional) training and different sequence lengths used during training. 
+
+Training Strategy MPJPE ↓ PA-MPJPE ↓ esmooth ↓
+
+Training Directionality 
+
+Causal (Forward Only) 89.88 66.74 10.14 
+
+Non-Causal (Ours) 84.45 62.64 8.40 Pose Sequence Length ( N)
+
+20 poses 86.25 65.62 9.76 30 poses 86.03 64.87 8.95 
+
+40 Poses (Ours) 84.45 62.64 8.40 
+
+joints on EE3D-R (Fig. 11) and EE3D-W (Fig. 12) highlight the reduced jitter in these occlusion-heavy joints compared to prior methods. 
+
+D.3. Occlusion-Only Evaluation 
+
+To quantify robustness under occlusions, we evaluate only time steps and joints that are marked as occluded by the dataset-provided visibility masks. We focus on end-effectors that are most susceptible to self-occlusion and fast motion: elbows, wrists, knees, ankles, and feet. For each method, we report MPJPE, MPJPE-PA, and jitter plots re-stricted to the occluded subset. Tab. 12 summarizes the per-joint results for occluded end-effectors on EE3D-R and EE3D-W. The numbers show clear and consistent gains for our approach across all end-effectors. Improvements are most pronounced at the distal joints, such as wrists, ankles, and feet, where occlusions and rapid movements typically cause large errors. This strong performance under occlusions comes from the SSM blocks used in SPEM. SSM maintains an internal latent state that evolves smoothly over time, allowing the model to inte-grate motion information across long temporal ranges. Dur-ing occlusions—when spatial features are weak or absent— the SSM maintains and propagates a coherent motion state rather than relying solely on the current input. This tempo-ral continuity helps preserve joint trajectories and reduce jit-ter for occluded joints. Overall, the occlusion-only analysis demonstrates that our method effectively mitigates failures arising from self-occlusion, leading to more reliable pose recovery under challenging visibility conditions. 
+
+## E. Additional Ablations 
+
+E.1. Training Strategy 
+
+To assess the impact of the training strategy, we experi-ment with directionality and sequence length on EE3D-R, as summarised in Tab. 7. 
+
+Directionality. We compare causal (forward-only) training with non-causal (bidirectional) training. In the causal train-12 Table 8. Inference-time ablation on the EE3D-R dataset com-paring different strategies for resetting internal states. We evaluate resetting the SSM block states, resetting the Kalman fu-sion states, and using continuous state evolution without resets (ours).                
+
+> State Reset Strategy MPJPE ↓PA-MPJPE ↓esmooth ↓
+> SSM Reset (40 Frames) 104.56 81.24 15.20 Fusion Reset (40 Frames) 95.40 70.90 21.50
+> No Reset (Ours) 84.45 62.64 8.40
+
+ing setup, SSM has access only to past observations. In non-causal training, SSM incorporates both past and future context (bidirectional) during training, and when evaluated with causal inference, achieves lower errors and smoother trajectories compared to causal-only training. This demon-strates that bidirectional context at training time helps the model learn stronger motion priors that continue to gener-alise even when the model is deployed in a strictly causal setting. 
+
+Pose Sequence Length. In this ablation, we vary the num-ber of poses N used during training to study its effect on temporal modelling. With N = 20 , SPEM receives a limited temporal context, which reduces accuracy and in-creases jitter. Increasing the sequence length to N = 30 im-proves accuracy and reduces jitter. Training with N = 40 
+
+poses yields the best overall performance, indicating that longer sequences allow the model to learn richer motion dy-namics and produce more stable and accurate predictions. 
+
+E.2. Internal State Reset 
+
+We study the effect of different inference-time state reset strategies on EE3D-R. Since our model maintains internal states in both the SSM blocks and the learned fusion mod-ule, one natural question is whether these states should be periodically reset to avoid drift. To investigate this, we evaluate three settings: 1) resetting the SSM states every 
+
+40 frames, 2) resetting the Kalman fusion states every 40 
+
+frames, and 3) no resets, where states evolve continuously across the entire test sequence. As shown in Tab. 8, periodic resets do not yield benefits and in fact can degrade performance, either by increasing error or by reducing temporal smoothness. In contrast, con-tinuous state evolution without resets achieves the best re-sults, indicating that the model learns to regulate its internal states without the need for manual intervention. This analy-sis confirms that stability in our framework naturally arises from learned dynamics and fusion mechanisms. 
+
+E.3. Different Event Representations 
+
+We analyse the influence of different event representations on the pose estimation performance. Prior work by Gehrig et al. [7] introduced a versatile end-to-end trainable voxel-                                 
+
+> Table 9. Design choice study for event stream representa-tion for learning on the EE3D-R dataset. We experiment with learned voxel-based representation, learned LNES and fixed LNES.
+> Event Representation MPJPE ↓PA-MPJPE ↓esmooth ↓
+> Learned Voxel-Based [7] 100.25 78.54 10.78 Learned LNES 93.78 71.12 9.14
+> LNES (Ours) 84.45 62.64 8.40
+> Table 10. Inference-time ablation on the EE3D-R dataset com-paring the use of different 3D pose update rates frequencies.
+> Event Frequencies MPJPE ↓PA-MPJPE ↓esmooth ↓
+> 20 Hz (50 ms) 87.45 63.74 11.90 25 Hz (40 ms) 84.57 62.80 9.49
+> 50 Hz (20 ms) (Ours) 84.45 62.64 8.40
+
+based event stream representation for learning. We ex-tensively experimented with it in our framework at early and intermediate project stages and found that it leads to poor generalisation across datasets in our setting. We also experimented with a Learned LNES variant of the static LNES [31], where each 2D entry is assigned a learnable weight based on its spatial-temporal coordinates (x, y, t )
+
+and polarity p. These weights modulate local event aggre-gation, emphasising informative motion boundaries while suppressing noise. As shown in Tab. 9, the standard pre-deined LNES [31] yields the best accuracy and temporal smoothness. This suggests that structured, interpretable representations, such as LNES, provide a strong inductive bias for egocentric event-based pose estimation, achieving robustness without additional learnable overhead. Over-all, the question of whether pre-defined or learnable event stream representations for learning are the best choices re-mains problem-dependent and open in the broader context of event-based vision. 
+
+E.4. Inference-Time Event Frequencies 
+
+Tab. 10 summarises the evaluation of the robustness of our model to different event window durations ( T ) during infer-ence, effectively varying the target 3D pose update rates. Although the model is trained with an event window of 
+
+T = 20 ms (50 Hz), it maintains stable accuracy across a wide range of frequencies without significant degrada-tion. This flexibility is valuable for real-world deployment, where event rates may vary due to motion dynamics or hard-ware constraints. We attribute this robustness to the event-specific S5 blocks [8], whose learnable timescale parameters dynam-ically adapt to varying temporal resolutions. This capa-bility allows the model to adjust to changes in the effec-13 Table 11. Ablation of global and input/state-dependent covari-ance learning for Q and R on EE3D-R dataset. 
+
+Learning Strategy MPJPE ↓ PA-MPJPE ↓
+
+Input/State Dependent 91.15 69.74 
+
+Global Learned (Ours) 84.45 62.64 Jetson Nano 
+
+> Event Camera
+> Powerbank
+
+Figure 7. Our head-mounted device setup. The device uses a single fisheye egocentric event camera for input, NVIDIA Jetson Orin Nano for onboard processing, and a portable powerbank for standalone operation. 
+
+tive event rate, maintaining stable temporal modelling and smooth pose evolution across different inference frequen-cies. 
+
+E.5. Learning Strategy for Q and R 
+
+We evaluate an input-dependent formulation of the process (Q) and measurement ( R) noise covariances by predicting them with lightweight MLPs conditioned on feature embed-dings F (see Sec. 4.1). Since F depends on the internal latent state Z, the resulting Q and R are implicitly both input- and state-dependent. As shown in Tab. 11, this vari-ant performs worse than our proposed globally learned Q
+
+and R. We observe that the latter act as stable, calibrated priors for temporal fusion, whereas input-dependent covari-ances introduce additional flexibility that leads to overfitting and less stable filtering. 
+
+## F. Head-Mounted Device and Real-Time Demo 
+
+We build a head-mounted setup following the specifications of EventEgo3D++ [25, 26], with an additional down-facing fisheye Ximea MU050CR-SY RGB camera [42] for refer-ence views and an NVIDIA Jetson Orin Nano Super Devel-oper Kit for portable onboard processing (see Fig. 7). For our real-time demo, we deploy the Jetson Orin Nano with a power bank for fully portable operation, enabling evaluation on in-the-wild sequences under low-light and fast-motion scenarios. To visualise the predicted 3D poses, 0 5 10 15 20 25 30 35 40 
+
+> History length k
+> −10
+> −5
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> Right Hip
+> Right Knee
+> Right Ankle
+> Right Foot
+> Left Hip
+> Left Knee
+> Left Ankle
+> Left Foot
+> POG(K)
+
+Figure 8. We plot the improvement in MPJPE obtained by increas-ing the duration of temporal history k, showing how a longer past context yields larger gains for occluded lower body joints. 
+
+we implement a lightweight client-server viewer over Web-Sockets, where an iPad acts as the client device streaming poses in real time (see Fig. 10). Our method operates reli-ably on this portable setup, achieving ≈30 Hz pose update rates on real event streams (see our video 8:10-9:36). When using a laptop equipped with an NVIDIA 3050 Ti carried in a backpack, our method achieves ≈50 Hz. 
+
+## G. Past-Only Gain Analysis 
+
+To quantify how temporal history improves the accuracy of occluded joints in our method, we introduce and calculate the past-only gain (POG) metric, which is defined as fol-lows. Let t denote a timestep where a joint is currently oc-cluded and has been fully visible for the previous N = 40 
+
+frames (t−N, . . . , t −1) . We define k as the history length, that is, the number of most recent visible frames before t
+
+that the model is allowed to use when predicting the pose at time t. For instance, k = 0 means the prediction uses no temporal history, and k = 40 means the prediction uses the last 40 visible frames preceding the occlusion. For a given joint and occluded timestep t, let MPJPE kt denote the per-joint MPJPE when using a history of length k. The POG is defined as POG (k) = MPJPE 0 
+
+> t
+
+− MPJPE kt , (25) which measures how much MPJPE is reduced at the same occluded frame when the model has access to k frames of past information. A positive value indicates that temporal history improves occlusion accuracy. We compute this met-ric for multiple history lengths k. For each k, we evaluate 14 (A)  (B)  (C) Figure 9. Failure cases for different scenarios. (A) Strong self-occlusion crawl action, (B) interaction with objects, (C) other humans in the FOV. External views are only for reference. Red : Predicted pose. Green : Ground truth. C visualises our prediction only (no ground truth available). Inputs to E-3DPSM are egocentric LNES frames. 
+
+predictions at the exact same occluded timesteps t, com-pute MPJPE kt , and pair it with the baseline error MPJPE 0 
+
+> t
+
+.Averaging these paired values across all selected occlusion frames yields a POG plot for each joint. The resulting plot Fig. 8 shows positive gains for lower-body joints. The largest improvements appear for ankles and feet, which undergo frequent occlusions in egocentric settings. Increasing the history length produces progres-sively lower MPJPE at occluded frames, indicating that the model benefits from a richer temporal context. This con-firms that our continuous state formulation effectively pre-serves long-range motion structure and leverages it to re-cover 3D human poses under severe occlusions. 
+
+## H. Limitations 
+
+Fig. 9 shows challenging scenarios involving strong self-occlusions during crawling (Fig. 9-A), interactions with ob-jects (Fig. 9-B), and in the presence of other humans within the field of view (Fig. 9-C). Such situations can lead to de-graded 3D pose accuracy due to missing or ambiguous mo-tion cues. In addition, abrupt illumination changes such as flickering effects (see crouching in our video 7:50-8:06) can lead to occasional temporal instability, particularly during fast and complex motions. These limitations suggest sev-eral directions for future work: Modelling occlusions ex-plicitly and generative pose refinement could improve the plausibility of 3D poses when observations are incomplete.   
+
+> Figure 10. Our real-time viewer. Screenshot of our iPad-viewer showing the live event stream, reference RGB view, and the pre-dicted 3D skeleton rendered in real time. Note that there is a trans-mission delay of 3–5 poses.
+
+15 Table 12. Quantitative results for occlusion-only end-effector joints for the EE3D-R and EE3D-W datasets .
+
+Dataset Method Metric ↓ Elbow Wrist Knee Ankle Foot Avg. EE3D-R 
+
+EgoPoseFormer [44] MPJPE 47.85 28.34 100.11 204.64 169.94 110.18 PA-MPJPE 47.06 30.50 51.82 83.61 65.20 55.64 EventEgo3D [25] MPJPE 37.46 21.97 79.20 156.93 138.95 86.90 PA-MPJPE 40.41 25.78 48.58 78.27 61.63 50.93 EventEgo3D++ [26] MPJPE 34.41 20.87 81.73 158.51 146.62 88.43 PA-MPJPE 37.89 24.20 48.48 77.18 59.90 49.53 
+
+Ours (Causal) MPJPE 29.91 16.12 60.53 120.54 108.37 67.49 
+
+PA-MPJPE 31.68 19.02 41.08 63.02 52.37 41.85 
+
+Ours (Non-Causal) MPJPE 28.84 15.54 57.97 115.94 105.18 64.69 
+
+PA-MPJPE 30.29 18.21 39.09 61.63 51.28 40.10 EE3D-W 
+
+EgoPoseFormer [44] MPJPE 140.34 173.93 157.29 177.07 181.12 173.01 PA-MPJPE 104.34 119.89 102.39 124.28 132.86 113.67 EventEgo3D [25] MPJPE 64.56 100.27 194.68 264.90 174.81 159.04 PA-MPJPE 61.44 101.60 76.81 105.15 79.18 84.84 EventEgo3D++ [26] MPJPE 61.73 84.95 177.79 242.70 167.94 147.42 PA-MPJPE 57.28 87.80 74.33 95.53 73.24 77.64 
+
+Ours (Causal) MPJPE 54.04 75.69 162.53 229.09 157.84 135.84 
+
+PA-MPJPE 52.91 80.24 70.06 92.96 69.78 73.19 
+
+Ours (Non-Causal) MPJPE 54.72 74.84 160.40 225.28 156.34 134.72 
+
+PA-MPJPE 52.57 78.74 68.90 92.11 69.14 72.29 
+
+Table 13. Per-action quantitative results for the EE3D-R and EE3D-W datasets .
+
+Dataset Method Metric ↓ Walk Crouch Pushup Boxing Kick Dance Inter. w/ env. Crawl Sports Jump Avg. EE3D-R 
+
+EgoPoseFormer [44] MPJPE 123.65 175.60 184.12 150.45 125.99 119.71 153.75 226.87 143.84 136.98 154.09 PA-MPJPE 78.70 107.19 109.20 102.66 91.67 86.74 87.95 111.85 96.71 99.60 97.22 EventEgo3D [25] MPJPE 74.75 144.26 109.58 141.19 104.33 89.98 103.15 118.30 108.23 105.77 109.95 PA-MPJPE 55.92 97.73 87.40 109.70 85.13 72.10 72.63 85.87 84.91 87.31 83.86 EventEgo3D++ [26] MPJPE 71.52 150.57 93.54 125.75 98.46 85.45 96.10 116.76 98.71 97.10 103.39 PA-MPJPE 52.35 99.96 71.12 94.82 79.93 65.97 68.60 81.29 76.16 76.56 76.67 
+
+Ours (Causal) MPJPE 57.12 124.89 75.77 97.07 80.83 71.88 83.54 91.78 82.48 77.78 84.31 
+
+PA-MPJPE 39.49 86.09 57.63 74.61 62.25 52.84 59.37 65.66 63.02 60.52 62.14 
+
+Ours (Non-Causal) MPJPE 52.79 121.08 73.73 94.06 76.49 68.81 80.77 88.42 79.60 76.01 81.17 
+
+PA-MPJPE 34.72 83.53 55.10 71.66 59.12 51.00 57.54 63.49 60.96 59.81 59.69 EE3D-W 
+
+EgoPoseFormer [44] MPJPE 176.96 251.27 263.46 215.26 180.34 171.24 220.04 324.68 205.83 188.64 220.40 PA-MPJPE 106.25 144.71 147.41 138.59 123.75 117.10 118.74 151.08 130.41 128.30 130.45 EventEgo3D [25] MPJPE 190.79 175.79 178.25 153.63 188.65 182.25 187.92 181.10 223.55 208.59 187.05 PA-MPJPE 105.58 107.45 112.51 77.66 101.43 108.35 101.95 98.08 122.16 112.70 104.78 EventEgo3D++ [26] MPJPE 166.32 155.40 166.60 141.25 157.74 159.02 163.52 149.61 206.15 179.59 164.52 PA-MPJPE 92.97 97.60 106.26 65.18 85.14 100.38 91.47 84.32 113.47 104.90 94.16 
+
+Ours (Causal) MPJPE 144.64 138.75 148.76 131.62 146.04 142.56 149.34 138.67 192.47 168.50 150.13 
+
+PA-MPJPE 90.39 92.40 98.06 64.29 78.50 83.84 80.49 81.06 112.05 101.02 88.21 
+
+Ours (Non-Causal) MPJPE 141.57 139.74 146.60 129.55 140.42 138.85 145.99 135.83 189.58 164.45 147.25 
+
+PA-MPJPE 88.24 91.40 96.60 61.15 74.56 80.73 77.49 78.10 109.65 98.21 85.61 
+
+16 Table 14. Per-joint quantitative comparison for EE3D-R and EE3D-W datasets. 
+
+Dataset Method Metric ↓ Head Neck Shoulder Elbow Wrist Hip Knee Ankle Foot Avg. EE3D-R 
+
+EgoPoseFormer [44] MPJPE 140.3 173.9 157.3 177.1 181.1 212.6 169.8 144.8 207.6 173.00 PA-MPJPE 104.3 119.9 102.4 124.3 132.9 111.9 111.9 88.9 120.2 113.70 EventEgo3D [25] MPJPE 23.49 29.87 40.20 91.67 153.17 69.99 120.96 179.02 201.42 110.39 PA-MPJPE 49.27 41.63 44.48 79.58 133.53 55.66 83.45 108.78 125.26 84.52 EventEgo3D++ [26] MPJPE 22.66 29.36 40.03 77.86 125.41 63.02 119.86 177.03 196.58 103.29 PA-MPJPE 43.01 36.52 40.54 71.09 112.89 48.17 79.38 105.13 119.58 77.07 
+
+Ours (Causal) MPJPE 22.40 28.43 39.12 68.75 102.01 60.35 92.31 135.29 152.37 84.45 
+
+PA-MPJPE 34.79 29.57 36.70 59.08 85.87 44.28 64.16 82.27 96.64 62.65 
+
+Ours (Non-Causal) MPJPE 22.06 28.44 37.95 66.43 98.21 57.79 87.87 130.06 147.01 81.32 
+
+PA-MPJPE 33.41 28.57 35.16 56.71 82.20 41.57 61.19 79.94 93.95 60.21 EE3D-W 
+
+EgoPoseFormer [44] MPJPE 200.10 210.15 198.70 220.13 215.29 190.40 202.70 230.08 225.25 210.50 PA-MPJPE 130.50 140.20 128.92 135.42 139.70 120.62 125.11 140.22 138.0 133.20 EventEgo3D [25] MPJPE 46.54 61.64 82.57 145.81 228.19 161.96 239.96 315.86 335.56 195.50 PA-MPJPE 69.16 55.87 65.48 102.11 184.56 76.49 94.26 134.92 145.26 108.20 EventEgo3D++ [26] MPJPE 44.87 56.67 74.02 127.95 185.59 136.72 215.69 285.08 303.66 172.43 PA-MPJPE 59.46 49.49 59.01 90.39 157.96 64.35 93.59 128.17 139.41 98.42 
+
+Ours (Causal) MPJPE 41.41 49.36 73.62 114.31 166.56 125.08 193.57 267.04 285.31 158.86 
+
+PA-MPJPE 56.83 46.48 58.72 88.40 144.05 59.57 87.36 123.67 134.30 93.46 
+
+Ours (Non-Causal) MPJPE 43.74 51.32 73.01 112.67 163.55 122.79 189.22 259.93 277.88 155.82 
+
+PA-MPJPE 55.95 45.28 57.46 85.13 138.42 58.55 85.02 121.06 130.62 90.86 
+
+17 0 5 10 15 20 25 30 35 40 50 100 150 200 
+
+> Avg . Displ acement  (mm )
+
+Elbow 
+
+0 5 10 15 20 25 30 35 40 50 100 150 200 
+
+> Avg . Displ acement  (mm )
+
+Wrist 
+
+0 5 10 15 20 25 30 35 40 50 100 150 200 
+
+> Avg . Displ acement  (mm )
+
+Knee 
+
+0 5 10 15 20 25 30 35 40 50 100 150 200 
+
+> Avg . Displ acement  (mm )
+
+Ankle 
+
+0 5 10 15 20 25 30 35 40 
+
+Time step 
+
+50 100 150 200 
+
+> Avg . Displ acement  (mm )
+
+Foot 
+
+Ground Truth Ours EventEgo3D++ EventEgo3D EgoPoseFormer Figure 11. The per-frame average end-effector joint displacements (Eq. (24)) for EE3D-R. Zoom recommended. 0 5 10 15 20 25 30 35 40 25 50 75 100 125 150 175 200 
+
+> Avg . Displ acement  (mm )
+
+Elbow 
+
+0 5 10 15 20 25 30 35 40 25 50 75 100 125 150 175 200 
+
+> Avg . Displ acement  (mm )
+
+Wrist 
+
+0 5 10 15 20 25 30 35 40 25 50 75 100 125 150 175 200 
+
+> Avg . Displ acement  (mm )
+
+Knee 
+
+0 5 10 15 20 25 30 35 40 25 50 75 100 125 150 175 200 
+
+> Avg . Displ acement  (mm )
+
+Ankle 
+
+0 5 10 15 20 25 30 35 40 
+
+Time step 
+
+25 50 75 100 125 150 175 200 
+
+> Avg . Displ acement  (mm )
+
+Foot 
+
+Ground Truth Ours EventEgo3D++ EventEgo3D EgoPoseFormer 
+
+Figure 12. The per-frame average end-effector joint displacements (Eq. (24)) for EE3D-W. Zoom recommended. 
+
+18 EgoPoseFormer  EventEgo3D  EventEgo3D++  Ours Reference View  Egocentric Events 
+
+> Boxing
+> Crawling
+> Crouch
+> Kick
+> Dance
+
+Figure 13. Per-action qualitative comparison of our method with prior approaches on EE3D-W (challenging sequences). We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Red: Predicted pose. Green: Ground truth. 
+
+19 EgoPoseFormer  EventEgo3D  EventEgo3D++  Ours Reference View  Egocentric Events 
+
+> Crouch
+> Walk
+> Sports
+> Pushup
+> Interaction
+
+Figure 14. Per-action qualitative comparison of our method with prior approaches on EE3D-R (walk and further challenging sequences). We compare against EgoPoseFormer [44], EventEgo3D [25], and EventEgo3D++ [26]. Red: Predicted pose. Green: Ground truth. 
+
+20

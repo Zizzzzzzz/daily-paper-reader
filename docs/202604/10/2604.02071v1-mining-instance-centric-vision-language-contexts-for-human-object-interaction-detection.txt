@@ -1,0 +1,282 @@
+Title: Mining Instance-Centric Vision-Language Contexts for Human-Object Interaction Detection
+
+URL Source: https://arxiv.org/pdf/2604.02071v1
+
+Published Time: Fri, 03 Apr 2026 00:59:52 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Mining Instance-Centric Vision–Language Contexts for Human–Object Interaction Detection 
+
+# Soo Won Seo 1* KyungChae Lee 1* Hyungchan Cho 1 Taein Son 2
+
+# Nam Ik Cho 1 Jun Won Choi 1†
+
+> 1
+
+# Seoul National University 2Hanyang University 
+
+swseo@adr.snu.ac.kr {kyungchae.lee, hyungchan1229, nicho, junwchoi }@snu.ac.kr tison@spa.hanyang.ac.kr 
+
+# Abstract 
+
+Human–Object Interaction (HOI) detection aims to local-ize human–object pairs and classify their interactions from a single image, a task that demands strong visual under-standing and nuanced contextual reasoning. Recent ap-proaches have leveraged Vision–Language Models (VLMs) to introduce semantic priors, significantly improving HOI detection performance. However, existing methods often fail to fully capitalize on the diverse contextual cues dis-tributed across the entire scene. To overcome these limita-tions, we propose the Instance-centric Context Mining Net-work (InCoM-Net)—a novel framework that effectively inte-grates rich semantic knowledge extracted from VLMs with instance-specific features produced by an object detector. This design enables deeper interaction reasoning by mod-eling relationships not only within each detected instance but also across instances and their surrounding scene con-text. InCoM-Net comprises two core components: Instance-centric Context Refinement (ICR), which separately ex-tracts intra-instance, inter-instance, and global contextual cues from VLM-derived features, and Progressive Context Aggregation (ProCA), which iteratively fuses these multi-context features with instance-level detector features to support high-level HOI reasoning. Extensive experiments on the HICO-DET and V-COCO benchmarks show that InCoM-Net achieves state-of-the-art performance, surpass-ing previous HOI detection methods. Code is available at 
+
+https://github.com/nowuss/InCoM-Net .
+
+# 1. Introduction 
+
+Human-Object Interaction (HOI) detection is a fundamen-tal vision task that aims to localize all human and object instances in an image and classify the interaction types be-
+
+> *Equal contributions.
+> †Corresponding author.
+
+tween them (e.g., holding, riding, pushing). Unlike conven-tional object detection, HOI detection requires understand-ing of spatial configurations, object affordances, and con-textual semantics to reason about the plausible relationships between humans and objects. Recent Transformer-based ar-chitectures [2, 16, 40, 41] have been proposed to advance HOI detection. However, despite these advancements, ac-curately capturing subtle, latent, and context-dependent in-teractions remains a considerable challenge. The emergence of Vision-Language Models (VLMs) such as CLIP [32], BLIP [23], and BLIP2 [24] has enabled powerful joint understanding of visual and textual modali-ties. Trained on large-scale image-text pairs, VLMs have shown strong generalization capabilities in zero-shot im-age classification, captioning, and visual question answer-ing. Owing to their ability to produce semantically rich visual representations aligned with language, recent stud-ies [22, 26, 29] have applied VLMs to HOI detection, aim-ing to leverage high-level interaction priors. Several studies have explored different strategies for uti-lizing features from VLMs in HOI detection. HOICLIP [30] introduced an interaction decoder that attends to VLM vi-sual features to incorporate contextual cues. UniHOI [1] adopted a similar decoder structure and further improved generalization ability by using LLM-generated text as aug-mented textual guidance. While these approaches focused on feature-level integration, several other methods aimed to exploit VLM features at the instance-level. ADA-CM [21] enhanced CLIP by injecting detection signals through lightweight adapters and applying instance-level pooling over adapted visual features. BCOM [35] em-ployed a dual-branch architecture that separately encodes RoI-aligned features from the object detector and the VLM. Despite recent progress, key challenges remain in HOI understanding. Effectively mining contextual information from VLM features is crucial for capturing human–object relationships. Various types of contextual cues can con-1
+
+> arXiv:2604.02071v1 [cs.CV] 2 Apr 2026 Figure 1. Illustration of three levels of contextual information. For each instance, contextual information can be distinguished into intra-instance, inter-instance, and global contexts, each providing complementary cues for interpreting human–object interactions.
+
+tribute to HOI reasoning, each playing a distinct yet com-plementary role. As illustrated in Fig. 1, humans rely on diverse contexts such as 1) visual cues from the target in-stance, 2) its relationships with surrounding instances, and 3) the broader surrounding scene context. Therefore, it is essential to effectively extract and integrate these multi-context features to enhance the model’s ability to infer com-plex human–object relationships. Several methods have been proposed to utilize the con-text features for HOI detection. Most approaches [1, 29, 30] have typically incorporated VLM representations in the fi-nal interaction reasoning phase as scene-level contextual cues. Recent studies [18, 20–22] inject detected instance information into VLM encoders to better align instance fea-tures with scene semantics. However, these methods ap-ply contextual information uniformly across all instances, failing to capture nuanced semantic information specific to each instance. This limitation hinders their capability to ac-curately interpret complex human-object interactions. To address these limitations, we propose the Instance-centric Context Mining Network (InCoM-Net), a novel framework for HOI detection. InCoM-Net constructs multi-context features for each instance using a VLM back-bone and integrates them with instance-level features via Transformer-based attention. By modeling features across diverse contextual scopes, the network can be more effec-tively guided in both what and where to attend, enabling more robust and context-aware HOI understanding. The main ideas of InCoM-Net are summarized as fol-lows. First, we introduce instance-centric multi-context fea-ture generation through the Instance-centric Context Re-finement (ICR) module. For each instance, three lev-els of contextual information—(1) intra-instance, (2) inter-instance, and (3) global contexts—are derived from VLM representations by applying scene-adaptive masks to the feature maps. These scene-adaptive masks enable the gen-eration of context-specific features for each instance-level query. The intra-instance context captures visual cues within the target instance, the inter-instance context mod-els interactions among multiple instances, and the global context provides complementary scene-level information to support comprehensive HOI reasoning. These multi-context features are encoded separately to preserve diverse semantic information and construct adaptive, multi-level contextual representations tailored to each instance. Second, the multi-context features are aggregated into the instance-level features from the object detector through the Progressive Context Aggregation (ProCA) module. ProCA employs multiple attention layers to iteratively gather and refine relevant contextual information. This pro-gressive integration enhances the alignment between each instance’s appearance and its surrounding context. Third, we enable balanced utilization of both VLM multi-context features and detector spatial features through masked feature training (MFT). We observe that, when combining these heterogeneous feature sources for HOI prediction, the model tends to over-rely on one source, which limits overall performance. During training, MFT mitigates this imbalance by selectively masking either the VLM multi-context features or the detector spatial features. This strategy encourages the model to effectively leverage diverse contextual cues under varying input conditions. We evaluate InCoM-Net on two widely used HOI bench-mark datasets: HICO-DET [4] and V-COCO [8]. The pro-posed InCoM-Net achieves state-of-the-art performance on both benchmarks. On HICO-DET, InCoM-Net achieves a +1.03 mAP improvement over the current best method, NMSR [36]. On V-COCO, our model also surpasses NMSR by a remarkable margin of +3.8 mAP. Moreover, our method demonstrates superior generalization and ro-bustness under the zero-shot setting of HICO-DET. Our contributions can be summarized as follows: • We present InCoM-Net, a novel HOI detection frame-work that effectively aggregates multi-contextual cues to enable fine-grained interaction reasoning. 2Masked Feature Training InCoM-Net Architecture Frozen Training    
+
+> Encoder Layer Encoder CNN Backbone CLIP Encoder HO Pair Generator Interaction Decoder Interaction Prediction Input Image Instance-centric Context Mining Interaction Decoder HO Pair Generator
+> Full input
+> DETR Encoder Layer Encoder Layer Decoder Layer Decoder Layer Decoder Layer
+> Interaction Decoder HO Pair Generator
+> VLM-only
+> Interaction Decoder HO Pair Generator
+> Detector-only
+> ICR Global Intra Inter Multi-context Features ProCA ICR ProCA ProCA ICR
+
+Figure 2. Overall framework of InCoM-Net. Left: overview of Instance-centric Context Mining that integrates multi-context VLM features with instance-level features. Right: masked feature training (MFT), balancing the utilization of heterogeneous feature sources via masking. 
+
+• We propose a novel architecture that generates multi-context features from VLM representations and inte-grates them in an iterative manner. Specifically, we in-troduce a masking strategy to derive (1) intra-instance, (2) inter-instance, and (3) global contextual features. Both the masking and feature generation processes are conducted independently for each instance, enabling instance-specific context modeling. • We also introduce a masked feature training strategy that balances the utilization of heterogeneous feature sources, allowing the model to robustly exploit complementary in-formation from both VLM and detector spatial features. • InCoM-Net achieves state-of-the-art performance on HICO-DET and V-COCO, demonstrating its effective-ness in capturing rich contextual cues for HOI detection. 
+
+# 2. Related Work 
+
+2.1. Human-Object Interaction Detection 
+
+HOI detection methods are broadly categorized into one-stage and two-stage methods. One-stage methods [5, 12, 17, 26, 41, 42] jointly detect objects and infer interactions within a unified framework. Early approaches [15, 25] adopt spatial anchors to associate human-object pairs in a single pass. QPIC [33] and HOTR [16] further advance this line of research by adopting the encoder-decoder architec-ture of DETR [3] for query-based reasoning. In contrast, two-stage methods [20, 31, 39, 40] first de-tect human and object instances, and then classify interac-tions between candidate pairs. To capture broader context, graph-based approaches [6, 11, 34, 38] model relational structures by propagating information between human and object nodes using message-passing mechanisms. More re-cent methods [2, 40] adopt Transformer architectures to im-prove context modeling, enabling more flexible encoding of global dependencies. 
+
+2.2. VLM Integration for HOI Detection 
+
+The emergence of VLMs pretrained on large-scale im-age–text pairs has led to growing interest in applying them to HOI detection. Recent studies [1, 7, 12, 13, 19, 21, 29, 30, 35] have explored diverse strategies for incorporating VLMs into HOI detection frameworks. Broadly, these ap-proaches can be grouped into two categories. The first line of work leverages scene-level VLM features as global se-mantic priors to guide interaction reasoning [1, 19, 29, 30]. The second line of research focuses on adapting VLM fea-tures to object instances [18, 20, 21, 35]. Although these methods improve locality awareness, their reliance on rigid RoI-based operations confines adaptation to object-bound regions and limits broader interaction context. 
+
+# 3. Method 
+
+3.1. Overview 
+
+The overall framework of InCoM-Net is illustrated in Fig. 2. Two independent backbone features are generated via two parallel pipelines: a DETR-based detector and a CLIP vi-sual encoder. First, a spatial feature map F is extracted using a CNN backbone [10], which is subsequently processed by DETR [3] to detect individual human and object instances. From the final L decoder layers of DETR, we obtain instance-wise detector features denoted as {ql}Ll=1 . In par-allel, CLIP [32] is used to extract VLM features. Specifi-cally, we use the top L layer features from the CLIP visual 3Surrounding Mask Instance Mask SA  SA  SA Global Hadamard Product Intra Inter FFN  FFN  FFN Figure 3. Structure of ICR. The illustration shows the process of generating the multi-context features for the i-th instance. 
+
+encoder, denoted as {V l}Ll=1 , to serve as the VLM features. InCoM-Net adopts Instance-centric Context Mining to model human-object-context interactions. This module is composed of two submodules: ICR and ProCA. These two modules operate over L layers to produce context-aggregated features. The ICR module first applies masked self-attention to the VLM features V l, where l denotes the layer index. The attention process is spatially guided by instance and surrounding masks from the detector. Using these masks, ICR extracts intra-instance, inter-instance, and global context features for each instance from the VLM rep-resentations. The ProCA module then performs instance-centric cross-attention, using the detector query features ql
+
+as queries and the multi-context features from ICR as keys and values. This process is iteratively applied across all L
+
+layers, resulting in context-aggregated features f l.Finally, the Human-Object (HO) pair generator con-structs HO features for all possible human-object pairs by combining the instance-wise features qL from DETR with the context-aggregated features f L. These HO features are then fed into the interaction decoder as queries for pairwise interaction modeling. The decoder applies cross-attention separately to CNN backbone features F and VLM features 
+
+V L, and outputs interaction classification results. To train InCoM-Net, we adopt a masked feature train-ing strategy in which either detector-based or VLM-based features are masked. During training, three input config-urations are applied equally: full input, detector-only, or VLM-only. This strategy encourages robust and balanced utilization of both feature sources. 
+
+3.2. Instance-centric Context Mining 
+
+Instance-centric Context Refinement (ICR). The struc-ture of ICR is illustrated in Fig. 3. ICR refines VLM con-text features to generate intra-instance, inter-instance, and global context features for each instance. Specifically, it ap-plies self-attention over the VLM features V l ∈ RN ×Dv ,guided by instance masks M R ∈ RK×N and surrounding FFN CA 
+
+> 1st K
+> FFN Multi-context Features Context-aggregated Features
+> 2nd
+> FFN
+> K-th
+> FFN CA  CA
+> Figure 4. Structure of ProCA.
+
+masks M C ∈ RK×N obtained from the detector, where 
+
+K and N denote the number of detected instances and the sequence length of the VLM features, respectively. The in-stance mask M Ri is a binary mask indicating the region of the i-th instance. The surrounding mask M Ci is defined as the union of all other instance masks, excluding M Ri .Using the masks M Ri and M Ci , the global context fea-tures ˆGl, the intra-instance context features ˆRli and the inter-instance context features ˆCli are obtained as follows 
+
+ˆGl = Self-Attention (V l, 1), (1) 
+
+ˆRli = Self-Attention (V l, M Ri ), (2) 
+
+ˆCli = Self-Attention (V l, M Ci ), (3) where Self-Attention (V, M ) denotes the masked self-attention operation similar to Hajimiri et al. [9], with V as the input feature and M as the attention mask. The final multi-context representations are obtained by passing each attended feature through a feed-forward network (FFN) 
+
+Gl = FFN ( ˆGl), (4) 
+
+Rli = FFN ( ˆRli), (5) 
+
+Cli = FFN ( ˆCli ). (6) 
+
+Progressive Context Aggregation (ProCA). The struc-ture of ProCA is shown in Fig. 4. ProCA forms context-aggregated features by leveraging cross-attention, where the detector queries attend to the multi-context features pro-duced by ICR. For the i-th instance, the detector query fea-tures qli are first combined with the context-aggregated fea-tures f l−1 
+
+> i
+
+from the previous layer 
+
+ˆf li = f l−1 
+
+> i
+
++ FFN  qli
+
+ , (7) where f 0 
+
+> i
+
+is initialized as zero embedding. Then, each combined instance feature ˆf li interacts with its global, intra-instance and inter-instance context features 
+
+Gl, Rli, and Cli to capture complementary semantics across 4multiple contextual levels. Specifically, cross-attention is applied to each context feature separately 
+
+f li,G = Cross-Attention 
+
+ ˆf li , G l, G l
+
+, (8) 
+
+f li,R = Cross-Attention 
+
+ ˆf li , R li, R li
+
+
+
+, (9) 
+
+f li,C = Cross-Attention 
+
+ ˆf li , C li , C li
+
+
+
+, (10) where Cross-Attention (Q, K, V ) denotes the standard cross-attention operation with query Q, key K, and value 
+
+V . The individual outputs are concatenated and passed through an FFN to produce the context-aggregated feature 
+
+f li = FFN  [ f li,G ∥ f li,R ∥ f li,C ] , (11) where || denotes channel-wise concatenation. This process is repeated for L layers, enabling ProCA to progressively integrate multi-level semantic features from the VLM and produce the final context-aggregated features f Li .
+
+3.3. HO Pair Generation and Interaction Reasoning 
+
+HO Pair Generator. We construct HO pair features s by fusing detector query features qL and context-aggregated features f L. For each human-object pair (h, o ), we combine corresponding detector query features (qLh , q Lo ) and context-aggregated features (f Lh , f Lo )
+
+s = LN  Linear  qLh ∥ qLo
+
+ 
+
++ LN  Linear  f Lh ∥ f Lo
+
+ , (12) where LN denotes layer normalization. The resulting pair features s are then passed through a shallow Transformer encoder to obtain the final HO pair feature ˆs.
+
+Interaction Decoder. The interaction decoder enhances the HO pair features ˆs for HOI reasoning. The decoder queries are initialized to z0 = ˆ s and updated through Lz
+
+layers. At the l-th layer, zl is processed by a self-attention block and two parallel cross-attention blocks, which attend to the CNN backbone features F and the VLM features V L,respectively 
+
+ˆzl =Self-Attention (zl), (13) 
+
+zl+1 =FFN (Cross-Attention (ˆ zl, F, F )+ Cross-Attention (ˆ zl, V L, V L)) , (14) The final decoder outputs are passed to the interaction clas-sifier to obtain the final results. 
+
+3.4. Masked Feature Training (MFT) 
+
+We train InCoM-Net using MFT, as shown in Fig. 2 (right). Specifically, we construct three masked input configura-tions: (1) full input xf = {f L, q L, V L, F }, (2) detector-only xd = {qL, F }, and (3) VLM-only xv = {f L, V L}.Masking is applied to both the instance-wise features and the interaction decoder inputs. When masked, instance fea-tures are zeroed out, and the corresponding cross-attention blocks are deactivated to yield zero outputs. During training, each configuration is individually pro-cessed by the sub-module Φθ (·), which consists of the HO pair generator, the interaction decoder, and the interaction classifier. The final training objective is defined as follows 
+
+L = X
+
+> x∈X
+
+Lf (y, Φθ (x)) , (15) where X = {xf , x d, x v }, Lf denotes the focal loss, and y
+
+is the ground-truth interaction label. 
+
+# 4. Experiments 
+
+4.1. Datasets and Evaluation Settings 
+
+Datasets. We evaluate InCoM-Net on two widely used benchmarks for HOI detection: HICO-DET [4] and V-COCO [8]. HICO-DET contains 47,776 images, including 38,118 training images and 9,658 test images, with annota-tions for 600 HOI categories defined by 117 verbs and 80 object classes. V-COCO, a subset of MS-COCO [27], con-sists of 10,346 images annotated with 26 common actions, each potentially associated with one or more object roles. 
+
+Regular Settings. We follow standard evaluation proto-cols, reporting the mean Average Precision (mAP). A pre-diction is considered correct when both the human and ob-ject bounding boxes have an Intersection over Union (IoU) greater than 0.5 with the ground truth, and the interaction class is correctly predicted. For HICO-DET, we report mAP on three standard splits: Full (all 600 categories), Rare (138 categories with fewer than 10 training instances), and Non-Rare (the remaining 462 categories). For V-COCO, we re-port role-based mAP (AP role ), requiring correct prediction of both the action and its object roles with IoU ≥ 0.5, under both Scenario 1 and Scenario 2. 
+
+Zero-shot Settings. In the zero-shot HOI detection set-ting, the 600 HOI categories in HICO-DET are split into 480 seen and 120 unseen categories. The model is trained only on the seen categories and evaluated on both seen and unseen categories at test time. We report results under two settings: Rare First Unseen Combination (RF-UC) and Non-rare First Unseen Combination (NF-UC). In RF-UC, the 120 unseen categories are sampled from rare interac-tions, whereas in NF-UC, they are selected from non-rare interactions. The evaluation procedure follows the standard HICO-DET protocol, except that performance is reported on the Unseen , Seen , and Full splits. 5Table 1. Performance comparison under the regular setting on the HICO-DET and V-COCO datasets. R50 denotes ResNet-50. 
+
+HICO-DET V-COCO Default Setting Known-Object Setting Method Backbone Full Rare Non-rare Full Rare Non-rare AP S1 role AP S2 role 
+
+QPIC [33] [CVPR21] R50 29.07 21.85 31.23 31.68 24.14 33.93 58.8 61.0 UPT [39] [CVPR22] R50 31.66 25.94 33.36 35.05 29.27 36.77 59.0 64.5 STIP [41] [CVPR22] R50 32.22 28.15 33.43 35.29 31.43 36.45 66.0 70.7 PViC [40] [ICCV23] R50 34.69 32.14 35.45 38.14 35.38 38.97 62.8 67.8 RmLR [2] [ICCV23] R50 36.93 29.03 39.29 38.29 31.41 40.34 63.8 69.8 
+
+VLM-based Methods with ViT-B 
+
+GEN-VLKT [26] [CVPR22] R50+CLIP 33.75 29.25 35.10 36.78 32.75 37.99 62.4 64.5 HOICLIP [30] [CVPR23] R50+CLIP 34.69 31.12 35.74 37.61 34.47 38.54 63.5 64.8 CLIP4HOI [29] [NeurIPS23] R50+CLIP 35.33 33.95 35.74 37.19 35.27 37.77 – 66.3 HOLa [20] [ICCV25] R50+CLIP 35.41 34.35 35.73 – – – – –LAIN [18] [CVPR25] R50+CLIP 36.02 35.70 36.11 – – – – 65.1 GroupHOI [11] [NeurIPS25] R50+CLIP 36.70 34.86 37.26 39.42 37.78 39.91 65.0 66.0 SCTC [14] [AAAI24] R50+CLIP 37.92 34.78 38.86 – – – 67.1 71.7 HORP [7] [CVPR25] R50+CLIP 38.61 36.14 39.34 40.98 38.25 41.79 65.6 68.3 
+
+InCoM-Net R50+CLIP 39.53 38.87 39.73 42.24 40.50 42.76 72.2 74.2 VLM-based Methods with ViT-L 
+
+CMMP [22] [ECCV23] R50+CLIP 38.14 37.75 38.25 – – – – 64.0 ADA-CM [21] [ICCV23] R50+CLIP 38.40 37.52 38.66 – – – 58.6 64.0 HOLa [20] [ICCV25] R50+CLIP 39.05 38.66 39.17 – – – 60.3 66.0 VDRP [37] [NeurIPS25] R50+CLIP 39.07 39.08 39.06 – – – 60.6 66.2 BCOM [35] [CVPR24] R50+CLIP 39.34 39.90 39.17 42.24 42.86 42.05 65.8 69.9 GroupHOI [11] [NeurIPS25] R50+CLIP 39.46 37.10 40.16 41.58 39.42 42.40 66.4 67.3 UniHOI [1] [NeurIPS23] R50+BLIP2 40.06 39.91 40.11 42.20 42.60 42.08 65.6 68.3 ContextHOI [12] [AAAI25] R50+CLIP 41.82 43.91 41.19 – – – 66.1 –SPLHOI [28] [TIP25] R50+BLIP2 42.06 42.53 41.92 44.62 45.49 44.36 68.1 72.9 InterProDa [13] [AAAI25] R50+CLIP 42.67 45.21 41.92 – – – 67.6 –NMSR [36] [ICCV25] R50+CLIP 42.93 42.41 43.11 44.97 44.20 45.23 69.8 72.1 
+
+InCoM-Net R50+CLIP 43.96 45.61 43.46 45.59 45.92 45.49 73.6 75.4 
+
+Implementation Details. We adopted DETR [3] with ResNet-50 [10] backbone, pre-trained on MS-COCO and fine-tuned on the target HOI dataset. For the CLIP en-coder [32], we considered two visual backbones: ViT-B and ViT-L. Both DETR and CLIP were kept frozen during train-ing. The number of interaction decoder layers and the value of L were set to 2 and 3, respectively. The model was op-timized using AdamW with a weight decay of 10 −4. The initial learning rate was set to 10 −4 and was reduced by a factor of 5 every 10 epochs. Training was performed for 30 epochs with a batch size of 16 on four NVIDIA GeForce RTX 3090 GPUs. Other implementation details are pro-vided in the Supplementary Material .
+
+4.2. Performance Comparison 
+
+Regular HOI Detection. We compare InCoM-Net with existing HOI detection methods on two widely used bench-marks. As shown in Table 1, InCoM-Net achieves state-of-the-art performance on both HICO-DET and V-COCO. On HICO-DET, our InCoM-Net surpasses the previous best method HORP [7] by 0.92 mAP with ViT-B, and out-performs NMSR [36] by 1.03 mAP using ViT-L. On V-COCO, with ViT-B, InCoM-Net achieves 72.2 AP S1 role and 74.2 AP S2 role , outperforming the previous best method SCTC [14] by 5.1 AP S1 role and 2.5 AP S2 role , respec-tively. With ViT-L, the performance further improves to 73.6 AP S1 role and 75.4 AP S2 role , surpassing NMSR [36] by 3.8 on AP S1 role and SPLHOI [28] by 2.5 on AP S2 role .
+
+Zero-shot HOI Detection. Table 2 presents the zero-shot results on HICO-DET. InCoM-Net consistently achieves state-of-the-art results under both RF-UC and NF-UC set-tings. With a ViT-B backbone, it surpasses the previous best method, LAIN [18], by 0.82 mAP on RF-UC Unseen, and outperforms VDRP [37] by 2.23 mAP on NF-UC Unseen. 6Table 2. Zero-shot performance comparison on HICO-DET.                                                                                                        
+
+> RF-UC NF-UC Method Unseen Seen Full Unseen Seen Full VLM-based Methods with ViT-B
+> GEN-VLKT [26] 21.36 32.91 30.56 25.05 23.38 23.71 HOICLIP [30] 25.53 34.85 32.99 26.39 28.10 27.75 ADA-CM [21] 27.63 34.35 33.01 32.41 31.13 31.39 CLIP4HOI [29] 28.47 35.48 34.08 31.44 28.26 28.90 CMMP [22] 29.45 32.87 32.18 32.09 29.71 30.18 HOLa [20] 30.61 35.08 34.19 35.25 31.64 32.36 VDRP [37] 31.29 34.41 33.78 36.45 31.60 32.57 LAIN [18] 31.83 35.06 34.41 36.41 32.44 33.23
+> InCoM-Net 32.65 38.69 37.48 38.68 35.00 35.74 VLM-based Methods with ViT-L
+> BCOM [35] 28.52 35.04 33.74 33.12 31.76 32.03 UniHOI [1] 28.68 33.16 32.27 28.45 32.63 31.79 CMMP [22] 35.98 37.42 37.13 33.52 35.53 35.13 InterProDA [13] 36.38 40.88 39.58 33.64 36.47 35.50 LAIN [18] 36.57 38.54 38.13 37.52 35.90 36.22 VDRP [37] 36.72 38.48 38.13 37.48 36.21 36.46
+> InCoM-Net 37.69 41.46 40.71 39.45 38.42 38.62
+
+When scaled to a ViT-L backbone, InCoM-Net further im-proves performance, exceeding VDRP [37] by 0.97 mAP on RF-UC Unseen and LAIN [18] by 1.93 mAP on NF-UC Unseen. Additional quantitative results are provided in the 
+
+Supplementary Material .
+
+4.3. Ablation Study 
+
+Our ablation studies were conducted on HICO-DET under the regular setting using InCoM-Net with ViT-B. 
+
+Contributions of Main Components. Table 3 presents the performance of the proposed method as each component is incrementally introduced. The baseline model removes the ICR and ProCA from the InCoM-Net, using only the detector instance features as input to the HO Pair generator for interaction modeling. Incorporating ICR improves per-formance by 1.25 mAP, demonstrating the benefit of multi-contextual representations. Applying ProCA yields a fur-ther performance gain of 1.00 mAP, indicating its effec-tiveness in integrating diverse semantic cues from VLMs. Finally, introducing MFT provides an additional 1.11 mAP improvement, underscoring the importance of balancing the utilization of heterogeneous feature sources. 
+
+Impact of Multi-context Modeling. Table 4 reports the contribution of different context types in ICR. The baseline employs raw VLM features (V ) as a uniform context rep-resentation. As each context type is added—global (G),intra-instance (R), and inter-instance (C)—performance consistently improves. In particular, incorporating intra-instance context yields a 0.54 mAP gain, with a notable                                                   
+
+> Table 3. Ablation study of main components of InCoM-Net. Method Full Rare Non-rare Baseline 36.17 33.11 37.08 + ICR 37.42 34.47 38.30 + ProCA 38.42 36.80 38.90 + MFT 39.53 38.87 39.73
+> Table 4. Effect of different context types in ICR. Context Full Rare Non-rare Baseline (V)38.30 37.31 38.60
+> G38.65 36.76 39.21
+> G,R39.19 38.78 39.32
+> G,R,C39.53 38.87 39.73
+> Table 5. Ablation study on the number of ProCA layers. Layers Full Rare Non-rare 137.42 34.47 38.30 237.99 36.21 38.53 338.42 36.80 38.90 438.48 37.06 38.92
+
+improvement of 1.47 mAP on rare categories. Overall, the complete multi-context configuration achieves a cumulative 1.23 mAP improvement over the baseline, demonstrating that leveraging diverse context types effectively enriches scene representations for HOI detection. 
+
+Ablation Study of ProCA Layers. Table 5 presents the results with different numbers of ProCA layers. As the number of layers increases from L=1 to L=4, performance consistently improves, yielding a 1.06 mAP gain. This in-dicates that the ProCA effectively leverages semantic infor-mation from varying VLM layers. However, the gains be-come marginal beyond L=3; therefore, we adopt L=3 as the default configuration. 
+
+Impact of Masked Feature Training. To verify that MFT mitigates the imbalance in feature utilization, we ap-ply it to our model, the baseline, and HOICLIP [30], a representative VLM-based HOI method. We first examine whether HOI models tend to favor one feature source over the other. Specifically, we evaluate all models under three inference settings: Full (both VLM and detector features), 
+
+V-only (VLM features only), and D-only (detector features only), while training all models with both features types. As shown in Table 6, without MFT, all methods suffer a substantial performance drop in the D-Only setting, indicat-ing a strong bias toward VLM features and confirming the imbalance issue. MFT effectively alleviates this problem. 7Ours Repair, Toaster Wash, Horse Cook, Pizza Load, Truck Baseline Figure 5. Visualization of activation maps from the interaction decoder. Table 6. Impact of MFT. * denotes reproduced results using their open-source code. Method MFT Full V-only D-only HOICLIP ∗ [30] 34.00 30.63 23.98                             
+
+> ✓35.41 34.48 32.72 Baseline 36.17 33.21 18.52
+> ✓37.30 36.02 33.66
+> InCoM-Net 38.42 36.20 19.11
+> ✓39.53 38.41 36.14
+> Table 7. Comparison with alternative VLM feature extraction strategies. Strategy Full Rare Non-rare RoI Align 36.37 34.48 36.93 Img Crop 37.34 35.40 37.92
+> InCoM-Net 38.42 36.80 38.90
+
+Across all methods, MFT significantly narrows the gap be-tween V-only and D-only settings and consistently improves overall performance by over 1.1 mAP. These results demon-strate that MFT encourages more balanced utilization of VLM and detector spatial features, leading to more robust HOI reasoning under varying input conditions. 
+
+Effect of Instance-centric Context Mining. Table 7evaluates the effectiveness of Instance-centric Context Min-ing approach by replacing ICR and ProCA with two alterna-tive strategies: RoI Align and Image Crop. RoI Align pools instance features from the VLM features using bounding box coordinates, while Image Crop independently crops and encodes each instance. Both approaches extract instance features without incorporating surrounding context. In con-trast, our method constructs instance representations with their surrounding context through ICR and ProCA, outper-forming RoI Align and Image Crop by 2.05 and 1.08 mAP, respectively. The performance gap is more pronounced on rare categories, reaching 2.32 and 1.40 mAP, underscoring the importance of instance-centric context modeling. 
+
+4.4. Qualitative Results 
+
+Fig. 5 presents a qualitative comparison between the acti-vation maps of InCoM-Net and the baseline model without ICR and ProCA. The baseline tends to focus on limited or ir-relevant regions for the interaction. In contrast, our method attends to key interaction regions as well as contextual cues essential for HOI reasoning. 
+
+# 5. Conclusion 
+
+In this work, we proposed InCoM-Net, a novel HOI de-tection framework that leverages Instance-centric Context Mining to more effectively utilize semantically rich VLM representations for interaction reasoning. By extracting multi-context information from VLM features, our model constructs adaptive contextual representations for each in-stance and progressively integrates them through a dedi-cated attention mechanism. This allows the model to cap-ture rich contextual cues that are critical for accurate HOI prediction. In addition, our masked feature training encour-ages balanced utilization of heterogeneous feature sources, enhancing robustness under varying input conditions. Ex-tensive experiments on HICO-DET and V-COCO demon-strate that InCoM-Net achieves state-of-the-art performance and strong generalization in zero-shot settings. Overall, this work underscores the value of instance-centric context modeling for VLM-based HOI detection, enabling more ef-fective use of semantically rich VLM representations. 86. Acknowledgments 
+
+This work was supported by 1) the Ministry of Trade, Indus-try and Energy (MOTIE, Korea) (No.RS-2024-00443216, Development and PoC of On-Device AI Computing based AI Fusion Mobility Device), and 2) Institute of Informa-tion & communications Technology Planning & Evalua-tion (IITP) grant funded by the Korea government(MSIT) [NO.RS-2021-II211343, Artificial Intelligence Graduate School Program (Seoul National University)] 
+
+# References 
+
+[1] Yichao Cao, Qingfei Tang, Xiu Su, Song Chen, Shan You, Xiaobo Lu, and Chang Xu. Detecting any human-object in-teraction relationship: Universal HOI detector with spatial prompt learning on foundation models. In Advances in Neu-ral Information Processing Systems , pages 739–751, 2023. 1, 2, 3, 6, 7 [2] Yichao Cao, Qingfei Tang, Feng Yang, Xiu Su, Shan You, Xiaobo Lu, and Chang Xu. Re-mine, learn and reason: Ex-ploring the cross-modal semantic correlations for language-guided HOI detection. In Proceedings of the IEEE/CVF In-ternational Conference on Computer Vision , pages 23492– 23503, 2023. 1, 3, 6 [3] Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers. In Proceedings of the European Conference on Computer Vision , pages 213–229, 2020. 3, 6 [4] Yu-Wei Chao, Yunfan Liu, Xieyang Liu, Huayi Zeng, and Jia Deng. Learning to detect human-object interactions. In 
+
+Proceedings of the IEEE/CVF Winter Conference on Appli-cations of Computer Vision , pages 381–389, 2018. 2, 5 [5] Mingfei Chen, Yue Liao, Si Liu, Zhiyuan Chen, Fei Wang, and Chen Qian. Reformulating HOI detection as adaptive set prediction. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9004– 9013, 2021. 3 [6] Chen Gao, Jiarui Xu, Yuliang Zou, and Jia-Bin Huang. DRG: Dual relation graph for human-object interaction detection. In Proceedings of the European Conference on Computer Vi-sion , pages 696–712, 2020. 3 [7] Pei Geng, Jian Yang, and Shanshan Zhang. HORP: Human-object relation priors guided HOI detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pat-tern Recognition , pages 25325–25335, 2025. 3, 6 [8] Saurabh Gupta and Jitendra Malik. Visual semantic role la-beling. arXiv preprint , 2015. 2, 5 [9] Sina Hajimiri, Ismail Ben Ayed, and Jose Dolz. Pay atten-tion to your neighbours: Training-free open-vocabulary se-mantic segmentation. In Proceedings of the IEEE/CVF Win-ter Conference on Applications of Computer Vision , pages 5061–5071, 2025. 4 [10] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 770–778, 2016. 3, 6 [11] Jiajun Hong, Jianan Wei, and Wenguan Wang. Learning human-object interaction as groups. In Advances in Neural Information Processing Systems , 2025. 3, 6 [12] Mingda Jia, Liming Zhao, Ge Li, and Yun Zheng. Contex-tHOI: Spatial context learning for human-object interaction detection. In Proceedings of the AAAI Conference on Artifi-cial Intelligence , pages 3931–3939, 2025. 3, 6 [13] Mingda Jia, Liming Zhao, Ge Li, and Yun Zheng. Or-chestrating the symphony of prompt distribution learning for human-object interaction detection. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 3940– 3948, 2025. 3, 6, 7 [14] Weibo Jiang, Weihong Ren, Jiandong Tian, Liangqiong Qu, Zhiyong Wang, and Honghai Liu. Exploring self- and cross-triplet correlations for human-object interaction detection. In Proceedings of the AAAI Conference on Artificial Intel-ligence , pages 2543–2551, 2024. 6 [15] Bumsoo Kim, Taeho Choi, Jaewoo Kang, and Hyunwoo J Kim. UnionDet: Union-level detector towards real-time human-object interaction detection. In Proceedings of the European Conference on Computer Vision , pages 498–514, 2020. 3 [16] Bumsoo Kim, Junhyun Lee, Jaewoo Kang, Eun-Sol Kim, and Hyunwoo J. Kim. HOTR: End-to-end human-object interaction detection with transformers. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 74–83, 2021. 1, 3 [17] Sanghyun Kim, Deunsol Jung, and Minsu Cho. Relational context learning for human-object interaction detection. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition , pages 2925–2934, 2023. 3 [18] Sanghyun Kim, Deunsol Jung, and Minsu Cho. Locality-aware zero-shot human-object interaction detection. In Pro-ceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 20190–20200, 2025. 2, 3, 6, 7[19] Qinqian Lei, Bo Wang, and Robby T. Tan. EZ-HOI: Vlm adaptation via guided prompt learning for zero-shot HOI de-tection. In Advances in Neural Information Processing Sys-tems , pages 55831–55857, 2024. 3 [20] Qinqian Lei, Bo Wang, and Robby T Tan. HOLa: Zero-shot HOI detection with low-rank decomposed VLM feature adaptation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 1825–1835, 2025. 2, 3, 6, 7 [21] Ting Lei, Fabian Caba, Qingchao Chen, Hailin Jin, Yuxin Peng, and Yang Liu. Efficient adaptive human-object interac-tion detection with concept-guided memory. In Proceedings of the IEEE/CVF International Conference on Computer Vi-sion , pages 6480–6490, 2023. 1, 3, 6, 7 [22] Ting Lei, Shaofeng Yin, Yuxin Peng, and Yang Liu. Ex-ploring conditional multi-modal prompts for zero-shot HOI detection. In Proceedings of the European Conference on Computer Vision , pages 1–19, 2024. 1, 2, 6, 7 [23] Junnan Li, Dongxu Li, Caiming Xiong, and Steven Hoi. BLIP: Bootstrapping language-image pre-training for unified vision-language understanding and generation. In Proceed-
+
+9ings of the 39th International Conference on Machine Learn-ing , pages 12888–12900. PMLR, 2022. 1 [24] Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. BLIP-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. In In-ternational Conference on Machine Learning , pages 19730– 19742. PMLR, 2023. 1 [25] Yue Liao, Si Liu, Fei Wang, Yanjie Chen, Chen Qian, and Ji-ashi Feng. PPDM: Parallel point detection and matching for real-time human-object interaction detection. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 482–490, 2020. 3 [26] Yue Liao, Aixi Zhang, Miao Lu, Yongliang Wang, Xiaobo Li, and Si Liu. GEN-VLKT: Simplify association and en-hance interaction understanding for HOI detection. In Pro-ceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 20123–20132, 2022. 1, 3, 6, 7[27] Tsung-Yi Lin, Michael Maire, Serge Belongie, James Hays, Pietro Perona, Deva Ramanan, Piotr Doll´ ar, and C Lawrence Zitnick. Microsoft COCO: Common objects in context. In 
+
+Proceedings of the European Conference on Computer Vi-sion , pages 740–755, 2014. 5 [28] Jinguo Luo, Weihong Ren, Zhiyong Wang, Xi’ai Chen, Hui-jie Fan, Zhi Han, and Honghai Liu. Synergistic prompting learning for human-object interaction detection. IEEE Trans-actions on Image Processing , 34:5710–5724, 2025. 6 [29] Yunyao Mao, Jiajun Deng, Wengang Zhou, Li Li, Yao Fang, and Houqiang Li. CLIP4HOI: Towards adapting CLIP for practical zero-shot HOI detection. In Advances in Neural Information Processing Systems , pages 45895–45906, 2023. 1, 2, 3, 6, 7 [30] Shan Ning, Longtian Qiu, Yongfei Liu, and Xuming He. HOICLIP: Efficient knowledge transfer for HOI detec-tion with vision-language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 23507–23517, 2023. 1, 2, 3, 6, 7, 8 [31] Siyuan Qi, Wenguan Wang, Baoxiong Jia, Jianbing Shen, and Song-Chun Zhu. Learning human-object interactions by graph parsing neural networks. In Proceedings of the Euro-pean Conference on Computer Vision , pages 407–423, 2018. 3[32] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learn-ing transferable visual models from natural language super-vision. In Proceedings of the 38th International Conference on Machine Learning , pages 8748–8763. PMLR, 2021. 1, 3, 6[33] Masato Tamura, Hiroki Ohashi, and Tomoaki Yoshinaga. QPIC: Query-based pairwise human-object interaction de-tection with image-wide contextual information. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10410–10419, 2021. 3, 6 [34] Oytun Ulutan, ASM Iftekhar, and Bangalore S Manjunath. VSGNet: Spatial attention network for detecting human ob-ject interactions using graph convolutions. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13617–13626, 2020. 3 [35] Guangzhi Wang, Yangyang Guo, Ziwei Xu, and Mohan Kankanhalli. Bilateral adaptation for human-object interac-tion detection with occlusion-robustness. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 27970–27980, 2024. 1, 3, 6, 7 [36] Bin Yang, Yulin Zhang, Hong-Yu Zhou, and Sibei Yang. No more sibling rivalry: Debiasing human-object interaction de-tection. In Proceedings of the IEEE/CVF International Con-ference on Computer Vision , pages 22707–22717, 2025. 2, 6[37] Chanhyeong Yang, Taehoon Song, Jihwan Park, and Hyun-woo J Kim. Visual diversity and region-aware prompt learn-ing for zero-shot HOI detection. In Advances in Neural In-formation Processing Systems , 2025. 6, 7 [38] Frederic Z. Zhang, Dylan Campbell, and Stephen Gould. Spatially Conditioned Graphs for Detecting Human-Object Interactions. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 13319–13327, 2021. 3[39] Frederic Z. Zhang, Dylan Campbell, and Stephen Gould. Efficient two-stage detection of human-object interactions with a novel unary-pairwise transformer. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 20104–20112, 2022. 3, 6 [40] Frederic Z Zhang, Yuhui Yuan, Dylan Campbell, Zhuoyao Zhong, and Stephen Gould. Exploring predicate visual con-text in detecting of human-object interactions. In Proceed-ings of the IEEE/CVF International Conference on Com-puter Vision , pages 10411–10421, 2023. 1, 3, 6 [41] Yong Zhang, Yingwei Pan, Ting Yao, Rui Huang, Tao Mei, and Chang-Wen Chen. Exploring structure-aware trans-former over interaction proposals for human-object interac-tion detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19548– 19557, 2022. 1, 3, 6 [42] Cheng Zou, Bohan Wang, Yue Hu, Junqi Liu, Qian Wu, Yu Zhao, Boxun Li, Chenguang Zhang, Chi Zhang, Yichen Wei, and Jian Sun. End-to-end human object interaction detection with HOI transformer. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 11825–11834, 2021. 3 
+
+10
