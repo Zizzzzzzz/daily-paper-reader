@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-001.webp",
+      "caption": "Table 1: Main results on the Qwen2.5-7B and Llama3.1-8B models. CoT and Ditill-R1 are built upon the instructionfollowing model, while Vanilla, LightThinker, and MemoSight are all based on Distill-R1. Acceleration methods are highlighted in blue, with bold and underlined values indicating the best and second-best results among them. The Acc of Vanilla serves as the upper bound for Acc of acceleration methods. Peak and Speed denote maximum context token counts and generated tokens per second, respectively.",
+      "page": 6,
+      "index": 1,
+      "width": 941,
+      "height": 527
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-002.webp",
+      "caption": "Figure 8: Case Study comparing the reasoning trajectories of LightThinker and MemoSight.",
+      "page": 15,
+      "index": 2,
+      "width": 948,
+      "height": 664
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-003.webp",
+      "caption": "Figure 7: Impact of loss weight configuration (λ) on average accuracy across varying compression ratios (c). The blue solid line represents a higher weight on the standard LM loss (λ = 0.7), while the orange dashed line represents an equal weighting (λ = 0.5).",
+      "page": 15,
+      "index": 3,
+      "width": 950,
+      "height": 473
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-004.webp",
+      "caption": "Figure 1: (Left) Context Compression: Contrary to Vanilla CoT, CoT compression utilizes memory tokens to compress context and reduce the KV cache footprint during the iterative reasoning and memory process. (Right) Multi-Token Prediction: Traditional MTP using multiple LM heads, contrasted with special token based MTP, which achieves parallel future prediction (d steps ahead) using a single LM head and interleaved register tokens ⟨r⟩.",
+      "page": 2,
+      "index": 4,
+      "width": 944,
+      "height": 225
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-005.webp",
+      "caption": "Figure 5: Efficiency Analysis. (a) Average generated tokens across all benchmarks for Vanilla, H2O, LightThinker, and MemoSight on Qwen-2.5-7B and Llama-3.1-8B. MemoSight generates the fewest tokens. (b) Compression Impact: Accuracy and peak context token count under compression levels from 2× to 16×. Higher compression reduces memory footprint but incurs accuracy degradation. (c) Offset Impact: Accuracy and inference speed across foresight offsets (d = 1 to 4) using speculative decoding. An offset of d = 2 achieves the highest accuracy.",
+      "page": 7,
+      "index": 5,
+      "width": 934,
+      "height": 258
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-006.webp",
+      "caption": "Figure 6: Time and memory efficiency evaluation. The main plot shows the inference time of MemoSight and Vanilla as the number of generated tokens increases. The inset charts (a)-(f) compare the peak token usage at different sequence lengths.",
+      "page": 13,
+      "index": 6,
+      "width": 931,
+      "height": 519
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-007.webp",
+      "caption": "Figure 3: Comparison of training attention masks. (1) Vanilla CoT uses a standard causal mask. (2) Previous CoT Compression restricts attention to memory tokens ⟨m⟩ to discard historical reasoning steps. (3) MemoSight introduces a unified strategy: foresight tokens ⟨f⟩ are structurally isolated to act as independent predictive branches, while memory tokens Mi aggregate the intrastep reasoning to serve as the context for future steps.",
+      "page": 4,
+      "index": 7,
+      "width": 454,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-008.webp",
+      "caption": "Figure 11: The shared system prompt applied to Vanilla, H2O, SepLLM, LightThinker, and MemoSight across the Qwen and Llama series.",
+      "page": 17,
+      "index": 8,
+      "width": 950,
+      "height": 477
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-009.webp",
+      "caption": "Figure 4: The MemoSight iterative inference pipeline. (Left) Foresight Acceleration: Foresight tokens ⟨f⟩ generate future token candidates in parallel, accelerating step generation via speculative decoding. (Right) Memory Acceleration: Upon completing a reasoning step, memory tokens ⟨m⟩ summarize the context, allowing the verbose raw reasoning tokens to be evicted from the KV cache. This process repeats until the final ⟨eos⟩ token is generated.",
+      "page": 5,
+      "index": 9,
+      "width": 944,
+      "height": 263
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-010.webp",
+      "caption": "Figure 9: System prompt for Qwen2.5-7B-Instruct and Llama3.1-8B-Instruct.",
+      "page": 16,
+      "index": 10,
+      "width": 950,
+      "height": 783
+    },
+    {
+      "url": "assets/figures/arxiv/2604.14889v1/fig-011.webp",
+      "caption": "Figure 10: Task prompt for Qwen2.5-7B-Instruct and Llama3.1-8B-Instruct.",
+      "page": 16,
+      "index": 11,
+      "width": 950,
+      "height": 462
+    }
+  ]
+}
