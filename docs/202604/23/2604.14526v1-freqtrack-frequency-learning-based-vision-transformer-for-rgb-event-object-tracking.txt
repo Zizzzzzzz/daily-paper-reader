@@ -1,0 +1,326 @@
+Title: FreqTrack: Frequency Learning based Vision Transformer for RGB-Event Object Tracking
+
+URL Source: https://arxiv.org/pdf/2604.14526v1
+
+Published Time: Fri, 17 Apr 2026 00:22:54 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# FREQ TRACK : F REQUENCY LEARNING BASED VISION 
+
+# TRANSFORMER FOR RGB-E VENT OBJECT TRACKING 
+
+Jinlin You 
+
+Dalian University of Technology 
+
+2497066671@mail.dlut.edu.cn 
+
+Muyu Li Dalian University of Technology 
+
+muyuli@dlut.edu.cn 
+
+Xudong Zhao Dalian University of Technology 
+
+xudongzhao@dlut.edu.cn 
+
+# ABSTRACT 
+
+Existing single-modal RGB trackers often face performance bottlenecks in com-plex dynamic scenes, while the introduction of event sensors offers new potential for enhancing tracking capabilities. However, most current RGB-event fusion methods, primarily designed in the spatial domain using convolutional, Trans-former, or Mamba architectures, fail to fully exploit the unique temporal re-sponse and high-frequency characteristics of event data. To address this, we1 pro-pose FreqTrack, a frequency-aware RGBE tracking framework that establishes complementary inter-modal correlations through frequency-domain transforma-tions for more robust feature fusion. We design a Spectral Enhancement Trans-former (SET) layer that incorporates multi-head dynamic Fourier filtering to adap-tively enhance and select frequency-domain features. Additionally, we develop a Wavelet Edge Refinement (WER) module, which leverages learnable wavelet transforms to explicitly extract multi-scale edge structures from event data, ef-fectively improving modeling capability in high-speed and low-light scenarios. Extensive experiments on the COESOT and FE108 datasets demonstrate that Fre-qTrack achieves highly competitive performance, particularly attaining leading precision of 76.6% on the COESOT benchmark, validating the effectiveness of frequency-domain modeling for RGBE tracking. 
+
+# 1 INTRODUCTION 
+
+Visual object tracking, as a core task in visual surveillance and autonomous systems, plays a critical role in scenarios requiring real-time localization and motion understanding. Although conventional RGB trackers (Bhat et al., 2019; Ye et al., 2022; Yan et al., 2021; Zheng et al., 2024) have achieved remarkable progress, they remain constrained by inherent limitations of frame-based imaging: mo-tion blur under high-speed movement, limited dynamic range in challenging illumination, and in-trinsic redundancy in sequential image processing. These issues become particularly pronounced in low-light or high-speed environments, where traditional RGB cameras struggle to capture precise temporal dynamics. Inspired by biological vision mechanisms, event cameras ( ?) offer an alternative sensing paradigm by asynchronously capturing pixel-level brightness changes with microsecond-level temporal reso-lution and ultra-high dynamic range. These characteristics provide rich complementary information to RGB data, especially in high-frequency motion regions where conventional images are prone to blurring or overexposure. Consequently, a growing body of research has explored RGB-Event fusion frameworks, with methods such as AFNet (Zhang et al., 2023), VisEvent (Wang et al., 2023), and CEUTrack (Tang et al., 2022) integrating the two modalities via cross-modal attention, feature align-ment, or spatiotemporal Transformers. However, most existing approaches operate predominantly in the spatial domain, overlooking the inherent frequency-domain relationship between RGB and event streams—a limitation that restricts the model’s ability to fully exploit structural and motion information embedded in different frequency bands. 1
+
+> arXiv:2604.14526v1 [cs.CV] 16 Apr 2026
+
+While Transformer-based fusion architectures have yielded promising results, they exhibit notable limitations: the self-attention mechanism ( ?) suffers from high computational complexity for long token sequences, making it inefficient for processing high-frequency event streams. More impor-tantly, existing RGBE tracking methods generally lack dedicated frequency-domain modeling. From an imaging mechanism perspective, event cameras asynchronously respond to brightness differen-tials and their outputs densely encode rapid changes in the scene, thereby dominating high-frequency motion information. In contrast, RGB cameras capture absolute intensity through integration, em-phasizing low-frequency structural content. This frequency-domain complementarity has yet to be effectively exploited. Furthermore, the static filter weight strategies in traditional frequency-domain methods are ill-suited to adapt to the sparse and dynamic characteristics of event data. Thus, ac-curately capturing fine motion boundaries and recovering clear textures under degraded conditions such as motion blur and low-light constitute a fundamental challenge for current methods. To address these issues, we propose FreqTrack, a novel RGBE tracking framework that systemat-ically incorporates frequency-domain transformations to achieve robust multimodal representation. Our approach is built upon two core innovations. First, we design a Spectral Enhancement Trans-former (SET) layer, which introduces multi-head dynamic Fourier (Cooley & Tukey, 1965) filtering on top of standard multi-head self-attention. Each SET layer comprises 12 parallel one-dimensional frequency-domain filter heads, enabling adaptive optimization of token sequences through complex-valued weight modulation and routing mechanisms. This allows the model to selectively enhance cross-modal frequency components while suppressing noise. Second, we develop a Wavelet Edge Refinement (WER) module, which employs a learnable discrete wavelet transform based on Haar wavelets (Mallat, 2002) to explicitly decompose event features into approximation and detail coeffi-cients. Combined with convolutional layers and normalization, this module extracts multi-scale edge structures and supplies refined event features to each main network layer, significantly improving tracking robustness in motion blur and low-light scenarios. Extensive experiments on two RGB-event tracking benchmarks, COESOT (Tang et al., 2022) and FE108 (Zhang et al., 2021), demonstrate that FreqTrack achieves highly competitive performance. On the large-scale COESOT dataset, it attains state-of-the-art precision and strong success rate, while on the smaller FE108 dataset, it delivers competitive precision and reasonable success perfor-mance. These results validate the importance of frequency-domain modeling in RGBE tracking and highlight the effectiveness of the proposed modules. In summary, our main contributions include: 1. We propose FreqTrack, a framework that incorporates frequency-domain modeling via dy-namic spectral filtering and wavelet-based edge enhancement to effectively capture cross-modal complementary information. 2. We design the SET layer and WER module, which adaptively enhance cross-modal fre-quency features and extract multi-scale edge structures, respectively. 3. We validate FreqTrack on two benchmarks, COESOT and FE108. On COESOT, it achieves state-of-the-art precision and highly competitive overall performance, demonstrating strong generalization ability with sufficient training data. 
+
+# 2 RELATED WORK 
+
+2.1 RGB-E VENT TRACKING 
+
+Research on RGB-Event (RGBE) fusion for object tracking has gained increasing attention, aiming to combine the rich texture of RGB images with the high dynamic response of event streams to address visual challenges in complex scenarios. Zhang et al. (2021) introduces a multi-modal align-ment and fusion module to effectively integrate RGB and event data with different sampling rates, achieving robust tracking at high frame rates. The VisEvent (Wang et al., 2023) method constructs a comprehensive dataset containing 820 visible-event video pairs and establishes a baseline using a cross-modality Transformer (CMT) to enhance feature interaction. CEUTrack (Tang et al., 2022) unifies RGB frames and color-event voxels through a single-stage backbone, enabling simultaneous feature extraction, matching, and interactive learning. AFNet (Zhang et al., 2023) further incorpo-rates an event-guided cross-modal alignment (ECA) module and cross-correlation fusion (CF) to 2Figure 1: The FreqTrack network framework and core modules. (a) Overall pipeline from input to output. (b) Wavelet Edge Refinement (WER) module employing Dynamic Wavelet Filtering (DWF). (c) Spectral Enhancement Transformer (SET) layer with Dynamic Fourier Filtering (DFF). improve target localization in dynamic environments. Zhu et al. (2023) proposed a masked model-ing strategy that randomly masks tokens of modalities to bridge the distribution gap between RGB and event data, thereby enhancing model generalization. HDETrack (Wang et al., 2024) pioneers the application of knowledge distillation in multimodal tracking, transferring multi-view (event image-voxel) knowledge to single-modality event tracking and expanding the utility boundaries of event data. 2.2 FREQUENCY DOMAIN LEARNING 
+
+Frequency-domain analysis has long served as a fundamental tool in signal and image processing. Early work such as the Fast Fourier Transform (FFT) laid the groundwork for efficient spectral analysis (Cooley et al., 2007), while subsequently developed adaptive filtering techniques achieved noise suppression while preserving structural details such as edges (Deng & Cahill, 1993). The capacity of wavelet transforms to decompose signals locally into multi-scale representations has led to their widespread adoption in enhancement tasks such as medical imaging (Yang et al., 2010). With the rise of deep learning, frequency-domain reasoning has regained prominence in modern architectures. Recent studies have revealed intriguing properties of Vision Transformers (ViTs) in the frequency domain: research in Park & Kim (2022) and Si et al. (2022) demonstrates that the self-attention mechanism in ViTs tends to capture low-frequency global structures but struggles with high-frequency local details. This finding is critical, as high-frequency information is often indispensable for precise pixel-level prediction tasks. Studies in Chen et al. (2024) show that down-sampling operations can cause high-frequency aliasing, adversely affecting edge quality in semantic segmentation, whereas Cai et al. (2021) successfully leverages frequency constraints to achieve more realistic and identity-preserving image translation. Frequency-domain guidance has also proven effective in image restoration and enhancement tasks. In image dehazing, Yu et al. (2022) combines frequency and spatial cues to recover clearer struc-tures. Similarly, research indicates that diffusion models exhibit biases in frequency components, which can be exploited to improve generation outcomes (Everaert et al., 2024). Even in classi-cal problems such as image completion, frequency characteristics have been implicitly utilized to maintain structural consistency (Drori et al., 2003). 3Figure 2: Structure of the Dynamic Filters (DFF/DWF). Dynamic Fourier Filtering(DFF) and Dy-namic Wavelet Filtering(DWF) share the same adaptive filtering architecture but differ in their un-derlying transformations: Fourier and Wavelet transforms, respectively Notably, the integration of frequency-domain learning into RGB-Event tracking has seen prelimi-nary exploration. FAEFTrack Shang et al. (2025) introduced a multi-frequency attention mechanism that maps different frequency components into channel dimensions via Discrete Cosine Transform and processes them through channel attention. However, this approach essentially constitutes a channel-wise frequency recombination strategy; while it distributes frequency information across channels, it falls short of achieving active selection and filtering of specific frequency components within the frequency domain. To address this limitation, we propose the FreqTrack framework, whose core innovation lies in introducing dynamic frequency-domain filters. This design enables the network to directly suppress interference from irrelevant frequency bands during forward prop-agation while proactively enhancing the extraction of critical frequency features, thereby achieving more precise and efficient feature enhancement in the frequency domain. 
+
+# 3 OUR PROPOSED APPROACH 
+
+3.1 OVERVIEW 
+
+This section presents FreqTrack, a unified frequency-learning framework for RGB-Event object tracking. The core idea incorporates dynamic frequency-domain modeling into the Transformer architecture to fully exploit cross-modal complementary information. Built upon a ViT backbone, our approach integrates two key components in each layer: the Spectral Enhancement Transformer (SET) layer, which augments self-attention with multi-head dynamic Fourier filtering to adaptively modulate frequency components, and the Wavelet Edge Refinement (WER) module, which lever-ages learnable wavelet transforms to extract multi-scale edge structures from event data and pro-gressively refines event representations through layer-wise interaction with the main network. The overall architecture is shown in Fig 1, and the following sections detail each component. 3.2 INPUT REPRESENTATION 
+
+Our framework adopts RGB video frames and asynchronous event streams as dual-modal input, achieving spatiotemporal consistency across modalities through dynamic temporal alignment and structured encoding. For RGB frame,the RGB video sequence is denoted as I = {I1, I 2, . . . , I N } where Ii represents the i-th RGB frame, and N is the total number of frames. We crop the template patch ZI (target initialization region) and search patch XI (candidate search region) from RGB frames. 4For event stream, the asynchronous event stream is represented as E = {ej =(xj , y j , t j , p j )}Mj=1 ,where each event ej contains pixel coordinates (xj , y j ),timestamp tj and po-larity pj ∈ { +1 , −1},with M being the total number of events. To achieve temporal alignment with RGB frames, we adopt the time surface representation (Lagorce et al., 2016) of events. For each RGB frame timestamp t(i) 
+
+> RGB
+
+,we construct an event window covering its exposure duration and compute event contributions via linear interpolation: 
+
+Vt(x, y ) = X
+
+> j
+
+pj · max 0, 1 − |t(i)RGB − tj |
+
+∆t
+
+!
+
+(1) where ∆t is the exposure time of RGB frames, the weight linearly decays with the temporal distance between events and RGB timestamps. 3.3 BACKBONE NETWORK 
+
+Before feeding multimodal data into the Transformer network, we transform them into token se-quence representations through a projection layer. This layer comprises four independent con-volutional branches dedicated to different input sources. For the RGB modality, the template re-gion PRGB  
+
+> t
+
+and search region PRGB  
+
+> s
+
+are projected into feature embeddings ERGB  
+
+> t
+
+∈ RNt×D and 
+
+ERGB  
+
+> s
+
+∈ RNs×D via 16 × 16 convolutional operations. For the event modality, the template voxels 
+
+VEV  
+
+> t
+
+and search voxels VEV  
+
+> s
+
+are projected into EEV  
+
+> t
+
+∈ RNt×D and EEV  
+
+> s
+
+∈ RNs×D through 4 × 4
+
+convolutional operations. All tokens are augmented with learnable position embeddings, where template regions share position encoding Pt ∈ RNt×D and search regions share Ps ∈ RNs×D .After obtaining the projected tokens, the template and search tokens from the event modality are first concatenated: 
+
+EEV = [ EEV  
+
+> t
+
+; EEV  
+
+> s
+
+] ∈ R(Nt+Ns)×D (2) This concatenated event sequence is then fed as a whole into the Wavelet Edge Refinement module for feature enhancement: ˜EEV = WER( EEV ) (3) The enhanced event tokens are reorganized with RGB tokens to form a unified sequence: 
+
+H0 = [ ERGB  
+
+> t
+
+; ˜EEV  
+
+> t
+
+; ERGB  
+
+> s
+
+; ˜EEV  
+
+> s
+
+] ∈ R2( Nt+Ns)×D (4) where ˜EEV  
+
+> t
+
+and ˜EEV  
+
+> s
+
+are split from ˜EEV .As shown in Fig. 1, our backbone network consists of 12 layers, with the first 6 layers employing Spectral Enhancement Transformer (SET) layers, as shown in Fig. 1(c), and the latter 6 layers using standard Transformer layers. The SET layer incorporates Dynamic Fourier Filtering based on the standard Transformer: 
+
+H′′  
+
+> l
+
+= H′ 
+
+> l
+
++ DFF(LN( H′
+
+> l
+
+)) (5) 
+
+H′ 
+
+> l
+
+= Hl + MSA(LN( Hl)) (6) 
+
+Hl+1 = H′′  
+
+> l
+
++ MLP(LN( H′′  
+
+> l
+
+)) (7) The subsequent 6 standard Transformer layers follow the classical design: 
+
+H′ 
+
+> l
+
+= Hl + MSA(LN( Hl)) (8) 
+
+Hl+1 = H′ 
+
+> l
+
++ MLP(LN( H′
+
+> l
+
+)) (9) Unlike two-stream Siamese trackers that use Transformer layers solely for sensor data fusion, our approach enables adaptive data fusion while preserving discriminative information by directly con-catenating template and search region tokens from both sensor modalities. 3.4 SPECTRAL ENHANCEMENT TRANSFORMER LAYER 
+
+Dynamic Fourier Filtering Mechanism. The Spectral Enhancement Transformer (SET) layer is designed to address core challenges in RGBE tracking, where target appearance often undergoes 5complex variations due to occlusion, illumination changes, and dynamic backgrounds. While event data provides high-temporal-resolution edge structures, it remains sparse and noise-sensitive. Tra-ditional spatial attention mechanisms face limitations in handling such issues, often struggling to capture stable structural patterns shared across modalities, particularly those more evident in the frequency domain. To this end, building on prior work in frequency-domain adaptive process-ing (Tatsunami & Taki, 2024), we introduce the Dynamic Fourier Filtering (DFF) mechanism as a structural saliency encoder, enabling the network to develop frequency preference capabilities cru-cial for robust tracking.The structure of the Dynamic Fourier Filtering (DFF) mechanism is shown in Fig. 2. The mathematical formulation begins with an input token sequence H ∈ RN ×D , which first under-goes linear projection to an intermediate representation: 
+
+H′ = W1H + b1 (10) Application of 1D Discrete Fourier Transform along the sequence dimension yields frequency-domain representations where low-frequency components correspond to stable shape-related struc-tural patterns, while high-frequency components reflect edges, rapid motion, and event stream ac-tivations. The key innovation lies in the dynamic filtering strategy—different tracking scenarios require distinct frequency preferences: fast-motion scenarios necessitate enhanced high-frequency responses from events, sudden illumination changes demand suppression of high-frequency noise, and stable scenes benefit from boosted low-frequency structural patterns from RGB. This adaptabil-ity is achieved through input-dependent routing weights: 
+
+α = Softmax MLP 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+Hi
+
+!! 
+
+∈ RK (11) These weights combine K learnable basis filters for frequency-selective modulation: 
+
+˜Hfreq = Hfreq ⊙
+
+> K
+
+X
+
+> k=1
+
+αk · Wk (12) The final output is recovered through inverse transformation: 
+
+˜H = W2 · F −1( ˜Hfreq ) + b2 (13) This design provides significant advantages for RGBE tracking by filtering out background variations irrelevant to tracking in the frequency domain prior to spatial attention, enhancing high-frequency components representing motion boundaries in event streams, strengthening low-frequency structures related to target shape in RGB data, and generating scene-adaptive filtering preferences driven by input characteristics. 
+
+Spectral Enhancement Transformer Layer. The SET layer, as shown in Fig. 1(c), adopts a ”frequency-first, spatial-later” processing paradigm that coordinates spectral and spatial optimiza-tion. The architecture processes input tokens through three sequential operations while maintaining residual connections throughout. The computational flow begins with spectral enhancement via dynamic Fourier filtering: 
+
+H′ 
+
+> l
+
+= Hl + DFF(LN( Hl)) (14) This initial frequency-domain operation, implemented through a multi-head dynamic filtering ar-chitecture that parallels the attention mechanism, serves as structural prior enhancement, helping to filter noise and improve structural consistency before spatial modeling. The frequency-enhanced features subsequently undergo spatial context modeling through multi-head self-attention: 
+
+˜Hl = H′ 
+
+> l
+
++ MSA(LN( H′
+
+> l
+
+)) (15) At this stage, the attention mechanism more readily locks onto target regions because the input has been purified in the frequency domain—irrelevant background variations are suppressed while task-relevant structural patterns are enhanced. Finally, channel-wise transformation and feature re-finement complete the processing: 6Hl+1 = ˜Hl + MLP(LN( ˜Hl)) (16) The MLP reorganizes channel features to properly integrate frequency-domain enhancements into network representations. We deploy SET layers in the front part of the network to enhance shallow feature representations, while standard Transformer layers are employed in the later stages to focus on high-level semantic information. This layered design provides valuable frequency-dimensional reasoning capabilities for multimodal tracking tasks while maintaining computational efficiency without increasing model complexity. 3.5 WAVELET EDGE REFINEMENT MODULE 
+
+The Wavelet Edge Refinement (WER) module is designed to address the unique characteristics of event data through wavelet transform, which provides superior localization capabilities for analyz-ing transient signals compared to Fourier transforms. The detailed structure of the Wavelet Edge Refinement (WER) module is illustrated in Fig. 1(b).The module employs Dynamic Wavelet Filter-ing (DWF), as shown in Fig. 2, to adaptively process event features in the wavelet domain. While event streams inherently encode edge information and motion boundaries through pixel-level bright-ness changes, these features exhibit strong localization in both spatial and temporal domains. The Discrete Wavelet Transform (DWT) offers an effective mathematical framework for such analysis by decomposing signals into approximation coefficients that capture low-frequency trends and de-tail coefficients that preserve high-frequency information. For an input signal x[n], the transform is computed as: 
+
+cA [k] = X
+
+> n
+
+x[n] · ϕj,k [n], cD [k] = X
+
+> n
+
+x[n] · ψj,k [n] (17) where cA [k] and cD [k] represent approximation and detail coefficients respectively, with ϕj,k and 
+
+ψj,k being the scaling and wavelet functions. In our architecture, the WER module operates synchronously with each main network layer, estab-lishing a dedicated processing pathway for event data refinement. The module receives concatenated event token sequences from both template and search regions, formulated as Eev = [ Eev t ; Eev s ] ∈
+
+R(Nt+Ns)×D . The processing pipeline employs learnable Haar wavelets to decompose the input event tokens through DWT, followed by dynamic filtering operations in the wavelet domain. The forward propagation begins with: 
+
+cA , cD = DWT( Eev ) (18) where cA captures approximate low-frequency components of event activity while cD isolates de-tailed high-frequency edge information. Dynamic filtering is then applied separately to these coeffi-cients: ˜cA = cA ⊙ WcA, ˜cD = cD ⊙ WcD (19) The filtered coefficients undergo reconstruction via inverse wavelet transform: 
+
+˜Eev = IDWT( ˜cA , ˜cD ) (20) This refined event representation is subsequently split back into template and search components 
+
+˜Eev t and ˜Eev s for cross-modal integration in the main network. The modular design ensures pro-gressive refinement of event features across network depths, with each WER instance processing its predecessor’s output to build increasingly sophisticated representations while maintaining temporal precision. 3.6 HEAD AND LOSS FUNCTION 
+
+We adopt a widely adopted tracking head, which generates three distinct outputs: a classification score map for target-background discrimination, a bounding box size map, and a local offset map. For model optimization, we utilize a composite loss function combining focal loss (Lin et al., 2017) for classification, L1 loss (Girshick, 2015) for bounding box regression, and GIoU loss (Rezatofighi et al., 2019) for spatial alignment. The overall objective function is formulated as: 
+
+L = λf ocal Lf ocal + λ1L1 + λGIoU LGIoU (21) where λf ocal = 1 , λ1 = 14 and λGIoU = 1 are the hyperparameters in our experiment. 7Table 1: Tracking results on COESOT dataset 
+
+Method SR(%) PR(%) 
+
+EventTPT (Xia et al., 2025) 64.7 73.0 FAFETrack (Shang et al., 2025) 62.5 76.5 CEUTrack (Tang et al., 2022) 62.7 76.0 TransT (Chen et al., 2021) 60.5 72.4 TrDiMP (Wang et al., 2021) 60.1 72.2 KeepTrack (Mayer et al., 2021) 59.6 70.9 OSTrack (Ye et al., 2022) 59.0 70.7 AiATrack (Gao et al., 2022) 59.0 72.4 DiMP50 (Bhat et al., 2019) 58.9 72.0 STARK-S50 (Yan et al., 2021) 55.7 66.7 MixFormer22k (Cui et al., 2023) 55.7 66.3 ATOM (Danelljan et al., 2019) 55.0 68.8 SiamRPN (Li et al., 2018) 53.5 65.7 
+
+FreqTrack 62.7 76.6 
+
+# 4 EXPERIMENT 
+
+4.1 EXPERIMENTAL SETTINGS 
+
+Implementation Details. We implemented the proposed FreqTrack framework using PyTorch and trained it on 2 NVIDIA RTX 4090 GPUs. Specifically, we adopted the AdamW (Loshchilov & Hutter, 2017) optimizer, with the learning rate, batch size, and weight decay set to 0.0001, 8, and 0.0001, respectively. The learning rate scheduling followed a StepLR strategy with a decay rate of 0.1. For the backbone, we employed a lightweight pre-trained Vision Transformer model. 
+
+Evaluation metrics. In our experimental evaluation, tracking performance is examined through three widely used metrics: Success Rate (SR) and Precision Rate (PR). SR represents the fraction of frames where the Intersection over Union (IoU) between the predicted and ground-truth bounding boxes exceeds a given threshold, indicating the robustness of the tracker. PR captures the proportion of frames in which the distance between the predicted and ground-truth target centers falls below a specified pixel radius, serving as an indicator of localization accuracy. 
+
+Dataset. We evaluate the proposed method on two large-scale RGB-Event tracking datasets: FE108 (Zhang et al., 2021) and COESOT (Tang et al., 2022). The FE108 dataset is a multimodal visual tracking benchmark composed of synchronized RGB frames and event streams across 108 se-quences covering diverse scenes and object categories, designed to facilitate the evaluation of tracker robustness under challenging conditions such as rapid motion, illumination variation, and dynamic backgrounds.The COESOT dataset is a large-scale RGB-Event collaborative tracking benchmark featuring over ninety object categories and more than a thousand paired sequences, providing a comprehensive and systematic platform for assessing high-performance tracking algorithms that in-tegrate color and event-based information. 4.2 COMPARISONS WITH STATE -OF -THE -ARTS 
+
+Our experiments are conducted on two frame-event tracking benchmarks: FE108 and COESOT dataset. 
+
+Results on COESOT dataset. Table 1 presents the tracking results of the proposed method on the COESOT dataset. Our approach achieves a Success Rate (SR) of 62.7% and a Precision Rate (PR) of 76.6% , demonstrating highly competitive overall performance on this benchmark.Specifically, our method exhibits outstanding performance in terms of Precision Rate (PR), achieving the highest value among all compared methods. Compared to the recently proposed FAFETrack (SR 62.5%, PR 76.5%), we achieve a slight improvement in both success and precision rates. Furthermore, when compared to EventTPT (SR 64.7%, PR 73.0%), our method achieves a notable +3.6% improvement in precision while maintaining a competitive success rate. These consistent results validate the effectiveness of our proposed approach. 8Figure 3: Comparison of success rates under different challenging scenarios on COESOT. Table 2: Tracking results on FE108 dataset 
+
+Method SR(%) PR(%) 
+
+CMT-ATOM (Wang et al., 2023) 54.3 79.4 PrDiMP (Danelljan et al., 2020) 53.0 80.5 
+
+DiMP (Bhat et al., 2019) 52.6 79.1 ATOM (Danelljan et al., 2019) 46.5 71.3 SiamRPN (Li et al., 2018) 21.8 33.5 SiamFC++ (Xu et al., 2020) 23.8 39.1 KYS (Bhat et al., 2020) 26.6 41.0 
+
+FreqTrack 49.7 79.1 For a fine-grained analysis under specific challenging conditions, we present the success rate radar chart in Fig. 3. The results across ten challenging scenarios show that our FreqTrack achieves leading or highly competitive performance in most cases. Notably, it attains the highest success rates in scenarios such as deformation (DEF), rotation (ROT), fast motion (FM), illumination variation (IV), and motion blur (MB). This consistent advantage across various challenging scenarios, particularly in addressing key difficulties like dynamic appearance changes and motion blur, demonstrates the robustness of our frequency-domain modeling approach in enhancing feature representation and motion reasoning. These consistent results validate the effectiveness of our proposed approach. 
+
+Results on FE108 dataset. Table 2 presents the tracking results of the proposed FreqTrack on the FE108 dataset. Our method achieves a SR of 49.7% and a Precision Rate (PR) of 79.1%. On the relatively small-scale FE108 dataset, our method demonstrates competitive performance in PR, which is on par with the top-performing method. However, a performance gap in SR is observed compared to other state-of-the-art methods. We attribute this primarily to the limited scale of FE108, which contains only 76 training sequences, potentially restricting the model’s ability to fully learn robustness across diverse and challenging scenarios. In contrast, on the large-scale COESOT dataset comprising 827 training sequences, our method achieves more competitive results (SR 62.7%, PR 76.6%), validating its capacity to learn effective representations from sufficient data. 9Table 3: Ablation study for important components on COESOT dataset. × represents the component is removed. # RGB Event SET WER SR(%) PR(%) 
+
+1 × 40.1 48.2 2 × 57.1 72.3 3 × × 61.6 75.2 4 × 62.4 76.1 5 62.7 76.6 
+
+4.3 ABLATION STUDY 
+
+Impact of Multimodal Input. To comprehensively evaluate the contribution of multimodal input to tracking performance, we conduct ablation experiments under different modality configurations. As demonstrated in Table 3 (rows 1, 2, and 5), the model using only Event data achieves a success rate (SR) of 57.1% and a precision rate (PR) of 72.3%. In contrast, the model relying solely on RGB input yields significantly lower performance, with only 40.1% SR and 48.2% PR. This sub-stantial performance gap underscores the critical importance of event data in maintaining tracking robustness. The full model, which effectively integrates both RGB and Event modalities, achieves the best performance (62.7% SR, 76.6% PR), demonstrating that our fusion framework successfully leverages the complementary strengths of both modalities: RGB provides rich spatial appearance information while Event data delivers superior temporal resolution for motion tracking. 
+
+Effectiveness of the Spectral Enhancement Transformer Layer. To validate the contribution of the Spectral Enhancement Transformer (SET) layer, we analyze its impact in conjunction with the Wavelet Edge Refinement module. As shown in Table 3 (rows 3 and 5), when both the SET layer and WER module are removed, the performance drops to 61.6% SR and 75.2% PR. Compared to the complete model (62.7% SR, 76.6% PR), this represents a noticeable degradation in both met-rics. The performance decline confirms SET’s effectiveness in enhancing feature representations through frequency-domain processing. By adaptively modulating frequency components via dy-namic Fourier filtering, the SET layer enables the model to better capture structural patterns and suppress noise interference, thereby improving tracking accuracy in challenging scenarios with ap-pearance variations and motion blur. 
+
+Effectiveness of the Wavelet Edge Refinement Module. We further investigate the specific con-tribution of the Wavelet Edge Refinement (WER) module to the overall tracking performance. As reported in Table 3 (rows 4 and 5), removing only the WER module causes performance to de-crease from 62.7% to 62.4% in SR and from 76.6% to 76.1% in PR. Though the performance drop is modest, the consistent degradation across both metrics indicates WER’s positive role in refining event representations. The module employs learnable wavelet transforms and dynamic wavelet fil-tering (DWF) to extract multi-scale edge features from event data, effectively enhancing structural information while suppressing noise. The results confirm that the progressive refinement of event features through WER’s layer-wise processing contributes to more discriminative representations for accurate target localization. 4.4 VISUALIZATION 
+
+To comprehensively evaluate the tracking performance of FreqTrack in complex scenarios, we se-lected four representative cases from the 17 challenging scenarios in the COESOT dataset for vi-sualization analysis, including fast motion, illumination variation, similar object interference, and partial occlusion. As shown in Figure 4, we compare the ground truth bounding boxes with the predictions from our method and four baseline methods. The visualization results demonstrate that FreqTrack achieves excellent performance across the se-lected challenging conditions, reflecting its overall competitiveness in a broader range of challenging scenarios. Specifically, in fast motion scenarios, our method effectively captures motion boundaries through frequency-domain modeling, overcoming positioning drift caused by motion blur. Under severe illumination changes, the robustness of frequency-domain features to lighting variations en-ables continuous target tracking. When facing similar object interference, the discriminative capa-bility of spectral features helps distinguish between the target and distractors. In partial occlusion 10 Figure 4: Tracking results of our FreqTrack under 4 challenging scenarios on COESOT.Event im-ages are used for visual comparison only. cases, the multi-scale edge information extracted by the Wavelet Edge Refinement module helps maintain reasonable estimation of the target structure. These representative cases validate the general advantages of frequency-domain modeling: the Spec-tral Enhancement Transformer (SET) layer enhances the extraction of motion information and global structures, while the Wavelet Edge Refinement (WER) module preserves critical local details. Al-though only four representative scenarios are shown here, selected from the complete range of chal-lenges in the dataset, they sufficiently demonstrate the robustness and generalization capability of FreqTrack in complex real-world scenarios. 
+
+# 5 CONCLUSION 
+
+Based on the comprehensive analysis of existing RGB-Event tracking methods, this paper presents FreqTrack, an effective tracking framework that incorporates frequency-domain modeling through dynamic spectral filtering and wavelet-based edge enhancement. Specifically, the Spectral Enhance-ment Transformer (SET) layer enables adaptive frequency component selection via dynamic Fourier filtering, while the Wavelet Edge Refinement (WER) module extracts multi-scale edge structures from event streams. Extensive experiments conducted on COESOT and FE108 benchmarks demon-11 strate the competitive performance of FreqTrack in both precision and robustness. Ablation studies and qualitative visualizations further validate the effectiveness of each proposed component in en-hancing feature representation and motion reasoning. Benefiting from its frequency-aware architec-ture, FreqTrack exhibits strong potential for handling challenging scenarios involving motion blur and illumination variations. In future work, we plan to explore more efficient frequency-domain fusion strategies and extend the framework to other multimodal vision tasks. 
+
+# REFERENCES 
+
+Goutam Bhat, Martin Danelljan, Luc Van Gool, and Radu Timofte. Learning discriminative model prediction for tracking. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 6182–6191, 2019. Goutam Bhat, Martin Danelljan, Luc Van Gool, and Radu Timofte. Know your surroundings: Ex-ploiting scene information for object tracking. In European conference on computer vision , pp. 205–221. Springer, 2020. Mu Cai, Hong Zhang, Huijuan Huang, Qichuan Geng, Yixuan Li, and Gao Huang. Frequency domain image translation: More photo-realistic, better identity-preserving. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pp. 13930–13940, 2021. Linwei Chen, Lin Gu, and Ying Fu. When semantic segmentation meets frequency aliasing. arXiv preprint arXiv:2403.09065 , 2024. Xin Chen, Bin Yan, Jiawen Zhu, Dong Wang, Xiaoyun Yang, and Huchuan Lu. Transformer track-ing. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 8126–8135, 2021. James W Cooley and John W Tukey. An algorithm for the machine calculation of complex fourier series. Mathematics of computation , 19(90):297–301, 1965. James W Cooley, Peter AW Lewis, and Peter D Welch. The fast fourier transform and its applica-tions. IEEE Transactions on Education , 12(1):27–34, 2007. Yutao Cui, Tianhui Song, Gangshan Wu, and Limin Wang. Mixformerv2: Efficient fully transformer tracking. Advances in neural information processing systems , 36:58736–58751, 2023. Martin Danelljan, Goutam Bhat, Fahad Shahbaz Khan, and Michael Felsberg. Atom: Accurate tracking by overlap maximization. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 4660–4669, 2019. Martin Danelljan, Luc Van Gool, and Radu Timofte. Probabilistic regression for visual tracking. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 7183–7192, 2020. Guang Deng and LW Cahill. An adaptive gaussian filter for noise reduction and edge detection. In 
+
+1993 IEEE conference record nuclear science symposium and medical imaging conference , pp. 1615–1619. IEEE, 1993. Iddo Drori, Daniel Cohen-Or, and Hezy Yeshurun. Fragment-based image completion. In ACM SIGGRApH 2003 papers , pp. 303–312. 2003. Martin Nicolas Everaert, Athanasios Fitsios, Marco Bocchio, Sami Arpa, Sabine S¨ usstrunk, and Radhakrishna Achanta. Exploiting the signal-leak bias in diffusion models. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pp. 4025–4034, 2024. Shenyuan Gao, Chunluan Zhou, Chao Ma, Xinggang Wang, and Junsong Yuan. Aiatrack: Attention in attention for transformer visual tracking. In European conference on computer vision , pp. 146–164. Springer, 2022. Ross Girshick. Fast r-cnn. In Proceedings of the IEEE international conference on computer vision ,pp. 1440–1448, 2015. 12 Xavier Lagorce, Garrick Orchard, Francesco Galluppi, Bertram E Shi, and Ryad B Benosman. Hots: a hierarchy of event-based time-surfaces for pattern recognition. IEEE transactions on pattern analysis and machine intelligence , 39(7):1346–1359, 2016. Bo Li, Junjie Yan, Wei Wu, Zheng Zhu, and Xiaolin Hu. High performance visual tracking with siamese region proposal network. In Proceedings of the IEEE conference on computer vision and pattern recognition , pp. 8971–8980, 2018. Tsung-Yi Lin, Priya Goyal, Ross Girshick, Kaiming He, and Piotr Doll´ ar. Focal loss for dense object detection. In Proceedings of the IEEE international conference on computer vision , pp. 2980–2988, 2017. Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 , 2017. Stephane G Mallat. A theory for multiresolution signal decomposition: the wavelet representation. 
+
+IEEE transactions on pattern analysis and machine intelligence , 11(7):674–693, 2002. Christoph Mayer, Martin Danelljan, Danda Pani Paudel, and Luc Van Gool. Learning target candi-date association to keep track of what not to track. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 13444–13454, 2021. Namuk Park and Songkuk Kim. How do vision transformers work? arXiv preprint arXiv:2202.06709 , 2022. Hamid Rezatofighi, Nathan Tsoi, JunYoung Gwak, Amir Sadeghian, Ian Reid, and Silvio Savarese. Generalized intersection over union: A metric and a loss for bounding box regression. In Pro-ceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 658–666, 2019. Xilong Shang, Zhaoyuan Zeng, Xiaopeng Li, Cien Fan, and Weizheng Jin. Improving object track-ing performances with frequency learning for event cameras. IEEE Sensors Journal , 2025. Chenyang Si, Weihao Yu, Pan Zhou, Yichen Zhou, Xinchao Wang, and Shuicheng Yan. Inception transformer. Advances in Neural Information Processing Systems , 35:23495–23509, 2022. Chuanming Tang, Xiao Wang, Ju Huang, Bo Jiang, Lin Zhu, Jianlin Zhang, Yaowei Wang, and Yonghong Tian. Revisiting color-event based tracking: A unified network, dataset, and metric. 
+
+arXiv preprint arXiv:2211.11010 , 2022. Yuki Tatsunami and Masato Taki. Fft-based dynamic token mixer for vision. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 38, pp. 15328–15336, 2024. Ning Wang, Wengang Zhou, Jie Wang, and Houqiang Li. Transformer meets tracker: Exploiting temporal context for robust visual tracking. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 1571–1580, 2021. Xiao Wang, Jianing Li, Lin Zhu, Zhipeng Zhang, Zhe Chen, Xin Li, Yaowei Wang, Yonghong Tian, and Feng Wu. Visevent: Reliable object tracking via collaboration of frame and event flows. IEEE Transactions on Cybernetics , 54(3):1997–2010, 2023. Xiao Wang, Shiao Wang, Chuanming Tang, Lin Zhu, Bo Jiang, Yonghong Tian, and Jin Tang. Event stream-based visual object tracking: A high-resolution benchmark dataset and a novel baseline. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 19248–19257, 2024. Wenhao Xia, Jiawen Zhu, Zihao Huang, Jinqing Qi, You He, and Xu Jia. Towards survivability in complex motion scenarios: Rgb-event object tracking via historical trajectory prompting. In 
+
+2025 IEEE International Conference on Robotics and Automation (ICRA) , pp. 6447–6453. IEEE, 2025. Yinda Xu, Zeyu Wang, Zuoxin Li, Ye Yuan, and Gang Yu. Siamfc++: Towards robust and accurate visual tracking with target estimation guidelines. In Proceedings of the AAAI conference on artificial intelligence , volume 34, pp. 12549–12556, 2020. 13 Bin Yan, Houwen Peng, Jianlong Fu, Dong Wang, and Huchuan Lu. Learning spatio-temporal transformer for visual tracking. In Proceedings of the IEEE/CVF international conference on computer vision , pp. 10448–10457, 2021. Yi Yang, Zhengwei Su, and L Sun. Medical image enhancement algorithm based on wavelet trans-form. Electronics letters , 46(2):120–121, 2010. Botao Ye, Hong Chang, Bingpeng Ma, Shiguang Shan, and Xilin Chen. Joint feature learning and relation modeling for tracking: A one-stream framework. In European conference on computer vision , pp. 341–357. Springer, 2022. Hu Yu, Naishan Zheng, Man Zhou, Jie Huang, Zeyu Xiao, and Feng Zhao. Frequency and spatial dual guidance for image dehazing. In European conference on computer vision , pp. 181–198. Springer, 2022. Jiqing Zhang, Xin Yang, Yingkai Fu, Xiaopeng Wei, Baocai Yin, and Bo Dong. Object tracking by jointly exploiting frame and event domain. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pp. 13043–13052, 2021. Jiqing Zhang, Yuanchen Wang, Wenxi Liu, Meng Li, Jinpeng Bai, Baocai Yin, and Xin Yang. Frame-event alignment and fusion network for high frame rate tracking. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pp. 9781–9790, 2023. Yaozong Zheng, Bineng Zhong, Qihua Liang, Zhiyi Mo, Shengping Zhang, and Xianxian Li. Odtrack: Online dense temporal token learning for visual tracking. In Proceedings of the AAAI conference on artificial intelligence , volume 38, pp. 7588–7596, 2024. Zhiyu Zhu, Junhui Hou, and Dapeng Oliver Wu. Cross-modal orthogonal high-rank augmentation for rgb-event transformer-trackers. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pp. 22045–22055, 2023. 14

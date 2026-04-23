@@ -6,316 +6,145 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-14 ~ 2026-04-23
-- 运行时间：2026-04-23 15:06:12 UTC
+- 最新运行日期：2026-04-23
+- 运行时间：2026-04-23 20:29:50 UTC
 - 运行状态：成功
-- 本次总论文数：98
-- 精读区：85
+- 本次总论文数：41
+- 精读区：28
 - 速读区：13
 
 ### 今日简报（AI）
-深度复盘 98 篇前沿论文，重点攻克多模态大模型（MLLM）视觉 Token 剪枝失效的底层逻辑。
-满分研究揭示了解码过程中视觉信息偏移对剪枝效果的影响，同时涵盖了边缘计算下的交通监控与细粒度感知优化。
-建议优先研读 MLLM 视觉剪枝的失效边界，以规避多模态模型推理加速中的性能陷阱。
-- 详情：[/20260414-20260423/README](/20260414-20260423/README)
+今日深度解析 41 篇前沿论文，聚焦 RGB-Event 追踪突破与高效视觉感知架构。
+满分论文揭示了事件自适应融合与矩阵式 Token 合并技术在提升跟踪精度与合成效率上的巨大潜力。
+建议重点关注 MaMe & MaRe 框架，掌握在复杂视觉任务中平衡性能与资源消耗的最优解。
+- 详情：[/202604/23/README](/202604/23/README)
 
 ### 精读区论文标签
-1. [Why and When Visual Token Pruning Fails? A Study on Relevant Visual Information Shift in MLLMs Decoding](/20260414-20260423/2604.12358v1-why-and-when-visual-token-pruning-fails-a-study-on-relevant-visual-information-shift-in-mllms-decoding)  
-   标签：评分：10.0/10、query:evlm
-   evidence：多模态大语言模型中的视觉标记剪枝
-2. [Why and When Visual Token Pruning Fails? A Study on Relevant Visual Information Shift in MLLMs Decoding](/20260414-20260423/2604.12358v2-why-and-when-visual-token-pruning-fails-a-study-on-relevant-visual-information-shift-in-mllms-decoding)  
-   标签：评分：10.0/10、query:evlm
-   evidence：多模态大语言模型的视觉Token剪枝
-3. [Latent-Condensed Transformer for Efficient Long Context Modeling](/20260414-20260423/2604.12452v1-latent-condensed-transformer-for-efficient-long-context-modeling)  
-   标签：评分：10.0/10、query:evlm
-   evidence：潜空间中的KV缓存减少与上下文压缩
-4. [Latent-Condensed Transformer for Efficient Long Context Modeling](/20260414-20260423/2604.12452v2-latent-condensed-transformer-for-efficient-long-context-modeling)  
-   标签：评分：10.0/10、query:evlm
-   evidence：Transformer中的KV缓存减少与上下文压缩
-5. [CLASP: Class-Adaptive Layer Fusion and Dual-Stage Pruning for Multimodal Large Language Models](/20260414-20260423/2604.12767v1-clasp-class-adaptive-layer-fusion-and-dual-stage-pruning-for-multimodal-large-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：多模态大模型中视觉Token减少的双阶段剪枝
-6. [Generative Anonymization in Event Streams](/20260414-20260423/2604.12803v1-generative-anonymization-in-event-streams)  
+1. [Event-Adaptive State Transition and Gated Fusion for RGB-Event Object Tracking](/202604/23/2604.13426v1-event-adaptive-state-transition-and-gated-fusion-for-rgb-event-object-tracking)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：针对神经形态视觉传感器事件流的生成式匿名化框架
-7. [Event-Adaptive State Transition and Gated Fusion for RGB-Event Object Tracking](/20260414-20260423/2604.13426v1-event-adaptive-state-transition-and-gated-fusion-for-rgb-event-object-tracking)  
+   evidence：用于 RGB-事件对象跟踪的事件自适应状态转移
+2. [MaMe & MaRe: Matrix-Based Token Merging and Restoration for Efficient Visual Perception and Synthesis](/202604/23/2604.13432v1-mame--mare-matrix-based-token-merging-and-restoration-for-efficient-visual-perception-and-synthesis)  
+   标签：评分：10.0/10、query:evlm
+   evidence：基于矩阵的Token合并用于高效视觉感知
+3. [FreqTrack: Frequency Learning based Vision Transformer for RGB-Event Object Tracking](/202604/23/2604.14526v1-freqtrack-frequency-learning-based-vision-transformer-for-rgb-event-object-tracking)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：RGB-事件目标追踪及事件流密度自适应
-8. [MaMe & MaRe: Matrix-Based Token Merging and Restoration for Efficient Visual Perception and Synthesis](/20260414-20260423/2604.13432v1-mame--mare-matrix-based-token-merging-and-restoration-for-efficient-visual-perception-and-synthesis)  
-   标签：评分：10.0/10、query:evlm
-   evidence：基于矩阵的令牌合并用于高效视觉感知
-9. [UHR-BAT: Budget-Aware Token Compression Vision-Language model for Ultra-High-Resolution Remote Sensing](/20260414-20260423/2604.13565v1-uhr-bat-budget-aware-token-compression-vision-language-model-for-ultra-high-resolution-remote-sensing)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉语言模型的预算感知Token压缩
-10. [Vision-and-Language Navigation for UAVs: Progress, Challenges, and a Research Roadmap](/20260414-20260423/2604.13654v1-vision-and-language-navigation-for-uavs-progress-challenges-and-a-research-roadmap)  
-   标签：评分：10.0/10、query:evlm
-   evidence：机器人视觉-语言-动作 (VLA) 模型综述
-11. [Jump-Start Reinforcement Learning with Vision-Language-Action Regularization](/20260414-20260423/2604.13733v1-jump-start-reinforcement-learning-with-vision-language-action-regularization)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于机器人操作的视觉-语言-动作模型
-12. [One Token per Highly Selective Frame: Towards Extreme Compression for Long Video Understanding](/20260414-20260423/2604.14149v1-one-token-per-highly-selective-frame-towards-extreme-compression-for-long-video-understanding)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉语言模型中长视频理解的极端Token压缩
-13. [One Token per Highly Selective Frame: Towards Extreme Compression for Long Video Understanding](/20260414-20260423/2604.14149v2-one-token-per-highly-selective-frame-towards-extreme-compression-for-long-video-understanding)  
-   标签：评分：10.0/10、query:evlm
-   evidence：针对长视频理解的极端视频Token压缩
-14. [FreqTrack: Frequency Learning based Vision Transformer for RGB-Event Object Tracking](/20260414-20260423/2604.14526v1-freqtrack-frequency-learning-based-vision-transformer-for-rgb-event-object-tracking)  
+   evidence：利用频率学习和事件传感器的RGB-事件目标追踪
+4. [Bidirectional Cross-Modal Prompting for Event-Frame Asymmetric Stereo](/202604/23/2604.15312v1-bidirectional-cross-modal-prompting-for-event-frame-asymmetric-stereo)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：使用事件传感器的红蓝绿-事件目标跟踪
-15. [World-Value-Action Model: Implicit Planning for Vision-Language-Action Systems](/20260414-20260423/2604.14732v1-world-value-action-model-implicit-planning-for-vision-language-action-systems)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉-语言-动作（VLA）系统隐式规划的统一框架
-16. [Compressing Sequences in the Latent Embedding Space: $K$-Token Merging for Large Language Models](/20260414-20260423/2604.15153v1-compressing-sequences-in-the-latent-embedding-space-k-token-merging-for-large-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：潜嵌入空间中的Token压缩框架
-17. [Compressing Sequences in the Latent Embedding Space: $K$-Token Merging for Large Language Models](/20260414-20260423/2604.15153v2-compressing-sequences-in-the-latent-embedding-space-k-token-merging-for-large-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：通过潜嵌入空间中的K-token合并进行token压缩
-18. [VisPCO: Visual Token Pruning Configuration Optimization via Budget-Aware Pareto-Frontier Learning for Vision-Language Models](/20260414-20260423/2604.15188v1-vispco-visual-token-pruning-configuration-optimization-via-budget-aware-pareto-frontier-learning-for-vision-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉语言模型的视觉Token剪枝
-19. [Bidirectional Cross-Modal Prompting for Event-Frame Asymmetric Stereo](/20260414-20260423/2604.15312v1-bidirectional-cross-modal-prompting-for-event-frame-asymmetric-stereo)  
+   evidence：使用事件相机的事件-帧不对称立体视觉
+5. [Tri-Modal Fusion Transformers for UAV-based Object Detection](/202604/23/2604.16630v1-tri-modal-fusion-transformers-for-uav-based-object-detection)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：用于3D感知的事件-帧非对称立体视觉
-20. [Long-Term Memory for VLA-based Agents in Open-World Task Execution](/20260414-20260423/2604.15671v1-long-term-memory-for-vla-based-agents-in-open-world-task-execution)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于分层任务分解和执行的进度感知VLA模型
-21. [NeuroLip: An Event-driven Spatiotemporal Learning Framework for Cross-Scene Lip-Motion-based Visual Speaker Recognition](/20260414-20260423/2604.15718v1-neurolip-an-event-driven-spatiotemporal-learning-framework-for-cross-scene-lip-motion-based-visual-speaker-recognition)  
+   evidence：结合事件相机的无人机检测三模态框架
+6. [Relative State Estimation using Event-Based Propeller Sensing](/202604/23/2604.18289v1-relative-state-estimation-using-event-based-propeller-sensing)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：用于视觉说话人识别的事件驱动时空学习框架
-22. [AEGIS: Anchor-Enforced Gradient Isolation for Knowledge-Preserving Vision-Language-Action Fine-Tuning](/20260414-20260423/2604.16067v1-aegis-anchor-enforced-gradient-isolation-for-knowledge-preserving-vision-language-action-fine-tuning)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于机器人控制的视觉-语言-动作微调
-23. [Optimizing Korean-Centric LLMs via Token Pruning](/20260414-20260423/2604.16235v1-optimizing-korean-centric-llms-via-token-pruning)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于多语言大模型优化的Token剪枝
-24. [Tri-Modal Fusion Transformers for UAV-based Object Detection](/20260414-20260423/2604.16630v1-tri-modal-fusion-transformers-for-uav-based-object-detection)  
-   标签：评分：10.0/10、query:ev-cam
-   evidence：集成事件相机用于无人机目标检测
-25. [ReconVLA: An Uncertainty-Guided and Failure-Aware Vision-Language-Action Framework for Robotic Control](/20260414-20260423/2604.16677v1-reconvla-an-uncertainty-guided-and-failure-aware-vision-language-action-framework-for-robotic-control)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于机器人控制的视觉-语言-动作框架
-26. [Reducing Peak Memory Usage for Modern Multimodal Large Language Model Pipelines](/20260414-20260423/2604.16734v1-reducing-peak-memory-usage-for-modern-multimodal-large-language-model-pipelines)  
-   标签：评分：10.0/10、query:evlm
-   evidence：通过识别视觉标记和KV缓存中的冗余来降低峰值内存使用
-27. [Open-TQ-Metal: Fused Compressed-Domain Attention for Long-Context LLM Inference on Apple Silicon](/20260414-20260423/2604.16957v1-open-tq-metal-fused-compressed-domain-attention-for-long-context-llm-inference-on-apple-silicon)  
-   标签：评分：10.0/10、query:evlm
-   evidence：长文本推理中的KV缓存压缩与融合注意力机制
-28. [Graph-Guided Adaptive Channel Elimination for KV Cache Compression](/20260414-20260423/2604.16983v1-graph-guided-adaptive-channel-elimination-for-kv-cache-compression)  
-   标签：评分：10.0/10、query:evlm
-   evidence：通过图引导自适应通道消除进行KV缓存压缩
-29. [EvoComp: Learning Visual Token Compression for Multimodal Large Language Models via Semantic-Guided Evolutionary Labeling](/20260414-20260423/2604.17087v1-evocomp-learning-visual-token-compression-for-multimodal-large-language-models-via-semantic-guided-evolutionary-labeling)  
-   标签：评分：10.0/10、query:evlm
-   evidence：多模态大语言模型的视觉Token压缩
-30. [Towards Joint Quantization and Token Pruning of Vision-Language Models](/20260414-20260423/2604.17320v1-towards-joint-quantization-and-token-pruning-of-vision-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉语言模型的联合量化与标记剪枝
-31. [MoE-nD: Per-Layer Mixture-of-Experts Routing for Multi-Axis KV Cache Compression](/20260414-20260423/2604.17695v1-moe-nd-per-layer-mixture-of-experts-routing-for-multi-axis-kv-cache-compression)  
-   标签：评分：10.0/10、query:evlm
-   evidence：使用混合专家模型进行多轴KV缓存压缩
-32. [ReFineVLA: Multimodal Reasoning-Aware Generalist Robotic Policies via Teacher-Guided Fine-Tuning](/20260414-20260423/2604.17800v1-refinevla-multimodal-reasoning-aware-generalist-robotic-policies-via-teacher-guided-fine-tuning)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉-语言-动作模型的推理感知框架
-33. [ST-$π$: Structured SpatioTemporal VLA for Robotic Manipulation](/20260414-20260423/2604.17880v1-st--structured-spatiotemporal-vla-for-robotic-manipulation)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于机器人操作的结构化时空VLA模型
-34. [Can Explicit Physical Feasibility Benefit VLA Learning? An Empirical Study](/20260414-20260423/2604.17896v1-can-explicit-physical-feasibility-benefit-vla-learning-an-empirical-study)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视觉-语言-动作 (VLA) 模型中的显式物理可行性
-35. [OneDrive: Unified Multi-Paradigm Driving with Vision-Language-Action Models](/20260414-20260423/2604.17915v1-onedrive-unified-multi-paradigm-driving-with-vision-language-action-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：基于预训练VLM的统一自动驾驶框架
-36. [Stability Implies Redundancy: Delta Attention Selective Halting for Efficient Long-Context Prefilling](/20260414-20260423/2604.18103v1-stability-implies-redundancy-delta-attention-selective-halting-for-efficient-long-context-prefilling)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于高效预填充的令牌剪枝和选择性停止
-37. [Geometry-Guided 3D Visual Token Pruning for Video-Language Models](/20260414-20260423/2604.18260v1-geometry-guided-3d-visual-token-pruning-for-video-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：视频语言模型的3D视觉标记剪枝
-38. [Relative State Estimation using Event-Based Propeller Sensing](/20260414-20260423/2604.18289v1-relative-state-estimation-using-event-based-propeller-sensing)  
-   标签：评分：10.0/10、query:ev-cam
-   evidence：基于事件的螺旋桨感知与追踪
-39. [Match-Any-Events: Zero-Shot Motion-Robust Feature Matching Across Wide Baselines for Event Cameras](/20260414-20260423/2604.18744v1-match-any-events-zero-shot-motion-robust-feature-matching-across-wide-baselines-for-event-cameras)  
+   evidence：基于事件流的螺旋桨传感相对状态估计
+7. [Match-Any-Events: Zero-Shot Motion-Robust Feature Matching Across Wide Baselines for Event Cameras](/202604/23/2604.18744v1-match-any-events-zero-shot-motion-robust-feature-matching-across-wide-baselines-for-event-cameras)  
    标签：评分：10.0/10、query:ev-cam
    evidence：事件相机的零样本特征匹配
-40. [ST-Prune: Training-Free Spatio-Temporal Token Pruning for Vision-Language Models in Autonomous Driving](/20260414-20260423/2604.19145v1-st-prune-training-free-spatio-temporal-token-pruning-for-vision-language-models-in-autonomous-driving)  
+8. [HELM: Harness-Enhanced Long-horizon Memory for Vision-Language-Action Manipulation](/202604/23/2604.18791v1-helm-harness-enhanced-long-horizon-memory-for-vision-language-action-manipulation)  
    标签：评分：10.0/10、query:evlm
-   evidence：自动驾驶视觉语言模型的免训练时空Token剪枝
-41. [DASH-KV: Accelerating Long-Context LLM Inference via Asymmetric KV Cache Hashing](/20260414-20260423/2604.19351v1-dash-kv-accelerating-long-context-llm-inference-via-asymmetric-kv-cache-hashing)  
+   evidence：视觉-语言-动作操作的长周期记忆
+9. [JoyAI-RA 0.1: A Foundation Model for Robotic Autonomy](/202604/23/2604.20100v1-joyai-ra-01-a-foundation-model-for-robotic-autonomy)  
    标签：评分：10.0/10、query:evlm
-   evidence：通过KV缓存压缩和哈希加速长文本大模型推理
-42. [SpanVLA: Efficient Action Bridging and Learning from Negative-Recovery Samples for Vision-Language-Action Model](/20260414-20260423/2604.19710v1-spanvla-efficient-action-bridging-and-learning-from-negative-recovery-samples-for-vision-language-action-model)  
-   标签：评分：10.0/10、query:evlm
-   evidence：用于自动驾驶的高效视觉-语言-动作模型
-43. [CCTVBench: Contrastive Consistency Traffic VideoQA Benchmark for Multimodal LLMs](/20260414-20260423/2604.20460v1-cctvbench-contrastive-consistency-traffic-videoqa-benchmark-for-multimodal-llms)  
+   evidence：用于机器人的视觉-语言-动作（VLA）具身基础模型
+10. [From Scene to Object: Text-Guided Dual-Gaze Prediction](/202604/23/2604.20191v1-from-scene-to-object-text-guided-dual-gaze-prediction)  
+   标签：评分：10.0/10、query:mm-trf
+   evidence：自动驾驶中的驾驶员注意力预测
+11. [CCTVBench: Contrastive Consistency Traffic VideoQA Benchmark for Multimodal LLMs](/202604/23/2604.20460v1-cctvbench-contrastive-consistency-traffic-videoqa-benchmark-for-multimodal-llms)  
    标签：评分：10.0/10、query:mm-trf
    evidence：多模态大语言模型的交通视频问答基准
-44. [PokeVLA: Empowering Pocket-Sized Vision-Language-Action Model with Comprehensive World Knowledge Guidance](/20260414-20260423/2604.20834v1-pokevla-empowering-pocket-sized-vision-language-action-model-with-comprehensive-world-knowledge-guidance)  
-   标签：评分：10.0/10、query:evlm
-   evidence：提出用于具身操作的轻量级基础模型
-45. [Unveiling the Surprising Efficacy of Navigation Understanding in End-to-End Autonomous Driving](/20260414-20260423/2604.12208v1-unveiling-the-surprising-efficacy-of-navigation-understanding-in-end-to-end-autonomous-driving)  
-   标签：评分：9.0/10、query:mm-trf
-   evidence：端到端自动驾驶中的交通场景理解与导航
-46. [HazardArena: Evaluating Semantic Safety in Vision-Language-Action Models](/20260414-20260423/2604.12447v1-hazardarena-evaluating-semantic-safety-in-vision-language-action-models)  
+12. [Efficient Multi-View 3D Object Detection by Dynamic Token Selection and Fine-Tuning](/202604/23/2604.13586v1-efficient-multi-view-3d-object-detection-by-dynamic-token-selection-and-fine-tuning)  
    标签：评分：9.0/10、query:evlm
-   evidence：评估视觉-语言-动作模型中的语义安全性
-47. [MODIX: A Training-Free Multimodal Information-Driven Positional Index Scaling for Vision-Language Models](/20260414-20260423/2604.12537v1-modix-a-training-free-multimodal-information-driven-positional-index-scaling-for-vision-language-models)  
+   evidence：3D目标检测中的动态Token选择
+13. [SpaceMind: A Modular and Self-Evolving Embodied Vision-Language Agent Framework for Autonomous On-orbit Servicing](/202604/23/2604.14399v1-spacemind-a-modular-and-self-evolving-embodied-vision-language-agent-framework-for-autonomous-on-orbit-servicing)  
    标签：评分：9.0/10、query:evlm
-   evidence：通过位置索引缩放优化视觉语言模型效率
-48. [KV Packet: Recomputation-Free Context-Independent KV Caching for LLMs](/20260414-20260423/2604.13226v1-kv-packet-recomputation-free-context-independent-kv-caching-for-llms)  
+   evidence：用于机器人任务的具身视觉语言智能体框架
+14. [Revisiting Token Compression for Accelerating ViT-based Sparse Multi-View 3D Object Detectors](/202604/23/2604.14563v1-revisiting-token-compression-for-accelerating-vit-based-sparse-multi-view-3d-object-detectors)  
    标签：评分：9.0/10、query:evlm
-   evidence：提出了一种无需重新计算的大模型KV缓存框架
-49. [KV Packet: Recomputation-Free Context-Independent KV Caching for LLMs](/20260414-20260423/2604.13226v2-kv-packet-recomputation-free-context-independent-kv-caching-for-llms)  
+   evidence：用于加速基于ViT的3D目标检测器的标记压缩
+15. [StreamCacheVGGT: Streaming Visual Geometry Transformers with Robust Scoring and Hybrid Cache Compression](/202604/23/2604.15237v1-streamcachevggt-streaming-visual-geometry-transformers-with-robust-scoring-and-hybrid-cache-compression)  
    标签：评分：9.0/10、query:evlm
-   evidence：LLM的KV缓存与免重计算复用
-50. [When Less Latent Leads to Better Relay: Information-Preserving Compression for Latent Multi-Agent LLM Collaboration](/20260414-20260423/2604.13349v1-when-less-latent-leads-to-better-relay-information-preserving-compression-for-latent-multi-agent-llm-collaboration)  
+   evidence：Transformer的混合缓存压缩与令牌重要性追踪
+16. [StreamCacheVGGT: Streaming Visual Geometry Transformers with Robust Scoring and Hybrid Cache Compression](/202604/23/2604.15237v2-streamcachevggt-streaming-visual-geometry-transformers-with-robust-scoring-and-hybrid-cache-compression)  
    标签：评分：9.0/10、query:evlm
-   evidence：用于大模型协作的逐出式KV缓存压缩
-51. [YOCO++: Enhancing YOCO with KV Residual Connections for Efficient LLM Inference](/20260414-20260423/2604.13556v1-yoco-enhancing-yoco-with-kv-residual-connections-for-efficient-llm-inference)  
+   evidence：针对流式视觉几何Transformer的混合缓存压缩
+17. [SAGE: Selective Attention-Guided Extraction for Token-Efficient](/202604/23/2604.15583v1-sage-selective-attention-guided-extraction-for-token-efficient)  
    标签：评分：9.0/10、query:evlm
-   evidence：高效LLM推理中的KV压缩
-52. [Switch-KD: Visual-Switch Knowledge Distillation for Vision-Language Models](/20260414-20260423/2604.14629v1-switch-kd-visual-switch-knowledge-distillation-for-vision-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：高效视觉语言模型的知识蒸馏
-53. [World-Value-Action Model: Implicit Planning for Vision-Language-Action Systems](/20260414-20260423/2604.14732v2-world-value-action-model-implicit-planning-for-vision-language-action-systems)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于具身智能体的视觉-语言-动作 (VLA) 系统
-54. [MemoSight: Unifying Context Compression and Multi Token Prediction for Reasoning Acceleration](/20260414-20260423/2604.14889v1-memosight-unifying-context-compression-and-multi-token-prediction-for-reasoning-acceleration)  
-   标签：评分：9.0/10、query:evlm
-   evidence：统一上下文压缩与KV缓存管理以加速推理
-55. [Dispatch-Aware Ragged Attention for Pruned Vision Transformers](/20260414-20260423/2604.15408v1-dispatch-aware-ragged-attention-for-pruned-vision-transformers)  
-   标签：评分：9.0/10、query:evlm
-   evidence：视觉 Transformer 的 Token 剪枝方法与注意力延迟优化
-56. [AdaVFM: Adaptive Vision Foundation Models for Edge Intelligence via LLM-Guided Execution](/20260414-20260423/2604.15622v1-adavfm-adaptive-vision-foundation-models-for-edge-intelligence-via-llm-guided-execution)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于高效设备端推理的自适应视觉基础模型
-57. [Cut Your Losses! Learning to Prune Paths Early for Efficient Parallel Reasoning](/20260414-20260423/2604.16029v1-cut-your-losses-learning-to-prune-paths-early-for-efficient-parallel-reasoning)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于高效推理的路径剪枝和基于标记的剪枝
-58. [Topology-Aware Layer Pruning for Large Vision-Language Models](/20260414-20260423/2604.16502v1-topology-aware-layer-pruning-for-large-vision-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：针对大型视觉语言模型的拓扑感知层剪枝
-59. [BARD: Bridging AutoRegressive and Diffusion Vision-Language Models Via Highly Efficient Progressive Block Merging and Stage-Wise Distillation](/20260414-20260423/2604.16514v1-bard-bridging-autoregressive-and-diffusion-vision-language-models-via-highly-efficient-progressive-block-merging-and-stage-wise-distillation)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于视觉语言模型推理的高效渐进式块合并
-60. [BARD: Bridging AutoRegressive and Diffusion Vision-Language Models Via Highly Efficient Progressive Block Merging and Stage-Wise Distillation](/20260414-20260423/2604.16514v2-bard-bridging-autoregressive-and-diffusion-vision-language-models-via-highly-efficient-progressive-block-merging-and-stage-wise-distillation)  
-   标签：评分：9.0/10、query:evlm
-   evidence：高效视觉语言模型及高效解码dVLM
-61. [BARD: Bridging AutoRegressive and Diffusion Vision-Language Models Via Highly Efficient Progressive Block Merging and Stage-Wise Distillation](/20260414-20260423/2604.16514v3-bard-bridging-autoregressive-and-diffusion-vision-language-models-via-highly-efficient-progressive-block-merging-and-stage-wise-distillation)  
-   标签：评分：9.0/10、query:evlm
-   evidence：视觉语言模型的高效渐进式块合并
-62. [FedLLM: A Privacy-Preserving Federated Large Language Model for Explainable Traffic Flow Prediction](/20260414-20260423/2604.16612v1-fedllm-a-privacy-preserving-federated-large-language-model-for-explainable-traffic-flow-prediction)  
-   标签：评分：9.0/10、query:mm-trf
-   evidence：使用联邦大语言模型进行交通流预测
-63. [CATP: Confidence-Aware Token Pruning for Camouflaged Object Detection](/20260414-20260423/2604.16854v1-catp-confidence-aware-token-pruning-for-camouflaged-object-detection)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于目标检测的置信度感知令牌剪枝
-64. [HieraSparse: Hierarchical Semi-Structured Sparse KV Attention](/20260414-20260423/2604.16864v1-hierasparse-hierarchical-semi-structured-sparse-kv-attention)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于长上下文LLM的分层KV缓存压缩框架
-65. [Adverse-to-the-eXtreme Panoptic Segmentation: URVIS 2026 Study and Benchmark](/20260414-20260423/2604.16984v1-adverse-to-the-extreme-panoptic-segmentation-urvis-2026-study-and-benchmark)  
+   evidence：用于长文档处理的Token高效上下文缩减框架
+18. [NeuroLip: An Event-driven Spatiotemporal Learning Framework for Cross-Scene Lip-Motion-based Visual Speaker Recognition](/202604/23/2604.15718v1-neurolip-an-event-driven-spatiotemporal-learning-framework-for-cross-scene-lip-motion-based-visual-speaker-recognition)  
    标签：评分：9.0/10、query:ev-cam
-   evidence：包含事件相机数据的全景分割基准
-66. [Rule-VLN: Bridging Perception and Compliance via Semantic Reasoning and Geometric Rectification](/20260414-20260423/2604.16993v1-rule-vln-bridging-perception-and-compliance-via-semantic-reasoning-and-geometric-rectification)  
+   evidence：用于视觉说话人识别的事件驱动时空学习
+19. [SmoGVLM: A Small, Graph-enhanced Vision-Language Model](/202604/23/2604.16517v1-smogvlm-a-small-graph-enhanced-vision-language-model)  
+   标签：评分：9.0/10、query:evlm
+   evidence：用于高效推理的小型图增强视觉语言模型
+20. [Adverse-to-the-eXtreme Panoptic Segmentation: URVIS 2026 Study and Benchmark](/202604/23/2604.16984v1-adverse-to-the-extreme-panoptic-segmentation-urvis-2026-study-and-benchmark)  
+   标签：评分：9.0/10、query:ev-cam
+   evidence：包含用于恶劣天气全景分割的事件相机数据的基准测试
+21. [ScenarioControl: Vision-Language Controllable Vectorized Latent Scenario Generation](/202604/23/2604.17147v1-scenariocontrol-vision-language-controllable-vectorized-latent-scenario-generation)  
    标签：评分：9.0/10、query:mm-trf
-   evidence：规则合规导航的大规模城市基准
-67. [ONTO: A Token-Efficient Columnar Notation for LLM Input Optimization](/20260414-20260423/2604.17512v1-onto-a-token-efficient-columnar-notation-for-llm-input-optimization)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于LLM输入优化的标记高效列式表示法
-68. [OmniVLA-RL: A Vision-Language-Action Model with Spatial Understanding and Online RL](/20260414-20260423/2604.17706v1-omnivla-rl-a-vision-language-action-model-with-spatial-understanding-and-online-rl)  
-   标签：评分：9.0/10、query:evlm
-   evidence：采用混合Transformer结构的视觉-语言-动作模型
-69. [OFlow: Injecting Object-Aware Temporal Flow Matching for Robust Robotic Manipulation](/20260414-20260423/2604.17876v1-oflow-injecting-object-aware-temporal-flow-matching-for-robust-robotic-manipulation)  
-   标签：评分：9.0/10、query:evlm
-   evidence：在VLA模型中注入物体感知的时序流匹配
-70. [How Much Cache Does Reasoning Need? Depth-Cache Tradeoffs in KV-Compressed Transformers](/20260414-20260423/2604.17935v1-how-much-cache-does-reasoning-need-depth-cache-tradeoffs-in-kv-compressed-transformers)  
-   标签：评分：9.0/10、query:evlm
-   evidence：Transformer中KV缓存压缩权衡的理论研究
-71. [Unmasking the Illusion of Embodied Reasoning in Vision-Language-Action Models](/20260414-20260423/2604.18000v1-unmasking-the-illusion-of-embodied-reasoning-in-vision-language-action-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：评估用于机器人策略的视觉-语言-动作 (VLA) 模型
-72. [Neural Garbage Collection: Learning to Forget while Learning to Reason](/20260414-20260423/2604.18002v1-neural-garbage-collection-learning-to-forget-while-learning-to-reason)  
-   标签：评分：9.0/10、query:evlm
-   evidence：决定逐出哪些KV缓存条目
-73. [Test-Time Perturbation Learning with Delayed Feedback for Vision-Language-Action Models](/20260414-20260423/2604.18107v1-test-time-perturbation-learning-with-delayed-feedback-for-vision-language-action-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：视觉-语言-动作模型的测试时自适应
-74. [ESsEN: Training Compact Discriminative Vision-Language Transformers in a Low-Resource Setting](/20260414-20260423/2604.18452v1-essen-training-compact-discriminative-vision-language-transformers-in-a-low-resource-setting)  
-   标签：评分：9.0/10、query:evlm
-   evidence：适用于边缘设备和机器人的轻量级视觉语言模型
-75. [XEmbodied: A Foundation Model with Enhanced Geometric and Physical Cues for Large-Scale Embodied Environments](/20260414-20260423/2604.18484v1-xembodied-a-foundation-model-with-enhanced-geometric-and-physical-cues-for-large-scale-embodied-environments)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于自主系统的视觉-语言-动作 (VLA) 模型
-76. [T-REN: Learning Text-Aligned Region Tokens Improves Dense Vision-Language Alignment and Scalability](/20260414-20260423/2604.18573v1-t-ren-learning-text-aligned-region-tokens-improves-dense-vision-language-alignment-and-scalability)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于可扩展性的紧凑文本对齐区域令牌
-77. [SAW-INT4: System-Aware 4-Bit KV-Cache Quantization for Real-World LLM Serving](/20260414-20260423/2604.19157v1-saw-int4-system-aware-4-bit-kv-cache-quantization-for-real-world-llm-serving)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于LLM服务的KV缓存量化与压缩
-78. [DASH-KV: Accelerating Long-Context LLM Inference via Asymmetric KV Cache Hashing](/20260414-20260423/2604.19351v2-dash-kv-accelerating-long-context-llm-inference-via-asymmetric-kv-cache-hashing)  
-   标签：评分：9.0/10、query:evlm
-   evidence：通过KV缓存哈希加速长上下文LLM推理
-79. [GRASPrune: Global Gating for Budgeted Structured Pruning of Large Language Models](/20260414-20260423/2604.19398v1-grasprune-global-gating-for-budgeted-structured-pruning-of-large-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：大语言模型参数和KV缓存的结构化剪枝
-80. [GOLD-BEV: GrOund and aeriaL Data for Dense Semantic BEV Mapping of Dynamic Scenes](/20260414-20260423/2604.19411v1-gold-bev-ground-and-aerial-data-for-dense-semantic-bev-mapping-of-dynamic-scenes)  
+   evidence：视觉语言可控驾驶场景生成
+22. [Infrastructure-Centric World Models: Bridging Temporal Depth and Spatial Breadth for Roadside Perception](/202604/23/2604.17651v1-infrastructure-centric-world-models-bridging-temporal-depth-and-spatial-breadth-for-roadside-perception)  
    标签：评分：9.0/10、query:mm-trf
-   evidence：动态道路场景与交通参与者的语义BEV映射
-81. [ReaLB: Real-Time Load Balancing for Multimodal MoE Inference](/20260414-20260423/2604.19503v1-realb-real-time-load-balancing-for-multimodal-moe-inference)  
+   evidence：面向路侧感知的以基础设施为中心的世界模型
+23. [AQPIM: Breaking the PIM Capacity Wall for LLMs with In-Memory Activation Quantization](/202604/23/2604.18137v1-aqpim-breaking-the-pim-capacity-wall-for-llms-with-in-memory-activation-quantization)  
    标签：评分：9.0/10、query:evlm
-   evidence：多模态MoE推理效率的实时负载均衡
-82. [ReaLB: Real-Time Load Balancing for Multimodal MoE Inference](/20260414-20260423/2604.19503v2-realb-real-time-load-balancing-for-multimodal-moe-inference)  
+   evidence：使用内存中激活量化进行长上下文的KV缓存压缩和管理
+24. [EmbodiedLGR: Integrating Lightweight Graph Representation and Retrieval for Semantic-Spatial Memory in Robotic Agents](/202604/23/2604.18271v1-embodiedlgr-integrating-lightweight-graph-representation-and-retrieval-for-semantic-spatial-memory-in-robotic-agents)  
    标签：评分：9.0/10、query:evlm
-   evidence：多模态MoE推理的实时负载均衡
-83. [EmbodiedMidtrain: Bridging the Gap between Vision-Language Models and Vision-Language-Action Models via Mid-training](/20260414-20260423/2604.20012v1-embodiedmidtrain-bridging-the-gap-between-vision-language-models-and-vision-language-action-models-via-mid-training)  
+   evidence：VLM驱动机器人智能体中用于语义空间记忆的轻量化图表示
+25. [AdaCluster: Adaptive Query-Key Clustering for Sparse Attention in Video Generation](/202604/23/2604.18348v1-adacluster-adaptive-query-key-clustering-for-sparse-attention-in-video-generation)  
    标签：评分：9.0/10、query:evlm
-   evidence：通过中期训练弥合VLM与VLA模型之间的差距
-84. [From Scene to Object: Text-Guided Dual-Gaze Prediction](/20260414-20260423/2604.20191v1-from-scene-to-object-text-guided-dual-gaze-prediction)  
+   evidence：用于稀疏注意力和压缩的自适应键值聚类
+26. [T-REN: Learning Text-Aligned Region Tokens Improves Dense Vision-Language Alignment and Scalability](/202604/23/2604.18573v1-t-ren-learning-text-aligned-region-tokens-improves-dense-vision-language-alignment-and-scalability)  
+   标签：评分：9.0/10、query:evlm
+   evidence：用于长视频扩展的紧凑区域标记集
+27. [GOLD-BEV: GrOund and aeriaL Data for Dense Semantic BEV Mapping of Dynamic Scenes](/202604/23/2604.19411v1-gold-bev-ground-and-aerial-data-for-dense-semantic-bev-mapping-of-dynamic-scenes)  
    标签：评分：9.0/10、query:mm-trf
-   evidence：使用视觉语言模型进行自动驾驶的可解释驾驶员注意力预测
-85. [A Vision-Language-Action Model for Adaptive Ultrasound-Guided Needle Insertion and Needle Tracking](/20260414-20260423/2604.20347v1-a-vision-language-action-model-for-adaptive-ultrasound-guided-needle-insertion-and-needle-tracking)  
+   evidence：道路场景中动态场景的稠密语义BEV映射
+28. [Less Languages, Less Tokens: An Efficient Unified Logic Cross-lingual Chain-of-Thought Reasoning Framework](/202604/23/2604.20090v1-less-languages-less-tokens-an-efficient-unified-logic-cross-lingual-chain-of-thought-reasoning-framework)  
    标签：评分：9.0/10、query:evlm
-   evidence：用于机器人超声系统的视觉-语言-动作 (VLA) 模型
+   evidence：减少标记使用冗余和延迟
 
 ### 速读区论文标签
-1. [Intelligent ROI-Based Vehicle Counting Framework for Automated Traffic Monitoring](/20260414-20260423/2604.12470v1-intelligent-roi-based-vehicle-counting-framework-for-automated-traffic-monitoring)  
+1. [See&Say: Vision Language Guided Safe Zone Detection for Autonomous Package Delivery Drones](/202604/23/2604.13292v1-seesay-vision-language-guided-safe-zone-detection-for-autonomous-package-delivery-drones)  
    标签：评分：8.0/10、query:mm-trf
-   evidence：自动化交通监控和车辆计数框架
-2. [From Attenuation to Attention: Variational Information Flow Manipulation for Fine-Grained Visual Perception](/20260414-20260423/2604.12508v1-from-attenuation-to-attention-variational-information-flow-manipulation-for-fine-grained-visual-perception)  
+   evidence：视觉语言模型引导的自主无人机安全区域检测
+2. [FAST: A Synergistic Framework of Attention and State-space Models for Spatiotemporal Traffic Prediction](/202604/23/2604.13453v1-fast-a-synergistic-framework-of-attention-and-state-space-models-for-spatiotemporal-traffic-prediction)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：利用注意力和状态空间模型进行时空交通预测
+3. [On the Effectiveness of Context Compression for Repository-Level Tasks: An Empirical Investigation](/202604/23/2604.13725v1-on-the-effectiveness-of-context-compression-for-repository-level-tasks-an-empirical-investigation)  
    标签：评分：8.0/10、query:evlm
-   evidence：用于细粒度视觉感知的变分信息流
-3. [Efficient Semantic Image Communication for Traffic Monitoring at the Edge](/20260414-20260423/2604.12622v1-efficient-semantic-image-communication-for-traffic-monitoring-at-the-edge)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：用于交通监控的语义图像通信
-4. [VideoFlexTok: Flexible-Length Coarse-to-Fine Video Tokenization](/20260414-20260423/2604.12887v1-videoflextok-flexible-length-coarse-to-fine-video-tokenization)  
+   evidence：仓库级任务中上下文压缩效果的实证研究
+4. [[Emerging Ideas] Artificial Tripartite Intelligence: A Bio-Inspired, Sensor-First Architecture for Physical AI](/202604/23/2604.13959v1-emerging-ideas-artificial-tripartite-intelligence-a-bio-inspired-sensor-first-architecture-for-physical-ai)  
    标签：评分：8.0/10、query:evlm
-   evidence：用于压缩表示的可变长度视频标记化
-5. [Radar-Camera BEV Multi-Task Learning with Cross-Task Attention Bridge for Joint 3D Detection and Segmentation](/20260414-20260423/2604.12918v1-radar-camera-bev-multi-task-learning-with-cross-task-attention-bridge-for-joint-3d-detection-and-segmentation)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：自动驾驶中用于3D感知的BEV表示
-6. [RSGMamba: Reliability-Aware Self-Gated State Space Model for Multimodal Semantic Segmentation](/20260414-20260423/2604.12319v1-rsgmamba-reliability-aware-self-gated-state-space-model-for-multimodal-semantic-segmentation)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：用于场景理解的多模态语义分割
-7. [RSGMamba: Reliability-Aware Self-Gated State Space Model for Multimodal Semantic Segmentation](/20260414-20260423/2604.12319v2-rsgmamba-reliability-aware-self-gated-state-space-model-for-multimodal-semantic-segmentation)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：用于场景理解的多模态语义分割
-8. [HyperLiDAR: Adaptive Post-Deployment LiDAR Segmentation via Hyperdimensional Computing](/20260414-20260423/2604.12331v1-hyperlidar-adaptive-post-deployment-lidar-segmentation-via-hyperdimensional-computing)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：自动驾驶中用于3D场景理解的LiDAR分割
-9. [Dual-Modality Anchor-Guided Filtering for Test-time Prompt Tuning](/20260414-20260423/2604.12403v1-dual-modality-anchor-guided-filtering-for-test-time-prompt-tuning)  
+   evidence：物理人工智能与机器人的传感器优先架构
+5. [From Where Words Come: Efficient Regularization of Code Tokenizers Through Source Attribution](/202604/23/2604.14053v1-from-where-words-come-efficient-regularization-of-code-tokenizers-through-source-attribution)  
+   标签：评分：8.0/10、query:evlm
+   evidence：大语言模型代码分词效率
+6. [PAT-VCM: Plug-and-Play Auxiliary Tokens for Video Coding for Machines](/202604/23/2604.13294v1-pat-vcm-plug-and-play-auxiliary-tokens-for-video-coding-for-machines)  
    标签：评分：7.0/10、query:evlm
-   evidence：使用测试时提示微调适配视觉语言模型
-10. [Physics-Grounded Monocular Vehicle Distance Estimation Using Standardized License Plate Typography](/20260414-20260423/2604.12239v1-physics-grounded-monocular-vehicle-distance-estimation-using-standardized-license-plate-typography)  
-   标签：评分：6.0/10、query:mm-trf
-   evidence：自动驾驶中的单目车辆距离估计
-11. [All in One: A Unified Synthetic Data Pipeline for Multimodal Video Understanding](/20260414-20260423/2604.12335v1-all-in-one-a-unified-synthetic-data-pipeline-for-multimodal-video-understanding)  
+   evidence：用于机器视频编码的辅助标记框架
+7. [RobotPan: A 360$^\circ$ Surround-View Robotic Vision System for Embodied Perception](/202604/23/2604.13476v1-robotpan-a-360circ-surround-view-robotic-vision-system-for-embodied-perception)  
+   标签：评分：7.0/10、query:evlm
+   evidence：用于具身感知和导航的环视机器人视觉系统
+8. [SLQ: Bridging Modalities via Shared Latent Queries for Retrieval with Frozen MLLMs](/202604/23/2604.13710v1-slq-bridging-modalities-via-shared-latent-queries-for-retrieval-with-frozen-mllms)  
+   标签：评分：7.0/10、query:evlm
+   evidence：将冻结的多模态大模型适配为检索器的高效框架
+9. [SLQ: Bridging Modalities via Shared Latent Queries for Retrieval with Frozen MLLMs](/202604/23/2604.13710v2-slq-bridging-modalities-via-shared-latent-queries-for-retrieval-with-frozen-mllms)  
+   标签：评分：7.0/10、query:evlm
+   evidence：冻结多模态大模型检索的高效框架
+10. [Utilizing Inpainting for Keypoint Detection for Vision-Based Control of Robotic Manipulators](/202604/23/2604.13309v1-utilizing-inpainting-for-keypoint-detection-for-vision-based-control-of-robotic-manipulators)  
    标签：评分：6.0/10、query:evlm
-   evidence：多模态视频理解的合成数据流水线
-12. [Modality-Agnostic Prompt Learning for Multi-Modal Camouflaged Object Detection](/20260414-20260423/2604.12380v1-modality-agnostic-prompt-learning-for-multi-modal-camouflaged-object-detection)  
+   evidence：基于视觉的机器人机械臂控制
+11. [Event Tensor: A Unified Abstraction for Compiling Dynamic Megakernel](/202604/23/2604.13327v1-event-tensor-a-unified-abstraction-for-compiling-dynamic-megakernel)  
    标签：评分：6.0/10、query:evlm
-   evidence：对辅助模态的参数高效适配
-13. [PromptEcho: Annotation-Free Reward from Vision-Language Models for Text-to-Image Reinforcement Learning](/20260414-20260423/2604.12652v1-promptecho-annotation-free-reward-from-vision-language-models-for-text-to-image-reinforcement-learning)  
+   evidence：大语言模型推理优化与动态大算子编译
+12. [Enhanced Text-to-Image Generation by Fine-grained Multimodal Reasoning](/202604/23/2604.13491v1-enhanced-text-to-image-generation-by-fine-grained-multimodal-reasoning)  
    标签：评分：6.0/10、query:evlm
-   evidence：从冻结的VLM中提取对齐知识用于奖励构建
+   evidence：统一多模态大模型的推理优化
+13. [From Pixels to Nucleotides: End-to-End Token-Based Video Compression for DNA Storage](/202604/23/2604.13667v1-from-pixels-to-nucleotides-end-to-end-token-based-video-compression-for-dna-storage)  
+   标签：评分：6.0/10、query:evlm
+   evidence：基于Token的视频压缩
 
 
 <div class="dpr-home-promo-card">

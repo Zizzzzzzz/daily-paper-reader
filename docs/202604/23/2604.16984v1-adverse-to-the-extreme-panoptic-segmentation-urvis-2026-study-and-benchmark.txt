@@ -1,0 +1,204 @@
+Title: Adverse-to-the-eXtreme Panoptic Segmentation: URVIS 2026 Study and Benchmark
+
+URL Source: https://arxiv.org/pdf/2604.16984v1
+
+Published Time: Tue, 21 Apr 2026 00:49:04 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Adverse-to-the-eXtreme Panoptic Segmentation: URVIS 2026 Study and Benchmark 
+
+# Yiting Wang * Nolwenn Peyratout * Tim Brodermann * Jiahui Wang Yusi Cao Michele Cazzola Elie Tarassov Takuya Kobayashi Abderrahim Kasmi Guillaume Allibert C´ edric Demonceaux Valentina Donzella Kurt Debattista Radu Timofte Zongwei Wu Christos Sakaridis 
+
+# Abstract 
+
+This paper presents the report of the URVIS 2026 challenge on adverse-to-extreme panoptic segmentation. As the first challenge of its kind, it attracted 17 registered participants and 47 submissions, with 4 teams reaching the final phase. The challenge is based on the MUSES dataset, a multi-sensor benchmark for panoptic segmentation in adverse-to-extreme weather, including RGB frame camera, LiDAR, radar, and event camera data. Weighted Panoptic Quality (wPQ) is designed and adopted as the official ranking met-ric for fair evaluation across weather conditions. In this report, we summarise the challenge setting and benchmark results, analyse the performance of the submitted methods, and discuss current progress and remaining challenges for robust multimodal panoptic segmentation. 
+
+# 1. Introduction 
+
+Reliable situational awareness is a key requirement for the safe deployment of artificial intelligence in real-world systems, especially in robotics and autonomous driving. Among scene understanding tasks, panoptic segmentation is particularly attractive because it provides a unified pixel-level interpretation of both semantic regions and object in-stances, enabling the identification of traffic participants, potential hazards, and drivable areas in complex road scenes [1, 2, 8, 11, 12]. However, real-world deployment re-mains challenging, as adverse weather introduces modality-specific degradations in multimodal sensor data owing to the different physical characteristics of each sensor, thereby undermining the robustness of panoptic segmentation. RGB-based panoptic segmentation has advanced rapidly in recent years, spanning classical convolutional architec-      
+
+> *Organizers of the URVIS 2026 Challenge : MUSES-AXPS — Adverse-to-the-eXtreme Panoptic Segmentation Webpage of the MUSES-AXPS challenge: https : / / urvis -workshop.github.io/challenge-Muses.html
+
+Figure 1. Sensor configuration of MUSES. 
+
+tures, masked transformer-based designs, and more recently diffusion-based formulations [4, 5, 7, 9, 14]. Nevertheless, most existing progress has been built around frame-based visual data alone, and its robustness is inherently limited by the failure modes of a single modality. This situation changed with MUSES, which introduced synchronized RGB frame camera, LiDAR, RADAR, and event camera data together with high-quality 2D panoptic annotations under diverse weather and illumination condi-tions, thereby making multimodal panoptic segmentation in adverse driving scenarios practically accessible [1]. More importantly, MUSES highlights that the value of multi-modal perception lies not only in sensor complementarity, but also in the fact that different modalities degrade in fun-damentally different ways. Under adverse weather, RGB cameras often suffer from reduced visibility, contrast attenuation, blur, and partial oc-clusion caused by atmospheric scattering, precipitation, and lens contamination. LiDAR, in contrast, is affected by at-tenuation and backscatter: adverse particles such as fog droplets, raindrops, or snowflakes can weaken valid re-turns from distant objects while also generating spurious echoes at incorrect ranges, leading to both missing far-away points and noisy false measurements [13]. Event cameras offer high dynamic range and low latency, but since they respond to changes in brightness rather than absolute in-
+
+> arXiv:2604.16984v1 [cs.CV] 18 Apr 2026
+
+tensity, their signals can become unstable or noisy when low illumination, precipitation, and sensor noise perturb the temporal contrast triggering process. RADAR is gen-erally the most weather-robust modality; however, provided as FMCW range–azimuth power measurements, whose rep-resentation differs substantially from other sensor data ob-servations, so its contribution to dense pixel-level parsing is less direct and remains challenging to exploit effectively. Recent methods have begun to address this gap. CA-Fuser [2] proposes condition-aware multimodal fusion, where a global condition token inferred from RGB guides the fusion process and modality-specific adapters align het-erogeneous sensor inputs into a shared latent space. DGFu-sion [3] further extends this direction by introducing depth-guided fusion, using an auxiliary depth prediction branch and depth-aware local tokens to spatially modulate cross-modal interactions according to distance-dependent sen-sor reliability. These works represent important first steps toward robust multimodal semantic and panoptic percep-tion under adverse conditions. Nevertheless, this remains a relatively new research area with substantial room for progress. In this context, our challenge aims to provide a common benchmark and stimulate broader exploration of robust multimodal panoptic segmentation under diverse real-world weather conditions. 
+
+# 2. MUSES Dataset 
+
+We base the URVIS 2026 challenge on the MUSES [1], which is a real-world multimodal dataset for dense scene understanding under adverse environmental conditions. In contrast to other driving datasets, MUSES emphasizes both the diversity and severity of real-world environmental degradations, making it particularly suitable for evaluating robust perception systems. MUSES comprises 2,500 synchronized driving scenes, each recorded with a sensor suite including an RGB frame camera, LiDAR, radar, an event camera, and IMU/GNSS signals as seen in Figure 1. These modalities provide com-plementary information: while RGB images capture ap-pearance, LiDAR and radar offer robustness to illumination and weather, and event cameras provide high dynamic range and temporal resolution. A main characteristic of MUSES is the systematic cov-erage of two orthogonal axes of environmental degradation, namely illumination (day vs. night) and weather conditions (clear, fog, rain, snow). This results in a total of eight dis-tinct condition combinations, allowing for controlled eval-uation of model robustness across varying levels and types of degradation, as visible in the example scenes in Figure 2. The dataset is deliberately skewed towards adverse con-ditions. Out of the 2,500 samples, 500 correspond to clear daytime reference scenes, while the remaining 2,000 sam-ples capture adverse conditions distributed across both day and night. The detailed distribution across all condition combinations is summarized in Table 1.  
+
+> Table 1. Distribution of MUSES samples across weather and illumination conditions.
+
+Clear Fog Rain Snow Total Day 500 333 334 333 1500 Night 250 250 250 250 1000 Total 750 583 584 583 2500 The dataset is split into 1,500 training, 250 validation, and 750 test samples, with splits geographically separated to ensure robust generalization. Test-set annotations are withheld and evaluation is performed via an online bench-mark. All scenes are annotated with panoptic labels following the 19-class taxonomy of Cityscapes. The RGB images are labeled through a two-stage process that leverages all available data, including recordings from both clear and ad-verse conditions, as well as pixel-accurate alignment of the different sensor modalities. This procedure improves label consistency and increases coverage in visually degraded re-gions, resulting in high-quality pixel-level panoptic labels. Overall, MUSES constitutes a challenging and realistic benchmark for panoptic segmentation due to its multimodal nature, high-quality annotations, and extensive coverage of adverse conditions encountered in real-world driving. For further details on the sensor setup, calibration, and annota-tion protocol, we refer the reader to the MUSES paper [1]. 
+
+# 3. URVIS 2026: MUSES-AXPS Challenge 
+
+The URVIS 2026 Challenge: MUSES-AXPS — Adverse-to-the-eXtreme Panoptic Segmentation is motivated by the need to evaluate and improve panoptic segmentation algo-rithms under degraded real-world conditions. It is built on the MUSES dataset [1], a multi-sensor benchmark designed for dense scene understanding in challenging weather and illumination scenarios. The challenge took place on Cod-abench [15] 1. A central objective of the challenge is to benchmark fusion strategies across a complete set of sen-sors (RGB camera, LiDAR, radar and event camera) and weather conditions, enabling a deeper understanding of sen-sor fusion under adverse environmental disturbances. 
+
+3.1. Panoptic segmentation task 
+
+The task of panoptic segmentation plays a crucial role in perception, as it brings together two fundamental vision tasks: semantic segmentation and instance segmentation [8]. This unified representation allows a system not only        
+
+> 1https://www.codabench.org/competitions/13395/ RGB Image Lidar Events Radar Ref. Image Panoptic GT
+> Figure 2. Example scenes from the MUSES dataset. From left to right: RGB image, projected lidar points, projected events, azimuth-range radar scan, reference image, panoptic annotations. Best viewed zoomed in.
+
+to distinguish object categories but also to differentiate be-tween individual objects of the same type, offering highly detailed spatial and contextual information. In our case, the challenge is further amplified by adverse weather con-ditions, which degrade sensor data and make the segmen-tation task significantly more complex. Under such con-ditions, achieving reliable panoptic segmentation becomes even more critical to ensure robust perception and main-tain safety in real-world environments. The MUSES dataset allows the participant to rely on four different sensors to achieve the best fusion for the task. 
+
+3.2. Challenge phases 
+
+The challenge was conducted in two separate phases: a pub-lic validation phase and a private final test phase. For the first phase of the challenge, we used the validation set to compute the evaluation metrics, thus enabling participants to fine-tune their models based on the provided ground-truth annotations. This phase remained open for nearly one month, allowing participants to make at most one hundred submissions; in total, thirty-two submissions were received during this period. For the final phase, which lasted only six days, with a maximum of five submission per partici-pant, they were granted access to the full test-phase sensor data, a dataset distinct that used in the first phase, while the ground-truth annotations were deliberately withheld. A total of fifteen submissions from four teams were received during the final phase. 
+
+3.3. Evaluation and Ranking Protocol 
+
+We adopt the standard evaluation protocol for panoptic seg-mentation, based on Panoptic Quality (PQ), Segmentation Quality (SQ), and Recognition Quality (RQ). These metrics constitute the fundamental evaluation basis of the task, as they jointly assess both segmentation accuracy and seman-tic recognition performance. For a set of matched prediction–ground-truth segments, PQ is defined as 
+
+PQ = 
+
+P 
+
+> (p,g )∈TP
+
+IoU( p, g )
+
+|TP | + 12 |FP | + 12 |FN | , (1) where TP , FP , and FN denote the numbers of true posi-tives, false positives, and false negatives, respectively, and 
+
+IoU( p, g ) is the intersection-over-union between a matched prediction segment p and ground-truth segment g. Follow-ing the standard formulation, PQ can be decomposed as 
+
+PQ = SQ × RQ , (2) where SQ measures the average mask quality of matched segments, 
+
+SQ = 
+
+P 
+
+> (p,g )∈TP
+
+IoU( p, g )
+
+|TP | , (3) and RQ evaluates the recognition quality, 
+
+RQ = |TP ||TP | + 12 |FP | + 12 |FN | . (4) Intuitively, SQ reflects how accurately the predicted masks align with the ground-truth regions, while RQ reflects how well the method recognizes and detects valid panoptic in-stances. PQ therefore serves as the principal metric by jointly measuring both aspects. To ensure a fair comparison among participants, we adopt a restricted evaluation protocol. First, the ground-truth annotations of the test set are not released. They are only made available for the validation split, where partici-pants may use them during the validation phase for debug-ging, model development, and local analysis. Second, the test-set evaluation results are not publicly exposed during the challenge. All final results are computed by the organiz-ers on the hidden test set. This design reduces the possibility of overfitting to public feedback and discourages challenge-specific tuning based on repeated access to test metrics. Beyond the standard metrics, we further introduce weighted versions of the evaluation scores, namely weighted Recognition Quality (wRQ), weighted Segmenta-tion Quality (wSQ), and weighted Panoptic Quality (wPQ), to better reflect the objective of the challenge. Specifically, let W = {clear , fog , rain , snow } denote the set of weather conditions, and let λw be the weight assigned to condition 
+
+w ∈ W , with 
+
+λw ≥ 0. (5) To place greater emphasis on performance under adverse weather, we assign a lower weight to clear weather under daytime and a higher weight to each adverse-weather con-dition. In particular, we set 
+
+λday  
+
+> clear
+
+= 0 .5, λday/night  
+
+> fog / rain / snow
+
+= 1 , (6) so that each adverse-weather condition receives twice the weight of clear weather. We then define 
+
+wRQ = X
+
+> w∈W
+
+λw RQ w, (7) 
+
+wSQ = X
+
+> w∈W
+
+λw SQ w, (8) and 
+
+wPQ = X
+
+> w∈W
+
+λw PQ w, (9) where RQ w, SQ w, and PQ w are the corresponding scores computed on the subset associated with weather condition 
+
+w. Unlike a uniform average over all conditions, these weighted metrics assign higher importance to more chal-lenging adverse-weather scenarios. Since this challenge primarily focuses on robust multimodal panoptic segmen-tation under extreme weather, the fog, rain, and snow sub-sets are given larger weights in the final evaluation. At the same time, the clear-weather subset is still retained with a non-zero proportion, ensuring that methods also maintain competitive performance under standard driving conditions. In this way, the proposed weighted protocol emphasizes robustness in adverse environments while preserving bal-anced performance across diverse real-world scenarios. The final ranking of the challenge is determined by wPQ 
+
+on the hidden test set, while wSQ and wRQ are reported as complementary indicators for detailed analysis. 
+
+# 4. Methods 
+
+In this study, we use the top four methods from the URVIS 2026 MUSES-AXPS Challenge, as well as some represen-tative methods from recent research [2, 6]. 
+
+4.1. Two-Stage Mask2Former - MLJP Team 
+
+Description: We build upon a Mask2Former baseline for panoptic segmentation. To improve robustness under ad-verse conditions, we adopt a two-stage training strategy: pretraining on clear-day data followed by fine-tuning on all weather and illumination conditions. This strategy improves performance when evaluated on all conditions (+20.0 PQ all). We further explore a simple multimodal extension by incorporating LiDAR-derived features (depth, height, density), projected into the image plane and con-catenated with RGB inputs. The first convolution layer is adapted accordingly, while the rest of the architecture re-mains unchanged. However, this naive fusion does not lead to performance improvement, suggesting that effective mul-timodal perception requires more structured cross-modal in-teraction. Implementation: We use Mask2Former with a ResNet-50 backbone, MSDeformAttn pixel decoder, and a multi-scale transformer decoder with 100 object queries. The model is trained using AdamW with a base learning rate of 1 × 10 −4 and weight decay of 1 × 10 −4. Training is performed with a batch size of 4 using mixed precision. The training consists of two stages: (1) pretraining on clear-day data for 800 epochs, and (2) fine-tuning on all conditions for 90 epochs. All-condition training is initialized from an in-termediate checkpoint (epoch 450) of the clear-day model. Standard data augmentation includes resizing and random horizontal flipping. Gradient clipping and multi-step learn-ing rate scheduling are enabled, although learning rate de-cay is not reached due to early stopping. Total training time is approximately 17 hours on a single GPU (RTX 3090). 
+
+4.2. RGB Mask2Former - ElieT Team 
+
+Description: Our best-performing approach is the Mask2Former baseline trained end-to-end utilizing exclu-sively RGB images from the camera. To improve robust-ness over adverse conditions, we test leveraging the multi-sensor data projected in the image plane in two ways: (1) early fusion, by concatenating all modalities and adapting the first convolution layer, (2) intermediate fusion, using a shared-weight backbone across modalities and perform-ing stage-wise feature fusion prior to the pixel decoder. The intermediate fusion strategies evaluated include naive feature averaging, feature projection before fusion, and a cross-attention module between RGB and auxiliary modal-ities. However, both fusion methods underperformed com-pared to our RGB-only baseline, indicating that simple fu-sion techniques are not sufficient to improve performance. 
+
+Implementation: We use Mask2Former with a ResNet-50 backbone, MSDeformAttn pixel decoder, and a multi-scale transformer decoder with 100 object queries. The model is trained using AdamW with a base learning rate of 1 × 10 −4 and weight decay of 5 × 10 −2. The model is trained end-to-end on RGB images spanning all weather conditions for 160 epochs. Standard data augmentations are applied, including resizing, cropping, and random horizon-tal flipping. Furthermore, gradient clipping and a polyno-mial learning rate schedule are employed. The total training time is approximately 26h on a single Nvidia T4 GPU. 
+
+4.3. LiDAR-guided Mask2Former - Michele24 Team 
+
+Description Our approach incorporates a mid-fusion strat-egy between the Mask2Former architecture, featuring a Swin-T backbone, and multi-scale LiDAR features ex-tracted via a lightweight convolutional encoder. The LiDAR point cloud is projected onto the RGB image plane, and a corresponding validity mask is concatenated to provide ex-plicit information regarding the presence of the data. We employ a gated residual modulation applied indepen-dently at each feature resolution, inspired by Feature-wise Linear Modulation (FiLM) [10] and illustrated in Fig. 3.                    
+
+> Figure 3. The feature modulation block for a given resolution. Taking image ( FRGB ) and LiDAR ( FLiDAR ) feature maps as input, the symbols γ,β, and gdenote the scale, shift, and gating tensors, respectively. The blocks f,h, and ϕrepresent 1×1convolutions, while σindicates the sigmoid activation. The symbols ⊕and ⊙
+> indicate element-wise addition and the Hadamard product.
+
+Specifically, RGB features undergo an affine transforma-tion where the scale ( γ) and shift ( β) parameters are derived from the LiDAR features using 1 × 1 convolutions. A gate (g), followed by a sigmoid activation, is used to regulate the modulation intensity. Our method shows modest improve-ments with respect to RGB-only and early-fusion baselines, with the addition of only 6 M parameters. 
+
+Implementation: The model is trained end-to-end for 15 epochs without freezing any component. We utilize the AdamW optimizer and a cosine annealing scheduler, with a learning rate of 1 × 10 −5 (weight decay 0.01) for the Mask2Former components, and 5 × 10 −4 (weight decay 0.001) for the LiDAR encoder and fusion blocks. Training is performed on a single NVIDIA Tesla T4 GPU with 15 GB of available memory and a batch size of 2, requiring approximately 10 hours. To accommodate hardware constraints, input images are resized to a resolu-tion of 1024 × 512 . The resulting model exhibits a latency of 198 ms and 138 GFLOPs at inference time (measured with batch size 1), values that are only slightly higher than those of the RGB-only and early-fusion baselines. The code is available at https://github.com/MicheleCazzola/muses-axps. 
+
+4.4. Adapted CAFuser - wg Team 
+
+Description and implementation: We used a vGPU-32GB graphics card and selected the CAFuser model, which is used for Condition-Aware Multimodal Fusion for Robust Semantic Perception of Driving Scenes. The environment was Python 3.9.18, PyTorch 2.3.1 and CUDA 11.8. The main libraries used were Detectron2-v0.6. CAFuser is a condition-aware multimodal fusion architecture designed to enhance robust semantic perception in autonomous driving. It employs a Condition Token (CT), dynamically guiding the fusion of multiple sensor modalities to optimize perfor-mance across diverse scenarios. To train the CT, a verbo-visual contrastive loss aligns it with semantic environmen-tal descriptors, enabling direct prediction from RGB fea-tures. The Condition-Aware Fusion module uses the CT to adaptively fuse sensor data based on environmental con-text. Further, CAFuser introduces modality-specific fea-ture adapters, aligning inputs from different sensors into a shared latent space, and integrates these without loss of per-formance with a single shared backbone. We used the pre-trained weights of CAFuser with Swin-T as the backbone for model training. After the training was completed, we retained the best weights and evaluated them on the MUSES dataset. During the evaluation process, we adjusted the configuration file to reduce the number of fusion layers, keeping only res5 and res4, or using FP16 in-ference. The final submitted result was the optimal outcome obtained. 
+
+# 5. Experimental results 
+
+The official results of the URVIS: MUSES-AXPS challenge are presented in table 2. For the purpose of this challenge, we adapted the original panoptic segmentation metrics by introducing weather-weighted metrics to better reward per-formance under adverse weather conditions. To this end, we defined the weighted PQ: wPQ, the weighted SQ: wSQ and the weighted RQ: wRQ. These metrics are derived from the standard panoptic segmentation metrics, but each sam-ple is assigned a weight according to its weather condition. Scores from clear day samples are multiplied by 0.5, while samples from any of the seven other conditions ( snow, fog, rain, day or night ) retained a weight of 1. According to these criteria, the top performing partici-pant is wg team achieving a weighted panoptic quality of 54.23. Interestingly, the top-performing method used the entire set of sensors ( RGB camera, event camera, LiDAR and radar). The second-best method relied on two sensors: the RGB camera and the LiDAR, while the last two meth-ods used only RGB camera. These results suggest that ad-ditional sensing modalities can be beneficial under adverse conditions, but the gain cannot be attributed to modality count alone, as architecture design, pretraining, and fusion strategy also differ across methods. In table 3, we compare the results of baseline methods: Mask2Former [6] and CAFuser-CA² [2], the latter being the method provided by the authors of the MUSES dataset, with those obtained by the challenge participants. CAFuser-CA² remains the best-performing approach in terms of PQ across all weather conditions as well as the overall. The  
+
+> Table 2. Quantitative results for the URVIS MUSES-AXPS challenge
+
+Rank team name wPQ wSQ wRQ 1 wg 54.23 76.62 65.66 2 michele24 47.03 72.61 57.62 3 eliet 45.84 73.23 56.40 4 mljp 36.15 68.28 45.58 top two solutions outperform the RGB-only Mask2Former baseline, while the third-ranked submission remains slighly below it. Interestingly, the method from wg team achieves a particularly strong score in rainy conditions, reaching 57.9 PQ, which is almost identical to its performance in clear weather, 58.0 PQ. More generally, all participant methods perform noticeably better during daytime than nighttime and under clear weather compared to snow, rain and fog. Overall, the benchmark suggests that robust panoptic seg-mentation under adverse conditions does not necessarily re-quire highly complex architectural redesigns. Strong pre-trained segmentation models, combined with appropriate weather adaptation, already provide a surprisingly compet-itive starting point. In Figure 4, we provide three qualitative comparisons between the panoptic segmentation ground truth and the predictions from the different teams, displayed using the Cityscape color palette. The first column corresponds to a real world difficult scene: an urban scene at night with snowfall and snow on the ground. Camera visibility is re-duced due to melting snow. All methods successfully detect the cars. The pedestrians on the left constitute a particu-larly difficult detection case and are not well distinguished across the different approaches. The second column depicts a rainy night in a urban setting. Here, the water droplets greatly affect all participants’ performance, with an even more pronounced effect in the background. For the last col-umn, which shows a foggy daytime scene, with only a few object present in the frame. All participants provide strong predictions, producing accurate segmentation of the trees, road and building. 
+
+# 6. Discussion & Analysis 
+
+The challenge results reveal three main trends. First, per-formance gains are largely driven by strong initialization and weather adaptation strategies rather than by drastic changes to the segmentation architecture itself. Second, Mask2Former remains a highly competitive baseline under relatively modest training budgets. Third, simply append-ing projected LiDAR cues to RGB inputs is insufficient to fully exploit the 3D sensing capability of LiDAR. 
+
+Common effective practices. A recurring pattern across Table 3. Comparison of the panoptic quality values per weather condition for baselines and challengers methods 
+
+Rank Team Clear Fog Rain Snow Day Night All 1 wg 58.0 50.2 57.9 52.2 56.4 52.8 54.6 2 michele24 50.6 44.3 48.8 46.2 49.5 45.4 47.4 3 eliet 49.3 44.5 45.9 45.6 50.4 42.2 46.3 4 mljp 40.3 35.0 35.4 36.1 42.9 30.4 36.7 Baseline Mask2Former 48.8 46.5 45.4 45.1 49.3 39.4 46.9 CAFuser-CA² 61.4 57.5 59.6 57.2 59.5 57.3 59.7 
+
+Snow night Rain night Fog day 
+
+Frame camera 
+
+Ground Truth 
+
+wg 
+
+michele24 
+
+elieT 
+
+mljp  
+
+> Figure 4. Qualitative results on MUSES test samples.
+
+competitive methods is to start from a strong pretrained model or an easier training stage, and then adapt the model to the target adverse-condition setting. For instance, the 
+
+MLJP team adopts a two-stage schedule, first training on clear-day data and then fine-tuning on all weather and il-lumination conditions. Similarly, the winning wg submis-sion builds upon pretrained CAFuser weights. Taken to-gether, these observations suggest that robust initialization and curriculum-style adaptation are practical and effective strategies for adverse-condition panoptic segmentation. 
+
+Mask2Former remains a strong and efficient base-line. Despite its conceptual simplicity, Mask2Former re-mains one of the strongest baselines in this benchmark. The RGB-only Mask2Former baseline achieves 46.9 PQ all , out-performing the third- and fourth-ranked challenge submis-sions and remaining close to the second-ranked method. From a practical perspective, it also offers an attractive accuracy–complexity trade-off: competitive performance can be obtained with a standard architecture, a single GPU, and comparatively moderate training time. Nevertheless, the gap to CAFuser-CA 2 and to the winning wg submission indicates that there is still clear room for improvement once stronger multimodal and condition-aware reasoning is in-troduced. Since hardware, image resolution, and initializa-tion differ across submissions, the reported training times should be interpreted only as rough indicators rather than as a strictly controlled efficiency comparison. 
+
+More modalities do not automatically translate into better performance. The leaderboard does not support a simplistic conclusion that adding more modalities alone is sufficient to improve robustness. Instead, the results suggest that how multimodal information is fused is more important than the mere number of sensors. Both MLJP and ElieT report that straightforward early or intermediate fusion strategies do not improve over RGB-only Mask2Former. By contrast, the michele24 method obtains a modest gain through gated residual modulation with an explicit validity mask, and the best-performing wg submission employs a condition-aware fusion design together with a richer sensor suite. This indicates that adverse-weather robustness de-pends not only on access to complementary modalities, but also on structured fusion mechanisms that can adaptively determine when and how each modality should be trusted. 
+
+Why naive LiDAR fusion remains limited. A key ob-servation from several submissions is that simple LiDAR fusion strategies remain underwhelming. In most naive variants, LiDAR is first projected to the image plane and represented as auxiliary 2D channels, such as sparse depth, height, or intensity, which are then concatenated with RGB inputs or intermediate features. While convenient, this de-sign largely collapses the native 3D structure of LiDAR into image-aligned tensors and therefore underutilizes its geo-metric information. Such representations do not explicitly preserve point sparsity patterns, vertical geometry, occlu-sion structure, or range-dependent reliability, all of which are important under adverse weather and low-visibility con-ditions. As a result, the network tends to treat LiDAR as a set of additional image channels rather than as a comple-mentary 3D sensing modality. This likely explains why naive fusion often fails to outperform strong RGB-only baselines. 
+
+Implications for future work. These findings sug-gest several promising directions for future research. First, stronger weather adaptation strategies, such as staged train-ing or domain-specialized fine-tuning, appear to be consis-tently beneficial and should be further explored. Second, future multimodal panoptic segmentation models should preserve LiDAR geometry more explicitly, for example through point-, voxel-, or range-view encoders, rather than relying solely on projected 2D maps. Third, condition-aware fusion appears particularly important in adverse set-tings, where the reliability of each modality can vary sig-nificantly across weather and lighting conditions. More broadly, improving nighttime robustness remains an impor-tant open challenge, as nearly all methods still exhibit a clear performance drop from day to night. 
+
+Summary. Overall, the results suggest that strong initialization and weather-aware adaptation are highly ef-fective for robust panoptic segmentation. Meanwhile, Mask2Former remains a remarkably competitive baseline, indicating that large performance gains do not necessarily require complex redesigns of the segmentation head. In contrast, the mixed results of early- and mid-fusion variants suggest that simply concatenating projected LiDAR cues with RGB features is insufficient to fully exploit the com-plementary 3D information provided by LiDAR. To fully benefit from multimodal sensing, future methods will likely need more structured and geometry-aware fusion strategies than simple channel concatenation or image-plane projec-tion alone. 
+
+# 7. Conclusion 
+
+This report presents the outcomes of the URVIS 2026 Chal-lenge: MUSES-AXPS — Adverse-to-the-eXtreme Panop-tic Segmentation, conducted on the challenging MUSES dataset. We benchmark four participating methods against representative baseline approaches under diverse real-world weather and illumination conditions. The challenge results show that robust panoptic segmentation in adverse envi-ronments benefits substantially from strong pretraining and weather adaptation, while effective multimodal fusion re-mains an open research problem. Overall, this challenge provides a useful snapshot of the current state of adverse-condition panoptic segmentation and highlights promising directions for future progress in robust and condition-aware multimodal scene understanding. References 
+
+[1] Tim Br¨ odermann, David Bruggemann, Christos Sakaridis, Kevin Ta, Odysseas Liagouris, Jason Corkill, and Luc Van Gool. Muses: The multi-sensor semantic perception dataset for driving under uncertainty. In European Confer-ence on Computer Vision (ECCV) , 2024. 1, 2 [2] Tim Br¨ odermann, Christos Sakaridis, Yuqian Fu, and Luc Van Gool. Cafuser: Condition-aware multimodal fusion for robust semantic perception of driving scenes. IEEE Robotics and Automation Letters , 2025. 1, 2, 4, 6 [3] Tim Br¨ odermannn, Christos Sakaridis, Luigi Piccinelli, Wim Abbeloos, and Luc Van Gool. Dgfusion: Depth-guided sen-sor fusion for robust semantic perception. IEEE Robotics and Automation Letters , 2026. 2 [4] Bowen Cheng, Maxwell D Collins, Yukun Zhu, Ting Liu, Thomas S Huang, Hartwig Adam, and Liang-Chieh Chen. Panoptic-deeplab: A simple, strong, and fast baseline for bottom-up panoptic segmentation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 12475–12485, 2020. 1 [5] Bowen Cheng, Alex Schwing, and Alexander Kirillov. Per-pixel classification is not all you need for semantic segmen-tation. Advances in neural information processing systems ,34:17864–17875, 2021. 1 [6] Bowen Cheng, Ishan Misra, Alexander G. Schwing, Alexan-der Kirillov, and Rohit Girdhar. Masked-attention mask transformer for universal image segmentation. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 1290–1299, 2022. 4, 6 [7] Jitesh Jain, Jiachen Li, Mang Tik Chiu, Ali Hassani, Nikita Orlov, and Humphrey Shi. Oneformer: One transformer to rule universal image segmentation. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 2989–2998, 2023. 1 [8] Alexander Kirillov, Kaiming He, Ross Girshick, Carsten Rother, and Piotr Doll´ ar. Panoptic segmentation. In Pro-ceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 9404–9413, 2019. 1, 2 [9] Feng Li, Hao Zhang, Huaizhe Xu, Shilong Liu, Lei Zhang, Lionel M Ni, and Heung-Yeung Shum. Mask dino: Towards a unified transformer-based framework for object detection and segmentation. In Proceedings of the IEEE/CVF con-ference on computer vision and pattern recognition , pages 3041–3050, 2023. 1 [10] Ethan Perez, Florian Strub, Harm de Vries, Vincent Du-moulin, and Aaron C. Courville. Film: Visual reasoning with a general conditioning layer. In AAAI , 2018. 5 [11] Yiting Wang, Haonan Zhao, Kurt Debattista, and Valentina Donzella. The effect of camera data degradation factors on panoptic segmentation for automated driving. In 2023 IEEE 26th International Conference on Intelligent Transportation Systems (ITSC) , pages 2351–2356. IEEE, 2023. 1 [12] Yiting Wang, Haonan Zhao, Daniel Gummadi, Dianati Mehrdad, Debattista Kurt, and Valentina Donzella. Robust-ness of panoptic segmentation for degraded automotive cam-eras data. IEEE Transactions on Automation Science and Engineering , 2025. 1 [13] Yiting Wang, Tim Br¨ odermann, Hamed Haghighi, Haonan Zhao, Christos Sakaridis, Kurt Debattista, and Valentina Donzella. Aurora-kitti: Any-weather depth completion and denoising in the wild. arXiv preprint arXiv:2603.14701 ,2026. 1 [14] Jiarui Xu, Sifei Liu, Arash Vahdat, Wonmin Byeon, Xiao-long Wang, and Shalini De Mello. Open-vocabulary panop-tic segmentation with text-to-image diffusion models. In 
+
+Proceedings of the IEEE/CVF conference on computer vi-sion and pattern recognition , pages 2955–2966, 2023. 1 [15] Zhen Xu, Sergio Escalera, Adrien Pav˜ ao, Magali Richard, Wei-Wei Tu, Quanming Yao, Huan Zhao, and Isabelle Guyon. Codabench: Flexible, easy-to-use, and reproducible meta-benchmark platform. Patterns , 3(7):100543, 2022. 2
