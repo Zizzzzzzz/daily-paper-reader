@@ -1,0 +1,425 @@
+Title: Progressive Semantic Communication for Efficient Edge-Cloud Vision-Language Models
+
+URL Source: https://arxiv.org/pdf/2604.26508v1
+
+Published Time: Thu, 30 Apr 2026 00:54:01 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+Preprint. Under review. April 2026 
+
+# Progressive Semantic Communication for Efficient Edge-Cloud Vision-Language Models 
+
+Cyril Shih-Huan Hsu ∗ Wig Yuan-Cheng Cheng † Chrysa Papagianni ∗
+
+Abstract 
+
+Deploying Vision–Language Models (VLMs) on edge devices remains challenging due to their substantial compu-tational and memory demands, which exceed the capabilities of resource-constrained embedded platforms. Conversely, fully offloading inference to the cloud is often impractical in bandwidth-limited environments, where transmitting raw visual data introduces substantial latency overhead. While recent edge–cloud collaborative architectures attempt to partition VLM workloads across devices, they typically rely on transmitting fixed-size representations, lacking adaptability to dynamic network conditions and failing to fully exploit semantic redundancy. In this paper, we propose a progressive semantic communication framework for edge–cloud VLM inference, using a Meta AutoEncoder that compresses visual tokens into adaptive, progressively refinable representations, enabling plug-and-play deployment with off-the-shelf VLMs without additional fine-tuning. This design allows flexible transmission at different informa-tion levels, providing a controllable trade-off between communication cost and semantic fidelity. We implement a full end-to-end edge–cloud system comprising an embedded NXP i.MX95 platform and a GPU server, communicating over bandwidth-constrained networks. Experimental results show that, at 1 Mbps uplink, the proposed progressive scheme significantly reduces network latency compared to full-edge and full-cloud solutions, while maintaining high semantic consistency even under high compression. The implementation code will be released upon publication at https://github.com/open-ep/ProSemComVLM. 
+
+Fig. 1: Progressively refinable latent representation via Meta AutoEncoder. The fixed-length latent is structured as an ordered token sequence, where prefixes provide increasingly accurate approximations of the full representation. This enables monotonic improvement in reconstruction quality as transmission progresses, supporting efficient incremental communication and precise control over the trade-off between bandwidth usage and semantic accuracy. I. I NTRODUCTION 
+
+Vision-language models (VLMs) have rapidly emerged as a cornerstone of multimodal artificial intelligence, enabling machines to jointly reason over visual and textual inputs for tasks such as image captioning, visual question answering, and multimodal interaction. Despite their strong performance, the deployment of VLMs in real-world systems remains challenging due to their substantial computational and memory requirements. Large-scale models often exceed the capabilities of resource-constrained edge devices, while purely cloud-based solutions introduce 
+
+> ∗
+
+Informatics Institute, University of Amsterdam, The Netherlands. Email: {s.h.hsu, c.papagianni }@uva.nl 
+
+> †
+
+Open-EP Community, Taoyuan City 330049, Taiwan (R.O.C.). Email: onlywig@gmail.com 
+
+> arXiv:2604.26508v1 [cs.LG] 29 Apr 2026
+
+Preprint. Under review. April 2026 significant latency and communication overhead, limiting their applicability in real-time and bandwidth-constrained scenarios. To address these challenges, recent research has explored collaborative edge–cloud (or edge-to-server) inference paradigms, which leverage the modular structure of VLMs to distribute computation across devices. In such frameworks, lightweight processing, such as visual encoding or preliminary inference, is performed at the edge, while more computationally intensive language reasoning is delegated to centralized servers. Beyond simple partitioning, more advanced approaches further optimize communication efficiency by transmitting only task-relevant information or adaptively requesting additional data based on model uncertainty, thereby balancing accuracy, latency, and bandwidth usage. These developments highlight a growing trend toward semantic-aware and resource-efficient VLM deployment, where the goal is not only to distribute computation, but also to minimize unnecessary data transmission while preserving task performance. However, existing edge–cloud VLM systems still face several key limitations. First, most approaches rely on transmitting either raw pixels or fixed-size latent representations, which are inherently non-adaptive and fail to account for dynamic network conditions or task-dependent semantic requirements (e.g., [1]). Second, while some methods incorporate semantic-aware or uncertainty-driven transmission strategies (e.g., [2], [3]), they typically adopt non-progressive mechanisms, where additional information is transmitted in coarse steps without reusing previously transmitted content. This results in inefficient communication under iterative transmission and lacks a principled way to achieve fine-grained control over the trade-off between communication cost and semantic fidelity. These limitations highlight the need for a more flexible framework that enables adaptive, progressive, and semantically meaningful transmission for edge–cloud VLM inference. In this paper, we propose a progressive semantic communication framework for efficient edge–cloud VLM deployment, with the following contributions: 1. We introduce a progressively refinable latent representation via a plug-and-play Meta AutoEncoder (MetaAE), which enables incremental transmission and reuse of partial visual semantics, thereby significantly improving flexibility and communication efficiency compared to conventional non-progressive schemes. 2. We design a semantic quality-aware transmission control that adaptively determines whether additional informa-tion should be transmitted, enabling a controllable trade-off between communication cost and task performance. 3. We implement a real-world end-to-end edge–cloud testbed on an embedded NXP i.MX95 platform and a GPU server, demonstrating the practical feasibility of the proposed framework under bandwidth-constrained conditions, and validating its effectiveness in reducing latency while preserving semantic consistency. The rest of this paper is organized as follows. Section II provides context through related work. Section III introduces the proposed framework. We then detail our experimental setup in Section IV and evaluate the framework in Section V. We conclude this work in Section VI. II. R ELATED WORK 
+
+A. Vision Language Models 
+
+VLMs have progressed toward general-purpose multimodal reasoning by coupling pretrained vision encoders with large language models and improving cross-modal alignment and instruction following. Early modular designs such as Flamingo [4] show that bridging powerful vision-only and language-only backbones enables flexible few-shot prompting, while BLIP-2 [5] highlights a complementary efficiency point: keeping large backbones frozen and training a lightweight connector can yield strong VL capabilities with fewer trainable parameters. Instruction-tuned models such as LLaVA [6] further operationalize VLMs as conversational assistants by training on instruction-following multimodal data, shifting research emphasis from narrow benchmarks to interactive usage patterns that often demand low latency and robust deployment. More recent studies (e.g., VILA [7]) systematically analyze pretraining and data mixture choices that materially affect both performance and engineering cost, while large technical reports such as Qwen3-VL [8] reflect scaling trends that intensify resource pressures and motivate deployment optimization. 
+
+B. Semantic Communication 
+
+Semantic communication research reframes transmission objectives from reconstructing raw signals to preserving task-relevant information, increasingly using learned representations aligned to downstream goals. Transformer-based semantic image transmission (WITT [9]) demonstrates end-to-end learned coding optimized for channel conditions, Preprint. Under review. April 2026 
+
+Fig. 2: System overview of the proposed progressive edge–cloud semantic communication framework. The edge encodes visual inputs into progressively refinable representations and transmits partial latent segments under bandwidth constraints. The cloud reconstructs the latent via a meta decoder and employs semantic quality-aware transmission control to adaptively request additional information until a target quality threshold is met, after which the LLM decoder generates the final output. providing a base layer that can be reused when vision transformers act as the “front end” of VLMs. Explicit vision-language semantic communication is explored in VLM-CSC [10], which transmits high-density textual semantics extracted from images, and incorporates memory and noise-adaptive mechanisms, thereby bridging cross-modal semantics and channel robustness. Token-based paradigms (TokCom [11]) further align with modern VLM/LLM interfaces by treating tokens as the unit of communication and exploiting cross-modal context during reconstruction or generation. VLF-MSC [12] proposes sending a compact shared vision-language feature that conditions both language generation and image generation at the receiver. Video TokenCom [13] extends this direction by allocating rate/protection based on textual intent and token importance, which suggests principled ways to couple application goals with source–channel adaptation. 
+
+C. Edge-Cloud Deployment 
+
+Edge–cloud deployment work addresses the systems bottlenecks that arise when VLMs must run under tight latency, energy, and bandwidth constraints. Empirical evaluation on smartphones shows that even mobile-oriented VLM stacks can remain CPU-bound and underutilize accelerators, motivating careful runtime and partitioning design [14]. At the architectural level, Distributed VLMs [1] exploit the modularity of VLMs by offloading visual encoding to edge devices while retaining language generation on servers, improving throughput via parallelization. Collaborative strategies can further reduce uplink overhead by transmitting only task-relevant information. For example, [2] uses VLM attention for patch selection and an entropy-based uncertainty trigger for selective re-transmission. Similarly, [3] introduces a region-of-interest generation mechanism to reduce bandwidth consumption during transmission. These approaches align with the principle of semantic-aware communication in edge–cloud inference loops. III. M ETHODOLOGY 
+
+A. System Overview 
+
+We propose an edge–cloud collaborative framework for pregressive semantic communication with VLMs, as illustrated in Fig. 2. The system is designed to minimize communication overhead while preserving task-relevant semantic information through progressive and adaptive transmission over a practical RESTful interface. At the 
+
+edge side , an input image is first processed by a lightweight vision encoder, producing high-dimensional latent representations. These latents are further compressed by a meta encoder into a progressively refinable representation. This representation is explicitly ordered, such that earlier segments capture coarse semantic information, while subsequent segments provide incremental refinements that progressively improve the reconstruction quality. A transmission control module (CTRL in Fig. 2) selects an initial subset (e.g., 40 %) of the representation based on communication constraints. The selected segments are serialized into a compact JSON payload and transmitted to the cloud via an HTTP POST request. At the cloud side , the received payload is parsed and passed through a meta decoder to reconstruct the latent representation. A semantic quality estimator then evaluates whether the reconstructed latent satisfies a predefined quality threshold ϵ for the downstream task. If the estimated quality is sufficient, the reconstructed latent is combined with the textual input and forwarded to the LLM decoder to generate Preprint. Under review. April 2026 the final response. Otherwise, the system enters a closed-loop refinement process: the cloud sends a feedback signal via an HTTP response requesting additional representation segments from the edge. The edge then transmits further incremental information, which is accumulated at the cloud to progressively improve the reconstruction. This process repeats until the target semantic quality is achieved (see Sec. III-C). 
+
+B. Progressively Refinable Representations 
+
+Let z ∈ Rd denote the visual latent produced by the vision encoder for an input image x. The proposed meta encoder fenc (·) transforms z into a progressively refinable representation 
+
+r = fenc (z) ∈ Rdr . (1) To enable progressive transmission, we partition r into K chunks: 
+
+r = r1, r 2, . . . , r K
+
+,
+
+> K
+
+X
+
+> k=1
+
+dk = dr . (2) where rk ∈ Rdk denotes the k-th latent chunk. Unlike conventional compressed representations, the proposed representation is explicitly ordered . Specifically, the chunk index reflects transmission priority: earlier chunks capture coarse semantic information, while later chunks provide progressively finer refinements. This ordered structure enables coarse-to-fine reconstruction from partial transmissions. 
+
+Definition 1. (Latent Transmission Level, LTL ). For a total of K ordered latent chunks, the Latent Transmission Level ℓ ∈ { 1, 2, . . . , K } denotes the transmission state in which the first ℓ chunks are available at the receiver. The corresponding partial representation is defined as r(ℓ) = r1, r 2, . . . , r ℓ
+
+.
+
+Given the cumulative representation r(ℓ), the meta decoder predicts a level-dependent approximation of the original full latent z:
+
+ˆz(ℓ) = fdec (r(ℓ)) , ˆz(ℓ) ∈ Rd. (3) As ℓ increases, ˆz(ℓ) is expected to approach z with progressively higher fidelity. We refer to the normalized LTL 
+
+ℓ/K as the LTL ratio hereafter for simplicity. The above formulation enables a progressive transmission scheme, where information is delivered in an incremen-tal and reusable manner. In contrast, conventional non-progressive schemes transmit representations corresponding to each quality level independently, without reusing previously transmitted information. We next show that the proposed progressive scheme is strictly more communication-efficient under iterative transmission. 
+
+Proposition 1. Assume a representation is divided into K equal-sized chunks, each with transmission cost b. To reach transmission level K through sequential refinement, a progressive scheme incurs strictly lower total communication cost than a non-progressive scheme that retransmits the full representation at each level. Proof. In the progressive scheme, only the incremental chunk ∆r(ℓ) = rℓ is transmitted at each level ℓ. Since each chunk has size b, the total transmission cost to reach level K is 
+
+> K
+
+X
+
+> ℓ=1
+
+b = Kb. (4) In contrast, in a non-progressive scheme, the representation corresponding to level ℓ must be transmitted in full at each step, with cost ℓb . Therefore, the total transmission cost is 
+
+> K
+
+X
+
+> ℓ=1
+
+ℓb = b
+
+> K
+
+X
+
+> ℓ=1
+
+ℓ = K(K + 1) 2 b. (5) Comparing Eq. (4) and Eq. (5), we have 
+
+K(K + 1) 2 b > Kb, ∀K > 1, (6) which shows that the non-progressive scheme incurs strictly higher communication cost. Moreover, the total transmission cost of the progressive scheme scales linearly with the number of levels, i.e., O(K), whereas the non-progressive scheme scales quadratically, i.e., O(K2).Preprint. Under review. April 2026 
+
+C. Meta AutoEncoder 
+
+To realize the progressively refinable representation, we design a Meta AutoEncoder with three components: ( i) an encoder that maps the original latent into ordered transmission chunks, ( ii ) a prefix masking module that simulates partial transmission, and ( iii ) a decoder that reconstructs the latent while estimating its quality. We implement both encoder and decoder using Transformer encoder layers [15]. As a result, the representation is naturally structured as a sequence of tokens, where each token corresponds to a transmission unit. In the following, we use the term 
+
+token instead of chunk for clarity and consistency with transformer architectures. 
+
+Meta Encoder. Given the visual latent z ∈ Rd, the encoder produces an ordered representation as defined in Eq. (1) and (2), where each token is arranged according to transmission priority. Earlier tokens capture coarse semantic information, while later token provide finer refinements. 
+
+Prefix Masking Module. To simulate progressive transmission during training, a transmission level ℓ ∈ { 1, . . . , K }
+
+is sampled uniformly at random. Only the prefix r(ℓ) = r1, r 2, . . . , r ℓ
+
+ is kept, while the remaining tokens are replaced with zero padding tokens . This results in a masked representation ˜r(ℓ), which serves as input to the decoder. While uniform sampling provides a simple and unbiased training strategy, exploring optimal sampling distributions for different deployment scenarios is left for future work. The theoretical justification for how prefix masking encourages progressively refinable representations is provided in Appendix A. Fig. 3 illustrates the masking process with a PyTorch implementation. 
+
+Fig. 3: Example code of prefix masking module in PyTorch. 
+
+Meta Decoder with Semantic Quality Estimation. The decoder fdec (·) is implemented as a stack of Transformer encoder layers. In addition to the masked token sequence, a learnable error token is prepended to the input sequence [16]. The decoder output is used for two tasks: ( i) the token-wise outputs corresponding to the K token positions are passed through a reconstruction head to predict the full latent, as described in Eq. (3). Notably, the decoder always reconstructs the full latent z, regardless of the transmission level ℓ (see Eq. (8)). Second, the hidden state associated with the error token is fed into an auxiliary prediction head to estimate the reconstruction error: 
+
+ˆe(ℓ) = gerr ([ fdec (˜ r(ℓ))] err ) , (7) where gerr (·) denotes the error prediction head, and [·]err extracts the hidden state associated with the prepended error token from the decoder output sequence. Preprint. Under review. April 2026 
+
+Training Objective. The MetaAE is trained with two objectives. The latent reconstruction loss is defined as 
+
+Lrec = ∥ˆz(ℓ) − z∥22, (8) and the ground-truth error at level ℓ is defined as 
+
+e(ℓ) = ∥sg(ˆ z(ℓ)) − z∥22 , (9) where sg( ·) denotes the stop-gradient operator, and the error prediction loss is defined as 
+
+Lerr = ∥ˆe(ℓ) − e(ℓ)∥22. (10) For notational simplicity, ˆz(ℓ) denotes the decoder output tokens excluding the error token. The overall training objective is given by 
+
+Ltotal = Lrec + λerr · L err , (11) where λerr balances reconstruction accuracy and quality estimation. In this work, λerr = 1 .0 is chosen empirically. 
+
+D. Semantic Quality-Aware Transmission Control 
+
+Based on the Meta AutoEncoder, we define a semantic quality metric to guide adaptive transmission. In Eq. (7), the decoder predicts a reconstruction error ˆe(ℓ) for a given transmission level ℓ. We map this value to a bounded quality score as 
+
+q(ℓ) = exp   − ˆe(ℓ), q(ℓ) ∈ [0 , 1] , (12) where higher values indicate better reconstruction quality. This formulation ensures a monotonic relationship between reconstruction error and semantic quality, while normalizing the scale for consistent threshold-based decision making. 
+
+Semantic-Aware Quality Metric. The proposed quality metric is inherently semantic-aware . Specifically, the reconstruction target z is the latent representation extracted from a pretrained vision encoder with frozen weights. As such, z encodes high-level semantic information rather than low-level pixel details. Minimizing the reconstruction error in this latent space is therefore analogous to perceptual loss [17], capturing semantic fidelity. We further validate this design in Sec. V, where we show that the proposed semantic quality q(ℓ) is highly correlated with downstream task performance (e.g., caption similarity), demonstrating that it serves as an effective surrogate for task-level performance in transmission control. 
+
+Adaptive Transmission Control. The semantic quality score is used to drive a closed-loop transmission process between the edge and the cloud. Given a predefined quality threshold ϵ ∈ [0 , 1] , the cloud evaluates q(ℓ) after each transmission step and determines whether additional information is required. Specifically, starting from an initial transmission level ℓ0, the system iteratively performs: 1. Edge → Cloud: transmit the next-level token; 2. Cloud: reconstruct ˆz(ℓ) and compute q(ℓ);3. Decision: if q(ℓ) ≥ ϵ or ℓ = K, terminate; otherwise, request further transmission and return to Step 1. This process forms a feedback-driven control loop, enabling the system to adaptively balance communication cost and semantic fidelity. Fig. 4 illustrates the corresponding sequential diagram. In practice, the encoding process is performed only once at the initial iteration to generate the full ordered token sequence. The resulting tokens corresponding to all transmission levels are stored at the edge-side controller, and subsequent iterations simply transmit additional tokens from this cached representation without recomputing the encoder. IV. E XPERIMENTAL SETUP 
+
+A. End-to-End Edge–Cloud Testbed 
+
+Edge. The edge device is built on the NXP i.MX95 application processor, which integrates a six-core ARM Cortex-A55 64-bit CPU and the Neutron NPU 1, delivering up to 2 TOPS of inference throughput. The NPU supports hardware-accelerated execution of both CNN and transformer-based architectures. The platform runs a Yocto Project-based Linux distribution with kernel version Linux kernel 6.12. Although commercially available i.MX95-based boards such as IMX95-EVK was evaluated during the prototyping phase, we ultimately designed a 
+
+> 1https://www.nxp.com/products/i.MX95
+
+Preprint. Under review. April 2026 
+
+Fig. 4: Progressive transmission with semantic quality-based control. The initial transmission of textual input is omitted in this diagram for simplicity. custom SMARC 2 system-on-module based on the i.MX95 platform. This allows us to fully leverage the favorable NPU power envelope and to incorporate additional interfaces such as CAN bus, RS-485 and Micron LPDDR5 memory, specifically targeting robotic platform development, where sustained low-power edge inference is a primary design constraint. 
+
+Cloud. The cloud side is implemented on a server equipped with an Intel Core i7-10700K CPU, 32 GB of RAM, and an NVIDIA RTX 2080 Super GPU. The system is developed using Python 3.11.9 and PyTorch 2.5.1. The RESTful API is built using Flask 3.0.3, which handles bidirectional communication between the edge and the cloud. To emulate bandwidth-constrained network conditions, the cloud service is deployed within a Docker container, and traffic control is applied using the Linux tc utility with a token bucket filter (TBF). The configuration parameters are summarized in Table I. TABLE I: Traffic control (tc) configuration for cloud side           
+
+> Parameter Value
+> Interface <container ID>
+> Queue discipline tbf
+> Rate 1mbit
+> Burst 32 kbit
+> Latency 200 ms
+
+VLM. To evaluate the proposed framework under resource-constrained settings, we adopt SmolVLM-256M [18] with 
+
+4-bit quantization 3 as the backbone VLM. This model is designed for lightweight deployment, with a total parameter count of ∼256 million. The SmolVLM architecture follows a standard vision–language paradigm, consisting of a vision encoder that extracts visual features, and a language model that performs reasoning and generation. In our setup, the vision encoder is deployed on the edge device, while the language model is hosted on the cloud. During training, the VLM parameters are kept frozen, and only the MetaAE is optimized. 
+
+> 2https://sget.org/standards/smarc/
+> 3https://huggingface.co/HuggingFaceTB/SmolVLM-256M-Instruct
+
+Preprint. Under review. April 2026 
+
+MetaAE. The encoder consists of 2 Transformer encoder layers with 8 attention heads, hidden dimension of 576 ,and an MLP dimension of 4 × 576 . The decoder follows a similar design with 2 Transformer encoder layers. During training, progressive transmission is simulated by random prefix masking with four candidate transmission levels, corresponding to LTL ratios of 25 %, 50 %, 75 %, and 100 % of the full latent sequence. Tokens beyond the sampled prefix are zero-masked. We use a batch size of 128 and train for 50 epochs with the Adam optimizer and a learning rate of 1 × 10 −4. The model is trained on 50 , 000 images from the COCO 2017 training set [19] without using annotations. 
+
+B. Evaluation Metrics 
+
+Due to the limited capacity of the SmolVLM-256M model, absolute task accuracy is not the main focus of our evaluation. Instead, we assess how well the proposed method preserves the Semantic Consistency (SC) of the original model outputs under progressive transmission. In other words, the original model output is treated as the reference, and we measure the deviation introduced by the proposed framework. We evaluate the method on two well-established benchmarks for VLMs:  
+
+> •
+
+COCO Captioning (MS COCO 2017) [19]  
+
+> •
+
+POPE (Polling-based Object Probing Evaluation) [20] For each dataset, we randomly sample 1, 000 instances from the test split, and conduct 10 independent runs to account for stochasticity in generation. All reported results correspond to the average over these runs. Moreover, SC is quantified using a sentence embedding tool from fastembed 4. Specifically, we compute the cosine similarity 
+
+between the embedding of answers generated by the proposed method and by the original model. This metric captures the degree to which the semantic meaning is preserved, even if the exact wording differs. In addition, we compare the following 3 deployment configurations: ( i) Full Edge , where the entire VLM is executed on the edge; ( ii ) Full Cloud , where all computation is done on a cloud server; and ( iii ) Edge-Cloud ,corresponding to the proposed progressive transmission framework that partitions computation between edge and cloud. For a fair comparison, we do not apply any entropy-based compression to the transmitted features (or pixels) in all above configurations. More comprehensive evaluation details are provided in Appendix B. V. R ESULTS AND DISCUSSION 
+
+Fig. 5a illustrates the trade-off between Semantic Consistency (SC) and transmission delay over different LTL ratios, with SC and delay plotted on the left and right y-axes, respectively. Starting from 100 % LTL ratio, both benchmarks achieve their highest SC. As the LTL ratio gradually reduces, SC degrades gracefully, remaining above 
+
+80 % even at aggressive compression levels (e.g., 25 %), while the transmission delay decreases almost linearly. Notably, at 25 % LTL ratio, the proposed method achieves a substantial reduction in delay ( 75 %), while incurring less than 5% degradation in SC. Additionally, Fig. 5b shows a near-perfect monotonic relationship between the proposed quality metric defined in Eq. (12) and COCO task SC, with a Spearman’s Rank Correlation Coefficient (SRCC) of 1.0. This indicates that the proposed quality metric serves as a reliable proxy for semantic accuracy, making it well-suited for guiding adaptive transmission decisions. Table II shows qualitative results of image descriptions under different LTL ratios. For this representative real-world example, no noticeable semantic deviations are observed across levels: the main scene content is described correctly in all cases, while the wording varies with the LTL ratio. The image was taken by the authors and is therefore not included in the training/validation set, which further suggests robust generalization to Out-Of-Distribution (OOD), real-world data. As shown in Table III, the Full Edge configuration is computation-bound, while the Full Cloud setting is dominated by network delay. In contrast, the proposed Edge-Cloud approach achieves the lowest end-to-end delay by balancing computation and communication. Notably, the overhead of MetaAE is marginal in both delay and energy cost ( 0.35 %), while contributing to a sharp reduction in transmission delay. VI. C ONCLUSION 
+
+In this paper, we proposed a progressive semantic communication framework for efficient edge–cloud deployment of VLMs. By introducing a plug-and-play MetaAE with progressively refinable latent representations, the system enables partial information reuse and significantly improving communication efficiency. The integration of a semantic 
+
+> 4https://github.com/qdrant/fastembed
+
+Preprint. Under review. April 2026 
+
+(a) SC and delay curves. (b) SC vs Quality. 
+
+Fig. 5: SC-delay trade-off and SC-quality correlation. TABLE II: Answers to the question ”Describe the image in detail.” under different LTL ratios. 
+
+Image 25% 50% 75% 100% ground truth 
+
+A person standing in front of a bus stop with a brown coat on the sidewalk in front of the bus stop... A woman standing in front of a bus stop with a brown jacket on and a black bag with a leather strap... A woman standing in front of a bus stop with a brown jacket on and a black bag with some red... A woman standing in a bus stop, wearing a tan trench coat, brown skirt, and carrying a black handbag... A woman standing in front of a bus stop, wearing a tan trench coat, brown skirt... 
+
+A sandwich sits on a table, in a basket of what looks like some kind of bread or pastry... A sandwich sits on a table, in a basket of what looks like some kind of soup... A close-up shot of a white and red mini-sauce sandwich, possibly a pizza or a meatball... A small sandwich on a table, in the background there is a bowl of what looks like soup... A sandwich sits on a table, in a basket of what looks like a soup... 
+
+In the foreground, a person’s hand is holding a plush toy with a small face and a small body... In the foreground, a person’s hand is holding a plush avocado-shaped stuffed animal... In the foreground, a person’s hand is holding a small yellow and brown stuffed animal... In the foreground, a person is holding a small yellow and brown plush toy... In the foreground, a person is holding a small yellow avocado with a smiling face... 
+
+quality-aware transmission control mechanism further provides adaptive and fine-grained control over the trade-off between communication cost and semantic fidelity. Through a real-world end-to-end testbed on an embedded edge platform and a cloud server, we demonstrated that the proposed approach achieves substantial reductions in transmission latency ( ∼75 %) while maintaining high semantic consistency ( >80 %), under constrained bandwidth conditions. These results highlight the effectiveness of progressive semantic communication as a key enabler for deploying VLMs in resource-limited edge–cloud scenarios. ACKNOWLEDGMENT 
+
+This research was partially funded by the Dutch 6G flagship project Future Network Services (FNS). Preprint. Under review. April 2026 TABLE III: System-Level Performance at 1Mbps uplink. The Edge-Cloud setting is with 100 % LTL ratio, indicating the worst case scenario for the proposed progressive scheme. 
+
+Metric Full Edge Full Cloud Edge–Cloud 
+
+E2E Delay (s) 7.98 9.32 6.94 Vision Encode (s) 3.20 (edge) 0.05 (cloud) 3.21 (edge) Network Delay (s) - 8.75 1.62 LLM Decode (s) 3.46 (edge) 0.49 (cloud) 0.49 (cloud) MetaAE Encode (s) - - 0.01 (edge) Peak Memory (MB) 625 (edge) 92 (edge) 344 (edge) NPU Energy Cost (J) 23.31 - 11.27 
+
+REFERENCES [1] Y. Li, D. Gumaste, M. K. T¨ urkcan, J. Ghaderi, G. Zussman, and Z. Kosti´ c, “Distributed vlms: Efficient vision-language processing through cloud-edge collaboration,” 2025 IEEE International Conference on Pervasive Computing and Communications Workshops and other Affiliated Events (PerCom Workshops) , pp. 280–286, 2025. [2] S. Song and Y. Kim, “Collaborative edge-to-server inference for vision-language models,” arXiv preprint arXiv:2512.16349 , 2025. [3] Y. Zhang, H. Wang, Q. Bai, H. Liang, P. Zhu, G.-M. Muntean, and Q. Li, “VaVLM: Toward efficient edge-cloud video analytics with vision-language models,” IEEE Transactions on Broadcasting , vol. 71, no. 2, pp. 529–541, 2025. [4] J.-B. Alayrac, J. Donahue, P. Luc, A. Miech, I. Barr, Y. Hasson, K. Lenc, A. Mensch, K. Millican, M. Reynolds et al. , “Flamingo: a visual language model for few-shot learning,” Advances in neural information processing systems , vol. 35, pp. 23 716–23 736, 2022. [5] J. Li, D. Li, S. Savarese, and S. Hoi, “BLIP-2: Bootstrapping language-image pre-training with frozen image encoders and large language models,” in Proceedings of the 40th International Conference on Machine Learning , ser. Proceedings of Machine Learning Research, vol. 202. PMLR, 23–29 Jul 2023, pp. 19 730–19 742. [6] H. Liu, C. Li, Q. Wu, and Y. J. Lee, “Visual instruction tuning,” in Advances in Neural Information Processing Systems , vol. 36. Curran Associates, Inc., 2023, pp. 34 892–34 916. [7] J. Lin, H. Yin, W. Ping, P. Molchanov, M. Shoeybi, and S. Han, “Vila: On pre-training for visual language models,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2024, pp. 26 689–26 699. [8] S. Bai, Y. Cai, R. Chen, K. Chen, X. Chen, Z. Cheng, L. Deng, W. Ding, C. Gao, C. Ge et al. , “Qwen3-vl technical report,” arXiv preprint arXiv:2511.21631 , 2025. [9] K. Yang, S. Wang, J. Dai, K. Tan, K. Niu, and P. Zhang, “Witt: A wireless image transmission transformer for semantic communications,” in ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2023, pp. 1–5. [10] F. Jiang, C. Tang, L. Dong, K. Wang, K. Yang, and C. Pan, “Visual language model based cross-modal semantic communication systems,” 
+
+IEEE Transactions on Wireless Communications , 2025. [11] L. Qiao, M. B. Mashhadi, Z. Gao, R. Tafazolli, M. Bennis, and D. Niyato, “Token communications: A large model-driven framework for cross-modal context-aware semantic communications,” IEEE Wireless Communications , vol. 32, no. 5, pp. 80–88, 2025. [12] G. Ahn, J. Seo, and J. Kang, “Vlf-msc: Vision-language feature-based multimodal semantic communication system,” arXiv preprint arXiv:2511.10074 , 2025. [13] J. Men, M. B. Mashhadi, N. Wang, Y. Ma, M. Nilsson, and R. Tafazolli, “Video tokencom: Textual intent-guided multi-rate video token communications with uep-based adaptive source-channel coding,” arXiv preprint arXiv:2603.02470 , 2026. [14] P. R. Guerrero, Y. Pan, and S. Kashyap, “Efficient deployment of vision-language models on mobile devices: A case study on oneplus 13r,” arXiv preprint arXiv:2507.08505 , 2025. [15] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” 
+
+Advances in neural information processing systems , vol. 30, 2017. [16] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “Bert: Pre-training of deep bidirectional transformers for language understanding,” in Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers) , 2019, pp. 4171–4186. [17] J. Johnson, A. Alahi, and L. Fei-Fei, “Perceptual losses for real-time style transfer and super-resolution,” in European conference on computer vision . Springer, 2016, pp. 694–711. [18] A. Marafioti, O. Zohar, M. Farr´ e, M. noyan, E. Bakouch, P. M. C. Jim´ enez, C. Zakka, L. B. allal, A. Lozhkov, N. Tazi, V. Srivastav, J. Lochner, H. Larcher, M. Morlon, L. Tunstall, L. V. Werra, and T. Wolf, “SmolVLM: Redefining small and efficient multimodal models,” in Second Conference on Language Modeling , 2025. [19] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Doll´ ar, and C. L. Zitnick, “Microsoft coco: Common objects in context,” in European conference on computer vision . Springer, 2014, pp. 740–755. [20] Y. Li, Y. Du, K. Zhou, J. Wang, W. X. Zhao, and J.-R. Wen, “Evaluating object hallucination in large vision-language models,” in 
+
+Proceedings of the 2023 conference on empirical methods in natural language processing , 2023, pp. 292–305. Preprint. Under review. April 2026 APPENDIX ATHEORETICAL JUSTIFICATION OF PROGRESSIVE REFINABILITY 
+
+We now provide a theoretical justification for why the proposed prefix-masked training strategy encourages progressively refinable latent representations. Although the coarse-to-fine structure is not imposed by explicit supervision, prefix masking introduces a structured optimization bias over the ordered token sequence. Specifically, earlier tokens are visible under more transmission levels and therefore participate in more reconstruction objectives than later tokens. Proposition 2 formalizes this asymmetric optimization pressure and shows that prefix masking naturally prioritizes earlier tokens during training. Beyond this optimization bias, progressive refinement is also supported by the nested structure of prefix transmis-sion. A higher transmission level contains all tokens available at lower levels, together with additional refinement tokens. Therefore, under sufficient decoder capacity, the best achievable reconstruction error cannot increase as the prefix length grows. Proposition 3 formalizes this nested-prefix argument and establishes that the optimal reconstruction risk is non-increasing with the transmission level. Together, these results explain why prefix-masked training encourages early tokens to encode broadly useful coarse information, while later tokens provide incremental refinements. 
+
+Proposition 2 (Prefix masking induces asymmetric optimization pressure) . Let z ∈ Rd denote the target latent representation and let r = fenc (z) = ( r1, . . . , r K ) be the ordered token sequence produced by the meta encoder. Let Pℓ(r) denote the prefix-masking operator that keeps the first ℓ tokens and masks the remaining tokens: 
+
+Pℓ(r) = ( r1, . . . , r ℓ, 0, . . . , 0) .
+
+Consider the prefix-masked reconstruction objective 
+
+Lpm = 1
+
+K
+
+> K
+
+X
+
+> ℓ=1
+
+Lℓ, Lℓ = ∥fdec (Pℓ(r)) − z∥22 .
+
+Then token ri contributes only to the reconstruction losses whose transmission levels satisfy ℓ ≥ i. Consequently, token ri receives optimization signals from exactly K−i+1 prefix levels. Hence, earlier tokens receive reconstruction gradients from more prefix levels than later tokens, which induces an asymmetric optimization pressure over token positions. Proof. For a fixed transmission level ℓ, the prefix-masking operator Pℓ keeps token ri if and only if i ≤ ℓ. If i > ℓ ,then ri is replaced by a zero padding token and does not affect the decoder input Pℓ(r). Therefore, the level-ℓ
+
+reconstruction loss 
+
+Lℓ = ∥fdec (Pℓ(r)) − z∥22
+
+does not depend on ri whenever ℓ < i . Hence, 
+
+∇ri Lℓ = 0 , for all ℓ < i. 
+
+Taking the gradient of the total prefix-masked objective with respect to ri gives 
+
+∇ri Lpm = ∇ri
+
+1
+
+K
+
+> K
+
+X
+
+> ℓ=1
+
+Lℓ
+
+!
+
+= 1
+
+K
+
+> K
+
+X
+
+> ℓ=1
+
+∇ri Lℓ.
+
+Using ∇ri Lℓ = 0 for all ℓ < i , we obtain 
+
+∇ri Lpm = 1
+
+K
+
+> K
+
+X
+
+> ℓ=i
+
+∇ri Lℓ.
+
+Thus token ri receives reconstruction gradients only from the losses corresponding to levels ℓ = i, i + 1 , . . . , K ,i.e., from exactly K − i + 1 prefix levels. For two token indices i < j , we have 
+
+K − i + 1 > K − j + 1 .
+
+Therefore, earlier tokens are involved in more reconstruction objectives than later tokens. This proves that prefix masking induces an asymmetric optimization pressure over the ordered token sequence. Preprint. Under review. April 2026 
+
+Proposition 3 (Nested prefixes encourage progressive refinement) . Let the level-ℓ reconstruction risk be defined as 
+
+Rℓ = Ez
+
+h
+
+∥fdec (Pℓ(fenc (z))) − z∥22
+
+i
+
+,
+
+where Pℓ keeps the first ℓ tokens and masks the remaining tokens. Let R⋆ℓ denote the minimum achievable reconstruction risk at transmission level ℓ over the admissible encoder and decoder function classes. If the decoder at level ℓ+1 is sufficiently expressive to ignore the additional token rℓ+1 , then the optimal achievable reconstruction risk is non-increasing with the transmission level: 
+
+R⋆ℓ+1 ≤ R ⋆ℓ , ℓ = 1 , . . . , K − 1.
+
+Therefore, increasing the prefix length can only improve, or at least preserve, the best achievable reconstruction fidelity. Proof. At transmission level ℓ, the decoder observes the prefix-masked representation 
+
+Pℓ(r) = ( r1, . . . , r ℓ, 0, . . . , 0) .
+
+At transmission level ℓ + 1 , the decoder observes 
+
+Pℓ+1 (r) = ( r1, . . . , r ℓ, r ℓ+1 , 0, . . . , 0) .
+
+Thus, the information available at level ℓ is contained in the information available at level ℓ + 1 . The level-(ℓ + 1) 
+
+representation contains all tokens used at level ℓ, together with one additional token rℓ+1 .Let hℓ denote an arbitrary reconstruction mapping that uses the level-ℓ prefix: 
+
+ˆz(ℓ) = hℓ(Pℓ(r)) .
+
+Because Pℓ+1 (r) contains Pℓ(r) as a subset of its unmasked tokens, a decoder operating at level ℓ+1 can reproduce the same reconstruction mapping by ignoring the additional token rℓ+1 . That is, there exists a mapping hℓ+1 such that 
+
+hℓ+1 (Pℓ+1 (r)) = hℓ(Pℓ(r)) .
+
+Therefore, any reconstruction function achievable at level ℓ is also achievable at level ℓ + 1 . Hence, the admissible reconstruction function class at level ℓ is contained in the admissible reconstruction function class at level ℓ + 1 .Since minimizing over a larger function class cannot yield a higher minimum risk, we have 
+
+R⋆ℓ+1 = inf 
+
+> hℓ+1
+
+Ez
+
+h
+
+∥hℓ+1 (Pℓ+1 (r)) − z∥22
+
+i
+
+≤ inf 
+
+> hℓ
+
+Ez
+
+h
+
+∥hℓ(Pℓ(r)) − z∥22
+
+i
+
+= R⋆ℓ .
+
+Thus, 
+
+R⋆ℓ+1 ≤ R ⋆ℓ , ℓ = 1 , . . . , K − 1.
+
+This proves that the optimal achievable reconstruction error is non-increasing as more prefix tokens are made available. Consequently, nested prefix transmission encourages progressive refinement of the reconstruction. Preprint. Under review. April 2026 APPENDIX BEXTENDED MEASUREMENTS AND PER -R UN BENCHMARKS 
+
+This appendix reports the complete measurement record underlying Table III of the main text. Ten independent runs were performed for each of three deployment configurations—Full Edge, Full Cloud, and the proposed Edge– Cloud scheme—on the end-to-end testbed described in Section IV-A of the main text. All cloud-side experiments are carried out under a 1-Mbps throttled uplink emulated with the Linux tc token-bucket filter whose parameters are listed in Table I of the main text. On-board power is measured with a GW INSTEK SPS-2415 programmable DC supply at 11.7 V, sampled frame-by-frame from a video recording of the front panel during a full inference cycle. Wall-clock latencies are recorded at the client and the server using synchronized monotonic clocks; server recv ms 
+
+denotes the time from the start of the HTTP POST at the edge to the moment the server finishes reading the request body. Peak resident set size (RSS) is obtained via /proc/[pid]/status sampled at 10 Hz. The implementation code will be released upon publication at https://github.com/open-ep/ProSemComVLM. 
+
+A. Full-Edge Configuration 
+
+In the Full-Edge configuration, the entire SmolVLM-256M pipeline (vision encoder, LLM prefill, LLM decode) runs locally on the i.MX95 SMARC module, with no network dependency. The Neutron NPU executes the quantized vision encoder ( vision_encoder_q4.onnx ), and the ONNX-exported LLM decoder runs on the board through ONNX Runtime. Each run generates 120 tokens for the input image of size 512 × 512 × 3.TABLE IV: Per-Run Latency Breakdown for the Full-Edge Configuration                                                                            
+
+> Run Vision Encode (ms) LLM Prefill (ms) TTFT (ms) LLM Decode (ms) Total Generate (ms) E2E tok/s 13188.52 1322.39 4510.91 3416.58 7927.49 15.14 23196.16 1333.97 4530.13 3412.34 7942.47 15.11 33196.69 1313.17 4509.86 3495.68 8005.54 14.99 43209.57 1310.73 4520.30 3463.95 7984.25 15.03 53205.05 1317.80 4522.85 3403.12 7925.97 15.14 63202.93 1326.81 4529.74 3633.72 8163.46 14.70 73208.64 1318.79 4527.43 3540.80 8068.23 14.87 83207.00 1314.58 4521.58 3351.90 7873.48 15.24 93213.13 1316.15 4529.28 3496.96 8026.24 14.95 10 3199.68 1313.74 4513.42 3389.38 7902.80 15.18
+> Mean 3202.7 1318.8 4521.6 3460.4 7982.0 15.04 Std. ±7.1 ±7.4 ±7.4 ±83.8 ±82.8 ±0.16
+
+Vision encoding is remarkably deterministic on the Neutron NPU (coefficient of variation, CV = 0.22%); LLM prefill, which operates on a fixed-size visual token tensor, is similarly stable (CV = 0.56%). The dominant source of run-to-run variability is the auto-regressive decode phase ( ±83.8 ms), which is sensitive to on-board memory pressure and scheduler state. Time-to-first-token (TTFT), the user-perceived latency before any output is produced, averages 4521.6 ms; full 120-token delivery takes 7982.0 ms. Peak RSS reaches 624.6 MB, of which approximately 388 MB is attributable to the persistently loaded vision encoder and LLM weights, and 156 MB to the KV cache and intermediate activations generated during a 120-token decode. Fig. 6 shows the measured on-board power profile during a Full-Edge cycle. 
+
+B. Full-Cloud Configuration at 1 Mbps 
+
+In the Full-Cloud configuration, the edge performs no inference and forwards the raw 512 × 512 × 3 uint8 
+
+image to the server as a base64-encoded JSON payload of 1024.3 KiB. Both the vision encoder ( Stage 1 ) and the LLM decoder ( Stage 2 ) then execute on the GPU server. At 1 Mbps, the theoretical transmission time of a 1024.3-KiB payload is approximately 8395 ms. The measured server recv ms mean of 8754 ms (CV = 0.13%) is within 4.3% of this bound once HTTP framing, TCP slow start, and the TBF burst/latency parameters are accounted for. Network transfer therefore accounts for 93.9% of the end-to-end latency; the combined server-side vision and language computation (541 ms) contributes less than 6%. Peak on-board RSS remains at 92.2 MB since no model is loaded locally; the 6-MB increment over the 86-MB baseline is the pixel buffer (0.75 MB), the base64-encoded payload ( ∼1.3 MB), and the HTTP response buffer. Preprint. Under review. April 2026 
+
+Fig. 6: Measured on-board power during a single Full-Edge inference cycle, using the same supply, sampling, and power levels as Fig. 7. Two consecutive compute bursts are visible, each sharing the same envelope shape (rise– hold–decay–drop) as the single burst in Fig. 7: a first burst peaking at 11.85 W for the NPU vision encode (envelope width 3.20 s, matching Table IV) and a second slightly longer burst at the same peak for the auto-regressive LLM decode (envelope width 3.46 s, matching Table IV). The transition between the two bursts is a momentary drop to the 8.775-W initialization baseline rather than a sustained plateau. Subtracting the 7.6-W idle baseline, the total NPU-attributable energy obtained by integrating (P (t) − Pidle ) over the two bursts is 23.31 J. TABLE V: Per-Run Latency Breakdown at 1 Mbps for the Full-Cloud Configuration (Pixels)                                                  
+
+> Run server recv (ms) Stage 1 (ms) Stage 2 (ms) E2E (ms) 18748.0 61.8 511.6 9345.4 28746.8 47.3 503.4 9335.4 38748.4 49.8 505.5 9338.8 48745.5 45.6 533.0 9354.2 58766.5 46.1 462.0 9293.2 68746.7 45.6 461.3 9265.9 78787.0 45.6 464.4 9314.8 88746.7 45.6 462.1 9273.8 98751.2 45.7 505.3 9331.2 10 8754.1 46.8 525.4 9361.3
+> Mean 8754.1 48.0 493.4 9321.4 Std. ±11.4 ±5.0 ±26.7 ±31.7
+
+C. Edge–Cloud Configuration at 1 Mbps 
+
+In the proposed Edge–Cloud configuration, the Neutron NPU executes vision_encoder_q4.onnx on the board and emits a latent tensor of shape (64 , 576) in float32 , serialized as a 192.3-KiB JSON payload. The server receives the latent, performs the LLM decode, and returns the text response. The full progressive transmission pipeline with the Meta AutoEncoder sits between the vision encoder and the HTTP layer; the measurements reported here correspond to transmission at 100% latent transmission level (LTL ratio). Fig. 7 shows the measured on-board power profile during an Edge–Cloud cycle. Excluding Run 5 (3578.8 ms, attributable to transient OS scheduling interference. See Table VI), NPU encoding is tightly bounded: the remaining nine runs have a mean of 3171 ms and a standard deviation of only ±11 ms (CV = 0.3%). Network transfer is essentially deterministic (CV = 0.03%), which is expected because the 192.3-KiB latent payload plus TBF shaping yields a repeatable 1.62-s upload. The end-to-end composition is therefore 46.3% on-board NPU encode, 23.3% network, 7.0% cloud LLM decode, with the remainder attributable to protocol and scheduling overhead. Peak RSS is 343.7 MB, of which 254.6 MB is the vision-encoder ONNX session. 
+
+D. Batch-Size Ablation of the Vision Encoder 
+
+To isolate the effect of back-end choice on the vision encoder, we sweep the batch size from 1 to 8 on both the CPU and the Neutron NPU, with max_new_tokens fixed at 64. The input image is replicated within each Preprint. Under review. April 2026 
+
+Fig. 7: Measured on-board power during a single Edge–Cloud inference cycle (supply voltage 11.7 V, sampled frame-by-frame from the DC power supply panel). Four operating regimes are visible: boot (rising from 0 to 7.6 W), NPU initialization (holding at 8.775 W), a peak inference burst reaching 11.85 W as the latent is transmitted to the cloud and decaying to 10.97 W (envelope width 3.21 s, matching the mean NPU encoding time of Table VI), and a cooldown back to 7.6 W. Subtracting the 7.6-W idle baseline, the NPU-attributable energy obtained by integrating 
+
+(P (t) − Pidle ) over the burst is 11.27 J. TABLE VI: Per-Run Latency and Board Energy at 1 Mbps for Edge–Cloud Configuration ( 100 % LTL ratio)                                                              
+
+> Run NPU Encode (ms) server recv (ms) LLM Decode (ms) E2E (ms) Enc. Energy (J) 13187.4 1618.4 529.1 6953.6 11.19 23165.3 1617.7 487.1 6889.3 11.11 33191.0 1617.7 480.1 6908.1 11.20 43166.2 1617.7 485.4 6888.7 11.12 53578.8 1616.8 480.4 7293.5 12.57 63167.6 1617.3 476.4 6880.3 11.12 73161.0 1617.3 484.3 6881.5 11.10 83166.1 1617.4 483.7 6886.2 11.12 93169.2 1617.7 484.0 6890.1 11.13 10 3155.1 1617.0 484.4 6874.0 11.08
+> Mean 3210.8 1617.7 487.5 6934.5 11.27 Std. ±123.1 ±0.4 ±14.2 ±121.6 ±0.46
+
+batch, so that vision encoding is the only variable under test. For each configuration, we report the per-image vision-encoder time (Vis/img), the total generation time (Gen), the aggregate throughput, and peak RSS. TABLE VII: Performance of CPU vs. Neutron NPU on Various Batch Sizes                                                                                   
+
+> BS CPU NPU Vis/img (ms) TTFT (ms) Gen (ms) Thrpt (tok/s) RSS (MB) Vis/img (ms) TTFT (ms) Gen (ms) Thrpt (tok/s) RSS (MB) 19029.8 10554.6 5892.4 10.86 653.1 3198.6 4469.2 4385.4 14.59 600.0 29004.1 21028.9 8183.1 15.64 876.5 2644.8 7669.8 6668.6 19.19 802.7 39127.3 31933.5 9459.6 20.30 1085.4 2482.0 10953.0 6754.1 28.43 1015.4 49425.0 43871.5 10022.5 25.54 1195.7 2368.3 14082.1 7420.5 34.50 1121.0 59519.8 54841.1 11679.7 27.40 1297.0 2311.6 17194.4 8218.2 38.94 1231.1 69437.6 65211.1 12717.0 30.20 1463.4 2327.7 20662.1 8980.8 42.76 1365.2 79683.1 78767.9 15515.6 28.87 1582.5 2251.4 23698.0 10236.0 43.77 1537.5 89485.3 88417.5 16395.0 31.23 1820.6 2234.1 26866.5 10688.1 47.90 1787.4
+
+Three patterns are consistent across the sweep. First, CPU per-image vision-encoder time is essentially flat (∼9.0–9.7 s), indicating that the CPU path does not exploit batch-level parallelism. The Neutron NPU, by contrast, reduces Vis/img from 3198.6 ms at BS = 1 to 2234.1 ms at BS = 8, a 30% reduction, and widens its speedup over CPU on vision encoding from 2.82 × (9029 .8/3198 .6) at BS = 1 to 4.25 × (9485 .3/2234 .1) at BS = 8. Second, Preprint. Under review. April 2026 NPU throughput grows monotonically with batch size through BS = 8 (47.90 tok/s), with no sign of saturation, whereas CPU throughput exhibits a dip at BS = 7 (28.87 tok/s) before partially recovering at BS = 8, consistent with a memory-bandwidth bottleneck on the shared DDR path. Third, RSS grows by approximately 150 MB per additional batch sample on both back ends, so memory is the binding constraint at large batch sizes on the i.MX95. For the single-image inference setting reported in the main text (BS = 1), the NPU back end reduces TTFT from 10554.6 ms to 4469.2 ms (a 2.36 × speedup), bringing TTFT within the range usable for interactive applications.

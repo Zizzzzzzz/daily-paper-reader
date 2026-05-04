@@ -1,0 +1,934 @@
+Title: Computational neuromorphic tracking through scattering media with physics-informed speckle analysis
+
+URL Source: https://arxiv.org/pdf/2604.25310v1
+
+Published Time: Wed, 29 Apr 2026 00:37:28 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+Rapid t racking through strongly scattering media with 
+
+# physics -informed neuromorphic speckle analysis 
+
+## Yuqing Cao, Shuo Zhu, Rongzhou Chen, Jingyan Chen, Ni Chen 
+
+## and Edmund Y. Lam *
+
+Department of Electrical and Computer Engineering, The University of Hong 
+
+Kong, Pokfulam, Hong Kong, China. 
+
+*Corresponding author(s). E-mail(s):  elam@eee.hku.hk ;
+
+Abstract 
+
+This work addresses the critical problem of tracking fast -moving objects through strongly 
+
+scatte ring media in a low -light environment. Different from existing approaches that use 
+
+frame -based cameras with fixed exposure times, which trade off signal -to -noise ratio for 
+
+temporal resolution, we introduce computational neuromorphic tracking (CNT), a physics -
+
+informed framework that combines asynchronous event sensing with task -driven speckle 
+
+analysis for robust motion estimation. We formul ate the neuromorphic speckle 
+
+aggregation as a spatiotemporal speckle representation, jointly optimizing the temporal 
+
+and spatial parameters to maximize tracking stability under extreme conditions. Extensive 
+
+experiments demonstrate that our method enables r obust motion tracking of 10 × faster 
+
+motion and under 10 × dimmer illumination compared to conventional systems. These 
+
+improvements significantly broaden the operational regime for tracking through scattering 
+
+media, providing an efficient and scalable solution for demanding scenarios involving 
+
+rapid motion and low -light conditions. 
+
+Keywords: speckle, event camera, scattering, computational imaging 1 Introduction 
+
+Motion tracking through strongly scattering media is foundational for many applications, 
+
+including remote sensing and biomedical monitoring  [1, 2]. Since ballistic photons are 
+
+rapidly attenuated and multiple scattering severely distorts spatial information  [3, 4], the 
+
+detected signals consist predominantly o f randomized speckle  [2]. As a result, direct image 
+
+formation becomes unreliable or even infeasible  [6, 7]. This raises a fundamental question: 
+
+whether and how motion can be reliably estimated from seemingly random speckle 
+
+measurements when clear images are unavailable  [8-10 ], particularly under extreme 
+
+conditions such as rapid motions and low photon budgets  [11 , 12 ].
+
+Existing speckle -based approaches, such as speckle correlography, attempt to answer this 
+
+question by estimating motion from temporal correlations of speckle patterns  [13 , 14 ]. While 
+
+computationally efficient, their p erformance is constrained by both measurement conditions 
+
+and underlying physics  [15 , 16 ]. In particular, reliable correlation requires that speckle 
+
+structure remains observable within the optical memory effect (OME), the small angular or 
+
+lateral range over w hich speckle patterns maintain correlation  [17 ]. Typically, these methods 
+
+rely on conventional frame -based cameras, which suffer from an inherent t rade -off: longer 
+
+exposure improves signal -to -noise ratio (SNR) but introduces motion blur, whereas shorter 
+
+exposure preserves temporal detail but reduces photon counts  [18 ]. This trade -off degrades 
+
+speckle contrast and temporal coherence under high -speed or low -light conditions  [19 , 20 ],
+
+precisely the regimes where robust tracking is most needed. As a resul t, the reliability of 
+
+frame -based speckle correlography deteriorates significantly when objects are moving faster 
+
+or when illumination levels drop. 
+
+Neuromorphic vision sensors offer an alternative acquisition paradigm by asynchronously 
+
+reporting per -pixel brightness changes with microsecond latency and high dynamic range 
+
+[21 -24 ]. This decouples temporal resolution from exposure time and enables flexible 
+
+temporal aggregation after acquisition  [25 , 26 ]. In principle, such sensors can alleviate the 
+
+exposure -speed trade -off inherent to frame -based imaging. However, replacing the sensing 
+
+modality alone does not resolve the tracking problem. Raw event streams are sparse and 
+
+noise -sensitive, particularly under low -light conditions, and do not directly yield stable 
+
+speckle repres entations suitable for correlation analysis  [20 ]. The central challenge, therefore, 
+
+lies not only in acquisition, but also in constructing a computational representation that 
+
+preserves both temporal dynamics and speckle structure from async hronous measurements. Recent efforts explore data -driven reconstruction or learning -based inference from speckle or 
+
+neuromorphic measurements  [7, 10 ], while others investigate direct processing of event 
+
+streams  [20 , 27 ]. These methods demonstrate the potential of asynchronous sensing, but often 
+
+rely on implicit representations or heuristic parameter choices. They do not explicitly address 
+
+the conditions required for stable speckle correlation under fast motion and photon -limited 
+
+regimes. In particular, how to jointly preserve temporal coherence and speckle structure for 
+
+reliable speckle -based trackin g remains insufficiently resolved. 
+
+Consequently , we pioneer computational neuromorphic tracking (CNT), a joint hardware -
+
+algorithm framework for motion estimation through strongly scattering media. CNT encodes 
+
+hidden motion clues into asynchronous event str eams and decodes them via physics‑informed 
+
+speckle analysis. The advantage of CNT over conventional frame‑based correlography is its 
+
+ability to handle rapid motion without blur or loss of signal under low‑light conditions. 
+
+Additionally, CNT produces more s table, noise‑resilient speckle maps than event‑only 
+
+methods that use raw streams directly. These advantages enable calibration‑free tracking 
+
+without prior knowledge of the medium or motion model. Experimentally, CNT increases the 
+
+operational range for both object speed and illumination by 10 × compared to frame‑based 
+
+tracking. It achieves reliable continuous tracking where other modalities fail, particularly in 
+
+high‑speed and low‑light scenarios. Fig. 1 Overview of the CNT framework. (a) Representative a pplication scenarios: autonomous driving in fog 
+
+at night (top) and noninvasive cell monitoring through biological tissue (bottom), both characterized by 
+
+challenges (i) rapid motion and (ii) low photon flux. (b) Schematic of the CNT hardware configuration. (c) 
+
+Comparison of imaging paradigms. Frame -based systems rely on synchronous exposure, coupling temporal 
+
+resolution and SNR, whereas CNT uses asynchronous neuromorphic sensing to extend the accessible range of 
+
+velocity and illumination. (d) Workflow of phy sics -informed speckle analysis. Event streams are aggregated 
+
+into neuromorphic speckle maps governed by the spatiotemporal parameter pair (𝑛 , 𝜔 ) , which are jointly 
+
+selected via a physics -informed objective function. Scale bar: 2 mm. 2 Results 
+
+## 2.1 CNT framework 
+
+Figure  1 presents an overview of the CNT framework. As illustrated in Figure  1a, scenarios 
+
+such as autonomous navigation in fog and non‑invasive monitoring through biological tissue 
+
+involve fast motion and low photon flux. CNT is designed to address both challenges to 
+
+enable future applications to such scenarios. To experimentally v alidate CNT, we built the 
+
+optical setup shown in Figure  1b. Using this system, we compare CNT against conventional 
+
+methods. As summarized in Figure  1c, CNT reliably tracks motion under h igh‑speed and 
+
+low‑light conditions where frame‑based methods fail due to motion blur or signal loss. This 
+
+performance advantage stems from the physics‑informed speckle analysis illustrated in 
+
+Figure  1d. 
+
+CNT constructs a s peckle representation parameterized by a temporal ratio 𝑛 and a spatial 
+
+cutoff frequency 𝜔 . Here 𝑛 balances temporal decorrelation against event statistics, while 𝜔 
+
+suppresses noise‑dominated high‑frequency components that destabilize correlation. Rath er 
+
+than relying on heuristic parameter selection, CNT optimizes a composite objective that 
+
+directly measures motion observability: 
+
+𝒥 (𝑛 , 𝜔 ) = 𝛼𝐾 (𝑛 , 𝜔 ) + 𝛽𝐺 (𝑛 , 𝜔 ) + 𝛾𝑀 (𝑛 , 𝜔 ), (1)
+
+where 𝛼 , 𝛽 , and 𝛾 are weights chosen empirically and fixed throughout all experiments. 𝐾 
+
+denotes local speckle contrast, 𝐺 spatial gradient energy, and 𝑀 temporal correlation  [2].
+
+These terms capture complementary requirements for stable correlation: contrast ensures 
+
+signal visibility, spatial gradients preserve structural detail, and temporal correlation 
+
+maintains consistency across measurements. The optimal param eters are obtained as 
+
+(𝑛 ∗, 𝜔 ∗) = argmax 
+
+> 𝑛 ,𝜔
+
+𝒥 (𝑛 , 𝜔 ). (2)
+
+With these optimized parameters, CNT forms the final speckle maps and then recovers 
+
+motion via speckle correlography. Under the optical memory effect (OME), the correlation 
+
+peak position remains invariant to the medium’s transmission properties  [2], enabling 
+
+calibration‑free tracking without prior knowledge of the medium. CNT explicitly acc ounts for 
+
+the OME constraint through adaptive temporal sampling. Let 𝑑 OME denote the maximum 
+
+displacement that preserves speckle correlation  [6]. For a reference exposure 𝜏 , the 
+
+displacement per aggregation window is 𝑣𝜏 /𝑛 . By selecting 𝑛 such that 𝑣𝜏 /𝑛 < 𝑑 OME , CNT ensures that each measurement remains within the correlation‑preserving regime. Recursive 
+
+reference updates then enable tracking over larger cumulative displacements. 
+
+Together, CNT integrates asynchronous sensing with physics‑informed representation design 
+
+to maintain motion observability under fast motion and low‑light conditions. The following 
+
+subsections experimentally v alidate this capability. 
+
+## 2.2 CNT validation       
+
+> Fig. 2 Experimental comparison of CNT with frame -based and event -only approaches. An object
+> translates at 1.5 mm/s. Correlations (middle row) are computed from successive speckle maps between one
+> second (top row) . Line profiles (bottom row) show autocorrelation (dashed) and cross -correlation (solid). (a)
+> Frame -based imaging shows no resolvable peak shift, resulting in failed displacement estimation. (b) Event -only
+> aggregation produces noisy correlations and a bias ed estimate of 1.87 mm. (c) CNT yields a clear correlation
+> peak shift with an estimated displacement of 1.47 mm. Scale bars: 4 mm.
+
+We evaluate how different sensing modalities and speckle analysis strategies affect 
+
+displacement estimation. Data are collected using the setup in Figure  1b, with object speed 
+
+fixed at 𝑣 = 1.5 mm /s and ground truth displac ement 1.5 mm . For CNT, the optimized 
+
+parameters are 𝑛 = 1 and 𝜔 = 50 . Figure  2 compares correlation behavior across methods. 
+
+Frame‑based speckle patterns ( Figure  2a) are blurred and low contrast due to temporal 
+
+integration, yielding a correlation peak at the origin and an estimated displacement of 0 mm .
+
+The event‑only method ( Figure  2b) produces grainy speckle maps with strong side‑lobe noise, 
+
+res ulting in a shifted peak at 1.87 mm . This error arises from stochastic event clusters that 
+
+generate spurious correlation maxima under low SNR conditions. In contrast, CNT ( Figure  2c) produces spatiotemporally consistent speckle maps that preserve structural contrast while 
+
+suppressing noise‑dominated components. The resulting correlation peak is sharp and 
+
+well‑defined, yielding an estimated displacement of 1.47 mm . Quantitatively, CNT a chieves 
+
+a relative error of 2.22 %, compared to 24 .4% for the event‑only method and 100 % for the 
+
+frame‑based method. These results show that accurate tracking requires not only appropriate 
+
+sensing but also a representation that jointly preserves temporal dy namics and speckle 
+
+structure. 
+
+## 2.3 Effect of temporal parameter          
+
+> Fig. 3 Effect of the temporal parameter 𝑛 on tracking performance. Distance versus time for target speeds
+> of (a) 1 mm/s, (b) 3 mm/s, and (c) 5 mm/s. Each panel compares ground truth (dotted), frame -based tracking
+> (green), and CNT (orange) under different values of 𝑛 . CNT performance depends strongly on 𝑛 .
+
+We investiga te the dependence of tracking performance on the temporal ratio 𝑛 = 𝜏 /Δ𝑡 ,
+
+where Δ𝑡 is the event aggregation window. Figure  3 shows displacement error versus 𝑛 for 
+
+different motion speeds. A clear trade‑off is observed. Small 𝑛 (long aggregation windows) 
+
+leads to temporal blurring and reduced sensitivity to fast dynamics, whereas large 𝑛 (short 
+
+windows) produces sparse event statistics and unstable correlation peaks. The optimal 𝑛 
+
+shifts with motion speed: faster motion requires finer temporal sampling to remain within the 
+
+memory effect, while slower motion benefits from longer integration to improve SNR. Suboptimal choices of 𝑛 lead to either temporal decorr elation or insufficient event statistics, 
+
+both of which degrade correlation stability. Another experiment conducted on a different 
+
+object is included in Supplementary Note 1, leading to a similar observation. 
+
+## 2.4 Joint optimization of spatiotemporal parameters         
+
+> Fig. 4 Joint optimization of spatiotemporal parameters. (a) Relative tracking error as a function of temporal
+> resolution ratio 𝑛 for different motion speeds. Each speed exhibits a distinct optimal 𝑛 that minimizes tracking
+> error. (b) Joint two -dimensional optimization over spatiotemporal parameter pair (𝑛 ,𝜔 ). Top row: value of the
+> constructed objective function. Bottom row: meas ured tracking accuracy (%). Yellow -highlighted regions
+> indicate optimal parameter pairs. The objective -function maxima closely align with the empirical accuracy
+> maxima.
+
+We evaluate the objective function 𝒥 (𝑛 , 𝜔 ) as a joint function of temporal and spati al 
+
+parameters. Tracking accuracy is measured using relative speed error. Figure  4a shows error 
+
+versus 𝑛 at different speeds, each exhibiting a distinct minimum, indicating that each motion 
+
+regime requires a specific temporal scale. Figure  4b presents a two‑dimensional analysis over 
+
+(𝑛 , 𝜔 ), where the maxima of 𝒥 closely coincide with the minima of tracking error. This 
+
+agreement indicates that 𝒥 captures key factors governing speckle correlation stability, namely contrast, structural preservation, and temporal consistency. This provides a criterion 
+
+for selecting spatiotemporal parameters without heuristic tuning. 
+
+## 2.5 Speed boundary      
+
+> Fig. 5 Cross -speed generalizability assessment. (a) Displacement over time for target speeds from 0.5 to
+> 20.0 mm/s, separated into (i) super -boundary and (ii) sub -boundary regimes relat ive to the single -pixel blur limit
+> under 25 fps. CNT (left column) follows the ground truth (dotted) across all speeds, while frame -based tracking
+> (right column) fails at super -boundary regime. (b) Violin plots of relative tracking error versus speed for f rame -
+> based (green) and CNT (orange) methods. The shaded region indicates errors exceeding 20% .
+
+We evaluate tracking performance relative to the single‑pixel motion blur limit of a 
+
+frame‑based system at 25 fps, corresponding to approximately 3.3 mm/s (see Supplementary 
+
+Note 2). Figure  5a shows displacement trajectory . Below this limit, both methods follow the 
+
+ground truth. Above it, frame‑based tracking saturates and underestimates displacement due 
+
+to motion‑induced decorrelation, while CNT maintains linear trajectories across all tested 
+
+speeds. Figure  5b shows the corresponding error distributions. Frame‑based errors increase 
+
+sharply beyond the blur limit, frequently exceeding 50 % with large variance. In contrast, 
+
+CNT maintains low error and narrow distributions up to 20 mm/s. Supplementa ry Note 3
+
+compares the performance of the CNT and frame -based method on different directions with 
+
+the same velocity, where CNT is more robust across various directions. These results indicate 
+
+that fixed‑exposure imaging imposes a practical speed limit, whi le CNT extends the 
+
+accessible regime through asynchronous sensing and adaptive temporal representation. 2.6 Illumination boundary        
+
+> Fig. 6Cross -illumination generalizability assessment. (a) Speckle frames acquired at 25 fps under
+> decreasing illumination. (b) Corresponding event streams over 40 ms. (c) Cumulative displacement estimated by
+> CNT (orange) and frame -based (green) methods compared with ground truth (dotted). (d) Relative tracki ng error
+> at the final time point. The shaded region indicates a high error region where errors exceed 20% .
+
+We evaluate performance under photon‑limited conditions from 10.5 lux to 0.9 lux. As 
+
+illumination decreases, frame‑based speckle patterns lose contr ast and spatial detail 
+
+(Figure  6a), while event streams retain activity ( Figure  6b). Quantitative results ( Figure  6c, d )
+
+show that frame‑based error increases rapidly, reaching 100 % at 0.9 lux. CNT maintains 
+
+errors below 10 % across the full range. This degradation reflects the exposure‑limited 
+
+trade‑off between SNR and motion blur in frame‑based systems. CNT avoids this co nstraint 
+
+by preserving temporal information through asynchronous sampling and optimizing the 
+
+spatiotemporal representation, enabling stable tracking under low‑light conditions. 2.7 Trajectory reconstruction      
+
+> Fig. 7 Nonlinear trajectory reconstruction. Two complex nonlinear trajectories at a speed of 1 mm/s and
+> under an illumination of 10.5 lux. (a) A combined lateral and diagonal trajectory. (b) A multi -turn trajectory.
+> Ground truth paths are shown as blue solid lines. Frame -based estima tes are shown as purple triangles, while
+> CNT estimates are shown as red circles. CNT accurately reconstructs both trajectories, while the frame -based
+> method shows significant lag and deviations, particularly at turning points.
+
+We compare CNT and frame‑based tracking on representative trajectories at 1 mm/s and 
+
+10.5 lux in Figure  7. Both methods track initial linear segments accurately. However, during 
+
+abrupt directional changes, frame‑based tracking exhibits increasi ng lag and deviation from 
+
+the ground truth, consistent with temporal misalignment and accumulated error. In contrast, 
+
+CNT maintains stable alignment throughout rapid directional changes. This robustness arises 
+
+from consistent speckle correlation enabled by adaptive temporal sampling and structured 
+
+representation, allowing reliable tracking under non‑smooth motion. A video demonstration 
+
+of reconstructing trajectory (a) is shown in supplementary material. 
+
+# 3 Discussion 
+
+We develop computational neuromorphic tracking (CNT) as a framework that integrates 
+
+asynchronous sensing with physics‑informed speckle analysis. Rather than relying on fixed -
+
+exposure acquisition settings or heuristic parameter selection, CNT formulates motion 
+
+tracking as a joint o ptimization of spatiotemporal representation. This perspective addresses 
+
+the challenge of preserving both temporal dynamics and speckle structure under scattering 
+
+and photon‑limited conditions. The experimental results (Sections  2.2 -2.7 ) demonstrate that CNT extends reliable tracking to 
+
+20 mm/s and 0.9 lux, beyond the regime accessible to frame‑based methods. The agreement 
+
+between parameters that maximize 𝒥 (𝑛 , 𝜔 ) and those that minimiz e tracking error 
+
+(Section  2.4 ) suggests that the objective captures key factors governing speckle correlation 
+
+stability, including contrast, structural integrity, and temporal consistency. 
+
+A key observation is that sensing a lone is insufficient for robust tracking in scattering 
+
+environments. Frame‑based imaging loses temporal information through integration, while 
+
+raw event streams remain unstable without structured aggregation (Section  2. 2). CNT 
+
+addresses this by explicitly controlling temporal sampling ( 𝑛 ) and spatial bandwidth ( 𝜔 ), 
+
+enabling a representation in which motion‑induced speckle evolution remains observable. 
+
+The dependence of optimal parameters on motion speed (Section  2.3 ) highlights the adaptive 
+
+nature of the framework. Faster motion requires finer temporal sampling, whereas slower 
+
+motion benefits from increased integration. By enabling post‑acquisition adjustment of these 
+
+parameters, CNT reduc es reliance on fixed hardware settings and allows adaptation across 
+
+varying conditions. 
+
+The speed boundary analysis (Section  2.5 ) shows that CNT maintains low error up to 
+
+20 mm/s, while frame‑based systems saturate above the single‑pixel blur limit. Under low 
+
+illumination (Section  2.6 ), CNT preserves temporal information through asynchronous 
+
+sampling, substantially extending illumination tolerance. For complex trajectories 
+
+(Section  2.7 ), CNT maintains stable correlation due to reduced reliance on precise spatial 
+
+filtering and adaptive temporal integration. 
+
+Despite these advantages, several limitations remain. The current study focuses on 
+
+single‑object tr acking in static scattering media. Extensions to multi‑object scenarios or 
+
+dynamically evolving media may introduce ambiguity and decorrelation effects  [6]. In 
+
+addition, performance remains constrained by the object size and assumptions such as far -
+
+field detection  [28 ].
+
+Future work may explore predictive filtering, adaptive parameter updates, and tighter 
+
+hardware –algorithm co‑design. More broadly, CNT suggests a general approach to 
+
+constructing task‑relevan t representations from sparse, asynchronous measurements, which 
+
+may extend to other computational imaging problems in complex media, including 
+
+non‑line‑of‑sight imaging  [29 ], flow estimation  [30 , 31 ], and deep tissue imaging  [32 ]. The success of recent learning -based approaches in scattering imaging  [7, 33 , 34 ] further 
+
+underscores the potential of integrating physics -informed representations with data -driven 
+
+strategies. 
+
+# 4 Materials and methods 
+
+## 4.1 Forward model for neuromorphic speckle formation 
+
+Event gen eration follows a threshold -crossing model  [35 ]. An event 𝒆 𝒊 = (𝒓 𝑖 , 𝑡 𝑖 , 𝑝 𝑖 ) is 
+
+triggered at pixel 𝒓 𝒊 and time stamp 𝑡 𝑖 , when the logarithmic intensity 𝐿 (𝒓 , 𝑡 ) = log 𝐼 (𝒓 , 𝑡 )
+
+satisfies 
+
+𝐿 (𝒓 𝑖 , 𝑡 𝑖 ) − 𝐿 (𝒓 𝑖 , 𝑡 𝑖 − Δ𝑡 𝑖 ) = 𝑝 𝑖 𝐷 , (3)
+
+where 𝑝 𝑖 ∈ {+1, −1} is the polarity and Δ𝑡 𝑖 is the time since the previous event at 𝒓 𝑖 . For 
+
+sufficiently small Δ𝑡 𝑖 ,
+
+∂𝐿 
+
+∂𝑡 (𝒓 𝑖 , 𝑡 𝑖 ) ≈ 𝑝 𝑖 𝐷 
+
+Δ𝑡 𝑖 
+
+, (4)
+
+indicating that events sample the temporal gradients of speckle fluctuations. A detailed 
+
+derivation is p rovided in Supplementary Note 4. This mechanism operates without exposure -
+
+based integration  [35 ].
+
+To construct displacement -sensitive speckle maps, events are aggregated within a temporal 
+
+window Δ𝑡 to form a neuromorphic speckle map 
+
+𝑆 (𝒓 , 𝑡 ) = ∑ 𝑝 𝑖 
+
+> 𝑖
+
+𝛿 (𝒓 − 𝒓 𝑖 ) rect (𝑡 𝑖 − 𝑡 
+
+Δ𝑡 ) , (5)
+
+where 𝛿 (⋅) is the Kronecker delta and rect (⋅) selects events within [𝑡 − Δ𝑡  
+
+> 2
+
+, 𝑡 + Δ𝑡  
+
+> 2
+
+] (see 
+
+Supplementary Note 5). The window Δ𝑡 governs a trade -off: shorter windows preserve rapid 
+
+dynamics, whereas longer windows improve SNR through event accumulation. 
+
+In practice, the measured map is corrupted by spurious events unrelated to speckle evolution, 
+
+such as photon shot noise under low illumination  [36 ]. We model the observation as 
+
+𝑆 m(𝒓 , 𝑡 ) = 𝑆 (𝒓 , 𝑡 ) + 𝜂 (𝒓 , 𝑡 ), (6)
+
+where 𝜂 (𝒓 , 𝑡 ) is a zero -mean random field with finite variance. 4.2 Spatiotemporal representation 
+
+Neuromorphic sensing allows the aggregation window to be selected post -acquisition. For 
+
+consistent com parison with frame -based imaging, we define the dimensionless parameter 𝑛 =
+
+𝜏 /Δ𝑡 , where 𝜏 is the exposure time of a reference camera ( 𝜏 = 40 ms in our experiments). 
+
+The aggregated map becomes 
+
+𝑆 m(𝒓 , 𝑡 ; 𝑛 ) = ∑ 𝑝 𝑖 
+
+> 𝑖
+
+𝛿 (𝒓 − 𝒓 𝑖 ) rect (𝑛 (𝑡 𝑖 − 𝑡 )
+
+𝜏 ) + 𝜂 (𝒓 , 𝑡 ; 𝑛 ), (7)
+
+with 𝜂 (𝒓 , 𝑡 ; 𝑛 ) the temporally accumulated noise. The parameter 𝑛 controls the balance 
+
+between temporal decorrelation and event statistics. 
+
+To suppress high -frequency noise, we apply a spatial denoising operator 𝒟 𝜔 {⋅} parameterized 
+
+by the cutoff frequency 𝜔 :
+
+𝑆 d(𝒓 , 𝑡 ; 𝑛 , 𝜔 ) = 𝒟 𝜔 {𝑆 m(𝒓 , 𝑡 ; 𝑛 )}. (8)
+
+We adopt a Fourier -transform -based lowpass filter  [37 , 38 ] with transfer function 𝐻 (𝒇 ; 𝜔 ) for 
+
+its simplicity and explicit frequency control. The denoised map is therefore 
+
+𝑆 d(𝒓 , 𝑡 ; 𝑛 , 𝜔 ) = ℱ−1 {𝐻 (𝒇 ; 𝜔 ) ℱ {∑ 𝑝 𝑖 
+
+> 𝑖
+
+𝛿 (𝒓 − 𝒓 𝑖 ) rect (𝑛 (𝑡 𝑖 − 𝑡 )
+
+𝜏 ) + 𝜂 (𝒓 , 𝑡 ; 𝑛 )}} . (9)
+
+This formulation separates temporal aggregation and spatial filtering, enabling joint control 
+
+of spatiotemporal representation via the parameter pair (𝑛 , 𝜔 ).
+
+## 4.3 Physics -informed speckle analysis 
+
+Conven tional metrics such as global speckle contrast do not align well with tracking 
+
+performance, as they may favor noisy, high -contrast patterns (see Supplementary Note 6). 
+
+We instead define a physics -informed objective function tailored to correlation -based motion 
+
+estimation. 
+
+The average local speckle contrast over sliding neighborhoods is 
+
+𝐾 = 𝔼 𝒓 [ 𝜎 𝑆 d(𝒓 )
+
+|𝜇 𝑆 d(𝒓 )| + 𝜀 ] , (10 )which emphasizes local fluctuations that contribute to correlation peak sharpness. To prevent 
+
+over -smoothing and preserve th e structural fingerprint of speckle patterns, we include the 
+
+spatial gradient energy 
+
+𝐺 = ⟨|∇𝑆 d(𝒓 , 𝑡 )|2⟩. (11 )
+
+Under the small -displacement regime ensured by operation within the optical memory effect, 
+
+temporal correlation serves as a reliable proxy for inter -frame similarity: 
+
+𝑀 = ∑ [(𝑆 d(𝒓 , 𝑡 ) − 𝜇 𝑡 )(𝑆 d(𝒓 , 𝑡 + Δ𝑡 ) − 𝜇 𝑡 +Δ𝑡 )]𝒓 
+
+√∑ (𝑆 d(𝒓 , 𝑡 ) − 𝜇 𝑡 )2 
+
+> 𝒓
+
+√∑ (𝑆 d(𝒓 , 𝑡 + Δ𝑡 ) − 𝜇 𝑡 +Δ𝑡 )2
+
+> 𝒓
+
+, (12 )
+
+where 𝜇 𝑡 = ⟨𝑆 d(𝒓 , 𝑡 )⟩𝒓 .
+
+These terms are combined into a physics -driven objective 
+
+𝒥 (𝑛 , 𝜔 ) = 𝛼𝐾 + 𝛽𝐺 + 𝛾𝑀 , (13 )
+
+with empirically determined weights 𝛼 = 1 , 𝛽 = 0.2 , and 𝛾 = 5 , held fixed across all 
+
+experiments. The optimal spatiotemporal parameter pair is 
+
+(𝑛 ∗, 𝜔 ∗) = argmax  
+
+> 𝑛 ∈𝑁 ,𝜔 ∈Ω
+
+𝒥 (𝑛 , 𝜔 ), (14 )
+
+which is optimized for motion observability and stable displacement inference, rather than 
+
+visual contrast. We solve the optimization problem over integer sets 𝑁 and Ω, where 𝑁 =
+
+{1, … ,10 } and Ω = {20 , … ,60 }, constrained by the physical limits of the sensing system. For 
+
+each (𝑛 , 𝜔 ) pair, we compute the denoised m ap and the objective 𝒥 . A coarse grid search 
+
+over 𝑁 × Ω identifies the region of maximal 𝒥 , followed by a coordinate -wise refinement to 
+
+converge to (𝑛 ∗, 𝜔 ∗). The optimal parameters are then applied to form the final speckle maps 
+
+for motion estimation. 
+
+## 4.4 Ca libration -free motion estimator 
+
+With the optimized parameter pair (𝑛 ∗, 𝜔 ∗), the maps 𝑆 d(𝒓 , 𝑡 ) encode displacement -sensitive 
+
+features. Motion is estimated using speckle correlography, which relies on the intrinsic spatial 
+
+correlation of speckle patterns and requires no prior knowledge of the scattering medium or 
+
+motion model  [2].
+
+To mitigate spatial biases arising from non -ideal illumination and collection geometry  [39 ],
+
+we first subtract the spatial mean: 𝑆 ̃ (𝒓 , 𝑡 ) = 𝑆 d(𝒓 , 𝑡 ) − ⟨𝑆 d(𝒓 , 𝑡 )⟩. (15 )
+
+The displacement between two frames 𝑡 𝑖 and 𝑡 𝑗 is then inferred from the peak of the mean -
+
+subtracted cross -correlation 
+
+𝐶 ̃𝑖 ,𝑗 (𝒓 ) = 𝑆 ̃ (𝒓 , 𝑡 𝑖 ) ⋆ 𝑆 ̃ (𝒓 , 𝑡 𝑗 ), (16 )
+
+relative to 𝐶 ̃𝑖 ,𝑖 (𝒓 ). This mean -subtracted formulation improves robustness without calibration 
+
+or prior assumptions (see Supplementary Note 7). 
+
+## 4.5 Re cursive tracking beyond OME 
+
+The tracking range of speckle correlography is fundamentally constrained by OME, which 
+
+limits the maximum displacement 𝑑 OME over which speckle patterns remain correlated  [2].
+
+Beyond this limit, direct correlation between distant frames fails. 
+
+CNT enables reliable estimation of small successive displacements, which allows the 
+
+reference to be updated sequentially. Consecutive maps 𝑆 ̃𝑖 and 𝑆 ̃𝑖 +1 are c onstructed such that 
+
+Δ𝒅 𝑖 →𝑖 +1 remains within the OME regime. After each step, the reference is updated ( 𝑆 ̃𝑖 ←
+
+𝑆 ̃𝑖 +1), and displacements are accumulated: 
+
+Δ𝒅 1→𝑛 = ∑ Δ
+
+> 𝑛 −1
+> 𝑘 =0
+
+𝒅 𝑘 →𝑘 +1. (17 )
+
+The cumulative displacement can thus exceed the intrinsic memory effect limit: 
+
+∥ Δ𝒅 1→𝑛 ∥≫ 𝑑 OME . (18 )
+
+This strategy preserves the validity of each local correlation while extending the effective 
+
+tracking range through sequential accumulation. Combined with high -temporal -resolution 
+
+neuromorphic sensing, it enables large -sca le motion tracking in scattering media without 
+
+prior knowledge of system parameters. 
+
+## 4.6 Data acquisition 
+
+The experimental setup is depicted in Figure  1b. A continuous -wave 532 nm laser (200 mW 
+
+DPSS) is expanded by a 2 × beam expander (BE) and passed through a rotating diffuser (RD) 
+
+to reduce spatial coherence, suppressing intense speckle hotspots and improving 
+
+measurement stability  [40 ]. The beam is then collimated and further expanded by a 10 × BE before illuminating a negative USAF resolution target (Thorlabs R3L3S1N) mounted on a 
+
+motorized transla tion stage, allowing controlled two -dimensional displacement. The element 
+
+‘5’ of group 0 is filtered to transmit light. Light passing through the moving target then 
+
+traverses a static 220 -grit ground -glass diffuser (Edmund Optics), generating dynamic 
+
+speck le patterns. An iris between the diffuser and camera reduces stray light to improve 
+
+contrast. See Supplementary Note 8 for the real optical experimental setup. 
+
+Detection is performed by an event camera (Inivation DAVIS346, 346 × 260 pixels) 
+
+equipped with a 20 × objective lens to magnify the speckle pattern rather than form a 
+
+focused image. The camera outputs 25 fps intensity frames and asynchronous event streams. 
+
+Distances from the target to the diffuser and from the diffuser to the s ensor image plane are 𝑢 
+
+and 𝑣 , respectively. We calibrate the relationship between physical velocity and pixel 
+
+displacement with 𝑢 = 125 mm and 𝑣 = 125 mm . Controlled experiments show that an 
+
+object speed of 1 mm/s corresponds to approximately 7.5 pixels p er second on the sensor, 
+
+enabling direct conversion between pixel shifts and physical speeds. 
+
+# Supplementary information 
+
+See Supplementary Information and Supplementary Video for supporting content. 
+
+# Declarations 
+
+• Funding: This work is supported by Theme -base d Research Scheme (T45 -701/22 -R) 
+
+and Research Grants Council of Hong Kong (GRF17201822). 
+
+• Competing interests: The authors declare no conflicts of interest. 
+
+• Availability of data and materials: Data underlying the results presented in this paper are 
+
+not publ icly available at this time but may be obtained from the authors upon reasonable 
+
+request. 
+
+• Authors’ contributions: Yuqing Cao, Shuo Zhu, and Edmund Y. Lam conceived and 
+
+designed the study. Yuqing Cao, Shuo Zhu, and Rongzhou Chen developed the 
+
+experimental s etup and performed the data acquisition. Yuqing Cao implemented the 
+
+computational algorithms and carried out data analysis. Yuqing Cao, Shuo Zhu, Jingyan 
+
+Chen, and Ni Chen interpreted the results. Edmund Y. Lam provided supervision throughout the project. Yuqing Cao wrote the initial draft of the manuscript. All authors 
+
+participated in discussions and commented on the manuscript. 
+
+• Acknowledgements: We are grateful to all members of the Imaging Systems Laboratory 
+
+in HKU for their support and valuable suggesti ons. 
+
+# References 
+
+[1] J. W. Goodman, Statistical Optics , John Wiley and Sons, 2 ed. (2015). 
+
+[2] J. W. Goodman, Speckle Phenomena in Optics: Theory and applications , SPIE 
+
+Bellingham, WA, USA, 2 ed. (2020). 
+
+[3] Bertolotti, J. et al. Non -invasive imaging through opaque scattering layers. Nature 491 ,
+
+232 –234 (2012). 
+
+[4] Xun, Z. et al. Reconstruction of the tumor spatial microenvironment along the 
+
+malignant -boundary -nonmalignant axis. Nature Communications 14 , 933 (2023). 
+
+[5] Gao, Y., Cao, L. & Tsai, D. P. Single -shot, reference -less computational wavefront 
+
+sensing for complex optical fields. Light: Science & Applications 15 , 174 (2026). 
+
+[6] Jauregui -Sánchez, Y., Penketh, H. & Bertolotti, J. Tracking moving objects through 
+
+scattering media via speck le correlations. Nature Communications 13 , 5779 (2022). 
+
+[7] Liu, H. et al. Learning -based real -time imaging through dynamic scattering media. Light: 
+
+Science & Applications 13 , 194 (2024). 
+
+[8] Shi, Y., Sheng, W., Fu, Y. & Liu, Y. Overlapping speckle correlation algorithm for 
+
+high -resolution imaging and tracking of objects in unknown scattering media. Nature 
+
+Communications 14 , 7742 (2023). 
+
+[9] Cua, M., Zhou, E. (Haojiang) & Yang, C. Imaging moving ta rgets through scattering 
+
+media. Opt. Express 25 , 3935 –3945 (2017). [10] Ma, K., Wang, X., He, S., Zhang, X. & Zhang, Y. Learning to image and track moving 
+
+objects through scattering media via speckle difference. Optics and Laser Technology 
+
+159 , 10 8925 (2023). 
+
+[11] Wu, J. et al. Dark -EvGS: Event camera as an eye for radiance field in the dark. IEEE 
+
+Transactions on Image Processing (2026). 
+
+[12] Cao, Y., Zhu, S., Chen, R., Chen, J. & Lam, E. Y. Low -latency object tracking through 
+
+scattering media with event cam era. (2025). 
+
+[13] Zhu, S., Guo, E., Gu, J., Bai, L. & Han, J. Imaging through unknown scattering media 
+
+based on physics -informed learning. Photonics Research 9, B210 –B219 (2021). 
+
+[14] Pang, Z. & Arie, A. Coherence synthesis in nonlinear optics. Light: Science & 
+
+Appl ications 14 , 101 (2025). 
+
+[15] Wang, Z., Lu, X., Chen, Z., Cai, Y. & Zhao, C. Topological links and knots of speckled 
+
+light mediated by coherence singularities. Light: Science & Applications 14 , 175 (2025). 
+
+[16] Zhang, Q. et al. Non -invasive estimation of the powder size distribution from a single 
+
+speckle image. Light: Science & Applications 13 , 200 (2024). 
+
+[17] Newman, J. A., Luo, Q. & Webb, K. J. Imaging hidden objects with spatial speckle 
+
+intensity correlations over object position. Physical Review Letters 116 , 073902 ( 2016). 
+
+[18] Zhang, P., Liu, H., Ge, Z., Wang, C. & Lam, E. Y. Neuromorphic imaging with joint 
+
+image deblurring and event denoising. IEEE Transactions on Image Processing 33 ,
+
+2318 –2333 (2024). 
+
+[19] Zhang, Y., Chan, S. H. & Lam, E. Y. Photon -starved snapshot holograph y. APL 
+
+Photonics 8, (2023). 
+
+[20] Zhu, S., Ge, Z., Wang, C., Han, J. & Lam, E. Y. Efficient non -line -of -sight tracking 
+
+with computational neuromorphic imaging. Optics Letters 49 , 3584 –3587 (2024). [21] Gehrig, D. & Scaramuzza, D. Low -latency automotive vision with event cameras. 
+
+Nature 629 , 103 4–1040 (2024). 
+
+[22] Zhu, S., Wang, C., Liu, H., Zhang, P. & Lam, E. Y. Computational neuromorphic 
+
+imaging: Principles and applications. vol. 12857 4 –10 (2024). 
+
+[23] Chen, R. et al.  Self -calibrated neuromorphic hyperspectral derivative imaging . Optica 
+
+13 , 587 –590 (2026). 
+
+[24] Guo, R. et al. EventLFM: Event camera integrated Fourier light field microscopy for 
+
+ultrafast 3D imaging. Light: Science & Applications 13 , 144 (2024). 
+
+[25] Zhu, S., Yin, Q., Wang, C., Huang, J. & Lam, E. Y. Ultrafast dynamic defect inspection 
+
+with computational neuromorphic imaging. Advanced Science 12 , e10338 (2025). 
+
+[26] Wang, C. et al. Angle -based neuromorphic wave normal sensing. Laser & Photonics 
+
+Reviews 19 , 2400647 (2025) .
+
+[27] Ge, Z., Zhang, P., Gao, Y., So, H. K. -H. & Lam, E. Y. Lens -free motion analysis via 
+
+neuromorphic laser speckle imaging. Optics Express 30 , 2206 –2218 (2022). 
+
+[28] Wang, F. et al. Far -field super -resolution ghost imaging with a deep neural network 
+
+constraint. Light: Science & Applications 11 , 1 (2022). 
+
+[29] Li, W. et al. Turning rough surfaces into non -line -of -sight cameras. Optica 12 , 626 –634 
+
+(2025). 
+
+[30] Zhang, Y. et al. Motility -based label -free detection of parasites in bodily fluids using 
+
+holographic speckle analysis and deep learning. Light: Science & Applications 7, 108 
+
+(2018). 
+
+[31] Postnov, D. D., Tang, J., Erdener, S. E., Kılıç, K. & Boas, D. A. Dynamic light 
+
+scattering imaging. Science advances 6, eabc4628 (2020). 
+
+[32] Zhang, Y. et al. Long -term mesoscale imaging of 3D int ercellular dynamics across a 
+
+mammalian organ. Cell 187 , 6104 –6122 (2024). [33] Lyu, M., Wang, H., Li, G., Zheng, S. & Situ, G. Learning -based lensless imaging 
+
+through optically thick scattering media. Advanced Photonics 1, 036002 (2019). 
+
+[34] Zheng, S., Wang, H., Do ng, S., Wang, F. & Situ, G. Incoherent imaging through highly 
+
+nonstatic and optically thick turbid media based on neural network. Photonics Research 
+
+9, B220 –B228 (2021). 
+
+[35] Gallego, G. et al. Event -based vision: A survey. IEEE Transactions on Pattern Analysis 
+
+and Machine Intelligence 44 , 154 –180 (2020). 
+
+[36] Ruiming, C., Dekel, G., Amit, K., L, Y. J. & Laura, W. Noise2Image: Noise -enabled 
+
+static scene recovery for event cameras. Optica 12 , 46 –55 (2025). 
+
+[37] Goodman, J. W. Introduction to Fourier Optics . (Robert s; Company publishers, 2017). 
+
+[38] Bracewell, R. N. The Fourier Transform and Its Applications . (McGraw -Hill, 1999). 
+
+[39] Penketh, H. & Bertolotti, J. Imaging through scattering media by exploiting the optical 
+
+memory effect: A tutorial. Journal of Physics: Photonics 6, (2024). 
+
+[40] Shin, S. C. et al. Removal of hot spot speckle on laser projection screen using both the 
+
+running screen and the rotating diffuser. Displays 27 , 91 –96 (2006).

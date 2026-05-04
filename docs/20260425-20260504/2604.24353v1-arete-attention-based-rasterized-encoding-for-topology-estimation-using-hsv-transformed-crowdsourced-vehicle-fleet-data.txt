@@ -1,0 +1,255 @@
+Title: ARETE: Attention-based Rasterized Encoding for Topology Estimation using HSV-transformed Crowdsourced Vehicle Fleet Data
+
+URL Source: https://arxiv.org/pdf/2604.24353v1
+
+Published Time: Tue, 28 Apr 2026 01:51:56 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# ARETE: Attention-based Rasterized Encoding for Topology Estimation using HSV-transformed Crowdsourced Vehicle Fleet Data 
+
+Daniel Fritz 1,2, Dimitrios Lagamtzis 1, Michael Mink 1, Markus Enzweiler 2, and Steffen Schober 2 
+
+> 1
+
+Mercedes-Benz AG, Research & Development, Sindelfingen, Germany  
+
+> 2
+
+Institute for Intelligent Systems, Esslingen University of Applied Sciences, Esslingen, Germany 
+
+Abstract. The continuous advancement of autonomous driving (AD) introduces challenges across multiple disciplines to ensure safe and ef-ficient driving. One such challenge is the generation of High-Definition (HD) maps, which must remain up to date and highly accurate for down-stream automotive tasks. One promising approach is the use of crowd-sourced data from a vehicle fleet, representing road topology and lane-level features. This work focuses on the generation of centerlines and lane dividers from crowdsourced vehicle trajectories. We adopt a Detection Transformer (DETR)-based approach, where a rasterized representation of vehicle trajectories is used as input to predict vectorized lane represen-tations. Each lane consists of a centerline with an associated direction and corresponding lane dividers that are geometrically constrained by the centerline. Our method includes the extraction of local tiles, from which crowdsourced vehicle trajectories are aggregated. Each tile under-goes a transformation into a rasterized representation encoding both the presence and direction of each trajectory, enabling the prediction of vec-torized directed lanes. Experiments are conducted on an internal dataset as well as on the public datasets nuScenes and nuPlan. 
+
+Keywords: HD Map Generation · Autonomous Driving · Detection Transformer . 
+
+## 1 INTRODUCTION 
+
+Digital maps are widely used by human drivers for navigation and spatial orienta-tion when planning and reaching a desired destination. In this context, Standard-Definition (SD) maps provide a coarse representation of the road network, which captures fundamental geographic information that is generally sufficient for ba-sic navigation tasks. When considering the task of Autonomous Driving (AD), the requirements of digital maps become significant stricter in terms of coverage and accuracy in order to represent the road structure and its lane-level features. A higher level of detail enables a more comprehensive understanding of the driv-ing environment and supports downstream tasks such as motion planning, scene understanding, and localization [5].  
+
+> arXiv:2604.24353v1 [cs.CV] 27 Apr 2026 2D. Fritz et al.
+
+Recent work focuses on generating centimeter-accurate HD maps by lever-aging data from onboard sensors, such as multi-view camera images and point clouds from radar and LiDAR, to predict HD map elements within online systems [18]. In contrast, offline HD map generation methods leverage crowdsourced data, such as vehicle trajectories, and can also incorporate additional data sources, such as SD maps or satellite imagery, to construct HD map elements [7]. This work introduces a pipeline for generating vectorized lane representa-tions consisting of a centerline and corresponding left and right lane dividers. A global city-level region is partitioned into local tiles, where crowdsourced ego-and tracked-vehicle trajectories are aggregated. These trajectories are trans-formed into a rasterized representation compatible with DETR-based architec-tures, encoding direction and presence via the HSV color model. To further enrich the representation, we incorporate mean velocity and spatial offsets lost during rasterization. The contributions of this paper are as follows: 
+
+– A pipeline for local tile extraction and vehicle trajectory aggregation. 
+
+– A detection transformer, which takes as input a rasterized version of crowd-sourced trajectories and generates vectorized lanes, explicitly modeling the relationship between a centerline and its corresponding lane dividers. 
+
+– A comprehensive augmentation pipeline and extensive experiments on dataset combinations to improve generalization. 
+
+## 2 RELATED WORK 
+
+2.1 Detection Transformer 
+
+DETRs [2] have gained popularity in object detection due to the omission of handcrafted features. This enables an end-to-end approach using learnable queries, each representing a potential object within the scene. This methodology has also been applied to online and crowdsourced HD map generation, leading to specialized approaches that leverage hierarchical learnable queries to encode instance- and point-level representations of HD map elements such as centerlines, lane dividers, road boundaries, and pedestrian crossings [24]. 
+
+2.2 Online-based Map Generation 
+
+Data from onboard sensors, such as cameras and LiDAR, serve as input for detecting and generating vectorized HD map elements, ultimately providing a strong prior for downstream tasks in automotive driving. In addition to high accuracy, real-time capability is essential for supplying geometric and semantic information about the vehicle’s surroundings. For online HD map generation, camera-based data is most commonly used, from which bird’s-eye view (BEV) features are extracted and potentially fused with other data domains such as LiDAR point clouds. The resulting features are then fed into a transformer architecture to predict vectorized polylines, including centerlines, lane dividers, road boundaries, and pedestrian crossings, in an end-to-end approach [17,13,23]. Topology Estimation using Crowdsourced Vehicle Fleet Data 3
+
+LaneGAP [12] learns hierarchical queries to predict centerlines from BEV fea-tures. To model the connectivity between distinct centerlines, a post-processing step converts the individual predicted centerlines into a graph-based representa-tion, enabling the formation of merging and branching structures. In contrast, LaneSegNet [10] directly models polylines at the segment level along with their connectivity. The framework employs a modified deformable attention mecha-nism to more effectively capture segment geometry. Lane dividers are predicted as offsets from embedded queries and subsequently added to the corresponding centerline segments to obtain the final segment-level lane representation. Map-TRv2 [14] introduced decoupled attention across hierarchical queries, and uti-lized a one-to-many assignment strategy between predictions and ground truth in order to accelerate convergence. The work in [8] employs separate branches to extract features from camera and LiDAR data, which are subsequently processed by a transformer for cross-attention and fusion. Combined with data augmen-tation strategies that explicitly simulate sensor failures, this approach improves robustness and generalization. The model in [1] uses BEV features from multi-view camera images to generate HD map elements. The queries are initially enhanced using BEV features, providing a prior before refinement within the Transformer module. A dynamic query management strategy is introduced to filter out queries with low confidence scores. 
+
+2.3 Crowdsourced-based Map Generation 
+
+Methods for offline HD map generation have the advantage of not being con-strained by real-time requirements. Furthermore, they can leverage crowdsourced data, which allows for a more comprehensive representation of a given scene when generating such maps. The framework proposed in [20] identifies complex urban intersections and generates a vectorized representation based on crowdsourced data, including camera images and vehicle trajectories. For a given intersection, these two data modalities are aligned within a global coordinate system using a geometric trans-former. By applying heuristic rules, the road topology of complex intersections is inferred, from which the most human-like paths are selected. However, careful tuning of the associated hyperparameters may be required when transferring the method to different datasets, particularly those with lower data density. In con-trast, MapCVV [3] leverages crowdsourced images to extract lane-level features, such as lane markings, stop lines, poles, traffic lights, and signs, in combination with crowdsourced trajectory data. The pipeline consists of multiple modules designed to reduce observational redundancy across different viewpoints and measurement runs within a scene, ultimately producing a vectorized HD map. While the aforementioned crowdsourced methods rely on rasterized representa-tions, LMT-Net [19] operates solely on vectorized inputs, including lane dividers and vehicle trajectories. Polylines are encoded as embedded one-dimensional vec-tors and processed by a Transformer using precomputed center points as queries and the encoded polylines as keys and values. The output consists of spatial point pairs and their connectivity, forming vectorized lanes as a directed graph. 4 D. Fritz et al. 
+
+Experiments are conducted on an internal dataset, which limits reproducibility. The approach of TrailTR [9] utilizes crowdsourced trajectories of both the ego vehicle and tracked agents. The vectorized data is transformed into a rasterized representation to enable compatibility with DETR-like architectures. The re-sulting images are split into multiple channels, where each channel is aggregated based on trajectory segment directions. This formulation enables the prediction of polylines with a single possible point-sequence permutation. Data augmenta-tion is applied to improve generalization, however, the predictions are limited to centerlines. [16] uses the HSV color model to rasterize vehicle trajectories with directional information, along with average velocity profiles and corresponding satellite imagery of a local region. The model architecture incorporates adjacent regions to further improve accuracy. The work in [6] presents a pipeline to re-duce the volume of crowdsourced data by applying simplification methods that remove redundancy while preserving the dataset’s characteristics, before passing the trajectories to a Transformer architecture for further polyline refinement. While related work provides frameworks for HD map construction, none of them specifically investigate lane representation prediction where lane dividers are directly constrained by the centerline using solely crowdsourced trajectories as input. In this work, we aim to address this gap by conducting comprehensive experiments on datasets with different distributions of trajectory density, in order not only to predict the centerline of a lane they represent, but also the corresponding lane dividers, ultimately forming a lane. 
+
+## 3 METHOD 
+
+This section provides the pipeline for processing the dataset consisting of vehicle trajectories. Given a city-level location, local tiles are extracted, where trajec-tories are aggregated along with the corresponding ground truth information. Subsequently, each tile is converted into a rasterized representation, serving as the final model input. 
+
+3.1 Tile Generation 
+
+In Figure 1, an example is shown of an vectorized map describing the road structure of a certain location. The map is modeled as a graph G = ( V, E), where V denotes the set of nodes (spatial points) and E represents the set of edges connecting these nodes. We adopt a simple tile generation strategy by projecting a regular grid onto the map, where each resulting cell corresponds to a tile. More formally, a tile 
+
+ti ∈ T j is defined as ti = ( pi, h i, w i), where pi ∈ R2 denotes the global center point of the tile, and hi and wi denote its height and width, respectively. Here, 
+
+i indexes the i-th tile within location j, and Tj denotes the set of all tiles for the j-th location. The trajectory points of each individual tile are transformed into a local coordinate system, with the tile’s center serving as the origin. Since Topology Estimation using Crowdsourced Vehicle Fleet Data 5Tile Generation Tile Aggregation Tile Rasterization  
+
+> Trajectories
+> Bounding Box
+> Center Point
+> Local Map Centerline
+> Lane Divider
+
+Fig. 1. Simplified illustration of the pipeline for generating local tiles. Tile selection is performed based on a location-level vectorized map. For each local tile, all possible ground truth paths are extracted, and corresponding vehicle trajectories are aggre-gated. Finally, each tile is rasterized using the aggregated vehicle trajectories. 
+
+the requirement for a valid tile is the availability of both crowdsourced data and ground truth information, tiles that are missing either of the two are discarded. It is worth noting that tile generation is not restricted to the grid-based method, which produces non-overlapping tiles. To increase data diversity, ad-ditional tiles are sampled around each grid-based tile, resulting in overlapping regions. However, this augmentation strategy is applied exclusively to the train-ing split. 
+
+3.2 Tile Aggregation 
+
+Given the tiles, data aggregation is performed to obtain a set of vehicle tra-jectories for each tile. Specifically, for a tile ti, we collect the set of ego-vehicle trajectories Di and the set of trajectories from other tracked vehicles Oi. Com-bining these two sets yields a set that can be abstractly referred to as a set of polylines. Each polyline is represented by a temporal sequence of spatial points along with a velocity for each point. The local ground truth information includes the local ground truth map representing the local region of the tile. Following LaneGAP [11], we extract all possible paths from the local ground truth graph. Specifically, for each start node, paths are generated that terminate at distinct end nodes. For our purpose, ground truth annotations for lane dividers are necessary, which are lacking particularly in the nuScenes dataset. In order to provide this information, we simulate lane dividers by exploiting the polygons encompassing the ground truth centerlines, which describe the drivable area of a lane segment. Hence, we perform lateral sampling along the centerline to create the lane divider information (which can also be seen as the boundaries of a lane). However, in certain scenes, such as intersections, these polygons are not available, leading to gaps when extracting lane dividers (see Figure 1). Therefore, we perform interpolation to create complete vectorized lane representations, where for each center point there exist left and right lateral lane divider points. 6 D. Fritz et al. 
+
+Before transforming the data into a rasterized representation, vehicle trajec-tories that do not spatially align with the ground truth are removed, and the same filtering is applied to the ground truth polylines. This ensures that the crowdsourced and ground truth data are spatially consistent. We also prune the polylines such that the start and end points are approximately aligned with each other to enable fair evaluation. 
+
+3.3 Tile Rasterization 
+
+To enable the prediction of polylines with directional information, the rasterized image must encode trajectory direction. Inspired by [4], we employ the HSV color model, which can simultaneously represent both the presence of a trajectory and its direction. The HSV model consists of three components: Hue, Saturation, and Value. The hue encodes the trajectory direction, while the value represents the brightness of the color, which we exploit to indicate the intensity, i.e., how frequently a pixel is occupied by points from vehicle trajectories. The saturation is set to 1. The HSV representation is then converted into an RGB image, where each RGB value corresponds to a direction angle, as illustrated in Figure 1. Furthermore, we extend the number of channels by including the pixel-wise mean velocity, as well as the x- and y-offsets for each occupied pixel, in order to preserve geometric information lost when transforming spatial points into discrete pixel coordinates. The final input representation is an image denoted as 
+
+ximg ∈ RC×H×W , where C, H, and W denote the number of channels, height, and width, respectively. In this case, the input has six channels: three from the RGB image converted from HSV, one for the velocity profile, and two for the x-and y-offsets. 
+
+## 4 EXPERIMENTS 
+
+4.1 Datasets 
+
+For our experiments, we use the nuScenes dataset. It contains approximately 15 hours of driving data collected in Boston and Singapore, comprising 1,000 manually selected scenes, with each scene covering a time interval of 20 seconds. Following [15], the nuScenes dataset is split using a near-extrapolation split to prevent data leakage. Furthermore, we utilize nuPlan as a second public dataset,                    
+
+> Table 1. Statistics of trajectories and ground truth lanes per tile.
+> Vehicle Trajectories # GT Lanes # Dataset Mean Max Mean Max Internal 16 200 315 nuPlan 1500 94000 628 nuScenes 20 260 319 Topology Estimation using Crowdsourced Vehicle Fleet Data 7
+
+providing significantly more driving time (1,200 hours). The original splits are used for nuPlan. Training is also conducted on an internal dataset covering the German cities Sindelfingen and Boeblingen. Similar to nuScenes and nuPlan, our dataset provides trajectories of ego-vehicles and tracked vehicles. The internal dataset provides ground truth information about centerlines and lane dividers, which omits the need to interpolate lane divider information. Table 1 summarizes the mean and maximum number of vehicle trajectories used for rasterization, as well as the number of ground truth lanes per tile. While the internal dataset and nuScenes exhibit similar distributions, nuPlan provides significantly denser data. 
+
+4.2 Data Augmentation 
+
+To increase data diversity, data augmentation is applied during training. As men-tioned in Section 3.1, the number of grid-based tiles is extended by randomly sampling tiles to expose the model to more diverse local regions. Furthermore, we apply various methods to modify the polylines of a tile before transforming it into an image, including random rotations and horizontal and vertical flips. To simulate different trajectory densities within a tile, sets of trajectories are ran-domly dropped, which ultimately leads to a different number of lanes to predict within a tile. Additionally, Gaussian noise is added to the x- and y-coordinates. Moreover, points are randomly shifted by sampling from a uniform distribution in the range [ −3.0, +3 .0] along both axes. Finally, image masking is applied by randomly zeroing out patches within the input image. Each augmentation method is independently applied with a probability of 0.3, allowing multiple augmentations to be applied to a single tile. 
+
+4.3 Model Architecture 
+
+As illustrated in Figure 2, the input image ximg ∈ RC×H×W is first passed through the backbone network, where C, H, and W are the number of channels, height, and width, respectively. The resulting feature map f ∈ RC′×H′×W ′
+
+is then processed by a Feature Pyramid Network (FPN) to transform the channel dimension C′ into d. The dimensions H′ and W ′ are reshaped into a single se-quence, yielding a representation z ∈ R(H′W ′)×d. Subsequently, z is processed by a deformable transformer encoder and decoder. As described in [14], decoupled attention over hierarchical queries qhie ∈ RN ×M ×d is applied, where N and M
+
+denote the number of queries and the number of points per query, respectively. Finally, two regression branches are employed to generate vectorized lane from the learnable queries. The centerline branch predicts a sequence of points, denoted as Lc ∈ RN ×M ×2, where N represents the number of centerlines in a scene and M denotes the number of points per centerline. Each point is defined by its Cartesian x- and y-coordinates in the local coordinate system of the tile. Inspired by LaneSegNet [10], we further employ an offset branch, which takes the hierarchical queries as input and outputs the pointwise offsets for the x-and y-values, denoted as Lo ∈ RN ×M ×2. Consequently, the left and right lane 8 D. Fritz et al. Backbone  
+
+> Offset
+> Centerline FPN & reshape
+> Transformer
+> Encoder
+> Transformer
+> Decoder
+> Classification
+> Crowdsourced Trajectories HSV-based input Vectorized lanes
+> Detection Transformer
+
+Fig. 2. Overview of the model for vectorized lane prediction. The input is a rasterized version of the crowdsourced vehicle trajectories. The deformable DETR processes the features from the backbone and outputs lane representations consisting of a centerline and its corresponding left and right lane dividers. 
+
+dividers can be computed as Ll = Lc + Lo and Lr = Lc − Lo, respectively. The final lane can be denoted as L = {Lc, L l, L r }, with L ∈ RN ×M ×6, since for each center point there exists a corresponding left and right lane divider point, each consisting of x- and y-values. The classification branch predicts the probability of each instance being either an object or a no-object, resulting in Nc = 2 classes. 
+
+4.4 Training Loss 
+
+We follow the methodology of DETR to compute the loss by performing bipar-tite matching between ground truth and predictions [2]. Specifically, we consider the sets of ground truth and predictions, y = {y}Ni=1 , ˆ y = {ˆy}Ni=1 , respectively. To match the number of predictions, the ground truth set is padded with ∅
+
+instances, representing the no-object class. The optimal assignment is then for-mulated as ˆσ = arg min 
+
+> σ∈SN
+> N
+
+X
+
+> j
+
+Lmatch (ˆ yj , y σ(j) ), (1) where SN denotes the set of possible assignment permutations, and Lmatch rep-resents the matching cost, consisting of the Manhattan distance for the geomet-ric cost and the focal loss for the classification cost. Given the assigned pairs described by ˆ σ, the classification loss is calculated as the focal loss 
+
+Lclass =
+
+> N
+
+X
+
+> i
+
+LFocal (ˆ pˆσ(i) , c i), (2) where ˆ pˆσ(i) denotes the predicted classification score and ci the corresponding class label. The use of focal loss is motivated by the class imbalance, as the number of predictions is significantly higher than the average number of ground truth instances within a scene. The classification task is binary and serves solely Topology Estimation using Crowdsourced Vehicle Fleet Data 9
+
+to distinguish whether a prediction corresponds to a lane or to the no-lane (no-object) class. For the displacement loss, only the Nv positively assigned pairs are considered. This loss is based on the Manhattan distance DL1 , and is formulated as 
+
+Lpoint =
+
+> N
+
+X
+
+> i
+
+1{ci̸ =∅}
+
+> Nv
+
+X
+
+> j
+
+DL1(ˆ yˆσ(i),j , y i,σ (j) ), (3) where the Manhattan distance is calculated pointwise over the centerline and lane divider points. To encourage the prediction of coherent centerlines and lane dividers of a lane, a direction loss is incorporated, which measures the cosine similarity. The loss is formulated as 
+
+Ldir =
+
+> N
+
+X
+
+> i
+
+1{ci̸ =∅}
+
+> Nv
+
+X
+
+> j
+
+cos sim(ˆ yˆσ(i),j , y i,σ (j) ), (4) where the cosine similarity is calculated based on the direction vector of two consecutive points over the centerline and lane dividers. The resulting loss Lo2o ,based on the computed one-to-one assignment ˆ σ, is defined as 
+
+Lo2o = λclass Lclass + λpoint Lpoint + λdir Ldir , (5) where λclass , λ point , and λdir are balancing weights for the distinct loss terms. To accelerate convergence, we add a one-to-many auxiliary loss Lo2m that builds upon Lo2o , but allows to reuse the same ground truth multiple times, as described in [14]. Furthermore, a second auxiliary loss Laux is added that acts as Lo2o , but is calculated from the results of the intermediate transformer decoder hidden states instead of only the last hidden state. Consequently, the final training loss is defined as 
+
+L = λo2o Lo2o + λo2m Lo2m + λaux Laux , (6) where λo2o , λ o2m , and λaux are balancing weights for the individual loss terms. 
+
+4.5 Implementation 
+
+All tiles are extracted within a range of [ −30 m, +30 m] along both x- and y-directions. Ground truth centerlines and lane dividers are resampled to M = 20 points for training and evaluation. The input image resolution is 512 × 512. We use a ResNet-50 backbone unless otherwise specified. The transformer em-bedding dimension is 256. For deformable attention, we use 4 sampling points and 8 attention heads. Both encoder and decoder consist of 6 layers. All feed-forward networks use an embedding dimension of 512 with a dropout rate of 0.1 applied throughout the transformer. Training is performed with batch size 32 using AdamW and an initial learning rate of 1 × 10 −4 with cosine decay. The backbone learning rate is set to one tenth of this value. The number of queries is N = 50 for the one-to-one group and 150 for the one-to-many group. All loss weights λclass , λ point , λ dir , λ o2o , λ o2m , λ aux are set to 1. 10 D. Fritz et al. 
+
+4.6 Metric 
+
+Following common practice in HD map generation, we evaluate the predictions using average precision based on the Chamfer distance under multiple thresholds [21]. The average precision is defined as 
+
+AP = 1
+
+|T |
+
+X 
+
+> τ∈T
+
+AP τ , (7) where T contains the thresholds {0.5, 1.0, 1.5}. We evaluate the average pre-cision separately for centerlines and lane dividers, denoted as AP c and AP ld ,respectively. 
+
+4.7 Quantitative Results 
+
+Training is conducted on individual datasets and their combinations to study the effect of cross-dataset training on validation performance. Table 2 reports the AP for different training and validation splits. The relatively high AP of 79.1 on the internal dataset is mainly due to simple scenes with straight lanes (e.g., highways) and tiles containing fewer lanes to predict. In contrast, nuPlan achieves an AP of 44.2, featuring a significantly higher trajectory density and, consequently, more complex road structures with a larger number of lanes per tile. The nuScenes dataset yields an AP of 62.5, which can also be attributed to simpler sampled tiles and a lower average number of lanes per tile. Furthermore, we investigate the influence on the nuScenes validation split when extending its training split with training data from other datasets. In Table 2, it can be seen that incorporating the internal dataset improves the overall AP. However, when considering lane dividers specifically, a slight decrease can be observed. While the AP c improves, potentially due to increased data diversity, this benefit does not fully transfer to AP ld . A possible reason is the variation in road widths across datasets, which may limit the model’s ability to generalize accurate lane divider positions. In contrast, when extending the nuScenes training data with that of nuPlan, the AP decreases to 60.2, which can possibly be attributed to the different data distributions in terms of number of vehicle trajectories and number of lanes to predict per tile.                             
+
+> Table 2. Training results on different datasets.
+> Train Split Val Split AP c↑AP ld ↑AP ↑
+> Internal Internal 81.3 76.9 79.1 nuPlan nuPlan 44.7 43.7 44.2 nuScenes nuScenes 64.2 60.8 62.5 nuScenes + Internal nuScenes 65.5 60.4 63.0
+> nuScenes + nuPlan nuScenes 61.8 58.5 60.2 Topology Estimation using Crowdsourced Vehicle Fleet Data 11
+
+4.8 Qualitative Results 
+
+Figure 3 shows examples of model outputs. Green lines represent centerlines, while orange lines represent lane dividers. Each line is directed. We sort the predicted lanes by confidence scores from the classification branch and visualize only those with the highest scores. The model correctly captures the overall lane geometry and direction. However, in the left column, one lane is missing com-pared to the ground truth, indicating room for improvement. Another limitation is the lack of geometric consistency in merging centerlines and lane dividers, where lines that should merge are slightly misaligned or remain separated. This could be addressed by explicitly supervising such overlapping regions during the merging process. 
+
+4.9 Ablation Studies 
+
+For the ablation studies, we use the near-extrapolation split of nuScenes for training. Table 3 reports the AP results for different backbone networks used for feature extraction. For our setup, ResNet-50 achieves the best performance with an AP of 62.5. Using a lighter backbone such as ResNet-34 results in an AP of 49.7, representing a significant drop compared to ResNet-50. Swin-T and EfficientNet-B5 achieve APs of 47.7 and 40.4, respectively. These results indicate that ResNet-50 is the most suitable backbone for our task. Further ablation studies are shown in Table 4, using training on the near-extrapolation split of nuScenes with data augmentation as the baseline. Remov-ing data augmentation decreases AP by 11.8. We also evaluate query pruning, following [22], which removes low-confidence queries during training. Training with query pruning was conducted with data augmentation, and pruning was Prediction Ground Truth                                      
+
+> s
+> Fig. 3. Examples of model outputs for selected tiles. The left and middle columns originate from nuScenes and nuPlan, respectively, while the right column is from the internal dataset. Lanes are predicted with direction, consisting of centerlines (green) and lane dividers (orange). Lanes with the highest confidence scores are depicted. 12 D. Fritz et al.
+> Table 3. Results using different backbones. All training runs conducted on nuScenes dataset using the near extrapolation split.
+> Backbone AP c↑AP ld ↑AP ↑
+> ResNet-34 51.1 48.3 49.7 ResNet-50 64.2 60.8 62.5
+> SwinT 49.1 46.2 47.7 EfficientNet-B5 41.1 39.7 40.4
+> Table 4. Results using different methods. All training runs conducted on nuScenes dataset using the near extrapolation split.
+> Method AP c↑AP ld ↑AP ↑
+> With Data Aug. 64.2 60.8 62.5 Without Data Aug. 52.5 48.9 50.7 Query Pruning 60.0 57.6 58.8
+
+applied only to the one-to-one group. The number of queries was reduced from 50 to 25, resulting in an AP drop of 3.7. 
+
+## 5 CONCLUSION 
+
+This work introduced a pipeline for tile extraction from a global HD map, where each tile was transformed into a rasterized representation encoding both the presence and directional information of trajectories from crowdsourced datasets. The model predicted lane representations consisting of a centerline and corre-sponding left and right lane dividers, with dividers derived from predicted offsets. Experiments on multiple datasets with varying trajectory densities and numbers of ground truth lanes demonstrated the impact of data characteristics on per-formance. Future work could explore additional data sources such as satellite imagery or OpenStreetMap (OSM) to improve accuracy, particularly for lane divider localization, and extend the output set to include road boundaries and pedestrian crossings. Leveraging OSM for tile selection could further focus on complex structures and improve performance on challenging scenarios. 
+
+## Acknowledgment 
+
+This work is a result of the joint research project STADT:up (19A22006O). The project is supported by the German Federal Ministry for Economic Affairs and Energy (BMWE), based on a decision of the German Bundestag. The author is solely responsible for the content of this publication. Topology Estimation using Crowdsourced Vehicle Fleet Data 13 
+
+## References 
+
+1. Bai, W., Zhang, Y., Guo, Q., Liu, W., Du, S., Hu, J., Cheng, S., Ning, Z.: Dynamic query management and internal consistency representation based transformer for online vectorized hd map construction. IEEE Transactions on Multimedia pp. 1–15 (2026) 2. Carion, N., Massa, F., Synnaeve, G., Usunier, N., Kirillov, A., Zagoruyko, S.: End-to-end object detection with transformers. In: Computer Vision – ECCV 2020. pp. 213–229. Springer International Publishing, Cham (2020) 3. Chen, P., Jiang, X., Zhang, Y., Tan, J., Jiang, R.: Mapcvv: On-cloud map construc-tion using crowdsourcing visual vectorized elements towards autonomous driving. IEEE Robotics and Automation Letters 9(6), 5735–5742 (2024) 4. Djuric, N., Radosavljevic, V., Cui, H., Nguyen, T., Chou, F.C., Lin, T.H., Singh, N., Schneider, J.: Uncertainty-aware short-term motion prediction of traffic ac-tors for autonomous driving. In: 2020 IEEE Winter Conference on Applications of Computer Vision (WACV). pp. 2084–2093 (2020) 5. Elghazaly, G., Frank, R., Harvey, S., Safko, S.: High-definition maps: Comprehen-sive survey, challenges, and future perspectives. IEEE Open Journal of Intelligent Transportation Systems 4, 527–550 (2023) 6. Fritz, D., Lagamtzis, D., Mink, M., Schober, S.: ADVNTG: Autonomous Driving Vehicle and Neural Transformer-Based HD Map Generation Using Crowd-Sourced Fleet Data. In: 2025 IEEE 28th International Conference on Intelligent Transporta-tion Systems (ITSC). pp. 1954–1959. IEEE, Gold Coast, Australia (Nov 2025) 7. Guo, Y., Zhou, J., Li, X., Tang, Y., Lv, Z.: A review of crowdsourcing update methods for high-definition maps. ISPRS International Journal of Geo-Information 
+
+13 (3) (2024) 8. Hao, X., Zhao, Y., Ji, Y., Dai, L., Hao, P., Li, D., Cheng, S., Yin, R.: What really matters for robust multi-sensor hd map construction? In: 2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). pp. 1298–1304 (2025) 9. Hubbertz, M., Colling, P., Han, Q., Meisen, T.: Inferring driving maps by deep learning-based trail map extraction. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops. pp. 2450–2459 (June 2025) 10. Li, T., Jia, P., Wang, B., Chen, L., Jiang, K., Yan, J., Li, H.: Lanesegnet: Map learning with lane segment perception for autonomous driving. In: The Fourteenth International Conference on Learning Representations (ICLR) (2024) 11. Liao, B., Chen, S., Jiang, B., Cheng, T., Zhang, Q., Liu, W., Huang, C., Wang, X.: Lane graph as path: Continuity-preserving path-wise modeling for online lane graph construction. In: European Conference on Computer Vision (2023) 12. Liao, B., Chen, S., Jiang, B., Cheng, T., Zhang, Q., Liu, W., Huang, C., Wang, X.: Lane graph as path: Continuity-preserving path-wise modeling for online lane graph construction. In: Computer Vision – ECCV 2024. pp. 334–351. Springer Nature Switzerland, Cham (2025) 13. Liao, B., Chen, S., Wang, X., Cheng, T., Zhang, Q., Liu, W., Huang, C.: Maptr: Structured modeling and learning for online vectorized hd map construction. In: International Conference on Learning Representations (2023) 14. Liao, B., Chen, S., Zhang, Y., Jiang, B., Zhang, Q., Liu, W., Huang, C., Wang, X.: Maptrv2: An end-to-end framework for online vectorized hd map construction. International Journal of Computer Vision pp. 1–23 (2024) 14 D. Fritz et al. 15. Lilja, A., Fu, J., Stenborg, E., Hammarstrand, L.: Localization is all you evaluate: Data leakage in online mapping datasets and how to fix it. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 22150–22159 (June 2024) 16. Liu, G., Zhang, D., Xu, C., Zhang, X., Zhang, Z., Zhao, J., Wu, Z., Zhang, J.: City-scale lane-level mapping from crowdsourced trajectories and satellite imagery. IEEE Robotics and Automation Letters 11 (4), 4793–4800 (2026) 17. Liu, Y., Yuan, T., Wang, Y., Wang, Y., Zhao, H.: Vectormapnet: End-to-end vec-torized hd map learning. In: International conference on machine learning. PMLR (2023) 18. Lyu, H., Berrio Perez, J.S., Huang, Y., Li, K., Shan, M., Worrall, S.: Online high-definition map construction for autonomous vehicles: A comprehensive survey. Journal of Sensor and Actuator Networks 14 (1) (2025) 19. Mink, M., Monninger, T., Staab, S.: Lmt-net: Lane model transformer network for automated hd mapping from sparse vehicle observations. In: 2024 IEEE 27th International Conference on Intelligent Transportation Systems (ITSC). pp. 1203– 1210 (2024) 20. Qin, T., Huang, H., Wang, Z., Chen, T., Ding, W.: Traffic flow-based crowdsourced mapping in complex urban scenario. IEEE Robotics and Automation Letters 8(8), 5077–5083 (2023) 21. Tang, X., Jiang, K., Yang, M., Liu, Z., Jia, P., Wijaya, B., Wen, T., Cui, L., Yang, D.: High-definition maps construction based on visual sensor: A comprehensive survey. IEEE Transactions on Intelligent Vehicles 9(10), 5973–5994 (2024) 22. Xu, L., Wu, Z., Qiu, W., Pang, S., Bai, X., Mei, K., Xue, J.: Redundant queries in detr-based 3d detection methods: Unnecessary and prunable. In: Proceedings of the AAAI Conference on Artificial Intelligence (2025) 23. Yuan, T., Liu, Y., Wang, Y., Wang, Y., Zhao, H.: Streammapnet: Streaming map-ping network for vectorized online hd map construction. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV). pp. 7356–7365 (January 2024) 24. Zhang, Y., Qian, Y., Meng, C., Zhang, R., Yi, H., Wang, C., Yang, M.: Local vectorized high definition map construction for autonomous driving: A compre-hensive review. IEEE Transactions on Intelligent Transportation Systems 26 (12), 21502–21525 (2025)
