@@ -1,0 +1,437 @@
+Title: ERASE: Eliminating Redundant Visual Tokens via Adaptive Two-Stage Token Pruning
+
+URL Source: https://arxiv.org/pdf/2605.09982v1
+
+Published Time: Tue, 12 May 2026 02:06:09 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# ERASE: Eliminating Redundant Visual Tokens via Adaptive Two-Stage Token Pruning 
+
+Yuna Lee 1 Kyoungho Min 1 Yulhwa Kim 2,∗
+
+> 1
+
+Department of Electrical and Computer Engineering, Sungkyunkwan University, Republic of Korea 
+
+> 2
+
+Department of Semiconductor Systems Engineering, Sungkyunkwan University, Republic of Korea 
+
+{yuna6548, kyohmin, yulhwakim}@skku.edu 
+
+## Abstract 
+
+Recent advancements in Vision-Language Models (VLMs) enable large language models (LLMs) to process high-resolution images, significantly improving real-world multimodal understanding. However, this capability introduces a large number of vision tokens, resulting in substantial computational overhead. To mitigate this issue, various vision token pruning methods have been proposed. Nevertheless, existing approaches predominantly rely on learned semantic features within the model to capture visual redundancy. Moreover, they lack adaptive mechanisms to adjust pruning strategies according to the complexity of the in-put image. In this paper, we propose ERASE, a two-stage vision token pruning framework that identifies and retains salient tokens through pruning strategies adaptive to image complexity. Experiment results demonstrate that ERASE sig-nificantly reduces vision tokens while preserving accuracy. For Qwen2.5-VL-7B, at a token pruning ratio of 85%, ERASE retains 89.46% of the original model accuracy, whereas the best prior method retains only 78.19%. Our code is available at https://github.com/Tuna-Luna/ERASE .
+
+## 1 Introduction 
+
+Recent VLMs augment LLMs with visual understanding capabilities by jointly processing text and image modalities [ 1, 2]. However, visual inputs typically generate a large number of vision tokens, significantly increasing computational cost and inference latency. To mitigate this issue, numerous vision token compression methods have been proposed [ 3– 11 ]. Meanwhile, existing approaches primarily focus on capturing visual redundancy from semantic information inside visual encoder and their context-relevance detection depends on static stage inside LLM. In this paper, we propose ERASE: Eliminating Redundant visual tokens via Adaptive two-StagE token pruning , a hierarchical vision token pruning framework that compresses vision tokens through two complementary pruning stages. ERASE jointly exploits redundancy at both image and contextual levels while adaptively adjusting the pruning strategy according to the visual complexity of each input. Specifically, ERASE consists of: (1) image-level pruning, which removes visually redun-dant regions using entropy scores computed directly from the raw image, and (2) context-aware pruning, which further prunes vision tokens at adaptive decoder layers based on input-specific con-textual redundancy. Extensive experiments demonstrate that ERASE consistently achieves a superior efficiency-performance trade-off over existing vision token pruning methods across diverse VLM architectures and benchmarks. 
+
+> ∗Corresponding author Preprint.
+> arXiv:2605.09982v1 [cs.CV] 11 May 2026
+
+Figure 1: Scaling behavior of (a) vision token count, (b) prefill latency, and (c) KV cache size with increasing image resolution in Qwen2.5-VL-7B. 
+
+## 2 Motivation 
+
+2.1 Vision token scaling in modern VLMs 
+
+VLMs process images by partitioning them into patches and converting them into visual tokens consumable by LLMs. Early VLMs [ 12 , 13 ] operated on a fixed and limited number of vision tokens without supporting varying input resolutions. For instance, LLaVA [ 12 ] processes 336 ×336 images into 576 vision tokens using CLIP [ 14 ]. Consequently, high-resolution images must be resized before processing, often degrading image understanding quality. To address this limitation, advanced VLMs adopt dynamic tiling strategies that partition high-resolution images into multiple tiles [ 15 – 17 ]. For instance, DeepSeek-VL2 [ 16 ] divides an image into up to n × m (nm ≤ 9) tiles and appends a global thumbnail to preserve global context and varying aspect ratios. Recent models such as Qwen2.5-VL [ 1] and Qwen3-VL [ 18 ] further support fully configurable resolutions using dedicated ViT-based vision encoders. However, recent VLMs that support high-resolution image processing substantially increase the number of vision tokens. Since images are represented as 2D spatial grids, the number of tokens scales quadratically with image resolution (Fig. 1a). For example, a 2K image generates approximately 3K tokens, while a 4K image produces around 16K tokens. Moreover, because attention complexity scales quadratically with sequence length, this token explosion significantly increases prefill latency (Fig. 1b) and KV cache memory usage (Fig. 1c). Therefore, efficient VLM inference requires effective vision token compression. 
+
+2.2 Prior vision token pruning methods 
+
+As shown in Fig. 2, vision token pruning methods can be categorized into single-objective and hybrid approaches. Single-objective approaches focus on either visual redundancy or text-vision relevance, whereas hybrid approaches combine both objectives within single-stage or multi-stage frameworks.   
+
+> (a) Single objective pruning (b) Hybrid pruning (c) Proposed ERASE
+
+Figure 2: Comparison of vision token pruning schemes. (a) (Top) vision-only redundancy pruning [ 8,5, 19 ]; (Bottom) text-conditioned pruning [ 6, 7, 20 ]. (b) (Top) single-stage hybrid pruning [ 4, 3]; (Bottom) multi-stage hybrid pruning [ 9– 11 ]. (c) Image-complexity-aware two-stage hybrid pruning. 22.2.1 Single-objective pruning methods 
+
+Figure 3: Scaling of attention map size in the image encoder of Qwen2.5-VL-7B. 
+
+Vision-only redundancy reduction. Vision-only approaches prune redundant vision tokens using only visual features before the LLM backbone (Fig. 2a Top) [ 21 , 19 , 22 , 8, 5]. These methods typically rely on attention scores or visual feature similarity. Early attention-based methods were mainly designed for CLIP-based VLMs such as LLaVA, where the image encoder produces a global [CLS] token, enabling efficient O(N ) token relevance estimation [ 21 , 19 , 22 ]. However, modern VLMs process images natively without a global 
+
+[CLS] token, requiring storage of the full N × N attention map for attention-based pruning. In addition, modern VLMs typically down-sample vision tokens inside the vision-language projector, meaning far more tokens are processed in the vision encoder than fed into the LLM. As illustrated in Fig. 3, storing these attention maps for high-resolution images incurs extreme peak memory overhead (exceeding 120GB), making such methods impractical. Feature-similarity-based methods instead group visually similar tokens and preserve those with lower similar-ity scores [ 8 , 5]. However, visually important regions often depend on the text prompt, and ignoring text-vision relevance leaves room for further compression. Their effectiveness also depends heavily on the ability of the target model to encode semantic information into visual features. 
+
+Text-conditioned relevance pruning. Text-conditioned approaches retain vision tokens that are highly relevant to the text instruction. These methods operate inside the LLM backbone, typically leveraging cross-attention to prune tokens receiving low attention weights from text tokens [ 6, 20 ,7]. While effective at capturing instruction relevance, they overlook spatial redundancy among neighboring vision tokens. As noted in DART [ 3], preserving one token from a similar token group should also affect the importance of the remaining tokens. Moreover, these methods typically apply pruning at fixed decoder layers, limiting pruning effectiveness. 
+
+2.2.2 Hybrid pruning strategies Single-stage hybrid pruning. Single-stage approaches jointly address visual redundancy and text relevance, typically at or just before the LLM decoder [ 3, 4]. For instance, DART [ 3 ] employs similarity-based metrics using pivot tokens from both modalities, while CDPruner [ 4] operates at the LLM embedding layer to maximize diversity while preserving text relevance. However, CDPruner relies on the CLIP text encoder [CLS] token, making it less effective for natively integrated VLMs such as the Qwen series. Overall, these methods either suffer from architectural dependencies or fail to exploit the dynamic layer-wise evolution of vision-text relationships within the LLM backbone. 
+
+Multi-stage hybrid pruning. Multi-stage approaches combine both objectives by first reducing visual redundancy before the LLM, followed by context-aware compression inside the LLM [ 9–11 ]. By decoupling redundancy reduction and relevance filtering, these methods alleviate the unreliability of attention scores caused by attention dilution among similar vision tokens. Despite this advantage, the methods adopted at each stage still limit pruning effectiveness. In Stage 1 visual redundancy reduction, they still require full attention maps, and VScan [ 9 ] further exacerbates this issue by requiring two attention maps inside the image encoder, effectively doubling the severe memory overhead shown in Fig. 3. Subsequent works such as iLLaVA [ 11 ] mitigate this overhead by modifying FlashAttention [ 23 ] to return cumulative sums instead of full attention maps. However, methods operating on vision encoder features still inherit the limitations of latent-feature-based redundancy reduction, preventing direct handling of raw-image redundancy. Furthermore, in Stage 2 text-conditioned relevance pruning, these methods still apply pruning at fixed decoder layers. 
+
+## 3 Proposed method 
+
+3.1 Overview of the proposed ERASE 
+
+ERASE compresses vision tokens through an adaptive two-stage framework (Fig. 4). Similar to prior multi-stage hybrid methods, Stage 1 removes visually redundant tokens, while Stage 2 prunes instruction-irrelevant tokens. Unlike previous approaches, Stage 1 directly removes redundant tokens 3Figure 4: Overview of proposed ERASE from the input image and adaptively determines both the Stage 1 pruning threshold and the decoder layer for Stage 2 based on image complexity. The following sections describe each stage in detail. 
+
+3.2 Stage 1: Image-level vision token pruning 
+
+Stage 1 of ERASE removes redundant vision tokens directly from the input image while preserv-ing visual information. In raw images, neighboring pixels often share similar values, allowing semantic content to remain intact even after redundant pixels are removed. Moreover, because redun-dancy levels vary across images, applying a fixed pruning ratio can significantly degrade accuracy. Based on this intuition, we use image entropy to estimate image complexity and apply Bayesian Optimization [24] to determine the optimal pruning ratio for each complexity level. 
+
+3.3 Image complexity estimation via entropy 
+
+Entropy quantifies the amount of information in a discrete random variable X as follows: 
+
+H(X) = −
+
+> n
+
+X
+
+> i=1
+
+P (xi) ln P (xi) (1) where xi denotes a possible outcome of X, and P (xi) represents its probability. We use entropy to measure the information density of each image patch corresponding to a vision token. As shown in Fig. 5, redundancy mainly arises from spatially continuous regions, resulting in low entropy, whereas high-information regions typically occur near edges where pixel values change rapidly, producing high entropy. Specifically, for each spatial patch of size ph × pw, we construct an intensity histogram and compute a local patch entropy score. The global raw image complexity is then defined with the median of all patch-level entropy scores across the image.   
+
+> (a) Raw image (b) Low entropy patches (c) High entropy patches
+
+Figure 5: Low-/high-entropy patches in (Top) low- and (Bottom) high-complexity images. 43.3.1 Adaptive token pruning level 
+
+Because visual scene complexity varies across images, applying a fixed pruning ratio is suboptimal. For example, a simple scene with a large sky background (Fig. 5(Top)) contains mostly homogeneous patches with near-zero entropy, allowing aggressive pruning while preserving informative regions. In contrast, a densely informative image (Fig. 5(Bottom)) contains fewer uniform regions, and most local patches exhibit high entropy due to complex textures and multiple objects. Consequently, their global entropy values, defined as the median of local patch-level entropies, differ significantly, with simple images exhibiting lower entropy than complex ones. This suggests that global entropy can effectively guide pruning ratio selection. To determine the optimal pruning ratio for each image, we partition image complexity into discrete levels and assign a target Stage 1 pruning ratio to each level. Predefined entropy thresholds Θ are used to classify image complexity. During inference, ERASE first computes the global entropy of the input image and then performs Stage 1 pruning according to the assigned budget for each complexity level. In practice, ERASE uses four complexity levels. To determine the optimal entropy thresholds and pruning ratios, we perform Bayesian Optimization (see Appendix D for details). 
+
+3.4 Stage 2: Context-aware vision token pruning 
+
+To further compress vision tokens beyond Stage 1, Stage 2 adopts an instruction-aware strategy that preserves tokens relevant to the input text. Similar to previous approaches, ERASE uses attention scores to measure text-vision relevance, but introduces a dynamic mechanism for selecting the decoder layer used for relevance estimation and pruning. 
+
+3.5 Layer-wise dynamics of visual-text processing in VLMs 
+
+Orthogonal to vision token pruning, recent interpretability studies on layer-wise VLM representations suggest that multimodal processing follows hierarchical stages. For example, DyVTE [ 25 ] shows that early decoder layers mainly perform intra-modality modeling and early fusion, whereas deeper layers are responsible for cross-modal reasoning. Similarly, probing studies on layer-wise visual functions [ 26 ] report that shallow layers specialize in basic visual recognition, while deeper layers handles tasks that need fine-grained visual-semantic information. Prior vision token pruning works have partially acknowledged this layer-wise functionality. VScan [ 9] observed that simpler tasks converge at earlier layers, while Nüwa [ 10 ] reported that important layers vary across tasks. However, despite recognizing that layer importance depends on the input, these methods still perform pruning at fixed decoder layers. Building on these observations, we hypothesize that simple images require only early-layer processing to identify text-relevant regions, whereas complex images require deeper layers to capture fine-grained details relevant to the prompt. 
+
+3.5.1 Complexity-aware dual-layer selection 
+
+To validate the relationship between image complexity and the required depth of multimodal pro-cessing, we compare the accuracy retained after pruning tokens at early versus mid-to-late decoder layers. This analysis is conducted only on samples where the base model originally produces correct predictions. As shown in Fig. 6, pruning at mid-to-late layers maintains stable accuracy across different global entropy values, whereas early-layer pruning exhibits significantly higher variance. In particular, the accuracy of early-layer pruning degrades as global entropy increases, empirically supporting our hypothesis that complex images require deeper multimodal processing. Motivated by this observation, ERASE introduces an image-complexity-aware dual-layer selection mechanism. Using the entropy thresholds Θ from Stage 1 (Section 3.3.1), the entropy space is partitioned into two complexity levels. Images with overall entropy ¯H ≤ Θ⌈| Θ|/2⌉ are classified as simple and undergo early-layer pruning, whereas images exceeding this threshold are classified as complex and use mid-to-late layer pruning. At the selected layer k (where k ∈ { Learly , L late }), the remaining vision tokens are evaluated using aggregated text-to-vision attention scores. Because this operates on the reduced token sequence from Stage 1, the additional computational overhead is negligible. Finally, ERASE retrospectively evicts KV cache entries corresponding to pruned vision tokens for all layers up to k, significantly reducing memory usage during autoregressive generation. 5(a) Retained accuracy of pruning at early layer and mid-to-late layer on Qwen2.5-VL-7B. 
+
+> (b) Retained accuracy of pruning at early layer and mid-to-late layer on Qwen3-VL-8B.
+
+Figure 6: Retained accuracy across raw images with different global entropy value 
+
+## 4 Experiment 
+
+4.1 Experiment settings Models. We comprehensively evaluate ERASE on recent state-of-the-art VLMs. Specifically, we select the Qwen2.5-VL-7B and Qwen3-VL-8B. To validate ERASE’s architecture-agnostic robustness, we include InternVL3-8B, particularly to evaluate our method’s compatibility with dynamic image-tiling strategies. Implementation on various model size is provided in Appendix B.0.1. 
+
+Benchmarks. While many vision token pruning works primarily evaluate on visual grounding tasks, such benchmarks often rely on coarse global context, allowing prior methods to maintain high-level accuracy despite aggressive pruning. In contrast, text-rich domains are far more sensitive to token removal, as discarding a small but critical visual region can significantly alter semantic meaning. To evaluate the ability of ERASE to preserve fine-grained visual information, we conduct experiments on six challenging benchmarks covering text recognition (TextVQA [ 27 ], OCRBench [ 28 ]), document and chart understanding (ChartQA [ 29 ], DocVQA [ 30 ], InfoVQA [ 31 ]), and complex visual reasoning (MathVista [32]). Results on visual grounding tasks are also provided in Appendix B.0.2. 
+
+Implementation details. ERASE conducts model-wise Bayesian Optimization to determine the entropy thresholds for image complexity classification and the Stage 1 pruning ratios for each com-plexity level (see Appendix. D.3). We compare against five recent token pruning baselines, including DART [ 3], CDPruner [ 4], PruneSID [ 5], IVC-Prune [ 7], and iLLaVA [ 11 ]. Additional details and ERASE configurations including pruning layer index candidates are provided in Appendix. A.1. 
+
+4.2 Accuracy evaluation 
+
+Tables 1 and 2 present the accuracy results on Qwen2.5-VL-7B and Qwen3-VL-8B, respectively. ERASE consistently outperforms previous methods across all pruning ratios on both models. In particular, under extreme pruning ratios, ERASE retains around 89% of the original accuracy, whereas the best prior methods achieve only 78.19% and 80.41%. Effective pruning requires preserving both visually and contextually important tokens. Although CDPruner and DART consider both, their accuracy degrades due to early-stage contextual evaluation, lack of image-complexity awareness, and reliance on simple similarity metrics. PruneSID incorporates stronger visual processing but struggles on text-relevant tasks because it does not explicitly model text relevance. IVC-Prune better captures contextual relevance through mid-layer value-based attention scores, yet performs poorly at high pruning ratios because it lacks visual criticality assessment and adaptivity. Similarly, iLLaVA merges vision tokens, potentially obscuring fine-grained details such as characters within images. In contrast, ERASE jointly optimizes visual redundancy reduction and contextual relevance through its adaptive two-stage framework, achieving the best accuracy retention across all pruning ratios. 6Table 1: Accuracy evaluation results on Qwen2.5-VL-7B 
+
+Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%) 
+
+100% Base 882 85.30 86.00 94.82 82.31 65.10 83.62 100.00 -62.1% DART 695 79.11 75.60 82.53 58.69 61.50 71.16 85.09 CDPruner 666 79.66 61.36 82.92 58.90 53.50 67.16 80.31 PruneSID 696 78.02 78.96 87.09 59.76 60.70 72.36 86.53 IVC-Prune 719 83.19 79.24 93.43 79.89 57.40 77.51 92.69 iLLaVA 710 73.57 64.56 83.08 69.02 58.80 70.01 83.72 
+
+ERASE 752 84.91 83.84 94.04 80.29 64.70 80.50 96.26 
+
+-75.0% DART 589 72.68 64.56 71.77 46.96 55.70 61.76 73.86 CDPruner 576 75.92 50.52 75.65 51.09 53.30 60.68 72.56 PruneSID 581 70.65 70.84 77.59 50.13 59.20 64.42 77.04 IVC-Prune 642 81.49 75.52 91.88 77.64 52.00 73.79 88.24 iLLaVA 609 66.46 50.96 72.57 61.60 55.90 61.40 73.42 
+
+ERASE 677 84.30 82.04 93.54 79.34 63.80 78.45 93.82 
+
+-85.0% DART 494 63.57 51.60 57.06 37.09 50.50 51.54 61.63 CDPruner 455 70.65 39.04 66.18 43.67 47.60 52.11 62.31 PruneSID 504 62.99 58.64 67.12 38.76 53.40 55.22 66.03 IVC-Prune 492 74.21 65.92 84.14 68.64 50.20 65.39 78.19 iLLaVA 492 55.87 39.60 57.93 52.38 50.50 50.91 60.89 
+
+ERASE 590 83.34 76.76 90.56 77.67 61.50 74.81 89.46 
+
+Table 2: Accuracy evaluation results on Qwen3-VL-8B 
+
+Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%) 
+
+100% Base 903 82.98 83.16 95.75 83.21 69.10 84.08 100.00 -65.11% DART 686 73.89 63.60 74.90 53.25 51.90 64.36 76.54 CDPruner 499 69.97 47.28 63.06 47.28 39.70 52.87 62.87 PruneSID 726 73.46 63.56 90.51 66.67 50.30 69.52 82.68 IVC-Prune 766 82.35 79.60 95.31 82.21 52.60 78.11 92.90 iLLaVA 752 76.11 64.68 84.89 71.09 54.90 71.15 84.61 
+
+ERASE 800 82.12 81.44 95.44 82.45 56.40 79.64 94.72 
+
+-72.77% DART 610 68.57 57.28 64.99 46.43 49.80 58.01 68.99 CDPruner 415 63.47 40.32 54.53 42.32 39.60 46.96 55.85 PruneSID 658 69.98 57.32 85.77 59.69 48.10 64.44 76.64 IVC-Prune 699 81.74 76.48 94.97 81.67 51.50 76.04 90.44 iLLaVA 687 72.57 61.72 79.63 67.14 53.60 67.23 79.95 
+
+ERASE 761 81.77 79.96 95.00 82.45 55.10 78.40 93.24 
+
+-84.43% DART 493 56.61 41.64 44.94 34.96 45.10 45.43 54.02 CDPruner 232 49.97 26.08 38.49 33.96 34.10 34.30 40.79 PruneSID 528 60.19 42.68 68.86 44.76 43.80 52.18 62.06 IVC-Prune 499 77.65 63.32 91.02 76.67 47.10 67.61 80.41 iLLaVA 569 63.29 46.92 67.64 60.48 49.50 57.46 68.33 
+
+ERASE 674 81.18 78.72 93.21 81.78 50.70 75.50 89.79 
+
+Because ERASE uses raw images for Stage 1 pruning and attention scores for Stage 2 pruning, it generalizes across diverse architectures. To validate this property, we further evaluate ERASE on InternVL3-8B. Table 3 shows the results on InternVL3-8B. ERASE consistently preserves base model accuracy more effectively, retaining 89.10% of the original performance even at an 85.0% pruning ratio. Moreover, the performance gap between ERASE and IVC-Prune widens as the pruning ratio increases, demonstrating the robustness and generalizability of ERASE under extreme compression. 
+
+4.3 Ablation studies 4.3.1 Adaptive token pruning level at Stage 1 
+
+To validate the effectiveness of the proposed Stage 1 image-level pruning, which operates before the LLM decoder layers, we compare ERASE with prior methods that also perform early vision token reduction, including CDPruner, PruneSID, and iLLaVA using only Stage 1 pruning. ERASE dynamically adjusts the pruning ratio based on image complexity, achieving an average token reduction ratio of 33.79% across benchmarks. For fair comparison, the baselines are configured with a matched static pruning ratio of 33.00%. As shown in Table 4, ERASE preserves base model accuracy within a 1% margin. In contrast, CDPruner suffers an average drop of 7.13% because it relies on a contrastively aligned text encoder (e.g., CLIP) to extract a [CLS] token for early cross-modal relevance. Since Qwen2.5-VL lacks this component, it fails to capture precise cross-modal semantics, leading to severe visual information loss. PruneSID also shows noticeable degradation because it 7Table 3: Accuracy evaluation results on InternVL3-8B                                                                                                                                           
+
+> Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%)
+> 100% Base 882 82.11 86.08 91.98 75.49 68.80 82.11 100.00 -62.5% DART 772 73.19 77.48 75.64 54.40 66.70 70.77 86.19 CDPruner 519 67.08 58.68 57.83 49.01 53.00 56.25 68.51 PruneSID 630 68.78 75.36 66.67 50.94 66.70 65.24 79.46 IVC-Prune 770 80.30 82.48 86.85 68.61 62.60 76.31 92.93
+> ERASE 857 81.11 83.92 88.48 72.77 69.80 80.30 97.79
+> -75.0% DART 692 68.29 68.72 62.92 45.11 64.90 63.19 76.96 CDPruner 373 58.21 46.76 42.60 39.46 42.50 44.47 54.16 PruneSID 413 57.10 61.88 46.75 40.19 58.20 50.90 61.99 IVC-Prune 667 77.48 76.60 84.12 67.04 57.20 71.52 87.11
+> ERASE 831 80.44 82.08 85.33 71.73 67.20 78.31 95.38
+> -85.0% DART 588 60.78 57.56 48.11 36.52 57.80 53.26 64.87 CDPruner 260 47.18 32.08 28.08 31.32 42.50 34.53 42.05 PruneSID 255 41.18 46.72 30.72 31.86 52.90 38.15 46.46 IVC-Prune 546 67.96 65.28 72.77 57.74 53.10 61.91 75.40
+> ERASE 773 79.21 78.48 79.01 66.66 63.30 73.99 90.11
+
+Table 4: Retained accuracy after Stage 1 on Qwen2.5-VL-7B 
+
+Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. 
+
+100% Base 882 85.30 86.00 94.82 82.31 65.10 83.62 -33.00% CDPruner 778 83.71 77.88 90.29 68.05 61.20 76.49 -33.00% PruneSID 837 84.24 84.36 93.89 76.57 62.90 80.94 -33.00% iLLaVA 667 78.08 77.88 87.28 77.62 58.10 74.28 -33.79% ERASE 868 84.95 83.84 94.19 80.80 65.30 82.65 Table 5: Accuracy of Qwen2.5-VL-7B under different Stage 2 pruning layer selection strategies 
+
+Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. 
+
+Base 882 85.30 86.00 94.82 82.31 65.10 83.62 Layer 2 669 83.73 80.04 91.46 69.27 63.70 75.85 Layer 7 618 82.16 75.36 88.60 61.35 62.30 71.93 Layer 12 647 83.16 76.92 92.12 72.22 62.80 75.15 Layer 17 694 84.31 82.72 94.01 79.54 63.40 78.90 Dynamic (11.28) 677 84.30 82.04 93.54 79.34 63.80 78.45 evaluates token importance in the latent space, making token selection vulnerable to embedding distortions. Similarly, iLLaVA suffers significant degradation because merging vision tokens blurs visual information. These results demonstrate that the proposed Stage 1 image-level pruning removes raw-image redundancy more effectively than previous methods. 
+
+4.3.2 Adaptive pruning layer selection at Stage 2 
+
+Table 5 illustrates the impact of dynamically selecting the Stage 2 pruning layer under a total pruning ratio of 75%. Static pruning baselines exhibit a distinct non-linear degradation pattern across layer depth. Pruning too early (Layer 2) severely compromises fine-grained visual reasoning, causing substantial drops on tasks such as InfoVQA. As pruning shifts to middle layers (Layer 7 and 12), accuracy further deteriorates, indicating that token removal during intermediate processing strongly disrupts multimodal reasoning. Accuracy recovers only when pruning is deferred to mid-to-late layers (Layer 17), where deeper multimodal reasoning occurs. However, static mid-to-late-layer pruning (Layer 17) significantly reduces computational efficiency, as all vision tokens must propagate through most of the LLM backbone before pruning. ERASE resolves this efficiency-accuracy trade-off through adaptive layer selection. By pruning simple images early and complex images late, ERASE achieves an average accuracy of 78.45%, closely matching the static late-layer performance of 78.90%. Importantly, this is achieved while advancing the average effective pruning layer to 11.28, demonstrating that ERASE preserves accuracy while maximizing efficiency gains. 8Table 6: Efficiency comparison of pruning methods on 4K images with 16K vision tokens                                        
+
+> Method KV Cache Prefill Latency Decode Latency Task Latency
+> (MB) ↓(ms) ↓(ms/token) ↓(ms/task) ↓
+> Base 891.27 3694 31.03 3780 DART 189.74 ( ×4.70) 2550 ( ×1.45) 28.22 ( ×1.10) 2628 ( ×1.44) CDPruner 135.72 ( ×6.57) 2931 ( ×1.26) 28.01 ( ×1.11) 2998 ( ×1.26) PruneSID 135.76 ( ×6.57) 3262 ( ×1.13) 28.96 ( ×1.07) 3353 ( ×1.13) IVC-Prune 135.73 ( ×6.57) 3315 ( ×1.11) 28.64 ( ×1.08) 3389 ( ×1.12) iLLaVA 314.18 ( ×2.84) 3508 ( ×1.05) 31.72 ( ×0.98) 3573 ( ×1.06)
+> ERASE (Ours) 135.75 ( ×6.57) 2337 ( ×1.58) 28.50 ( ×1.09) 2419 ( ×1.56)
+
+4.4 Efficiency analysis 
+
+Figure 7: Latency of Qwen2.5-VL-7B To comprehensively evaluate the efficiency improvements of ERASE, we measure the prefill, decode, and end-to-end task latency of Qwen2.5-VL-7B. All profiling is con-ducted on a single NVIDIA RTX 5880Ti GPU with batch size 1. To reflect realistic optimized deployment settings, FlashAttention-2 [ 23 ] is enabled for all measurements. Evaluations are performed on a randomly sampled 30% subset of DocVQA under an aggressive final pruning ratio of 85.0%. Fig. 7 illustrates the task latency speedup achieved by ERASE compared to prior methods. The efficiency gain becomes more pronounced as the number of vision tokens increases, since self-attention complexity scales quadrat-ically with sequence length. For high-resolution images containing around 16K vision tokens, ERASE achieves up to 1.56 × end-to-end speedup, outperforming the best prior baseline ( 1.44 ×). To further analyze these improvements, Table 6 presents a detailed efficiency comparison on high-resolution images (4K images with 16K vision tokens), where vision tokens become the primary bottleneck. ERASE achieves the highest overall task speedup among all evaluated methods. In contrast, CDPruner relies on iterative MAP inference to update marginal gains, while PruneSID performs complex PCA-based grouping, both introducing substantial prefill overhead. IVC-Prune is also bottlenecked because all vision tokens must propagate into mid-to-late LLM layers before pruning, limiting early-stage computational savings. Similarly, iLLaVA achieves minimal prefill speedup, likely because it modifies FlashAttention to return cumulative sums and gradually reduces vision tokens, resulting in limited KV cache reduction. While IVC-Prune and ERASE retrospectively evict KV cache entries of earlier layers after identifying important vision tokens in Stage 2, iLLaVA lacks this mechanism. A similar limitation also exists in DART, where pruning occurs only inside the LLM decoder layers. In contrast, ERASE employs a lightweight non-iterative entropy calculation at the input stage, removing a substantial portion of redundant tokens before they enter the LLM backbone. As a result, ERASE achieves significant real-world speedups in high-resolution settings using only lightweight operations. 
+
+## 5 Conclusion 
+
+In this paper, we proposed ERASE, an adaptive two-stage vision token pruning framework for efficient VLM inference. ERASE jointly addresses visual redundancy and contextual relevance through entropy-guided image-level pruning and adaptive text-conditioned token pruning. In particular, ERASE dynamically adjusts both the Stage 1 pruning ratio and the Stage 2 pruning layer according to image complexity. Extensive experiments across multiple VLM architectures and challenging benchmarks demonstrate that ERASE consistently achieves superior efficiency-accuracy trade-offs compared to previous methods, preserving higher accuracy even under aggressive pruning ratios while significantly reducing end-to-end latency in high-resolution settings. 9References 
+
+[1] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun Tang, et al. Qwen2.5-vl technical report. arXiv preprint arXiv:2502.13923 ,2025. [2] Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo Chen, Sen Xing, Muyan Zhong, Qinglong Zhang, Xizhou Zhu, Lewei Lu, et al. Internvl: Scaling up vision foundation models and aligning for generic visual-linguistic tasks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 24185–24198, 2024. [3] Zichen Wen, Yifeng Gao, Shaobo Wang, Junyuan Zhang, Qintong Zhang, Weijia Li, Conghui He, and Linfeng Zhang. Stop looking for “important tokens” in multimodal language models: Duplication matters more. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing , pages 9972–9991, 2025. [4] Qizhe Zhang, Mengzhen Liu, Lichen Li, Ming Lu, Yuan Zhang, Junwen Pan, Qi She, and Shanghang Zhang. Beyond attention or similarity: Maximizing conditional diversity for token pruning in MLLMs. In The Thirty-ninth Annual Conference on Neural Information Processing Systems , 2025. URL https://openreview.net/forum?id=BLLixcuZgl .[5] Zhengyao Fang, Pengyuan Lyu, Chengquan Zhang, Guangming Lu, Jun Yu, and Wenjie Pei. Prune redundancy, preserve essence: Vision token compression in vlms via synergistic importance-diversity. In International Conference on Learning Representations , 2026. URL 
+
+https://openreview.net/forum?id=i36E5Ezm0H .[6] Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Junyang Lin, Chang Zhou, and Baobao Chang. An image is worth 1/2 tokens after layer 2: Plug-and-play inference acceleration for large vision-language models. In European Conference on Computer Vision , pages 19–35. Springer, 2024. [7] Zhichao Sun, Yidong Ma, Gang Liu, Nemo Chen, Xu Tang, Yao Hu, and Yongchao Xu. IVC-prune: Revealing the implicit visual coordinates in LVLMs for vision token pruning. In 
+
+The Fourteenth International Conference on Learning Representations , 2026. URL https: //openreview.net/forum?id=46LbXtFgBm .[8] Saeed Ranjbar Alvar, Gursimran Singh, Mohammad Akbari, and Yong Zhang. Divprune: Diversity-based visual token pruning for large multimodal models. In Proceedings of the Computer Vision and Pattern Recognition Conference , pages 9392–9401, 2025. [9] Ce Zhang, Kaixin Ma, Tianqing Fang, Wenhao Yu, Hongming Zhang, Zhisong Zhang, Haitao Mi, and Dong Yu. VScan: Rethinking visual token reduction for efficient large vision-language models. Transactions on Machine Learning Research , 2026. ISSN 2835-8856. URL https: //openreview.net/forum?id=KZYhyilFnt .[10] Yihong Huang, Fei Ma, Yihua Shao, Jingcai Guo, Zitong YU, Laizhong Cui, and Qi Tian. Nüwa: Mending the spatial integrity torn by VLM token pruning. In The Fourteenth International Conference on Learning Representations , 2026. [11] Lianyu Hu, Liqing Gao, Fanhua Shang, Liang Wan, and Wei Feng. iLLaVA: An image is worth fewer than 1/3 input tokens in large multimodal models. In The Fourteenth International Conference on Learning Representations , 2026. URL https://openreview.net/forum? id=svKk3PkjZn .[12] Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. Visual instruction tuning. Advances in neural information processing systems , 36:34892–34916, 2023. [13] Haoyu Lu, Wen Liu, Bo Zhang, Bingxuan Wang, Kai Dong, Bo Liu, Jingxiang Sun, Tongzheng Ren, Zhuoshu Li, Hao Yang, et al. Deepseek-vl: towards real-world vision-language under-standing, 2024. [14] Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sastry, Amanda Askell, Pamela Mishkin, Jack Clark, et al. Learning transferable visual models from natural language supervision. In International conference on machine learning ,pages 8748–8763. PmLR, 2021. 10 [15] Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee. Llava-next: Improved reasoning, ocr, and world knowledge, January 2024. URL https: //llava-vl.github.io/blog/2024-01-30-llava-next/ .[16] Zhiyu Wu, Xiaokang Chen, Zizheng Pan, Xingchao Liu, Wen Liu, Damai Dai, Huazuo Gao, Yiyang Ma, Chengyue Wu, Bingxuan Wang, et al. Deepseek-vl2: Mixture-of-experts vision-language models for advanced multimodal understanding, 2024. [17] Jinguo Zhu, Weiyun Wang, Zhe Chen, Zhaoyang Liu, Shenglong Ye, Lixin Gu, Hao Tian, Yuchen Duan, Weijie Su, Jie Shao, et al. Internvl3: Exploring advanced training and test-time recipes for open-source multimodal models. arXiv preprint arXiv:2504.10479 , 2025. [18] Shuai Bai, Yuxuan Cai, Ruizhe Chen, Keqin Chen, Xionghui Chen, Zesen Cheng, Lianghao Deng, Wei Ding, Chang Gao, Chunjiang Ge, et al. Qwen3-vl technical report. arXiv preprint arXiv:2511.21631 , 2025. [19] Senqiao Yang, Yukang Chen, Zhuotao Tian, Chengyao Wang, Jingyao Li, Bei Yu, and Jiaya Jia. Visionzip: Longer is better but not necessary in vision language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 19792–19802, 2025. [20] Long Xing, Qidong Huang, Xiaoyi Dong, Jiajie Lu, Pan Zhang, Yuhang Zang, Yuhang Cao, Conghui He, Jiaqi Wang, Feng Wu, et al. Conical visual concentration for efficient large vision-language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 14593–14603, 2025. [21] Xuyang Liu, Ziming Wang, Junjie Chen, Yuhang Han, Yingyao Wang, Jiale Yuan, Jun Song, Siteng Huang, and Honggang Chen. Global compression commander: Plug-and-play inference acceleration for high-resolution large vision-language models. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 7350–7358, 2026. [22] Qizhe Zhang, Aosong Cheng, Ming Lu, Zhiyong Zhuo, MinQi Wang, Jiajun Cao, Shaobo Guo, Qi She, and Shanghang Zhang. [cls] attention is all you need for training-free visual token pruning: Make vlm inference faster. arXiv preprint arXiv:2412.01818 , 2024. [23] Tri Dao. FlashAttention-2: Faster attention with better parallelism and work partitioning. In 
+
+International Conference on Learning Representations (ICLR) , 2024. [24] Donald R Jones, Matthias Schonlau, and William J Welch. Efficient global optimization of expensive black-box functions. Journal of Global optimization , 13(4):455–492, 1998. [25] Qiong Wu, Wenhao Lin, Yiyi Zhou, Weihao Ye, Zhanpeng Zen, Xiaoshuai Sun, and Rongrong Ji. Accelerating multimodal large language models via dynamic visual-token exit and the empirical findings. In Advances in Neural Information Processing Systems , 2025. [26] Cheng Shi, Yizhou Yu, and Sibei Yang. Vision function layer in multimodal llms. In Advances in Neural Information Processing Systems , 2025. [27] Amanpreet Singh, Vivek Natarajan, Meet Shah, Yu Jiang, Xinlei Chen, Dhruv Batra, Devi Parikh, and Marcus Rohrbach. Towards vqa models that can read. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 8317–8326, 2019. [28] Yuliang Liu, Zhang Li, Mingxin Huang, Biao Yang, Wenwen Yu, Chunyuan Li, Xu-Cheng Yin, Cheng-Lin Liu, Lianwen Jin, and Xiang Bai. Ocrbench: on the hidden mystery of ocr in large multimodal models. Science China Information Sciences , 67(12):220102, 2024. [29] Ahmed Masry, Xuan Long Do, Jia Qing Tan, Shafiq Joty, and Enamul Hoque. Chartqa: A benchmark for question answering about charts with visual and logical reasoning. In Findings of the association for computational linguistics: ACL 2022 , pages 2263–2279, 2022. [30] Minesh Mathew, Dimosthenis Karatzas, and CV Jawahar. Docvqa: A dataset for vqa on document images. In Proceedings of the IEEE/CVF winter conference on applications of computer vision , pages 2200–2209, 2021. 11 [31] Minesh Mathew, Viraj Bagal, Rubèn Tito, Dimosthenis Karatzas, Ernest Valveny, and CV Jawa-har. Infographicvqa. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , pages 1697–1706, 2022. [32] Pan Lu, Hritik Bansal, Tony Xia, Jiacheng Liu, Chunyuan Li, Hannaneh Hajishirzi, Hao Cheng, Kai-Wei Chang, Michel Galley, and Jianfeng Gao. Mathvista: Evaluating mathematical reasoning of foundation models in visual contexts. In International Conference on Learning Representations (ICLR) , 2024. [33] Wenbin Wang, Liang Ding, Minyan Zeng, Xiabin Zhou, Li Shen, Yong Luo, Wei Yu, and Dacheng Tao. Divide, conquer and combine: A training-free framework for high-resolution image perception in multimodal large language models. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 39, pages 7907–7915, 2025. [34] Penghao Wu and Saining Xie. V?: Guided visual search as a core mechanism in multimodal llms. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,pages 13084–13094, 2024. [35] xAI Corp. Grok-1.5 vision preview: Connecting the digital and physical worlds with our first multimodal model. https://x.ai/blog/grok-1.5v , 2024. [36] Lin Chen, Jinsong Li, Xiaoyi Dong, Pan Zhang, Yuhang Zang, Zehui Chen, Haodong Duan, Jiaqi Wang, Yu Qiao, Dahua Lin, et al. Are we on the right way for evaluating large vision-language models? Advances in Neural Information Processing Systems , 37:27056–27087, 2024. [37] Drew A Hudson and Christopher D Manning. Gqa: A new dataset for real-world visual reasoning and compositional question answering. Conference on Computer Vision and Pattern Recognition (CVPR) , 2019. [38] Yuan Liu, Haodong Duan, Yuanhan Zhang, Bo Li, Songyang Zhang, Wangbo Zhao, Yike Yuan, Jiaqi Wang, Conghui He, Ziwei Liu, et al. Mmbench: Is your multi-modal model an all-around player? In European conference on computer vision , pages 216–233. Springer, 2024. [39] Xingyu Fu, Yushi Hu, Bangzheng Li, Yu Feng, Haoyu Wang, Xudong Lin, Dan Roth, Noah A Smith, Wei-Chiu Ma, and Ranjay Krishna. Blink: Multimodal large language models can see but not perceive. In European Conference on Computer Vision , pages 148–166. Springer, 2024. [40] Jinze Bai, Shuai Bai, Yunfei Chu, Zeyu Cui, Kai Dang, Xiaodong Deng, Yang Fan, Wenbin Ge, Yu Han, Fei Huang, et al. Qwen technical report. arXiv preprint arXiv:2309.16609 , 2023. [41] Chaoyou Fu, Haojia Lin, Xiong Wang, Yi-Fan Zhang, Yunhang Shen, Xiaoyu Liu, Yangze Li, Zuwei Long, Heting Gao, Ke Li, et al. Vita-1.5: Towards gpt-4o level real-time vision and speech interaction. arXiv preprint arXiv:2501.01957 , 2025. [42] Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4 technical report. arXiv preprint arXiv:2303.08774 , 2023. 12 A Detailed experimental settings 
+
+A.1 Implementation details Comparison methods We configured all baselines following their official implementations and guidelines. Since our evaluation models lack a paired text encoder, CDPruner was implemented using text tokens projected by the LLM’s embedding layer. For DART, the pruning layer is set to 2 for Qwen2.5-VL and 3 for Qwen3-VL, accounting for the deep-stack layers in the latter. For IVC-Prune, we prune at layer 16 (for 28-layer models) or 22 (for 36-layer models), setting kc to 10% for target ratios below 70%, and 5% otherwise. For iLLaVA, we adopted their 88.9% setting for pruning ratios below 80%, and the 66.7% setting otherwise for Qwen3-VL and description from the paper for Qwen2.5-VL. Finally, to evaluate these baselines on the tiling-based InternVL3-8B architecture, we adapted their official LLaVA-NEXT [15] implementations, another model that uses a tiling-based. 
+
+Configuration of ERASE Stage 2 in ERASE adaptively chooses between an early and a mid-to-late layer. We designate layer 2 as the early pruning layer for the Qwen2.5-VL series and InternVL3-8B, and layer 4 for the Qwen3-VL series, considering the deep-stack layers. The mid-to-late pruning layer is uniformly positioned at 60% of the total depth for all evaluated models. 
+
+Benchmarks To extensively validate the functionality of ERASE, we conducted additional evalua-tions on conventional visual grounding and general perception tasks. The visual grounding evaluations comprise benchmarks that primarily feature real-world images, assessing a wide spectrum of capabil-ities. These include fine-grained visual perception (HRBench8K [ 33 ], VStarBench [ 34 ]), general visual question answering (RealWorldQA [35], MMStar [36], GQA [37], MMBench V 1.1 [38]), and multi-image understanding (BLINK [39]). For benchmarks that requires an LLM-as-a-judge paradigm for qualitative assessment, we employ Qwen1.5-1.8B-Chat [ 40 ]. This specific model was selected as prior studies [ 41 ] have demonstrated its evaluation reliability compared to GPT-4 [42]. Table 7: Accuracy evaluation results on Qwen2.5-VL-3B                                                                                                                                           
+
+> Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%)
+> 100% Base 824 79.06 83.96 93.07 75.95 60.30 79.12 100.00 -62.1% DART 626 72.24 78.12 83.55 49.94 55.20 66.94 84.60 CDPruner 654 77.25 71.20 81.01 52.05 52.40 66.55 84.11 PruneSID 587 65.89 76.92 83.50 54.22 57.00 66.04 83.46 IVC-Prune 617 77.32 76.92 90.96 74.75 55.30 72.83 92.04
+> ERASE 706 78.62 80.40 91.32 73.34 57.30 75.26 95.12
+> -75.0% DART 519 66.58 71.32 72.85 38.66 50.90 58.70 74.19 CDPruner 591 75.61 62.28 75.13 48.49 47.50 61.35 77.54 PruneSID 494 57.29 70.08 72.20 44.19 53.00 57.69 72.92 IVC-Prune 527 75.06 68.60 88.11 72.58 54.60 68.61 86.71
+> ERASE 611 77.95 78.52 89.68 71.74 57.20 72.70 91.88
+> -85.0% DART 413 58.23 59.36 57.08 30.54 46.90 48.90 61.80 CDPruner 515 71.57 52.28 66.27 43.86 46.60 55.35 69.95 PruneSID 426 51.47 60.84 62.98 36.81 49.20 50.65 64.01 IVC-Prune 396 68.27 56.44 78.30 63.72 53.00 59.89 75.69
+> ERASE 493 76.23 70.44 83.89 69.25 55.00 67.35 85.12
+
+## B Extended evaluation results 
+
+B.0.1 Main experiment on different model sizes 
+
+To validate the size-agnostic applicability of ERASE, we extend our main evaluations to the Qwen2.5-VL-3B and Qwen3-VL-4B models. Table 7 and Table8 summarize the evaluation results across the core benchmarks for Qwen2.5-VL-3B and Qwen3-VL-4B, respectively. Consistent with our primary findings, ERASE outperforms all baseline methods in preserving the base model’s accuracy. On the Qwen2.5-VL-3B architecture, ERASE demonstrates remarkable robustness at an extreme pruning ratio of 85.0%, surpassing the best competing method by a margin of nearly 10 percentage points (85.12% vs. 75.69%). 13 Table 8: Accuracy evaluation results on Qwen3-VL-4B                                                                                                                                           
+
+> Ratio Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%)
+> 100% Base 874 81.56 82.68 94.79 79.94 65.30 81.95 100.00 -65.11% DART 712 76.96 68.72 87.70 59.34 53.00 69.49 84.80 CDPruner 619 73.16 59.48 71.12 54.27 45.10 60.84 74.24 PruneSID 660 69.87 64.44 89.35 64.24 47.90 66.97 81.72 IVC-Prune 749 81.56 78.72 94.23 78.66 52.80 76.81 93.74
+> ERASE 784 80.41 80.48 94.40 78.20 62.00 78.98 96.38
+> -72.77% DART 656 74.13 59.84 81.64 51.28 49.80 63.72 77.75 CDPruner 534 69.65 51.96 62.88 49.00 44.00 55.15 67.30 PruneSID 583 66.98 59.84 81.64 51.28 49.80 63.72 77.75 IVC-Prune 695 80.96 76.16 93.83 78.00 52.10 75.09 91.64
+> ERASE 745 80.31 79.44 93.78 77.57 57.00 77.10 94.09
+> -84.43% DART 510 64.00 44.08 61.93 37.78 45.60 50.73 61.91 CDPruner 405 59.96 38.12 45.46 39.00 39.20 43.71 53.34 PruneSID 454 56.36 45.76 73.72 44.60 43.40 51.54 62.90 IVC-Prune 494 76.23 61.56 89.01 71.81 48.90 66.15 80.73
+> ERASE 632 79.65 76.72 90.11 77.43 52.40 73.25 89.39
+
+Similarly, on Qwen3-VL-4B under an aggressive pruning ratio of 84.43%, ERASE successfully retains 89.39% of the original accuracy, whereas the best baseline achieves only 80.73%. These results empirically confirm that ERASE efficiently performs vision token pruning and prevents catastrophic information loss across various model scales. Table 9: Visual grounding evaluation results on Qwen2.5-VL-7B 
+
+Ratio Method HRBench 8K V* RWQA MMStar GQA MMB v1.1 BLINK Avg. Retain (%) 100% Base 66.13 78.01 70.20 65.53 60.16 82.51 55.92 68.35 100.00 -62.1% DART 65.25 70.16 68.24 62.67 58.68 80.65 54.23 65.70 96.12 CDPruner 66.63 79.58 67.19 62.33 58.56 81.11 53.81 67.03 98.22 PruneSID 66.50 78.53 69.02 62.73 59.82 80.42 52.92 67.13 98.22 IVC-Prune 66.50 79.06 69.41 63.60 59.92 82.74 55.44 68.10 99.63 iLLaVA 56.38 61.78 65.75 61.07 58.35 79.95 54.29 62.51 91.45 
+
+ERASE 66.50 78.53 70.46 64.33 60.02 82.04 55.65 68.22 99.81 
+
+-75.0% DART 63.63 69.10 65.49 58.73 57.62 79.41 53.71 66.56 96.16 CDPruner 66.38 79.58 65.49 60.53 57.27 79.80 54.13 66.97 96.75 PruneSID 66.13 79.06 65.62 60.80 59.12 79.49 49.97 64.73 93.52 IVC-Prune 65.88 78.53 68.89 63.67 59.73 82.43 55.29 68.86 99.49 iLLaVA 52.00 55.50 63.92 58.20 56.58 78.87 53.81 59.84 87.55 
+
+ERASE 66.75 78.01 70.59 64.07 59.94 81.81 56.13 68.97 99.65 
+
+-85.0% DART 61.13 65.45 60.65 54.27 55.51 77.55 51.29 64.42 93.07 CDPruner 64.50 75.39 63.53 56.80 55.63 78.17 53.29 65.73 94.96 PruneSID 62.25 77.49 63.92 57.07 58.14 77.71 49.03 63.37 91.56 IVC-Prune 66.63 79.58 68.37 62.40 59.11 81.58 55.29 68.44 98.87 iLLaVA 49.63 49.74 63.40 54.13 54.40 75.85 52.39 57.08 83.51 
+
+ERASE 66.38 79.06 70.59 63.33 59.52 81.97 55.50 68.74 99.31 
+
+B.0.2 Experiment on visual grounding sets 
+
+Table 9, Table 10, and Table 11 present the accuracy evaluation results for Qwen2.5-VL-7B, Qwen3-VL-8B, and InternVL3-8B respectively, on the visual grounding benchmarks. Prior works generally excel on these benchmarks, as visual grounding tasks often rely primarily on coarse-grained global context. For instance, although DART, CDPruner, and PruneSID suffered significant performance degradation in the main experiments (Tables 1, 2, and 3), they maintained the base model’s accuracy relatively well on visual grounding tasks. Particularly on the Qwen2.5-VL-7B model (Table 9), all prior methods consistently retained over 90% of the original accuracy across all pruning ratios. Similarly, iLLaVA achieved notably improved accuracy for visual grounding tasks on the Qwen3-VL-8B model. For these baselines, accuracy degradation occurs primarily on fine-grained benchmarks (e.g., HRBench8K, VStarBench), especially at extreme pruning ratios, likely due to the information loss introduced by token merging. 14 This discrepancy indicates that while prior token reduction methods perform well on standard visual grounding tasks, they struggle significantly when tasks require distinguishing fine-grained details that exhibit visually similar yet semantically distinct features, such as dense text within an image. In contrast, our proposed ERASE achieves performance comparable to the base model on standard visual grounding tasks while successfully preserving and capturing the fine-grained details within the image. Table 10: Visual grounding evaluation results on Qwen3-VL-8B 
+
+Ratio Method HRBench 8K V* RWQA MMStar GQA MMB v1.1 BLINK Avg. Retain (%) 100% Base 72.13 83.77 71.37 66.60 61.88 84.52 68.28 72.65 100.00 -65.11% DART 71.12 77.49 65.62 55.67 57.31 78.33 59.86 66.49 91.52 CDPruner 65.38 81.68 61.31 48.80 58.20 73.76 54.66 63.40 87.27 PruneSID 71.12 82.72 67.58 57.93 60.08 75.70 63.55 68.38 94.13 IVC-Prune 72.75 83.77 70.98 63.53 61.33 83.44 67.96 71.97 99.06 iLLaVA 70.88 81.15 69.93 63.93 61.15 83.36 66.65 71.01 97.74 
+
+ERASE 75.63 83.25 71.24 66.13 61.37 82.97 64.49 72.15 99.32 
+
+-72.77% DART 68.50 75.39 63.79 51.53 55.36 74.15 58.34 63.87 87.91 CDPruner 66.50 79.06 59.74 48.53 56.15 70.82 54.08 62.13 85.51 PruneSID 72.38 83.77 67.20 53.27 60.06 73.45 59.60 67.10 92.37 IVC-Prune 72.13 83.25 70.59 62.60 61.11 83.59 68.23 71.64 98.61 iLLaVA 70.25 82.20 69.93 62.53 60.91 82.28 67.23 70.76 97.40 
+
+ERASE 74.75 83.25 71.50 65.20 61.31 83.20 63.76 71.85 98.90 
+
+-84.43% DART 63.88 64.92 58.04 47.00 52.10 71.13 52.08 58.45 80.45 CDPruner 64.63 74.35 52.68 41.33 51.77 60.14 47.87 56.11 77.23 PruneSID 71.63 82.72 65.23 48.00 57.37 69.50 57.08 64.50 88.79 IVC-Prune 72.13 83.77 70.98 61.27 60.30 83.67 67.54 71.38 98.25 iLLaVA 68.25 75.92 69.67 61.93 60.23 82.66 64.02 68.95 94.91 
+
+ERASE 74.88 83.77 71.24 63.60 61.37 82.51 64.39 71.68 98.66 
+
+Table 11: Visual grounding evaluation results on InternVL3-8B 
+
+Ratio Method HRBench 8K V* RWQA MMStar GQA MMB v1.1 BLINK Avg. Retain (%) 100% Base 68.75 69.63 71.24 68.73 53.23 85.76 55.92 67.61 100.00 -62.5% DART 69.62 68.59 69.80 65.13 52.66 83.90 54.71 66.34 98.13 CDPruner 63.75 70.68 64.84 58.60 52.10 80.65 52.18 63.26 93.56 PruneSID 66.75 70.68 70.33 63.07 51.69 82.04 52.87 65.35 96.66 IVC-Prune 68.63 70.16 71.50 67.13 52.91 85.37 55.65 67.34 99.60 
+
+ERASE 68.25 70.68 71.50 69.07 53.90 84.83 53.60 67.40 99.70 
+
+-75.0% DART 67.13 68.06 67.84 62.53 52.11 82.28 53.45 64.77 95.80 CDPruner 61.63 67.02 60.39 55.93 52.49 78.25 48.97 60.67 89.74 PruneSID 62.87 66.49 67.84 61.87 52.45 78.87 50.82 63.03 93.23 IVC-Prune 68.50 69.63 71.24 66.67 52.73 85.14 54.71 66.95 99.02 
+
+ERASE 68.75 71.20 71.90 68.00 53.82 85.06 53.60 67.48 99.80 
+
+-85.0% DART 65.00 59.69 65.62 59.20 51.43 79.64 51.60 61.74 91.32 CDPruner 58.12 63.35 57.78 49.87 51.37 72.06 48.24 57.26 84.69 PruneSID 56.88 61.78 64.18 57.73 57.64 74.77 50.55 60.50 89.49 IVC-Prune 66.63 69.11 70.72 64.53 52.00 84.60 54.23 65.97 97.58 
+
+ERASE 68.75 71.20 72.29 67.60 54.02 84.67 53.55 67.44 99.75 
+
+## C Algorithm of ERASE 
+
+Algorithm 1 outlines the ERASE framework, utilizing a complexity configuration set T pre-optimized via Bayesian Optimization. In Stage 1, the global image entropy ( ¯H) is computed as the median of 
+
+M patch-level local entropies. Based on ¯H, the algorithm retrieves a retention ratio ( r1) and a target pruning layer ( k) from T , preserving only the top ⌊M · r1⌋ high-entropy tokens. The median of the optimized thresholds ( Θ) acts as a definitive boundary: ¯H below this median categorizes the image as simple (triggering Stage 2 early), while exceeding it delays Stage 2 to a mid-to-late layer. In Stage 2 (layer k), lightweight text-to-vision cross-attention identifies and retains the top Kfinal 
+
+text-relevant tokens. Notably, if Stage 1 already yields ≤ Kfinal tokens, Stage 2 is entirely bypassed, directly pruning to Kfinal tokens. Finally, we retrospectively prune the KV cache of preceding layers (1 . . . k ) for the evicted tokens to optimize memory efficiency. 15 Algorithm 1 ERASE: Adaptive Two-Stage Vision Token Pruning 
+
+Require: V ∈ RM ×D , T ∈ RL×D , Target tokens Kfinal 
+
+Require: Complexity Configuration Set T = {(Θ c, Rc, Kc)}Nc=1 
+
+Ensure: Pruned tokens Vout , Updated KV cache 
+
+// Stage 1: Image-Level Entropy Pruning  
+
+> 1:
+
+Hi = − P p(x) ln p(x) for patch i ∈ [1 , M ] 
+
+> 2:
+
+¯H = Median ({H1, . . . , H M }) 
+
+> 3:
+
+(r1, k ) ← (Rc, Kc) s.t. (Θ c, Rc, Kc) ∈ T ∧ Θc < ¯H ≤ Θc−1 
+
+> 4:
+
+IS1 ← arg TopK ({Hi}, ⌊M · r1⌋) 
+
+> 5:
+
+VS1 ← V[IS1, :] 
+
+// Stage 2: Context-Aware Pruning  
+
+> 6:
+
+A = Softmax 
+
+ Q(k)  
+
+> txt (K(k)
+> vis )T
+> √D
+
+
+
+∈ RL×|I S1| 
+
+> 7:
+
+s = Sum (A, dim = 0)  
+
+> 8:
+
+IS2 ← arg TopK (s, K final ) 
+
+> 9:
+
+Vout ← VS1[IS2, :] 
+
+// Retrospective KV Cache Pruning  
+
+> 10:
+
+Ievict ← I S1 \ I S2 
+
+> 11:
+
+for l = 1 , . . . , k do  
+
+> 12:
+
+KV (l) 
+
+> cache
+
+← KV (l) 
+
+> cache
+
+\ KV (l)[Ievict ] 
+
+> 13:
+
+end for  
+
+> 14:
+
+return Vout , KV cache 
+
+## D Details on Bayesian Optimization 
+
+D.1 Setup for experiment 
+
+We employed Bayesian Optimization to automatically determine the optimal entropy thresholds and their associated pruning ratios (denoted as pi for level i). The objective of the Bayesian Optimization is to maximize a joint reward that balances task performance and computational efficiency. Accordingly, the objective function F is defined as: 
+
+F = α · Accuracy + (1 − α) ·
+
+> n
+
+X
+
+> i=1
+
+ci · pi (2) In Eq. 2, the first term evaluates the model’s predictive capability, where Accuracy is the normalized accuracy across the datasets. The second term quantifies the expected computational efficiency gained through pruning. Here, ci represents the proportion of images in the dataset that fall into complexity level i, and pi is the corresponding pruning ratio (i.e., the fraction of tokens removed) assigned to that level. The hyperparameter α ∈ [0 , 1] controls the trade-off between retaining model accuracy and maximizing token reduction. Ultimately, the final entropy thresholds and pruning ratios are selected from the configuration that achieves the highest accuracy, as the primary objective of Stage 1 is to prune vision tokens without any information loss. The dataset for Bayesian Optimization is meticulously sampled from diverse benchmarks, comprising solely instances where the target VLM originally predicted the correct answers. This ensures that the optimization process is implicitly guided to preserve the critical visual features necessary for accurate task execution, independent from the performance of the model. It is conducted with sampled tasks from eight diverse benchmarks (InfoVQA, ChartQA, OCRBench, TextVQA, RealWorldQA, MMStar, MMBench V 1.1, and VstarBench) on Qwen2.5-VL-7B. To reduce the overhead of Bayesian Optimization, we excluded MMBench V 1.1 and VstarBench, for other evaluation models, as they retained 100% of the accuracy for most of the times when evaluated on Qwen2.5-VL-7B. 16 D.2 Ablation on configurations 
+
+To find optimal configuration, we conducted Bayesian Optimization with various settings, differing stage, iteration, and α values. As performance criteria, we report the main experiment’s average accuracy alongside the dynamic Stage 1 pruning ratio and the Stage 2 layer index ( k). An earlier Stage 2 layer (lower k) and a higher Stage 1 pruning ratio indicate greater computational efficiency. The results are summarized in Table 12. Table 12: Ablation study on Bayesian Optimization configurations on Qwen2.5-VL-7B                                         
+
+> Variant BO Settings Main Experiment Results Stages αIter S1 Prune (%) ↑S2 Layer ( k)↓Avg. Acc (%) ↑
+> v140.45 100 30.17 8.78 77.72
+> v240.85 100 31.58 10.87 77.71
+> v330.65 100 36.54 14.72 79.24
+> v440.65 150 34.02 11.02 78.60 Default ( v5)40.65 100 33.79 11.28 78.45
+
+The hyperparameter α controls the reward trade-off between task accuracy and pruning efficiency. When prioritizing efficiency aggressively ( v1, α = 0 .45 ), the BO algorithm broadens the threshold for classifying images as simple at Stage 2, resulting in the selection of an early layer ( k ≈ 8.78 ) for Stage 2. To compensate for this portion of simple images, the algorithm conservatively lowers the Stage 1 pruning ratio (30.17%). While this maximizes Stage 2 efficiency, it overly restricts the model’s deep multimodal reasoning, ultimately dropping accuracy to 77.72%. While an overly accuracy-centric reward ( v2, α = 0 .85 ) is intended to discourage token reduction, the Stage 1 pruning ratio does not decrease as much as anticipated, remaining at 31.58%. This fails to improve overall accuracy (77.71%); the insufficient removal of redundant regions in Stage 1 leaves excessive uninformative tokens that act as visual noise, hindering effective context-aware reasoning. We examine the effect of partitioning the continuous entropy space into fewer discrete levels ( v3,
+
+N = 3 ). While this variant yields a higher average accuracy (79.24%), it noticeably defers the Stage 2 context-aware pruning to a deeper layer ( k ≈ 14 .72 ). Consequently, a massive volume of unpruned vision tokens must be processed through the majority of the LLM layers, severely limiting early-stage computational savings. In contrast, utilizing N = 4 complexity levels enables finer-grained early decisions, striking an optimal balance between computational efficiency and accuracy. Finally, we evaluate the search cost required for Bayesian Optimization. Extending the search to 150 iterations ( v4) yields negligible shifts in pruning dynamics and accuracy compared to 100 iterations, indicating that the optimization process effectively converges early and renders additional search overhead unnecessary. Guided by this comprehensive empirical analysis, we establish our default configuration as N = 4 , α = 0 .65 , with 100 search iterations. 
+
+D.3 Obtained parameter values 
+
+Table 13: Optimized entropy thresholds and pruning ratios for each model             
+
+> Model Entropy Threshold Pruning Ratio (%)
+> Qwen2.5-VL-7B 1.69 / 1.35 / 1.17 17.32 / 24.86 / 50.53 / 59.66 Qwen2.5-VL-3B 2.06 / 1.41 / 0.89 11.34 / 16.79 / 55.80 / 61.28 Qwen3-VL-8B 1.61 / 0.22 / 0.06 15.50 / 22.37 / 24.26 / 80.60 Qwen3-VL-4B 4.92 / 0.64 / 0.55 17.88 / 20.66 / 54.21 / 74.67 InternVL3-8B 3.98 / 0.70 / 0.59 15.86 / 23.88 / 30.68 / 67.58
+
+Table 13 details the optimized entropy thresholds and pruning ratios for the evaluated models. Within the Qwen2.5-VL series, both models exhibit similar optimal configurations due to their shared architectural design, with minor deviations likely stemming from differences in model capacity. Conversely, the Qwen3-VL series adopts a more conservative approach to classifying simple images 17 (using lower entropy thresholds) yet applies significantly higher pruning ratios to them. This behavior is likely attributable to its larger patch size; because each individual patch covers a wider spatial area, it inherently encapsulates more information per token compared to the Qwen2.5-VL series. Unlike the Qwen family, InternVL3-8B employs a dynamic tiling strategy comprising a global thumbnail and multiple local tiles. Although the underlying entropy distributions may vary between these structural components, we aggregated all patches across the tiles and the thumbnail into a single pool to ensure a consistent evaluation protocol with the Qwen series. From this unified pool, we uniformly retained the vision tokens exhibiting the highest local entropy values. Table 14: Transferability evaluation on InternVL3-8B                                                                  
+
+> Method OCR Bench Text VQA Chart QA Doc VQA Info VQA Math Vista Avg. Retain (%) Base 882 82.11 86.08 91.98 75.49 68.80 82.11 100 DART 588 60.78 57.56 48.11 36.52 57.80 53.26 64.87 CDPruner 260 47.18 32.08 28.08 31.32 42.50 34.53 42.05 PruneSID 255 41.18 46.72 30.72 31.86 52.90 38.15 46.46 IVC-Prune 546 67.96 65.28 72.77 57.74 53.10 61.91 75.40 ERASE †750 79.58 72.60 74.53 66.40 60.50 71.44 87.00
+> ERASE 773 79.21 78.48 79.01 66.66 63.30 73.99 90.11
+
+D.4 Transferability of Bayesian Optimization 
+
+To demonstrate the transferability of ERASE, we hypothesize that models with shared architectural configurations allow for effective parameter transfer. Since Qwen2.5-VL-7B and InternVL3-8B both utilize a 28 × 28 patch size and 28 LLM layers, we directly applied the complexity thresholds ( Θ) and pruning ratios ( R) optimized for Qwen2.5-VL-7B to InternVL3-8B without any additional search. Table 14 compares this zero-shot transferred approach (ERASE †) with the natively optimized ap-proach ( ERASE ) at an 85.0% pruning ratio. Although the natively searched ERASE naturally yields the best accuracy retention (90.11%), ERASE † demonstrates remarkable robustness by retaining 87.00% of the base performance. Crucially, ERASE † still significantly outperforms the best com-peting baseline (IVC-Prune, 75.40%), confirming that our configurations generalize robustly across similar architectures while completely amortizing search costs. 
+
+## E Efficiency analysis 
+
+E.1 Stage-wise efficiency analysis Effective pruning ratio in Stage 1 Table 15 analyzes the effective pruning ratio across various benchmarks. Because Qwen2.5-VL-7B and InternVL3-8B utilize a 28 × 28 patch size while Qwen3-VL-8B utilizes a larger 32 × 32 patch size, Qwen3-VL-8B naturally generates fewer initial vision tokens, leading to a lower optimal pruning ratio. Furthermore, the effective pruning ratio adapts to the distinct image complexity distributions of each benchmark. Benchmarks featuring highly redundant images permit aggressive pruning—especially in Qwen2.5-VL-7B—with minimal accuracy degradation. For instance, despite undergoing approx-imately 40% pruning in Stage 1 on DocVQA and MathVista, the model experiences negligible accuracy drops and occasionally even surpasses the base performance (Table 4). Table 15: Average pruning ratio(%) at Stage 1 Model OCRBench TextVQA ChartQA DocVQA InfoVQA MathVista Avg. Qwen2.5-VL-7B 25.23 18.39 45.58 39.11 27.58 46.87 33.79               
+
+> InternVL3-8B 28.24 23.22 33.26 40.24 25.91 38.53 31.57
+> Qwen3-VL-8B 20.18 16.02 22.31 38.21 18.57 25.23 23.42
+
+18 Table 16: Average selected pruning layer at Stage 2 Model OCRBench TextVQA ChartQA DocVQA InfoVQA MathVista Avg. Qwen2.5-VL-7B 14.23 16.65 7.36 9.42 13.52 6.50 11.28               
+
+> InternVL3-8B 15.04 16.84 13.31 11.10 16.08 11.48 13.97
+> Qwen3-VL-8B 20.96 21.90 21.42 15.74 21.24 19.73 20.16
+
+Adaptive layer selection in Stage 2 Table 16 presents the average layer indices dynamically selected for applying Stage 2 across different tasks. Given that the Qwen3-VL-8B architecture consists of 36 layers—which is more than the 28 total layers of the other two models—Stage 2 naturally initiates at proportionally deeper layers to maintain effective context reasoning. As can be seen from the results, for benchmarks like DocVQA and MathVista, Stage 2 pruning is executed at early layers (e.g., layers 9.42 and 6.50 in Qwen2.5-VL-7B). Despite discarding tokens early in the network, the models robustly maintain their accuracy, clearly demonstrating the strong advantage of our adaptive layer selection strategy. Table 17: Efficiency comparison of pruning methods on various image resolutions                                                  
+
+> Method KV Cache Prefill Latency Decode Latency Task Latency Accuracy
+> (MB) ↓(ms) ↓(ms/token) ↓(ms/task) ↓(%) ↑
+> Base 260.80 847 28.80 988.97 94.80 DART 57.11 ( ×4.57) 555 ( ×1.53) 28.63 ( ×1.01) 685 ( ×1.44) 57.47 CDPruner 41.27 ( ×6.32) 604 ( ×1.40) 28.42 ( ×1.01) 735 ( ×1.35) 66.41 PruneSID 41.38 ( ×6.30) 625 ( ×1.36) 28.84 ( ×1.00) 795 ( ×1.24) 68.25 IVC-Prune 41.37 ( ×6.30) 710 ( ×1.19) 28.06 ( ×1.03) 877 ( ×1.13) 84.34 iLLaVA 99.52 ( ×2.62) 718 ( ×1.18) 32.03 ( ×0.90) 866 ( ×1.14) 58.41
+> ERASE (Ours) 41.29 ( ×6.32) 609 ( ×1.39) 27.46 ( ×1.05) 744 ( ×1.33) 90.53
+
+E.2 Efficiency comparison on overall resolution 
+
+While Table 6 presents the efficiency gains for high-resolution images, Table 17 illustrates the averaged efficiency improvements across various image resolutions. Although IVC-Prune achieves the highest accuracy among prior methods, it obtains minimal speedup in overall task latency. This is primarily because its prefill latency reduction is bottlenecked by its late-layer pruning strategy. For CDPruner and PruneSID, the overhead of iterative scoring is less pronounced for lower-resolution images, yielding better overall speedup compared to their high-resolution performance. Similarly, while iLLaVA achieves improved efficiency as the overhead of computing cumulative sums is partially mitigated at lower resolutions, it still struggles with suboptimal KV cache reduction and task latency speedup. Ultimately, although several baselines achieve notable speedups in task latency —some demonstrating marginally higher speedups than ERASE— they suffer from severe accuracy degradation. In contrast, ERASE successfully strikes an optimal balance between computational efficiency and task accuracy through its adaptive two-stage pruning mechanism. 
+
+## F Entropy analysis 
+
+To validate our premise that local entropy reflects the information density of individual vision tokens, and that global entropy effectively determines the image’s complexity level and corresponding pruning ratio, we provide visual examples in Fig. 8. Following the same settings as in Fig. 5, patches with a local entropy below 3.1 (indicating low information density) are visualized in the middle column, while the remaining highly informative patches are shown on the right. The example images are arranged in ascending order of their global entropy. As the global entropy increases, the proportion of low-entropy regions visibly decreases, substantiating our hypothesis. 19 (a) Raw image (b) Low entropy patches (c) High entropy patches 
+
+Figure 8: Extended visual examples of low- and high-entropy patches across varying complexity levels. The images are arranged in ascending order of global entropy (from top to bottom). 20

@@ -1,0 +1,250 @@
+Title: Aquatic Neuromorphic Optical Flow
+
+URL Source: https://arxiv.org/pdf/2605.07653v1
+
+Published Time: Mon, 11 May 2026 01:40:10 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+> 1
+
+# Aquatic Neuromorphic Optical Flow 
+
+Pei Zhang, Yunkai Liang, and Kaiqiang Wang 
+
+Abstract —Underwater environments impose severe constraints on conventional imaging systems and demand solutions that balance high-quality sensing with strict resource efficiency. While emerging event cameras offer a promising alternative, their potential in aquatic scenarios remains largely unexplored. Through the lens of neuromorphic vision, this work pioneers the investigation of motion fields that serve as key media for agile underwater perception. Built upon spiking neural networks, we introduce a self-supervised framework to estimate per-pixel opti-cal flow from asynchronous event streams, elegantly bypassing the long-standing bottleneck of underwater data scarcity. Extensive evaluations demonstrate that our method achieves competitive visual and quantitative results against leading techniques while operating with superior computational efficiency. By bridging neuromorphic sensing and aquatic intelligence, this work opens new frontiers for lightweight, real-time, and low-cost perception on resource-constrained underwater edge platforms. 
+
+Index Terms —Event camera, underwater, optical flow, spiking neural network, self-supervised learning. 
+
+I. I NTRODUCTION 
+
+# UNDERWATER and on-land computer vision diverge in focus and operational demands, with the former contend-ing with unstructured scenes, complex fluid dynamics, low light, and limited onboard computing resources in underwater vehicles [1], [2]. A survey in Fig. 1 (a) reveals that underwater efforts are often dedicated to handling challenges such as non-ideal illumination, resource constraints, communication limi-tations, and degraded imaging quality. Frame-based imaging (i.e ., image cameras), while a gold standard on land, becomes a hardware bottleneck in underwater environments. Neuromorphic vision via event cameras mimics the hu-man retina and responds to brightness changes with event streams [3]–[6]. As Fig. 1 (b) shows, it enjoys killing features over frame-based vision, including microsecond temporal res-olution along with low data rates, 120 dB high dynamic range (HDR) to overcome backscatter and light attenuation, and minimal power consumption [7]. These make it a promising solution for resource-constrained mobile platforms. Despite widespread terrestrial success [8]–[13], its underwater use remains emerging. AquaticVision [14] and OceanLab [15] pi-oneered event-based SLAM benchmarks, yet Table I reveals a persistent scarcity of diverse, large-scale datasets with reliable ground truth. Beyond navigation, event cameras enhance AUV 
+
+Pei Zhang is with the School of Electrical Engineering, Guangxi University (e-mail: pzhang@gxu.edu.cn). Yunkai Liang is with the Baise Artificial Intelligence Innovation and Development Center (e-mail: liangyunkai2020@163.com). Kaiqiang Wang is with the School of Physical Science and Technology, Northwestern Polytechnical University (e-mail: kqwang@nwpu.edu.cn). Corresponding author: Pei Zhang. This work was supported in part by the Guangxi University Talent Development Funding, and in part by the research funding of Key Laboratory of Photonic Technology for Integrated Sensing and Communication, Ministry of Education, Guangdong University of Technology. Illumination Real Time Energy Bandwidth Motion Blur Contextual Clarity On Land Underwater    
+
+> (a) HDR Latency Power Data Rate FPS Texture & Color Image Cam Event Cam (b) (c) (d)
+
+Fig. 1. (a) Underwater and on-land vision differ in focus. (b) Neuromorphic and frame-based vision differ in features. (c) Frame-based optical flow and a color-coding scheme. (d) Neuromorphic optical flow and source events. 
+
+docking via fast marker localization [16], serve as scientific tools to observe millisecond-scale plankton behaviors [17] and transparently camouflaged organisms [18], and boost underwa-ter image restoration [19], [20]. These works fully cover the current state of research on underwater neuromorphic vision. In dynamic fluid environments, optical flow is a basic but vital cue for downstream tasks like navigation and SLAM, detection and tracking, imaging reconstruction, and flow-aware control. However, it remains unexplored for the lack of large-scale, annotated event data. Then, event-based self-supervised learning becomes a dominant paradigm practical for real-world deployment. Despite success on land [21]–[23], its viability for underwater use remains unverified. Another challenge lies in the tension between limited computing resources on underwater platforms and the resource-intensive nature of standard artificial neural networks (ANNs). Addressing both algorithm and hardware bottlenecks, spiking neural networks (SNNs) offer a convincing solution for their computational efficiency and native capacity to handle spike-like events [24], [25], making them well suited for underwater tasks [26], [27]. To our knowledge, this work pioneers the study of underwa-ter motion fields through the lens of neuromorphic vision. We present a self-supervised SNN framework to estimate per-pixel optical flow from event streams. As compared in Fig. 1 (c) and (d), our neuromorphic solution delivers a more impressive result for aquatic scenes by seeing through the dark and blind spots between frames. It earns competitive performance against leading ANN baselines while operating with superior computational efficiency, and also benefits downstream tasks like tracking camouflaged marine life. This work opens new avenues for lightweight, real-time, and low-cost perception on resource-constrained underwater edge systems. II. M ETHODOLOGY 
+
+A. Self-Supervised Learning for Optical Flow 
+
+Underwater perception is degraded by light absorption and scattering, which attenuates visibility, reduces scene contrast, and amplifies sensor noise [28]. The light intensity at a spatial position x = ( x, y )⊺ at a depth z, is denoted as I(x, z ) =                                                
+
+> arXiv:2605.07653v1 [cs.CV] 8 May 2026 2
+> TABLE I EXISTING UNDERWATER NEUROMORPHIC DATASETS
+> AquaticVision (2025) [14] Aqua-Eye (2024) [18] OceanLab (2023) [15] DAVIS-NUIUIED (2022) [19]
+> Task SLAM object detection SLAM image enhancement
+> Sensor 2×DAVIS346 DAVIS346 DAVIS346 HD frame camera DAVIS346
+> Pixel 346 ×260 346 ×260 346 ×260 1920 ×1080 346 ×260
+> Annotation —bounding box ——
+> Environment lab tank natural scene natural scene lab tank
+> Dataset Scale limited moderate limited limited
+> (a) (b) (c)
+> Fig. 2. (a) An event stream of a coral scene and its corresponding event-count representations. (b) Dynamics of an LIF neuron in which the firing threshold and leak are learnable. (c) Overview of the proposed Aq-FireNet.
+
+I0(x)e −αz , with the initial intensity I0 and attenuation factor 
+
+α anchored on light and water properties. Event cameras detect per-pixel brightness changes and encode an event e = ( x, t, p )
+
+triggered at x at a timestamp t when the variation ∆L(x, z, t )
+
+over the time elapsed ∆t reaches a contrast threshold c
+
+∆L(x, z, t ) = log 
+
+ I(x, z, t )
+
+I(x, z, t − ∆t)
+
+
+
+= pc, (1) with the polarity p ∈ { +1 , −1} for the change direction. Then, an event stream E, comprising all online events from underwa-ter scenes, is denoted as E = {ei}i=0: ∞ = (xi, t i, p i) i=0: ∞,with each being indexed by i. Beyond target motion, envi-ronmental dynamics such as turbulence and suspended par-ticulates, often trigger background noise. We harness count encoding, a computationally-efficient representation meshing with resource-constrained underwater settings. Here, events are accumulated per-pixel and per-polarity over a time interval to shape event-count images for continuous optical flow esti-mation [22]. As Fig. 2 (a) shows, each image k is populated with the consecutive, non-overlapping partitions of a stream 
+
+Ek = {ei}K−1 
+
+> i=0
+
+(i.e ., each has K events), ensuring a compact yet precise depiction of dynamic scenes. We exploit contrast maximization (CM) to estimate per-pixel flow fields from event streams in a self-supervised fash-ion [29], [30]. While conventional models assume linear warp-ing in rigid scenes, underwater environments introduce optical distortions, driven by local refractive index variations, to cause magnification and shrinkage of targets. To describe such fluid scenes, we augment the linear model with isotropic scaling and represent motion as a synergy of translation and scaling. Assuming the candidate motion vector θ(x) =  v(x), ϕ (x)⊺,where v = (vx, v y )⊺ is the velocity, is constant within a small spatiotemporal partition, each event is propagated to a reference time t′ and a warped position x′
+
+x′ 
+
+> i
+
+= xi + v(xi)( t′ − ti)
+
+| {z }
+
+> Linear Warping
+
++ ϕ(xi)( xi − xc)( t′ − ti)
+
+| {z }
+
+> Isotropic Scaling
+
+. (2) The factor ϕ is an approximation of the divergence of the local distortion field, and captures the expansion ( ϕ > 0) or contraction rate ( ϕ < 0). This micro-refraction is assumed isotropic for stable, parameter-efficient optimization. Due to the unknown optical center of the distortion, we set xc to the spatial centroid of the given partition. This aligns micro-refraction effects with regions of highest event activity, en-abling efficient estimation without learnable parameters. The aggregation result is termed an image of warped events (IWE). Then, the IWE of the per-pixel average timestamp for each polarity p′ at t′, denoted as Tp′ (x, θ | t′), is shaped by a linear interpolation kernel σ(x) = max  0, 1 − | x|
+
+Tp′ (x, θ | t′) = 
+
+P 
+
+> i
+
+1pi=p′ σ(x − x′
+
+> i
+
+)σ(y − y′
+
+> i
+
+)ti
+
+P 
+
+> i
+
+1pi=p′ σ(x − x′
+
+> i
+
+)σ(y − y′
+
+> i
+
+) + ϵ , (3) with the offset ϵ for numerical stability. With accurate flow, events from the same moving edge align tightly in space-time after motion compensation, leading to a sharper event distribution and a lower Tp′ . Then, the CM loss LCM at t′
+
+is the scaled sum of the squared temporal images ( i.e ., edge energy) for both polarities across all pixels 
+
+LCM (t′) = 
+
+P 
+
+> x
+
+f (T+, t ′) + f (T−, t ′)
+
+P 
+
+> x
+
+1δ(x′)>0 + ϵ , (4) where δ(x′) is a per-pixel event count of the IWE for ensuring loss convexity, and the function f (T, t ′) = ∥T (x, θ | t′)∥2 +
+
+λ0∥T (x, θ | t′)∥0. Incorporating the L0 term for noisy event-based reconstruction has been verified [31]. In underwater scenes where optical degradation induces diffuse event patterns 3                                                                                                 
+
+> TABLE II QUANTITATIVE EVALUATION BY SUPERVISED METRICS
+> A[14] B[18] C[18] D[19] AEE %3px AEE %3px AEE %3px AEE %3px
+> FireNet 1.57 13.39 1.22 4.72 0.43 0.21 0.70 1.22 EV-FlowNet 1.41 9.28 1.05 3.39 0.41 0.19 0.62 0.92 LIF-FireNet 1.63 15.02 1.38 3.45 0.50 0.35 0.71 2.03 XLIF-FireNet 1.48 11.13 1.29 4.31 0.46 0.33 0.68 1.95 LIF-EV-FlowNet 1.52 11.79 1.31 3.52 0.46 0.56 0.63 1.36 XLIF-EV-FlowNet 1.40 10.74 1.18 3.12 0.43 0.20 0.60 1.30 Aq-FireNet 1.40 9.92 1.20 3.33 0.41 0.18 0.68 1.49 Aq-FireNet ( ϕ= 0 )1.43 11.21 1.26 3.74 0.42 0.23 0.70 1.61 Aq-FireNet ( λ0= 0 )1.48 12.37 1.32 3.97 0.44 0.27 0.70 1.80
+> A. scan_with_board C. moon_jellyfish2 B. sum10 D. scene_3
+> Color encodes the scores, the darker the better.
+
+and ambiguity, it complements temporal alignment to penalize minor deviations in the IWE, encouraging sharper motion boundaries while reducing blur and noise. Given its non-convex and non-differentiable nature, we use a differentiable approximation for optimization ∥x∥0 ≈ P 
+
+> i
+
+tanh 2(|xi|/ϵ ). To mitigate temporal scaling issues during backpropagation [32], the CM loss is computed bidirectionally to ensure equal contributions from all events LCM = LCM (t0) + LCM (tK−1).At the flow level, a smoothness regularizer LSM penalizes flow variations to enforce spatial collinearity 
+
+LSM (θ) = X
+
+> x
+
+X 
+
+> n∈N (x)
+
+ρ θ(x) − θ(n) 
+
+> 1
+
+, (5) with the Charbonnier loss ρ(x) = ( x2 + ϵ2)β for outlier rejec-tion and the set of spatial neighbors N (x). We set β = 0 .45 
+
+and ϵ = 0 .001 . Finally, the overall loss L to supervise network training is L = LCM + λLSM . As shown in Fig. 2 (a), a buffer 
+
+¯Ek→k+K
+
+.
+
+= (Ei, ˆθi) k+K 
+
+> i=k
+
+accumulates K forward-pass event-flow tuples to ensure adequate motion context for optimization. Parameters are then updated via backpropagation through time, followed by network state detachment and buffer resets. 
+
+B. Neuron Model and Network Architecture 
+
+As Fig. 2 (b) illustrates, the LIF neuron integrates incom-ing synaptic input over time with a leakage term modeling membrane decay [33]. The membrane potential ui[t] of a postsynaptic neuron i at a timestep t follows 
+
+ui[t] = ζu i[t − 1] + (1 − ζ)
+
+ X 
+
+> j
+
+˜wij sj [t] + X
+
+> o
+
+ˇwio so[t − 1] 
+
+
+
+,
+
+(6) where ζ is the membrane decay, and P 
+
+> j
+
+˜wij sj [t], with the feedforward weight ˜w, represents the total synaptic input at the current timestep, computed as the weighted sum of incoming spikes ( i.e ., events) sj [t] ∈ { 0, 1} from all presynaptic neurons 
+
+j. Similar explanation for the recurrent weight ˇw and the index 
+
+o. When the potential exceeds a firing threshold, the neuron emits a spike and then resets. Repeated over time, this process enables event-driven computation across SNN layers.                                                                                           
+
+> TABLE III QUANTITATIVE EVALUATION BY UNSUPERVISED METRICS
+> A[14] B[18] C[15] D[19] FWL RSAT FWL RSAT FWL RSAT FWL RSAT FireNet 1.13 0.91 1.49 0.90 1.36 1.01 1.82 0.83 EV-FlowNet 1.23 0.93 1.46 0.83 1.33 0.97 1.74 0.81 LIF-FireNet 1.01 1.01 1.42 1.01 1.32 1.04 1.61 0.87 XLIF-FireNet 1.06 0.95 1.44 0.94 1.35 1.03 1.70 0.85 LIF-EV-FlowNet 1.08 0.97 1.40 0.91 1.29 0.98 1.67 0.87 XLIF-EV-FlowNet 1.13 0.92 1.38 0.91 1.29 0.97 1.73 0.84 Aq-FireNet 1.18 0.95 1.48 0.92 1.36 0.98 1.78 0.83 Aq-FireNet ( ϕ= 0 )1.14 0.99 1.43 0.92 1.35 1.01 1.75 0.84 Aq-FireNet ( λ0= 0 )1.10 1.00 1.42 0.94 1.33 1.02 1.71 0.86
+> A. hdr C. recording6 B. flame_jellyfish19 D. scene_9
+> Color encodes the scores, the darker the better.
+
+As Fig. 2 (c) depicts, our prototype Aquatic-FireNet (Aq-FireNet) inherits a topology from FireNet [34] for its fast, lightweight, and computationally-efficient features, to match real-time camera responses and resource-constrained under-water platforms. To handle turbidity-induced scale variations and visual distortions, we leverage a dual-pathway, multi-scale convolutional architecture augmented by cross-pathway skip connections. A lightweight spiking attention module is inte-grated to amplify salient motion while suppressing background noise. Spatiotemporal modeling is achieved through a hybrid recurrent strategy that couples the implicit short-term memory of LIF neurons with explicit long-term ConvGRUs [35]. III. E XPERIMENT 
+
+A. Setup 
+
+Training samples are taken from a composite compris-ing DAVIS-NUIUIED and OceanLab ( 400 sequences), using 
+
+128 × 128 crops with spatial, polarity augmentations. We opti-mize using Adam (initial learning rate 2×10 −4, cosine decay) for 200 epochs [36]. We also employ gradient accumulation over K = 10 forward-pass partitions of K = 10 3 events, yielding an effective large batch size of 10 4 events per weight update. The loss weights are λ = 0 .001 and λ0 = 0 .01 .In the absence of ground truth, we generate a reference using RAFT [37] on consecutive frames. The input to event-based models comprises all events spanning the corresponding time windows. While this measures relative rather than abso-lute accuracy, it enables supervised assessments via average endpoint error (AEE ↓) and outlier percentage ( %3px ↓). For comprehensive evaluations on AquaticVision, Aqua-Eye, and the DAVIS-NUIUIED test split, we compare with FireNet and EV-FlowNet, including their SNN variants [21], [22]. All baselines are retrained from scratch on our composite set. Finally, unsupervised metrics, variance-based flow warp loss (FWL ↑) [38] and time-based ratio of squared average timestamps (RSAT ↓) [22] are reported as a supplement. 
+
+B. Quantitative and Qualitative Evaluation 
+
+Tables II and III indicate that our Aq-FireNet consistently outperforms SNN-based FireNet variants across all scenarios, 4                                              
+
+> (a) Frame (b) Reference (c) Events (d) Ours (e) XLIF-FireNet (f) LIF-EV-FlowNet (g) LIF-FireNet
+> Fig. 3. Visual results on AquaticVision, DAVIS-NUIUIED, and Aqua-Eye datasets, with a color-coding scheme shown alongside. TABLE IV COMPUTATIONAL EFFICIENCY COMPARISON
+> Params. Ops *Firing Rate Power Latency
+> (M)(G)(%)(mJ )(ms )FireNet 0.15 4.85 —22.32 33.87 EV-FlowNet 14.13 28.54 —131.28 61.24 LIF-FireNet 0.074 2.95 30.42 2.67 23.90 LIF-EV-FlowNet 20.39 23.73 41.57 21.33 47.27 Ours 0.134 2.31 24.35 2.08 26.49
+> *Ops (Operations) refer to FLOPs in ANNs, SOPs in SNNs.
+> (a) Isotropic scaling (b) L0regularizer
+> Fig. 4. Ablation study on how our modules affect learning performance.
+
+and earns competitive runner-up performance against larger ANN models in most cases. Our core design is also verified by quick tests, which confirm that removing either the isotropic scaling ( ϕ = 0 ) or the L0 regularizer yields a performance drop across supervised and unsupervised metrics. As shown in Fig. 3, our method yields optical flow estimates more faithful to the reference than state-of-the-art SNN base-lines across challenging aquatic scenes. It effectively handles severe visual degradations like uneven lighting and turbidity-induced low contrast. Particularly, our approach robustly tracks the slight motion of camouflaged, weakly dynamic marine life that the competitors often fail to distinguish from backgrounds. Underwater deployment demands strict resource and latency management. Table IV reports theoretical energy consumption    
+
+> (a) Frame (b) Without optical flow (c) With optical flow
+> Fig. 5. Our neuromorphic optical flow facilitates camouflaged fish detection.
+
+by distinguishing floating-point operations (FLOPs) for ANNs from synaptic operations (SOPs) for SNNs [25], [39]. Our method earns the lowest computational cost, sparsest firing rate, and highest energy efficiency, while securing runner-ups in model size and inference latency. This confirms its viability for real-time, resource-constrained aquatic tasks. As Fig. 4 illustrates, Aq-FireNet achieves lower loss than its linear-warping baseline ( ϕ = 0 ), confirming that isotropic scal-ing is essential for compensating complex, non-translational dynamics. Analysis of the L0 regularizer reveals a trade-off in noisy aquatic contexts. Excessive regularization ( λ0 = 0 .1)causes underfitting and training instability, whereas insufficient penalization ( λ0 = 0 .001 ) fails to disentangle true motion from ambient noise and then slows convergence speed. As visualized via feature maps in Fig. 5, we verify our flow estimates on motion segmentation as a sample of downstream tasks. Camouflaged marine life often remains high photometric similarity to surrounding backgrounds and nearly indistin-guishable in frames. Shifting attention to changing pixels, our neuromorphic flow fields isolate dynamic contours and enable precise target extraction against cluttered aquatic backgrounds. IV. C ONCLUSION 
+
+This work pioneers underwater motion field estimation via a self-supervised SNN framework. Visual and quantitative results verify its effectiveness and robustness. It opens new avenues for lightweight, real-time, and low-cost perception on resource-constrained underwater edge systems. 5
+
+REFERENCES [1] S. P. Gonz´ alez-Sabbagh and A. Robles-Kelly, “A survey on underwater computer vision,” ACM Computing Surveys , vol. 55, no. 13s, pp. 1–39, 2023. [2] Y. Zhu and L. F. Tadesse, “SpectroGen: a physically informed gener-ative artificial intelligence for accelerated cross-modality spectroscopic materials characterization,” Matter , vol. 9, no. 1, p. 102434, 2026. [3] I. Schiopu and R. C. Bilcu, “Lossless compression of event camera frames,” IEEE Signal Processing Letters , vol. 29, pp. 1779–1783, 2022. [4] P. Zhang, Z. Ge, L. Song, and E. Y. Lam, “Neuromorphic imaging with density-based spatiotemporal denoising,” IEEE Transactions on Computational Imaging , vol. 9, pp. 530–541, 2023. [5] Y. Wang, C. Jiang, X. Jia, Y. Guo, and L. Yu, “Event-based shutter unrolling and motion deblurring in dynamic scenes,” IEEE Signal Processing Letters , vol. 31, pp. 1069–1073, 2024. [6] C. Wang, S. Zhu, P. Zhang, K. Wang, J. Huang, and E. Y. Lam, “Angle-based neuromorphic wave normal sensing,” Laser & Photonics Reviews ,vol. 19, no. 4, p. 2400647, 2025. [7] P. Zhang, S. Zhu, C. Wang, Y. Zhao, and E. Y. Lam, “Neuromorphic imaging with super-resolution,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 35, no. 2, pp. 1715–1727, 2025. [8] D. Gehrig and D. Scaramuzza, “Low-latency automotive vision with event cameras,” Nature , vol. 629, pp. 1034–1040, 2024. [9] S. Zhu, Q. Yin, C. Wang, J. Huang, and E. Y. Lam, “Ultrafast dynamic defect inspection with computational neuromorphic imaging,” Advanced Science , vol. 12, no. 44, p. e10338, 2025. [10] W. Chen, Y. Zhang, X. Sun, and F. Wu, “Event-based stereo depth es-timation by temporal-spatial context learning,” IEEE Signal Processing Letters , vol. 31, pp. 1429–1433, 2024. [11] R. Chen, C. Wang, Y. Li, Y. Cao, S. Zhu, and E. Y. Lam, “Self-calibrated neuromorphic hyperspectral derivative imaging,” Optica , vol. 13, no. 4, pp. 587–590, 2026. [12] S. Shiba, Y. Aoki, and G. Gallego, “Fast event-based optical flow estimation by triplet matching,” IEEE Signal Processing Letters , vol. 29, pp. 2712–2716, 2023. [13] J. Wu, P. Duan, Z. Wang, C. Wang, B. Shi, and E. Y. Lam, “Dark-EvGS: event camera as an eye for radiance field in the dark,” IEEE Transactions on Image Processing , vol. 35, pp. 3172–3185, 2026. [14] Y. Peng, Y. Hong, Z. Hong, A. P.-Y. Chui, and J. Wu, “AquaticVision: benchmarking visual SLAM in underwater environment with events and frames,” arXiv preprint arXiv:2505.03448 , 2025. [15] J. H. Klasson, B. Sorensen, K. Brummenaes, and G. B. Ellingsen, “Event-dataset for underwater SLAM,” https: //github.com/OsloMet-OceanLab/underwater event dataset, 2023. [16] F. Zhang, Y. Zhong, L. Chen, and Z. Wang, “Event-based circular detection for AUV docking based on spiking neural network,” Frontiers in Neurorobotics , vol. 15, p. 815144, 2022. [17] S. Takatsuka, N. Miyamoto, H. Sato, Y. Morino, Y. Kurita, A. Yabuki, C. Chen, and S. Kawagucci, “Millisecond-scale behaviours of plankton quantified in vitro and in situ using the event-based vision sensor,” 
+
+Ecology and Evolution , vol. 14, no. 8, p. e70150, 2024. [18] C. Luo, J. Wu, S. Sun, and P. Ren, “TransCODNet: underwater transparently camouflaged object detection via RGB and event frames collaboration,” IEEE Robotics and Automation Letters , vol. 9, no. 2, pp. 1444–1451, 2024. [19] X. Bi, P. Wang, T. Wu, F. Zha, and P. Xu, “Non-uniform illumination underwater image enhancement via events and frame fusion,” Applied Optics , vol. 61, no. 29, pp. 8826–8832, 2022. [20] X. Bi, P. Wang, W. Guo, F. Zha, and L. Sun, “RGB/event signal fusion framework for multi-degraded underwater image enhancement,” 
+
+Frontiers in Marine Science , vol. 11, p. 1366815, 2024. [21] A. Z. Zhu, L. Yuan, K. Chaney, and K. Daniilidis, “EV-FlowNet: self-supervised optical flow estimation for event-based cameras,” in 
+
+Proceedings of Robotics: Science and Systems , 2018. [22] J. Hagenaars, F. Paredes-Vall´ es, and G. de Croon, “Self-supervised learning of event-based optical flow with spiking neural networks,” 
+
+Advances in Neural Information Processing Systems , vol. 34, pp. 7167– 7179, 2021. [23] F. Paredes-Vall´ es, K. Y. Scheper, C. De Wagter, and G. C. De Croon, “Taming contrast maximization for learning sequential, low-latency, event-based optical flow,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , 2023, pp. 9661–9671. [24] W. Maass, “Networks of spiking neurons: the third generation of neural network models,” Neural Networks , vol. 10, no. 9, pp. 1659–1671, 1997. [25] A. K. Kosta and K. Roy, “Adaptive-SpikeNet: event-based optical flow estimation using spiking neural networks with learnable neuronal dy-namics,” in IEEE International Conference on Robotics and Automation (ICRA) , 2023, pp. 6021–6027. [26] C. Li, W. Liu, G. Gong, X. Ding, and X. Zhong, “SU-YOLO: spiking neural network for efficient underwater object detection,” Neurocomput-ing , vol. 644, p. 130310, 2025. [27] V. Sudevan, F. Zayer, R. Kausar, S. Javed, H. Karki, G. De Masi, and J. Dias, “Underwater image enhancement by convolutional spiking neural networks,” arXiv preprint arXiv:2503.20485 , 2025. [28] T. G. Mayerh¨ ofer, S. Pahlow, and J. Popp, “The Bouguer–Beer–Lambert law: shining light on the obscure,” ChemPhysChem , vol. 21, no. 18, pp. 2029–2046, 2020. [29] G. Gallego, H. Rebecq, and D. Scaramuzza, “A unifying contrast maximization framework for event cameras, with applications to motion, depth, and optical flow estimation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2018, pp. 3867–3876. [30] G. Gallego, M. Gehrig, and D. Scaramuzza, “Focus is all you need: loss functions for event-based vision,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019, pp. 12 272–12 281. [31] P. Zhang, H. Liu, Z. Ge, C. Wang, and E. Y. Lam, “Neuromorphic imag-ing with joint image deblurring and event denoising,” IEEE Transactions on Image Processing , vol. 33, pp. 2318–2333, 2024. [32] A. Z. Zhu, L. Yuan, K. Chaney, and K. Daniilidis, “Unsupervised event-based learning of optical flow, depth, and egomotion,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019, pp. 989–997. [33] L. F. Abbott, “Lapicque’s introduction of the integrate-and-fire model neuron (1907),” Brain Research Bulletin , vol. 50, no. 5–6, pp. 303–304, 1999. [34] C. Scheerlinck, H. Rebecq, D. Gehrig, N. Barnes, R. Mahony, and D. Scaramuzza, “Fast image reconstruction with an event camera,” in 
+
+IEEE Winter Conference on Applications of Computer Vision (WACV) ,2020, pp. 156–163. [35] N. Ballas, L. Yao, C. Pal, and A. Courville, “Delving deeper into con-volutional networks for learning video representations,” arXiv preprint arXiv:1511.06432 , 2015. [36] D. P. Kingma and J. Ba, “Adam: a method for stochastic optimization,” in International Conference on Learning Representations (ICLR) , 2015. [37] Z. Teed and J. Deng, “RAFT: recurrent all-pairs field transforms for optical flow,” in European Conference on Computer Vision (ECCV) ,2020, pp. 402–419. [38] T. Stoffregen, C. Scheerlinck, D. Scaramuzza, T. Drummond, N. Barnes, L. Kleeman, and R. Mahony, “Reducing the sim-to-real gap for event cameras,” in European Conference on Computer Vision (ECCV) , 2020, pp. 534–549. [39] Z. Zhou, Y. Zhu, C. He, Y. Wang, S. YAN, Y. Tian, and L. Yuan, “Spikformer: when spiking neural network meets transformer,” in Inter-national Conference on Learning Representations (ICLR) , 2023.

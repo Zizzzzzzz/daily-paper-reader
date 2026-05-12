@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-001.webp",
+      "caption": "Figure 2: ATAAT Implicit Decoupling Mechanism. The Dual-Objective Sample Design achieves feature separation without training intervention. A poisoned sample x̃ combines a visible trigger t (defining logic) with an invisible orthogonal perturbation δ (generated via gradient engineering). During end-to-end training, δ directs poisoned inputs to an independent malicious subspace, naturally separating them from the benign manifold. This implicit orthogonality (Sim(θ) ≈ 0) effectively circumvents gradient interference and prevents representation overlap, ensuring high benign task performance while maintaining attack efficacy.",
+      "page": 6,
+      "index": 1,
+      "width": 936,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-002.webp",
+      "caption": "Figure 5: Visual comparison of attack effectiveness under different defense mechanisms. Circuit Breakers provided the most effective blocking.",
+      "page": 15,
+      "index": 2,
+      "width": 424,
+      "height": 523
+    },
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-003.webp",
+      "caption": "Figure 1: Overview of the Adaptive Threat-Aware Adversarial Tuning (ATAAT) Framework. This figure illustrates how ATAAT achieves robust backdoor injection by eliminating “Gradient Interference” (Sim(θ) ≈ 0) across different supply chain privilege scenarios. (a) Left - Scenario 1: Data Poisoning (Implicit De-confliction). Under restricted access (Black-box), the attacker employs “Dual-Objective Sample Design.” This perturbation introduces an invisible orthogonal perturbation (δ). This induces the backdoor gradient to implicitly avoid the benign manifold in the Feature Space. (b) Middle - Scenario 2: Model Fine-tuning (Explicit De-confliction). Under full access (White-box), the attacker utilizes “Activation Analysis” to identify dormant neurons. A binary mask (M ) physically locks the backdoor logic into a specific subset of the Parameter Space. (c) Right - Neuron Visualization: This intuitively shows the transformation of neurons inactive in benign tasks (gray dots) into backdoor-dedicated anchor pathways (red dots), thereby avoiding optimization conflicts at the physical level.",
+      "page": 2,
+      "index": 3,
+      "width": 948,
+      "height": 463
+    },
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-004.webp",
+      "caption": "Figure 4: Evolution of Gradient Cosine Similarity during Training. Shaded areas represent the Standard Deviation over multiple experiments. The gray dashed line (y = 0) is the orthogonal baseline. (1) Baseline (BadVLA) (red line) drops rapidly early in training and stabilizes in the negative range (Sim ≈ −0.4 after 400 steps), indicating persistent gradient cancellation that triggers performance collapse. (2) ATAAT (blue line) maintains a value near 0 throughout, proving that gradient interference was successfully eliminated via the orthogonal decoupling strategy.",
+      "page": 7,
+      "index": 4,
+      "width": 450,
+      "height": 513
+    },
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-005.webp",
+      "caption": "Figure 3: ATAAT Real-World Evaluation. Performance across threat models: (a) Scenario 1: Data Poisoning. Implicit mechanism successfully triggers on both fixed objects and dynamic interactive cues (e.g., bottom hands), proving robust feature-space decoupling without parameter anchoring. (b) Scenario 2: Semantic Backdoor. Explicit anchoring enables response to highlevel semantic triggers. Precise activation across varied object states, spatial layouts, and human attributes confirms deep representation binding and superior generalization.",
+      "page": 7,
+      "index": 5,
+      "width": 457,
+      "height": 346
+    },
+    {
+      "url": "assets/figures/arxiv/2605.08612v1/fig-006.webp",
+      "caption": "Table 13: Examples of instruction variants for evaluating semantic robustness. We tested Synonym Replacement (Set A) and Syntactic Restructuring (Set B).",
+      "page": 16,
+      "index": 6,
+      "width": 941,
+      "height": 195
+    }
+  ]
+}

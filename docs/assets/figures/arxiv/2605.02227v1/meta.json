@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-001.webp",
+      "caption": "Fig. 3: Change-Robust Online Spatial-Semantic (CROSS) Topological System Overview. Given an RGB-D frame and odometry, the online tracking module (orange) performs sequential hypothesis testing in continuous SE(3). Motion updates are propagated via SE(3) pushforward, while measurement updates are constructed through VPR-based keyframe retrieval. Competing hypotheses are efficiently managed using Gaussian-mixture clustering, pruning, and fusion (see Section IV-A). The map-management module (blue) uses the estimated state from the tracking module to create nodes and edges, detect loop closures, and perform pose-graph optimization and smoothing, yielding a consistent pose-aware topological map (see Section IV-B).",
+      "page": 2,
+      "index": 1,
+      "width": 950,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-002.webp",
+      "caption": "Fig. 5: Multi-session relocalization results on the Rover [32] Campus scene. Left: Relocalization outcomes across different locations. Each row corresponds to a mapping trajectory (indicated by different colors), while columns show relocalization attempts at the same physical locations captured at different times or months, as illustrated in the top image. Empty space indicates relocalization failed at that specific location. The compared methods are: (a) ORB-SLAM3, (b) RTAB-Map, (c) MASt3R-SLAM, and (d) Ours. Most baseline methods struggle under significant lighting and appearance changes, whereas our approach consistently relocalizes despite substantial visual variation. Right: A compact summary view, where each grid cell reports the relocalization success rate for a given mapping–testing sequence pair. Due to space constraints, we report only the four best-performing methods; full results and additional analysis are provided in Section V-A.",
+      "page": 7,
+      "index": 2,
+      "width": 1032,
+      "height": 423
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-003.webp",
+      "caption": "TABLE I: Relocalization success rate (RS) under appearance change on indoor (OpenLORIS) and outdoor (Rover) benchmarks, without vs. with self mapping.",
+      "page": 7,
+      "index": 3,
+      "width": 518,
+      "height": 292
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-004.webp",
+      "caption": "Fig. 8: Occlusion sequence across six timestamps. Top row shows the online mapping and belief evolution of our system: the yellow line denotes the estimated trajectory; blue ellipses represent the propagated motion message, and green ellipses represent the measurement message. The lengths of the principal axes indicate the estimated uncertainty. Bottom row shows the corresponding RGB observations. At timestamp (1), with no occlusion, uncertainty is low. At (2) and (3), occlusion prevents reliable visual observations, causing the motion message to continue propagating using local odometry while the measurement message remains static. At (4), the two messages overlap, indicating successful retrieval and alignment with the stored map. At (5), occlusion occurs again and uncertainty increases as the motion message propagates. Finally, at (6), once the occlusion disappears, uncertainty rapidly decreases and the system localizes with high confidence.",
+      "page": 14,
+      "index": 4,
+      "width": 1022,
+      "height": 390
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-005.webp",
+      "caption": "Fig. 9: Noisy-odometry experiment under different signal-to-noise ratio (SNR) settings. Each column shows the full trajectory for the same sequence with increasing levels of odometry noise injected via right-multiplicative perturbations in SE(3). The yellow line denotes the trajectory estimated by our system, the green line shows the reference trajectory provided by the SLAM system, and the blue line corresponds to the corrupted odometry used for motion propagation. As the SNR decreases, the odometry becomes increasingly distorted, as evidenced by the highly corrupted blue trajectories. Notably, even at SNR= 0.2, which corresponds to very large noise relative to the true odometry measurements, our estimated trajectory remains close to the reference, demonstrating robustness to severe odometric corruption.",
+      "page": 14,
+      "index": 5,
+      "width": 1048,
+      "height": 265
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-006.webp",
+      "caption": "Fig. 12: Multi-session relocalization results on the Rover [32] Campus scene. Left: Relocalization outcomes across different locations. Each row corresponds to a mapping trajectory (indicated by different colors), while columns show relocalization attempts at the same physical locations captured at different times or months, as illustrated in the top image. Empty space indicates relocalization failed at that specific location. The compared methods are: (a) ORB-SLAM3 [6], (b) RTAB-Map [17], (c) MASt3R-SLAM [27], (d) Greedy Matching (GM), (e) Sequence Matching (SM), (f) Probabilistic Belief Update (PBU), (g) ABM [16], and (h) Ours. Most baseline methods struggle under significant lighting and appearance changes, whereas our approach consistently relocalizes despite substantial visual variation. Right: A compact summary view, where each grid cell reports the relocalization success rate for a given mapping–testing sequence pair. Additional analysis are provided in Section V-A.",
+      "page": 18,
+      "index": 6,
+      "width": 1032,
+      "height": 885
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-007.webp",
+      "caption": "Fig. 7: Fast-motion sequence across seven timestamps. Top row shows the online mapping trajectory of our system: yellow lines indicate the estimated trajectory; blue ellipses denote the Gaussian mixture of the measurement message, while cyan ellipses denote the Gaussian mixture of the propagated motion message. The principal axis lengths of each ellipse correspond to the estimated uncertainty (variance) along that direction. Bottom row shows the corresponding RGB observations. At timestamp (1), uncertainty is low. At (2), observation uncertainty increases significantly due to severe motion blur. At (3), the system maintains tracking with high uncertainty despite residual blur. At (4) and (5), observation uncertainty becomes very large again due to heavy blur, introducing spurious hypotheses. At (6) and (7), the system rapidly eliminates these spurious hypotheses via sequential hypothesis testing once visual observations return to normal.",
+      "page": 13,
+      "index": 7,
+      "width": 1079,
+      "height": 378
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-008.webp",
+      "caption": "Fig. 13: Multi-session relocalization results on the OpenLORIS [33] Corridor scene. Left: Relocalization outcomes across different locations. Each row corresponds to a mapping trajectory (indicated by different colors), while columns show relocalization attempts at the same physical locations captured at different times or months, as illustrated in the top image. Empty space indicates relocalization failed at that specific location. Note that the last two sequences (20:54 and 20:56) are shaded gray to indicate a lack of spatial overlap. The compared methods are: (a) ORB-SLAM3 [6], (b) RTAB-Map [17], (c) MASt3R-SLAM [27], (d) Greedy Matching (GM), (e) Sequence Matching (SM), (f) Probabilistic Belief Update (PBU), (g) ABM [16], and (h) Ours. Most baseline methods struggle under significant lighting and appearance changes, whereas our approach consistently relocalizes despite substantial visual variation. Right: A compact summary view, where each grid cell reports the relocalization success rate for a given mapping–testing sequence pair. Additional analysis are provided in Section V-A.",
+      "page": 19,
+      "index": 8,
+      "width": 1032,
+      "height": 765
+    },
+    {
+      "url": "assets/figures/arxiv/2605.02227v1/fig-009.webp",
+      "caption": "Fig. 11: Factor-graph representation of our Gaussian mixture filtering model. ϕmot t and ϕmeas",
+      "page": 17,
+      "index": 9,
+      "width": 474,
+      "height": 383
+    }
+  ]
+}

@@ -1,0 +1,520 @@
+Title: Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+URL Source: https://arxiv.org/pdf/2605.01901v1
+
+Published Time: Tue, 05 May 2026 01:26:51 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins 
+
+## Rei Tamaru a, Pei Li b,∗ and Bin Ran a
+
+> a
+
+Department of Civil and Environmental Engineering, University of Wisconsin-Madison, Madison, WI, USA 
+
+> b
+
+Department of Civil and Architecture Engineering and Construction Management, University of Wyoming, Laramie, WY, USA 
+
+A R T I C L E I N F O 
+
+Keywords :Advanced Traffic Management Digital Twin Representation Learning Diffusion Model 
+
+A B S T R A C T 
+
+Traffic digital twins are powerful tools for advanced traffic management, and most systems are built on static geometric representations. However, these representations fail to capture the dynamic functional semantics required for behavior-aware reasoning, such as how a lane operates under complex traffic conditions. To address this gap, we introduce GeoLaneRep, a behavior-grounded lane representation learning framework for traffic digital twins. GeoLaneRep jointly encodes static lane geometry, observed vehicle trajectories, and operational descriptors into a shared, cross-camera semantic embedding. The encoder is trained with a joint objec-tive combining contrastive cross-camera alignment, auxiliary role supervision, and temporal anomaly detection. Across 16 roadside cameras and 132 lanes, the learned embeddings achieve a 0.004 lateral-rank error and an edge-role F1 of 1.000 in zero-shot cross-camera matching, and an AUROC of 0.991 for window-level anomaly detection. We further show that the same behavioral embeddings can condition a diffusion-based generator to synthesize lane geometries that satisfy targeted operational specifications, with 87 .9% overall specification accuracy across 38 lane groups. GeoLaneRep thus provides a semantic interface between roadside observations and downstream digital twin tasks, supporting cross-camera transfer, behavior-aware monitoring, and goal-directed lane synthesis. The framework is openly available at https://github.com/ raynbowy23/GeoLaneRep .
+
+## 1. Introduction 
+
+Digital twins have emerged as a promising system for advanced traffic management, integrating sensing, simulation, and decision-support capabilities within a cohesive virtual environment (Xu et al., 2023; Wu et al., 2025; Gu et al., 2026). These systems continuously monitor live traffic states, evaluate control strategies, and support decision-making in the physical space. Early traffic digital twins operated primarily as descriptive platforms for visualization and state synchronization, limiting their capabilities to passive observation. This demands constructive digital twins capable of interpreting operational shifts and supporting rapid, intervention-oriented reasoning (Irfan et al., 2024; Dasgupta et al., 2024). This requirement is particularly critical at the lane level, the operational layer at which traffic management interventions are defined and executed. Although contemporary digital twins replicate road geometric and vehicle trajectories at high fidelity, structural reproduction alone is insufficient for operational reasoning (Zhou et al., 2025; Miller et al., 2021). Strategic interventions, such as dynamic lane reassignment, merge coordination, turn regulation, and work-zone configuration, depend intrinsically on understanding the specific functional role each lane plays within the broader traffic ecosystem (Feng et al., 2025). Therefore, a constructive digital twin must conceptualize each lane not merely as a physical boundary but as a dynamic, interpretable component whose operational utility can be analyzed and compared. Recent advancements in representation learning offer a viable approach to bridging this semantic gap. A growing body of literature demonstrates that learned neural embeddings have been shown to extract spatiotemporal structures from high-dimensional transportation data. For instance, Trajectory Representation Learning (TRL) improves spatial similarity computations and travel-time estimation (Wang et al., 2024a), while graph-based architectures encode higher-order topological dependencies across macroscopic road networks (Mao et al., 2022; Zhang and Long, 2023). Furthermore, integrated embedding strategies model multi-agent interaction ego-trajectory predictions (Hou et al., 
+
+> ∗
+
+Corresponding author 
+
+tamaru@wisc.edu (R. Tamaru); pei.li@uwyo.edu (P. Li); bran@wisc.edu (B. Ran) 
+
+> ORCID
+
+(s): 
+
+Rei Tamaru et al.: Preprint submitted to Elsevier Page 1 of 19 
+
+> arXiv:2605.01901v1 [cs.CV] 3 May 2026 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+2023). These efforts demonstrate that neural representations capture rich traffic dynamics, but their focus has remained disproportionately bounded to moving agents or macro-scale network topologies, largely bypassing the lane itself as the unit of representation. This oversight is particularly detrimental to the advancement of traffic digital twins, which require robust lane-level operational reasoning to complement geometric reconstruction. Prevailing lane representations are strictly topological or geometric, encoding centerlines, boundaries, and static connectivity. Such features are indispensable for high-definition map generation and autonomous navigation, but do not capture the functional semantics of a lane during live traffic operations (Arman and Tampère, 2021). Two lanes possessing identical geometric parameters may serve profoundly disparate operational purposes, ranging from uninterrupted through-movement to auxiliary flow or merge assistance. Crucially, these functional roles are not static as they emerge dynamically from the surrounding lane topology, fluctuating traffic demand, and the continuous trajectory interactions of individual vehicles (Poggenhans et al., 2018; Naumann et al., 2023). Consequently, current methodologies lack a representation that synthesizes static geometric structure with observed traffic behavior, thereby precluding rigorous semantic comparison across lanes and across scenes. To address these challenges, this work proposes GeoLaneRep , a behavior-aware lane representation framework for traffic digital twins. GeoLaneRep jointly encodes static lane geometry, observed vehicle trajectories, and operational descriptors into a shared semantic embedding. By extending lane representation beyond static geometry, GeoLaneRep captures critical operational and functional information needed for lane-level reasoning. Experimental results on real-world data demonstrate that GeoLaneRep supports multiple downstream digital twin tasks, including zero-shot cross-camera lane matching, temporal anomaly detection, and behavior-conditioned lane geometry generation. The main contributions of this work are summarized as follows: 
+
+• We introduce GeoLaneRep, a representation learning framework that produces a single shared lane embedding by jointly encoding spatial geometry, observed trajectories, and operational descriptors with three parallel encoders fused via cross-lane multi-head attention. 
+
+• We propose a joint training objective that combines contrastive cross-camera alignment, auxiliary role supervi-sion, and temporal anomaly detection, and we show empirically that this joint formulation outperforms two-stage and single-objective variants across all evaluation metrics. 
+
+• We demonstrate that the resulting embedding supports three downstream tasks through the same encoder weights, including zero-shot cross-camera lane matching, per-window anomaly detection, and behavior-conditioned geometry generation, establishing a semantic interface between roadside observations and lane-level digital twin tasks. 
+
+• We evaluate GeoLaneRep using data from 16 real-world traffic cameras. Experimental results indicate strong performance in lane embedding, anomaly detection, and lane geometry generation. 
+
+## 2. Related Work 
+
+2.1. Digital Twins for Traffic Management 
+
+Digital twins in transportation are conceptualized as dynamic virtual counterparts of physical mobility networks, integrating sensing, communication, and computational modeling to support monitoring and decision making (Wang et al., 2022, 2024b; Wu et al., 2025). Recent methodological advances have improved dynamic traffic synchronization (Kušić et al., 2023) and simulation-based analysis (Perna et al., 2025). Nonetheless, contemporary transportation digital twins remain anchored in state alignment, visual replication, and macroscopic calibration (Luo et al., 2025; Bongomin et al., 2025). This paradigm presents a critical limitation: effective traffic management relies not merely on continuous observation but on interpreting the infrastructure’s functional behavior as it evolves. Existing frameworks, including those designed to estimate operational measures (Xu et al., 2025b) and synchronize lane geometry (Tamaru et al., 2025), are predominantly observational. They maintain parity between physical and virtual states, but they lack a formal mechanism to encode lanes as actionable semantic units. Advancing toward a constructive digital twin requires a cohesive representation layer that consolidates structural geometry, traffic dynamics, and operational semantics. Addressing this methodological gap forms the primary motivation for this study.   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 2 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+2.2. Semantic Understanding of Traffic Operations 
+
+While conventional traffic models capture vehicle kinematics, they rarely yield a learned semantic representation of lane-level operations. Recent work has sought to augment traffic comprehension by deploying large vision-language models (Rivera et al., 2025; Luo et al., 2024). For instance, CityLLaVA (Duan et al., 2024) leverages roadside camera feeds for question-answering on urban scenes, whereas MAPLM (Cao et al., 2024) combines multi-view imagery, bird’s-eye-view projections, and high-definition maps for spatial reasoning. From the ego-vehicle perspective, Liao et al. (2024) fuses LiDAR and video within a VLM architecture to parse driving environments. Despite their formidable descriptive capabilities, these frameworks predominantly generate textual or symbolic outputs, such as natural language narratives, bounding boxes, and scene descriptions, which remain computationally prohibitive to integrate into the continuous mathematical control loops required for precise traffic management. Concurrently, recent work argues that actionable traffic semantics must extend beyond visible geometry. The PAMR framework (Liang et al., 2026) jointly models geometric configurations and semantic traffic rules for robust navigation. Similarly, Fu et al. (2024) demonstrates that explicit reasoning over lane structure enhances scene analysis, particularly in pedestrian-heavy scenarios. At a macroscopic scale, Xu et al. (2025a) incorporates road connectivity and regional proximity to refine cross-city traffic forecasting. Building upon these insights, this research pivots from descriptive, VLM-driven scene interpretation toward infrastructure-centric representation learning that embeds behavioral semantics directly into the representation. 
+
+2.3. Representation Learning for Transportation and Lane Structure 
+
+Representation learning is increasingly used in transportation engineering to distill latent structure from high-dimensional traffic data (Alahi, 2026). TRL frameworks such as START (Jiang et al., 2023) jointly encode trajectories and road segments for self-supervised recovery, while GTR (Wang et al., 2025) and TRACK (Han et al., 2025) leverage spatio-temporal encoders and co-attentional transformers to capture intrinsic trajectory dynamics. These methods operate primarily at the network scale or in unconstrained motion settings, treating the lane as a contextual feature rather than the unit of representation. At the lane level, several studies use representation learning to infer lane topology. Li et al. (2025a) models lanes as nodes within a unified spatial topology to predict nonlinear fluctuations in traffic flow. Complementing this, advanced vectorized mapping techniques, such as MapTR (Liao et al., 2022), extract structured lane networks directly from onboard sensors. Furthermore, generative approaches like CDSTE (Lei et al., 2024) and RoadDiff (Li et al., 2025b) employ diffusion-based modules to infer fine-grained lane traffic states from macroscopic observations. While these frameworks demonstrate that lane-specific topological reasoning improves predictive accuracy, their learned embeddings are optimized for narrow, task-dependent objectives. Consequently, they fail to achieve the broader mandate of representation learning: establishing a generalized methodology that uncovers underlying data structures to support versatile processing (Alahi, 2026). To resolve this methodological shortcoming, GeoLaneRep synthesizes geometric frameworks, trajectory behaviors, and operational descriptors into a single shared embedding, transforming lanes into semantic entities that are computationally retrievable, comparable, and amenable to behavior-conditioned synthesis. 
+
+## 3. Problem Setup 
+
+The GeoLaneRep framework (Figure 1) is structured as a three-stage pipeline: observe , encode , and generate .It represents a lane not as a physical shape alone but as a functional component defined jointly by its observed traffic behavior, geometric structure, and operational context. This unified representation is what lets the framework support multiple downstream tasks, zero-shot cross-camera matching, per-window anomaly detection, and behavior-conditioned lane generation, through a single shared embedding. 
+
+3.1. Problem Formulation and Variable Definition 
+
+We formulate each lane as a composite of its geometry, observed trajectories, summary traffic statistics, and structural role. For a given lane 𝑖 ,
+
+𝑥 𝑖 = ( 𝑔 𝑖 , 𝑖 , 𝑠 𝑖 , 𝑟 𝑖 ), (1) where 𝑔 𝑖 is the physical lane geometry. 𝑖 is the set of vehicle trajectories assigned to the lane by roadside sensing, 𝑠 𝑖 
+
+holds aggregated traffic statistics, and 𝑟 𝑖 encodes the lane’s structural role within its lane group.    
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 3 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 1: Overview of the GeoLaneRep pipeline. Roadside observations are converted into per-lane geometry, trajectories, and descriptors (left). Three parallel encoders, spatial, temporal, and descriptor, produce per-lane representations that are fused via cross-lane multi-head attention into a shared semantic embedding space that supports multiple downstream tasks.
+
+The trajectory set is 
+
+𝑖 = { 𝝉 (𝑛 ) 
+
+> 𝑖
+
+}𝑁 𝑖 
+
+> 𝑛 =1
+
+, 𝝉 (𝑛 ) 
+
+> 𝑖
+
+= {( 𝑥 𝑡 , 𝑦 𝑡 )} 𝑇 𝑛 
+
+> 𝑡 =1
+
+, (2) i.e., each lane carries 𝑁 𝑖 tracklets, and each tracklet is a sequence of 2-D image-normalized waypoints over 𝑇 𝑛 frames. Speed and heading are not stored per timestep; they are derived during preprocessing and enter the model only through the aggregate descriptor 𝑠 𝑖 . To capture short-term traffic variation without overwhelming the model with noise, we further partition each lane’s trajectory stream into discrete temporal windows before feature construction. Beyond raw movement data, the geometric component 𝑔 𝑖 provides a structural prior, formatted as a centerline polyline 𝑔 𝑖 ∈ ℝ𝐾 ×2 , a sequence of 𝐾 waypoints in the same image-normalized coordinate frame. The descriptor 𝑠 𝑖 
+
+summarizes the traffic properties derived from the assigned tracklets. The role vector 𝑟 𝑖 captures interpretable structural signals such as the lane’s lateral rank within its group and whether it sits at an edge of the roadway. For a temporal window 𝑤 , the per-window trajectory tensor is denoted as 𝑖,𝑤 ∈ ℝ𝑁 𝑖,𝑤 ×𝐾 ×2 , consisting of 𝑁 𝑖,𝑤 
+
+tracklets that have been arc-length resampled to 𝐾 spatial points each. The corresponding traffic descriptor 𝑠 𝑖,𝑤 ∈ ℝ4
+
+records four lane-level quantities computed from those tracklets: mean speed, mean curvature, mean lateral offset from the lane centerline, and a normalized trajectory count used as a density proxy. The role vector 𝑟 𝑖 ∈ ℝ5 encodes lateral rank, leftmost and rightmost edge flags, a successor flag indicating whether the lane continues into a downstream segment, and the group’s lane count. Our objective is to learn a mapping 
+
+𝑓 ∶ 𝑥 𝑖 ↦ 𝑧 𝑖 , 𝑧 𝑖 ∈ ℝ𝑑 , (3) with 𝑑 = 128 in our implementation. The latent embedding 𝑧 𝑖 is intended to preserve behavioral semantics, properly trained, it places lanes with similar operational roles close together even when their raw geometries or camera viewpoints differ substantially. This makes the representation portable across the downstream tasks introduced in the experiments. 
+
+3.2. Input Construction and Preprocessing 
+
+Each lane instance is constructed from three primary information streams: static geometry, dynamic vehicle move-ment, and interpretable descriptors. The geometric stream provides the physical backbone of the lane. The trajectory stream captures how drivers actually interact with that structure, isolating realized behavior from idealized lane shape. The descriptor stream summarizes operational signals derived from those interactions, aggregate kinematics ( 𝑠 𝑖 ), and the lane’s structural role within its group ( 𝑟 𝑖 ). Constructing these inputs requires assigning trajectories to candidate lanes through spatial association with the known geometry within each lane group. We define a lane group as a set of adjacent lanes that share the same cross-section and local flow context (e.g., the four lanes of a single direction at a single intersection approach). The group provides the basis for determining lateral rank, edge status, and the neighbor-aware features used by the cross-lane attention.    
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 4 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 2: GeoLaneRep encoder architecture. The static lane geometry, the per-window set of assigned trajectories, and the fused stats–role descriptor pass through three parallel encoders that each emit a 64-dim embedding. The three embeddings are concatenated and passed through a fusion MLP to produce the per-window lane embedding, then averaged over valid temporal windows to obtain a per-lane embedding.
+
+Observations are then organized into discrete temporal windows, preserving short-term traffic fluctuations while simultaneously filtering extraneous noise. Geometry is normalized into a lane group’s shared image-normalized coordinate frame, and trajectory statistics are aggregated per window. Prior to encoding, the anchor geometry 𝑔 𝑖 is broadcast across the time dimension of the per-window stream, and the per-window dynamic statistics are concatenated with the static role vector to form a single unified descriptor: 
+
+𝑥 stat  
+
+> 𝑖,𝑤
+
+= [ 𝑠 𝑖,𝑤 ∥ 𝑟 𝑖 ] ∈ ℝ9. (4) The preprocessing pipeline, therefore, yields aligned, multi-modal inputs in which each lane is represented as a coherent semantic unit – geometry, behavior, and structural context bound together – rather than as an isolated geometric line on a map. 
+
+## 4. GeoLaneRep Encoder 
+
+Figure 2 presents the architecture of the GeoLaneRep encoder. The preprocessed lane inputs are encoded into a shared embedding space that captures lane-level behavioral semantics. To make latent similarity reflect operational similarity, the encoder is trained with structurally mined contrastive supervision across disparate camera views, supplemented by auxiliary role regression and temporal anomaly objectives that prevent representational collapse during long training runs. 
+
+4.1. Input Streams and Fusion 
+
+For lane 𝑖 and temporal window 𝑤 , the encoder consumes three inputs: (i) a static lane geometry polyline 
+
+𝑔 𝑖 ∈ ℝ𝐾 ×2 , (ii) the set of trajectory polylines 𝑖,𝑤 ∈ ℝ𝑁 𝑖,𝑤 ×𝐾 ×2 together with a validity mask 𝑚 𝑖,𝑤 ∈ {0 , 1} 𝑁 𝑖,𝑤 
+
+that flags which slots correspond to real tracklets, and (iii) a fused descriptor vector 𝑥 stat  
+
+> 𝑖,𝑤
+
+formed by concatenating the four trajectory statistics 𝑠 𝑖,𝑤 ∈ ℝ4 with the five-dim structural role descriptor 𝑟 𝑖 ∈ ℝ5.The architecture processes these inputs through a geometry stream, a trajectory stream, and a descriptor stream, each emitting a 64-dim embedding. The three embeddings are then fused into a single per-window lane representation. 
+
+Geometry Stream. The geometry branch maps the static lane shape into a structural embedding, 
+
+𝑓 𝑔 𝑖 = 𝑓 geom (𝑔 𝑖 ) ∈ ℝ64 . (5) 
+
+𝑓 geom first applies a per-waypoint linear projection ℝ2 → ℝ64 , adds a fixed sinusoidal positional encoding PE 𝐾 to preserve spatial ordering, and runs the resulting sequence through a 2-layer Transformer encoder. The token sequence   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 5 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+is mean-pooled across the 𝐾 waypoitns to a single vector, after which a per-stream Batch Normalization is applied externally. 
+
+Trajectory Stream. The trajectory branch models how vehicles traverse the lane, 
+
+𝑓 𝑥 𝑖,𝑤 = 𝑓 traj (𝑖,𝑤 , 𝑚 𝑖,𝑤 ) ∈ ℝ64 . (6) 
+
+𝑓 traj shares the geometry stream’s per-polyline encoding scheme: each tracklet’s 𝐾 waypoints are projected positionally encoded, and Transformer-encoded to a 64-dim vector. The resulting per-tracklet embeddings are subsequently mean-pooled across the 𝑁 𝑖,𝑤 slots with validity mask 𝑚 𝑖,𝑤 used to zero out padded slots and to divide by the true valid count, so padding does not bias the mean. Per-stream Bach Normalization is applied externally. 
+
+Descriptor Stream. The third branch processes the interpretable descriptor, which carries operational signals, aggregate kinematics, edge membership, and lateral ordering, not easily recovered from raw polylines. The descriptor passes through a two-layer MLP, 
+
+𝑓 𝑠 𝑖,𝑤 = 𝑓 desc 
+
+([𝑠 𝑖,𝑤 ∥ 𝑟 𝑖 ]) ∈ ℝ64 . (7) where 𝑓 desc has the form of a two-layer network mapping from ℝ9 → ℝ64 , with per-stream Batch Normalization and GELU activations so that all three streams share the same output normalization scheme. 
+
+Fusion. The three branch outputs are concatenated to form an intermediate representation 𝑐 𝑖,𝑤 = [ 𝑓 𝑔 𝑖 ∥ 𝑓 𝑥 𝑖,𝑤 ∥
+
+𝑓 𝑠 𝑖,𝑤 ] ∈ ℝ192 , which is projected to the final per-window embedding, 
+
+𝑧 𝑖,𝑤 = 𝑓 fuse (𝑐 𝑖,𝑤 ) ∈ ℝ128 . (8) 
+
+𝑓 fuse expands the 192-dim concatenation to 256-dim intermediate space via a linear projection, applies GELU activation and dropout, and projects down to the final ℝ128 embedding. A global, per-lane embedding is obtained by averaging across 𝑊 𝑖 valid temporal windows of lane 𝑖 ,̄𝑧 𝑖 = 1
+
+𝑊 𝑖 𝑊 𝑖 ∑
+
+> 𝑤 =1
+
+𝑧 𝑖,𝑤 , (9) This fusion design lets every lane be summarized by a single ℝ128 vector while preserving per-window granularity for the temporal anomaly head, which consumes the per-window sequence {𝑧 𝑖,𝑤 }𝑊 𝑖  
+
+> 𝑤 =1
+
+directly. 
+
+4.2. Cross-Lane Attention 
+
+In multi-lane road segments, a lane’s operational meaning is inherently relative. A passing lane is defined by its speed relative to adjacent traffic; an edge lane derives its role from the physical boundary. To capture these group-relative semantics, GeoLaneRep optionally routes the per-lane embeddings through a cross-lane attention module before downstream use. Lanes that share a common group identifier are packed together for joint processing. For every ordered lane pair 
+
+(𝑖, 𝑗 ) within a group, three relative features are combined: 
+
+𝜙 𝑖𝑗 = [Δlateral (𝑖, 𝑗 ), Δspeed (𝑖, 𝑗 ), 𝜌 density (𝑖, 𝑗 )], (10) where Δlateral (𝑖, 𝑗 ) = 𝑠 lat  
+
+> 𝑖
+
+− 𝑠 lat  
+
+> 𝑗
+
+and Δspeed (𝑖, 𝑗 ) = 𝑠 spd  
+
+> 𝑖
+
+− 𝑠 spd  
+
+> 𝑗
+
+are signed differences between the per-lane mean lateral offset and mean speed of the assigned trajectories, while 𝜌 density (𝑖, 𝑗 ) = 𝑠 cnt   
+
+> 𝑖
+> 𝑠 cnt
+> 𝑗 +𝜀
+
+is the ratio of their normalized trajectory counts, clamped to [−10 , 10] to prevent numerical explosion. The pairwise feature stack Φ ∈ ℝ||×||×3 is projected linearly to a per-head bias of dimension equal to the number of attention heads, and added directly to the scaled dot-product attention scores. A multi-head self-attention block with a residual connection and layer normalization then yields the final group-aware embedding, ̃𝑧 𝑖 = LayerNorm (̄𝑧 𝑖 + 𝑓 MHA (̄𝑧 𝑖 , group( 𝑖 ), 𝜙 𝑖, ⋅)) ∈ ℝ128 . (11) where group( 𝑖 ) denotes the set of per-lane embeddings for all lanes in the group containing lane 𝑖 , and 𝜙 𝑖, ⋅ collects the relative features between lane 𝑖 and every group member. Padded slots produced during batched group packing are masked out of both the attention scores and the output, so they exert no influence on the attended representation.   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 6 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+4.3. Multi-Task Learning 
+
+The encoder is trained under a multi-task regimen in which several heads supervise distinct facets of the learned representation. Rather than acting as isolated task-specific outputs, these heads shape the shared embedding space toward structural consistency, semantic interpretability, and temporal sensitivity. 
+
+4.3.1. Contrastive Alignment 
+
+To enforce cross-camera structural alignment, the group-aware embedding ̃𝑧 𝑖 is mapped through projection head 
+
+𝑓 proj before being 𝓁 2-normalized: 
+
+𝑝 𝑖 = 𝑓 proj (̃𝑧 𝑖 ),̂ 𝑝 𝑖 = 𝑝 𝑖 
+
+‖𝑝 𝑖 ‖2
+
+. (12) 
+
+𝑓 proj operates as a two-layer multi-layer perceptron mapping ℝ128 → ℝ64 . The trailing BatchNorm decorrelates batch statistics before 𝓁 2 normalization, which lets cosine similarity reduce cleanly to the dot product ̂𝑝 ⊤𝑖 ̂ 𝑝 𝑗 .The normalized projection ̂𝑝 𝑖 is then optimized with the standard InfoNCE objective (Oord et al., 2018), following the contrastive representation learning paradigm (Chen et al., 2020a,b), with positive pairs mined structurally across cameras rather than through input augmentation. This pulls structurally similar lanes from distinct cameras together in the embedding space while pushing apart pairs that disagree in role. Following standard representation learning practice, this projection head is discarded at inference, so downstream tasks operate directly on the encoder embeddings. 
+
+4.3.2. Role Supervision 
+
+A purely contrastive objective leaves the embedding free to ignore structurally meaningful attributes, an outcome typically called representation collapse , where the encoder finds a shortcut that minimizes the contrastive loss without preserving useful geometry. Three auxiliary heads provide direct supervision against this failure mode. They attach to the pre-attention per-lane embedding ̄𝑧 𝑖 rather than to the post-attention ̃𝑧 𝑖 , so the supervision targets a per-lane signal that is not yet contaminated by within-group mixing: 
+
+• Lateral rank head 𝑓 rank ∶ ℝ128 → ℝ, a two-layer MLP through a 32-dim hidden layer, predicts the lane’s normalized lateral position within the lane group. 
+
+• Edge flag head 𝑓 edge ∶ ℝ128 → ℝ2, a single linear projection, outputs logits for the leftmost and rightmost flags. 
+
+• Group size head 𝑓 size ∶ ℝ128 → ℝ, a linear projection, estimates the group’s normalized lane count. All three heads emit raw logits and are trained with BCE-with-logits against bounded [0 , 1] targets, which provides stronger gradients at extremes than MSE on a sigmoid-squashed prediction would. The combined role loss is 
+
+role = rank + edge + 0 .5 size . (13) When cross-lane attention is active, an additional group-rank consistency term enforces that, within each group, the predicted ranks form a monotonic and roughly uniformly spaced sequence: 
+
+group = 1
+
+𝐺 
+
+> 𝐺
+
+∑
+
+> 𝑔 =1
+
+‖‖‖sort (𝜎 (̂𝑟 𝑔 )) − linspace(0 , 1, 𝑛 𝑔 )‖‖‖ 
+
+> 22
+
+, (14) where ̂𝑟 𝑔 collects the predicted rank logits for the 𝑛 𝑔 lanes in group 𝑔 and 𝜎 is the sigmoid function. 
+
+4.3.3. Joint Training Objective 
+
+In the contrastive stage, the encoder loss combines the InfoNCE term with the role losses under a three-phase epoch schedule: 
+
+E(𝑒 ) = 𝑤 ctr (𝑒 ) ctr + 𝑤 role (𝑒 ) role . (15) The schedule (with 𝑒 ∕𝐸 the training fraction) is 
+
+(𝑤 ctr , 𝑤 role )( 𝑒 ) = 
+
+⎧⎪⎨⎪⎩
+
+(0 .3, 2.0) 𝑒 ∕𝐸 < 0.3 (role-dominant warm-up) 
+
+(1 .0, 1.0) 0.3 ≤ 𝑒 ∕𝐸 < 0.7 (balanced) 
+
+(2 .0, 0.5) 𝑒 ∕𝐸 ≥ 0.7 (contrastive fine-tune). (16)   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 7 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+The schedule prevents the contrastive and role objectives from colliding early in training: role supervision establishes an interpretable per-lane signal first, contrastive alignment then pulls cross-camera matches together, and a final contrastive-heavy phase sharpens retrieval quality. The temporal branch learns from synthetic anomaly injection. A fraction of valid training windows are corrupted by simulated speed reductions, trajectory drop-outs, or lateral deviations. The anomaly head is supervised by a validity-weighted binary cross-entropy loss, 
+
+temp =
+
+∑𝑖,𝑤 𝑣 𝑖,𝑤 BCE (𝑎 𝑖,𝑤 , 𝑦 𝑖,𝑤 
+
+)∑𝑖,𝑤 𝑣 𝑖,𝑤 
+
+, (17) where 𝑣 𝑖,𝑤 ∈ {0 , 1} is the window validity indicator and 𝑦 𝑖,𝑤 ∈ {0 , 1} is the ground-truth anomaly label, so padded windows contribute neither numerator nor denominator, and the loss remains comparable across batches with different valid-window counts. Under the joint training configuration, the encoder remains trainable through both streams, and the total loss is 
+
+ = 𝛼 temp + 𝛽 E, (18) where 𝛼, 𝛽 control the relative influence of the temporal and structural objective. Empirically, this joint formulation is what makes the encoder useful for both spatial retrieval and downstream temporal reasoning rather than excelling at one at the expense of the other (Sec. 6.2). 
+
+4.4. Geometry Dropout for Zero-Shot Transfer 
+
+Cross-camera generalization is a defining requirement for GeoLaneRep. A lane observed by a previously unseen camera may lack reliable geometric annotation, yet it must still be matched against a reference lane bank. To prevent the encoder from overfitting to static structural geometry, we apply geometry dropout during training. With probability 𝑝 drop , the geometry-stream embedding 𝑓 𝑔 𝑖 is zeroed out. This forces the network to derive lane semantics from the trajectory and descriptor streams alone. To preserve expected activation magnitudes, non-dropped embeddings are rescaled by 1∕(1 − 𝑝 drop ), the standard inverted-dropout correction. At inference, geometry can be leveraged for established reference lanes that carry annotations while safely omitted for new query lanes. This technique enables trajectory-driven zero-shot retrieval without retraining. 
+
+## 5. Downstream Tasks 
+
+Following the training phase, the GeoLaneRep encoder facilitates three downstream tasks, as Figure 3 shows. These operate directly on the learned embeddings rather than on raw geometry or trajectories. This section details three primary applications: zero-shot cross-camera lane matching, temporal anomaly detection, and behavior-conditioned geometry generation. All three reuse the encoder weights from the contrastive/joint training described in Sec. 4.3. Only the generation task adds a separately trained head. 
+
+5.1. Zero-Shot Cross-Camera Lane Matching 
+
+Given a query lane from a previously unseen camera, the matching task retrieves the most similar lane from a reference bank constructed over the training cameras. Both query and reference lanes are encoded with the trained encoder, and the match is the reference whose embedding has the highest cosine similarity to the query: 
+
+match( 𝑞 ) = arg max 
+
+> 𝑟 ∈
+
+̄𝑧 ⊤𝑞 ̄𝑧 𝑟 
+
+‖̄𝑧 𝑞 ‖ ‖ ̄𝑧 𝑟 ‖ . (19) This setup tests whether the encoder captures viewpoint-invariant structural semantics rather than scene-specific shortcuts. In deployment, reference lanes are typically encoded with all modalities available, while a query lane may be encoded under restricted conditions – most importantly, with the geometry stream dropped (Sec. 4.4) when the new camera has no attention. The matched reference’s structural attributes (lateral rank, edge flags, group size) transfer to the query lane, providing the operational labels needed by the rest of the pipeline.    
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 8 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 3: Downstream tasks built on the GeoLaneRep encoder. (a) Zero-shot cross-camera lane matching. (b) Temporal anomaly detection. (c) Behavior-conditioned geometry generation.
+
+5.2. Temporal Anomaly Detection 
+
+To facilitate continuous temporal reasoning, the framework processes each lane as a sequence of per-window embeddings: 
+
+𝑍 𝑖 = [ 𝑧 𝑖, 1, 𝑧 𝑖, 2, … , 𝑧 𝑖,𝑊 𝑖 ]. (20) and feeds the sequence through GRU to obtain a hidden state at each window: 
+
+ℎ(𝑤 ) 
+
+> 𝑖
+
+= GRU (𝑧 𝑖,𝑤 , ℎ (𝑤 −1) 
+
+> 𝑖
+
+). (21) A small MLP anomaly head maps each hidden state to a scalar logit 𝑎 𝑖,𝑤 ∈ ℝ, supervised at training time by the validity-weighted BCE loss temp defined in Eq. 17 against synthetically injected anomalies. At inference, the logits are passed through a sigmoid to obtain per-window anomaly probabilities, and a threshold (chosen by Youden’s J on the validation split) converts them to binary anomaly flags. Because the GRU consumes the full per-window sequence, the decision at window 𝑤 has access to the lane’s preceding behavioral context rather than only its current trajectory snapshot. 
+
+5.3. Behavior-Conditioned Geometry Generation 
+
+To connect the learned representation to digital twin interventions, the framework incorporates a behavior-conditioned geometry generator. Given a target embedding 𝑧 ⋆ ∈ ℝ128 that specifies a desired operational profile, supplied by the user or retrieved from a reference lane with the desired role, the generator synthesizes a candidate centerline ̂𝑔 whose behavioral semantics, when re-encoded, are close to 𝑧 ⋆.The module is a denoising diffusion probabilistic model (DDPM) (Ho et al., 2020) with a linear 𝛽 schedule of length 𝑇 dif f . Rather than initializing from pure Gaussian noise, the generative process applies a warm-start forward diffusion from a canonicalized anchor geometry 𝑔 anchor flattened into 𝑤 𝑠 = vec( 𝑔 anchor ) ∈ ℝ32 (𝐾 = 16 waypoints ×
+
+2 coordinates) by running the forward diffusion only up to an intermediate step 𝑡 0:
+
+𝑥 𝑡 0 =
+
+√̄𝛼 𝑡 0 𝑤 𝑠 +
+
+√
+
+1 − ̄𝛼 𝑡 0 𝜖, 𝜖 ∼  (0 , 𝐼 ), (22) where ̄𝛼 𝑡 = ∏𝑡 𝑠 =1 (1 − 𝛽 𝑠 ).   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 9 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 4: (Left) Tracklets extraction for each lane group depicted by transparent boundaries. (Right) Tracklets assignments to each annotated lanelet. Within a lane group, each color marks a distinct lane.
+
+The reverse denoising process is conditioned on the target embedding 𝑧 ⋆ via Feature-wise Linear Modulation (FiLM) (Perez et al., 2018). At each denoiser layer 𝑙 , two linear projections of the conditioning vector produce a scale and shift, 
+
+𝛾 𝑙 = 𝑓 scale (𝑧 ⋆), (23) 
+
+𝛽 𝑙 = 𝑓 shif t (𝑧 ⋆), (24) which modulate the layer’s hidden state after a linear transform and LayerNorm: 
+
+ℎ𝑙 = GELU 
+
+(
+
+LayerNorm (𝑓 hidden (ℎ𝑙 −1 )) ⋅ (1 + 𝛾 𝑙 ) + 𝛽 𝑙 )
+
+. (25) The denoiser also consumes a sinusoidal timestep embedding concatenated with the noisy geometry; from this it predicts the noise to remove at the current step. Iterating the FiLM-conditioned denoiser from 𝑡 0 down to 0 yields a candidate geometry ̂𝑔 that has been continuously nudged toward the target embedding’s behavioral semantics. The module produces an ensemble of candidates per specification, which are scored and ranked by re-encoding ̂𝑔 and measuring its similarity to 𝑧 ⋆ in the encoder space. 
+
+## 6. Experiments and Results 
+
+This section evaluates the GeoLaneRep framework across both encoder performance and downstream task execution. The evaluation encompasses lane-centered dataset construction, controlled preprocessing, and a series of targeted experiments. These experiments are explicitly designed to test representation quality, temporal consistency, and generation utility. 
+
+6.1. Experiment Setup 
+
+The dataset is collected and prepared to expose variations in lane geometry, traffic behavior, and cross-site operating conditions. It aggregates feeds from 16 roadside cameras served by 511 Wisconsin, covering 132 lanes organized into 38 lane groups and a total of 104,415 vehicle trajectories. The structural composition reflects diverse operational functionalities: 38 leftmost (28.8%), 38 rightmost (28.8%), and 38 interior (28.8%) lanes, with the remaining 18 lanes (13.6%) functioning as merges. All 16 cameras contribute to both training and cross-camera evaluation.   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 10 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+
+To prepare the raw video feeds, the framework uses a deterministic preprocessing pipeline. Raw vehicle kinematics are first extracted using YOLOv11n (Khanam and Hussain, 2024) with a confidence threshold of ≥ 0.25 , coupled with persistent tracking. Tracklets surviving a 5-frame minimum are spatially normalized to a [0 , 1] coordinate space. As illustrated in Figure 4, these dynamic tracklets are then assigned to manually annotated static lane boundaries. Assignment computes the mean point-to-polyline distance between each tracklet and every candidate lane, binds the tracklet to the nearest lane within a 60-pixel threshold, and discards tracks that fail the threshold as out-of-bound tracking errors. Crucially, this pipeline converts raw kinematic data into a structured lane-level representation. Rather than treating each vehicle in isolation, inputs are aggregated so that every sample describes holistic lane behavior, including temporal fluctuations and the lane’s operational role (leftmost, rightmost, interior, or merge). Each lane sample is summarized by four aggregate trajectory statistics: mean speed, mean curvature, mean lateral offset from the lane centerline, and a normalized trajectory count used as a density proxy, computed over the tracklets assigned to that lane. All static geometries and dynamic trajectories are arc-length resampled to 𝐾 = 16 points via linear interpolation. To enable contrastive learning, positive pairs are strictly mined across different cameras. A candidate pair is accepted only when the two lanes satisfy three structural alignment criteria: lateral rank difference ( |Δ| < 0.15 ), identical edge-type flags (leftmost/rightmost), and role cosine similarity ( ≥ 0.8). The final collated batches supply the encoder with standardized tensors: static geometry (𝐵, 𝐾, 2) , dynamic trajectories (𝐵, 𝑇 max , 𝐾, 2) with a boolean validity mask 
+
+(𝐵, 𝑇 max ) that prevents zero-padded slots from biasing the mean-pooled trajectory embedding, and the 9-dim fused stats vector (𝐵, 9) concatenating four trajectory statistics with the five-dim structural role descriptor. 
+
+6.2. Leave-One-Camera-Out Cross-Camera Evaluation 
+
+Cross-camera generalization is evaluated using a leave-one-camera-out (LOCO) protocol. For any given camera 𝑐 ,all lanes from the remaining cameras  ⧵ {𝑐 } are encoded to form a reference bank. Lanes from the held-out camera then serve as queries, each matched to its nearest reference by cosine similarity in the learned embedding space. This procedure is repeated with every camera held out in turn. This configuration tests whether the representation captures lane identity in a manner that transfers across unseen viewpoints and novel roadway layouts. The evaluation reports four complementary metrics. Mean cosine similarity measures overall nearest-neighbor affinity. However, this metric alone can be misleading, because a representation that collapses every lane into a narrow region of feature space will also produce uniformly high similarities. Greater analytical weight is therefore placed on 
+
+lateral rank difference , |𝑟 𝑞 − 𝑟 ref |, which verifies that the matched reference shares the query’s relative lateral position rather than an arbitrary nearby embedding. This evaluation also tracks edge F1 , which checks preservation of leftmost and rightmost boundary roles, alongside anomaly accuracy , measured on the same LOCO splits for methods that expose a temporal detection module. 
+
+6.2.1. Comparison Across Models 
+
+Table 1 benchmarks the proposed methodology against representative non-learning baselines, supervised refer-ences, and anomaly-detection alternatives. The compared models operate as follows: 
+
+• traj-stats uses a minimal set of aggregate trajectory statistics per lane and performs nearest-neighbor matching without learned embeddings. 
+
+• stats-oracle serves as the matching upper bound. It reads ground-truth lane-role annotations directly as input, so its high matching scores are not achievable at deployment time. It has no temporal module, hence no anomaly result. 
+
+• per-camera-sup trains supervised lane-role predictors independently for each camera. Reporting both the within-camera validation and the held-out-camera test scores isolates whether camera-specific supervision transfers to unseen views. 
+
+• contrastive uses the static encoder trained purely for cross-camera alignment, with no temporal modeling. 
+
+• two-stage (frozen) establishes cross-camera alignment first, freezes the encoder weights, and subsequently trains a GRU-based anomaly detector on those fixed embeddings. 
+
+• One-Class SVM and LSTM (traj-stats) are anomaly-focused baselines. They indicate whether joint represen-tation learning is required for temporal detection.                                                                                 
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 11 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Table 1
+> Comparison across cross-camera matching and anomaly detection baselines under the LOCO protocol. Lower lateral-rank difference is better; higher edge-role F1 and anomaly accuracy are better. "—" denotes metrics not applicable to a given method. The Is Generalize column summarizes whether the method is designed to transfer to unseen cameras at test time:
+> yes for methods trained without per-site labels, no for supervised or oracle baselines, partial for traj-stats , which uses no learned representation but requires the target site’s own trajectories at query time. Method Supervision Match sim. ↑Lat. diff ↓Edge F1 ↑Anomaly ↑Is Generalize traj-stats none 0.991 0.398 0.356 0.875 partial stats-oracle (GT) role labels required 0.990 0.018 1.000 —no per-camera-sup per-camera labels —0.227 / 0.476 0.481 / 0.182 —no SVM (One-Class) none ———0.776 yes LSTM (traj-stats) none ———0.823 yes GeoLaneRep (Ours) two-stage (frozen) none ———0.821 yes geometry-only none 1.000 0.448 0.262 —yes trajectory-only none 0.996 0.387 0.358 —yes contrastive none 0.932 0.013 0.994 —yes joint none 0.962 0.004 1.000 0.979 yes
+
+• geometry-only and trajectory-only are ablated architecture variants that isolate static shape cues and dynamic motion cues, respectively. 
+
+• joint constitutes the full proposed model. The encoder and temporal anomaly module are optimized simultane-ously end-to-end. The core finding is that high raw matching similarity does not imply meaningful cross-camera correspondence. The geometry-only, trajectory-only, and traj-stats baselines all yield extremely high nearest-neighbor similarity scores (0.991 –1.000 ), yet their lateral-rank errors remain large ( 0.387 –0.448 ), and their edge-role F1 scores remain low (0.262 –0.358 ). The three representations evidently place lanes into narrow clusters that admit high cosine similarity to the nearest neighbor without preserving the lane’s functional role. Applying the contrastive encoder sharpens cross-camera discriminability: lateral-rank error drops to 0.013 and edge F1 rises to 0.994 , at the cost of a slightly lower raw similarity ( 0.932 ). The full joint model refines this further, reaching a lateral-rank error of 0.004 and an edge F1 of 1.000 , while simultaneously securing the highest anomaly detection accuracy ( 0.979 ). These results lead to two conclusions. First, cross-camera lane correspondence requires the combination of geometric structure, trajectory observation, and contrastive alignment. No single modality alone is sufficient. Second, joint temporal-and contrastive training strengthens the embedding for both spatial retrieval and downstream temporal reasoning, rather than sacrificing one for the other. 
+
+6.2.2. Training Behavior: Joint vs. Two-Stage Optimization 
+
+Analyzing the training strategies exposes a clear gap between end-to-end joint optimization and the two-stage approach. Figure 5 (Left) shows the frozen-encoder variant plateauing near 81% anomaly accuracy by epoch ∼ 25 
+
+and making negligible further progress over the remaining epochs of that run. The joint model crosses the same 80% 
+
+threshold at epoch ∼ 25 and continues improving, stabilizing around 97% by epoch ∼ 75 . This sustained divergence indicates that anomaly detection capability cannot be merely “bolted on” to a fixed representation. The encoder itself must adapt to the temporal objective. Figure 5 (Right) confirms that the contrastive structure remains intact during joint training. Mean positive-pair similarity rises from ∼ 0 .10 to ∼ 0 .72 within the initial 25 epochs. Simultaneously, mean negative-pair similarity drops to ∼ −0 .20 over the same interval. Both curves remain stable across the full 200-epoch run, with variance at the scale of mini-batch noise rather than systematic drift. End-to-end optimization, therefore, heightens temporal sensitivity without triggering representation collapse (positives and negatives remaining well-separated) or eroding cross-camera alignment.      
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 12 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 5: Training behavior of the proposed model. Left: anomaly detection accuracy for two-stage training with a frozen encoder versus end-to-end joint training. Joint optimization continues improving well beyond the plateau reached by the frozen-encoder variant. Right: contrastive quality during joint training, showing rapid convergence of positive-pair similarity and stable separation from negative pairs.
+> (a) Lateral rank alignment (b) Embedding similarity structure Figure 6: Cross-camera lane embedding evaluation. (a) Cross-camera lateral rank alignment across 132 lanes from 16 cameras. Each point plots a query lane’s ground-truth lateral rank against the ground-truth rank of its embedding-nearest neighbor retrieved from a different camera. (b) Embedding similarity structure. Left: cosine similarity of projection pairs grouped into four categories. Right: per-lane cosine similarity matrix, organized by camera and group.
+
+6.3. Representation Quality 
+
+6.3.1. Lateral Rank Prediction 
+
+The encoder produces an embedding space in which cross-camera nearest-neighbor retrieval preserves lateral position: for each of the 132 lanes, the embedding-nearest lane drawn from a different camera shares the query’s ground truth lateral rank with mean absolute error 0.010 (Figure 6(a)). Matches align with the diagonal across the full 
+
+0 → 1 rank spectrum. This confirms the encoder captures the relative lateral ordering of lanes independent of the raw camera viewpoint under which a lane was observed. 
+
+6.3.2. Embedding Space Structure 
+
+Probing the learned embedding space reveals a distinct geometry driven by the contrastive training objective (Figure 6(b)). Lanes sharing identical lateral ranks across disparate cameras generate a median cosine similarity of 
+
++0 .72 (𝑛 = 1 ,878 pairs). This reflects strong cross-scene generalization at the semantic level. Conversely, sibling lanes situated within the exact same physical group, which share spatial proximity but execute different roles, are pushed apart to a median similarity of −0 .23 (𝑛 = 193 ), essentially matching the cross-camera diff-rank baseline. The embedding, therefore, does not use camera or group co-occurrence as a similarity shortcut; rank identity dominates. Different groups within the same camera sit at an intermediate −0 .12 (𝑛 = 330 ), indicating only a small residual camera bias.     
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 13 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 7: Overall anomaly detection performance on 5-minute detection window. Left: ROC curve with AUROC = 0.991 and operating points for the default and optimal thresholds. Right: confusion matrix at the optimal threshold ( 𝑡 = 0 .67 ).
+
+The per-camera similarity matrix (right panel) corroborates this structure; block-diagonal intensity captures within-camera within-group identity, while sparse off-diagonal bright cells mark the cross-camera same-rank matches that drive the +0 .72 distribution. 
+
+6.4. Temporal Consistency and Anomaly Sensitivity 
+
+This evaluation isolates whether the learned embedding maintains temporal stability under normal operation while reacting dynamically to operational disruptions. The embedding is assessed as an anomaly signal across three dimensions: absolute detection accuracy, robustness to temporal aggregation scale, and structural localization. 
+
+6.4.1. Overall Detection Performance 
+
+The embedding-based anomaly detector displays strong discriminative performance. Operating at a 5-minute window, the receiver operating characteristic yields an AUROC of 0.991 (Figure 7). Utilizing an optimal threshold of 
+
+𝑡 = 0 .67 , the detector achieves 92.2% precision, 93.9% recall, and a 93.0% F1 score across 1,376 evaluation windows. It triggers only 30 false positives and misses a mere 23 events. These margins show that embedding deviations provide a reliable mathematical signal for isolating anomalous behavior from standard traffic flow. 
+
+6.4.2. Effect of Operational Window Size 
+
+Detection fidelity intrinsically depends on the volume of temporal context available. However, performance stabilizes rapidly (Figure 8(a)). At a severe 1-minute restriction, precision drops to 0.36, and the F1 score falls to 0.51, while recall remains high at 0.93. The detector still catches most injected anomalies, but the per-window trajectory statistics are averaged over too few samples to separate corrupted windows from noisy clean ones, driving false positives up. This lack of history prevents the formation of a stable lane-level baseline. Expanding to a 2-minute window triggers a substantial recovery (F1 ≈ 0.82). The detector finds its optimal operational balance at the 5-minute mark (F1 ≈ 0.90, precision ≈ 0.88, recall ≈ 0.93). Performance remains consistent through 10- and 15-minute intervals. Consequently, a 2-to-5-minute contextual horizon provides maximum anomaly resolution while remaining highly practical for near-real-time digital twin monitoring. 
+
+6.4.3. Temporal Localization Across Lane Roles 
+
+Figure 8(b) maps anomaly score trajectories across standard leftmost, rightmost, middle, and complex merge lanes. Each panel overlays the predicted probability on the clean sequence (blue baseline) against the corrupted sequence (red), with shaded bands marking the injected windows. Under nominal conditions, these scores stay near zero. This proves the embedding holds temporal stability during standard operations. Upon anomaly injection, the scores spike sharply above the 0.5 threshold inside the injected windows, with magnitude varying by anomaly type. They return cleanly to baseline the moment the event concludes. Crucially, this reactive behavior is uniform across all structural lane roles. The anomaly signal is not biased toward a specific lane archetype.     
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 14 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> (a) Window size comparison (b) Anomaly score timelines Figure 8: Anomaly detection evaluation. (a) Anomaly detection performance across operational window sizes. (b) Anomaly score timelines across four representative lane roles. Each panel plots the detector’s predicted anomaly probability on the clean window sequence and on the same sequence with injected corruptions. Shaded bands mark windows where a synthetic anomaly was injected into the trajectory input.
+
+6.5. Behavior-Conditioned Geometry Generation 
+
+The final experiment evaluates whether the learned representation can physically guide the generation of new lane geometries that adhere to targeted semantic specifications. The generator receives a target specification and a spatial anchor and outputs candidate centerlines, which are re-encoded and scored for semantic compliance. 
+
+6.5.1. Spec-Conditioned and Relational Generation 
+
+Figure 9 showcases generation performance at the US12_Yahara site. The module produces plausible centerlines for rightmost, leftmost, and merge roles when conditioned on lateral role and anchor alone. For standard (edge) lanes, both independent and relational variants yield geometries that visually align with the real lane structure, with rightmost and leftmost candidates exhibiting the lowest semantic reconstruction errors. This confirms the generated lines remain faithful to the target embedding. Relational conditioning explicitly exposes the generator to the neighboring-lane context. This constrains the output toward locally consistent spacing. The generated geometries track the surrounding lane bundle rather than drifting independently, as is visible in the no-neighbor variant. 
+
+6.5.2. Generation Quality Across Sites 
+
+Quantitative evaluation across 38 camera groups and 570 generated candidates (Table 2) supports these obser-vations. The generator attains 99.5% lateral specification accuracy for leftmost lanes and 98.4% for rightmost lanes, with an overall accuracy of 87.9%. Merge lanes account for most of the residual error (65.8% accuracy), examining where merge-specified candidates actually land shows that failures do not scatter randomly but bifurcate into leftmost or rightmost geometries, suggesting that the model has learned “merge” as a region of interpolation between the two edge-lane modes rather than as a distinct topological class. Per-spec Chamfer distances tell the same story: merge candidates sit at 0.052 , roughly 30% higher than the 0.039 –0.040 seen on rightmost/leftmost, so the gap is not only categorical but also geometric. Aggregate geometric fidelity is strong. A mean Chamfer distance of 0.0450 indicates close pointwise alignment with the real roadway geometry. Fréchet Geometry Distance (FGD) is 0.0179 on the full candidate set and 0.0254 after      
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 15 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins
+> Figure 9: Qualitative examples of behavior-conditioned lane generation at US12_Yahara (group 0), comparing independent and relational conditioning for rightmost, leftmost, and merge lane generation.
+
+excluding candidates flagged as curvature outliers; in both regimes, the distributional shape of the generated lanes closely matches the reference. The generator avoids representation collapse: mean pairwise 𝐿 2 distance is 0.1737 , so the system produces a diverse ensemble of candidates rather than repeating a single solution. Finally, the curvature-smoothness analysis flags 7.0% (38 / 570) of candidates as rough outliers – high variance in heading-change angles along the polyline – leaving 93% whose curvature profiles fall within the smooth range defined by the threshold. 
+
+## 7. Conclusions 
+
+This research introduces GeoLaneRep , a behavior-grounded representation framework that enhances traffic digital twins by mapping static lane geometry, observed vehicle trajectories, and operational descriptors into a single shared embedding. Trained jointly with contrastive cross-camera alignment, auxiliary role supervision, and temporal anomaly detection, the encoder achieves a 0.004 lateral-rank error and an edge-role F1 of 1.000 under a leave-one-camera-out protocol, and an AUROC of 0.991 on per-window anomaly detection. Consequently, it produces a highly transferable embedding that generalizes seamlessly across heterogeneous camera deployments. Furthermore, a FiLM-conditioned diffusion module uses these embeddings to synthesize candidate lane geometries that satisfy targeted operational specifications at 87 .9% overall accuracy. The same encoder weights drive all three tasks, supporting the central claim that a single behavior-aware representation can serve heterogeneous lane-level digital-twin applications. The evaluation also surfaces an asymmetry between representation and generation quality. The encoder produces a stable, highly discriminative embedding space, but the generated lane geometry trails this fidelity, particularly for merge specifications ( 65 .8% accuracy versus 98 –99% for edge lanes). This gap likely reflects compounded upstream uncertainty rather than a generator-side defect alone: imperfect trajectory extraction, occlusion, lane-marking   
+
+> Rei Tamaru et al.: Preprint submitted to Elsevier Page 16 of 19
+
+Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins 
+
+Table 2 
+
+Quantitative evaluation of behavior-conditioned lane generation (38 lane groups, 570 candidates, 5 candidates per spec per group). FGD and curvature smoothness are reported in both raw and filtered forms; the filtered forms exclude candidates flagged by the curvature-outlier criterion. 
+
+Category Metric Value 
+
+Specification Accuracy Rightmost Lane 98.4% Leftmost Lane 99.5% Merge Lane 65.8% 
+
+Overall Accuracy 87.9% 
+
+Per-spec Chamfer Rightmost 0.039 Leftmost 0.040 Merge 0.052 
+
+Geometric & Spatial Candidate Diversity (Mean L2) 0.1737 Spatial Coherence 0.1003 Chamfer Distance (overall) 0.0450 Fréchet Geometry Distance (raw / filt.) 0.0179/0.0254 Curvature Smoothness (raw / filt.) 2.727/0.0220 Smoothness Outliers 7.0% (38/570) 
+
+ambiguity, and limited coverage of rare lane types each weaken the geometric supervision the diffusion module receives. A second limitation is that the generation scheme operates lane-wise and does not yet model the mutual dependence among neighboring lanes that real roadway geometry imposes. Third, the framework prioritizes semantic consistency over engineering-grade geometric fidelity. This allows training on noisy roadside observations without curated HD-map labels, but limits direct deployability for tasks that need vertical alignment, curvature continuity, or precise lane-boundary reconstruction. Looking forward, closing the representation-generation gap calls for richer geometric supervision: multi-view reconstruction, depth estimation, LiDAR fusion, or BIM-derived lane references would give the diffusion module a cleaner target without disturbing the behavioral embedding. Moving from lane-wise to corridor-level synthesis would require coupled multi-lane generation under topological and geometric constraints. For example, graph-structured decoders over lane groups, or relational denoisers conditioned on the neighboring-lane embeddings already produced by the cross-lane attention module. A third direction is interfacing the embedding with connected vehicle technologies. For example, vehicle-to-everything messages provide a machine-readable lane topology that could either supervise the representation or, conversely, be inferred or repaired by it when annotations are incomplete. Together, these extensions would carry GeoLaneRep beyond lane-level interpretation toward the coordinated, geometrically faithful interventions that constructive digital twins ultimately require. 
+
+## References          
+
+> Alahi, A., 2026. Chapter 9 - foundational principles for representation learning: applications in autonomous mobility, in: Antoniou, C., Dimitriou, L., Pereira, F.C. (Eds.), Mobility Patterns, Big Data and Transport Analytics (Second Edition). second edition ed.. Elsevier, pp. 265– 286. URL: https://www.sciencedirect.com/science/article/pii/B9780443267895000158 , doi: https://doi.org/10.1016/ B978-0-443-26789-5.00015-8 .Arman, M.A., Tampère, C.M., 2021. Lane-level routable digital map reconstruction for motorway networks using low-precision gps data. Transportation Research Part C: Emerging Technologies 129, 103234. URL: https://www.sciencedirect.com/science/article/pii/ S0968090X21002473 , doi: https://doi.org/10.1016/j.trc.2021.103234 .Bongomin, O., Mwape, M.C., Mpofu, N.S., Bahunde, B.K., Kidega, R., Mpungu, I.L., Tumusiime, G., Owino, C.A., Goussongtogue, Y.M., Yemane, A., Kyokunzire, P., Malanda, C., Komakech, J., Tigalana, D., Gumisiriza, O., Ngulube, G., 2025. Digital twin technology advancing industry 4.0 and industry 5.0 across sectors. Results in Engineering 26, 105583. URL: https://www.sciencedirect.com/science/article/pii/ S2590123025016536 , doi: https://doi.org/10.1016/j.rineng.2025.105583 .Cao, X., Zhou, T., Ma, Y., Ye, W., Cui, C., Tang, K., Cao, Z., Liang, K., Wang, Z., Rehg, J.M., Zheng, C., 2024. Maplm: A real-world large-scale vision-language benchmark for map and traffic scene understanding, in: 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), pp. 21819–21830. doi: 10.1109/CVPR52733.2024.02061 .Chen, T., Kornblith, S., Norouzi, M., Hinton, G.E., 2020a. A simple framework for contrastive learning of visual representations. ArXiv abs/2002.05709. URL: https://api.semanticscholar.org/CorpusID:211096730 .
+
+Rei Tamaru et al.: Preprint submitted to Elsevier Page 17 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins 
+
+Chen, X., Fan, H., Girshick, R.B., He, K., 2020b. Improved baselines with momentum contrastive learning. ArXiv abs/2003.04297. URL: 
+
+https://api.semanticscholar.org/CorpusID:212633993 .Dasgupta, S., Rahman, M., Jon, S., 2024. Harnessing digital twin technology for adaptive traffic signal control: Improving signalized intersection performance and user satisfaction. IEEE Internet of Things Journal 11, 36596–36618. doi: 10.1109/JIOT.2024.3420439 .Duan, Z., Cheng, H., Xu, D., Wu, X., Zhang, X., Ye, X., Xie, Z., 2024. Cityllava: Efficient fine-tuning for vlms in city scenario, in: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 7180–7189. Feng, Y., Camarcat, L., Koliou, P., Adan, F., Michalaki, P., Formosa, N., Zacharopoulos, G., Angeloudis, P., Quddus, M., 2025. Innovative interventions for transforming road capacity, safety and emissions on the england’s strategic road network. Research in Transportation Business & Management 61, 101398. URL: https://www.sciencedirect.com/science/article/pii/S2210539525001130 , doi: https://doi. org/10.1016/j.rtbm.2025.101398 .Fu, Y., Liao, W., Liu, X., Xu, H., Ma, Y., Zhang, Y., Dai, F., 2024. Topologic: An interpretable pipeline for lane topology reasoning on driving scenes, in: The Thirty-eighth Annual Conference on Neural Information Processing Systems. URL: https://openreview.net/forum?id= MXzr10iX2d .Gu, X., Duan, W., Zhang, G., Hou, J., Peng, L., Wen, M., Gao, F., Chen, M., Ho, P.H., 2026. Digital twin technology for intelligent vehicles and transportation systems: A survey on applications, challenges and future directions. IEEE Communications Surveys & Tutorials 28, 3235–3271. doi: 10.1109/COMST.2025.3581152 .Han, C., Wang, J., Wang, Y., Yu, X., Lin, H., Li, C., Wu, J., 2025. Bridging traffic state and trajectory for dynamic road network and trajectory representation learning, in: Proceedings of the Thirty-Ninth AAAI Conference on Artificial Intelligence and Thirty-Seventh Conference on Innovative Applications of Artificial Intelligence and Fifteenth Symposium on Educational Advances in Artificial Intelligence, AAAI Press. URL: https://doi.org/10.1609/aaai.v39i11.33280 , doi: 10.1609/aaai.v39i11.33280 .Ho, J., Jain, A., Abbeel, P., 2020. Denoising diffusion probabilistic models. Advances in neural information processing systems 33, 6840–6851. Hou, L., Li, S.E., Yang, B., Wang, Z., Nakano, K., 2023. Integrated graphical representation of highway scenarios to improve trajectory prediction of surrounding vehicles. IEEE Transactions on Intelligent Vehicles 8, 1638–1651. doi: 10.1109/TIV.2022.3197179 .Irfan, M.S., Dasgupta, S., Rahman, M., 2024. Toward transportation digital twin systems for traffic safety and mobility: A review. IEEE Internet of Things Journal 11, 24581–24603. doi: 10.1109/JIOT.2024.3395186 .Jiang, J., Pan, D., Ren, H., Jiang, X., Li, C., Wang, J., 2023. Self-supervised trajectory representation learning with temporal regularities and travel semantics, in: 2023 IEEE 39th International Conference on Data Engineering (ICDE), pp. 843–855. doi: 10.1109/ICDE55515.2023.00070 .Khanam, R., Hussain, M., 2024. Yolov11: An overview of the key architectural enhancements. arXiv preprint arXiv:2410.17725 . Kušić, K., Schumann, R., Ivanjko, E., 2023. A digital twin in transportation: Real-time synergy of traffic data streams and simulation for virtualizing motorway dynamics. Advanced Engineering Informatics 55, 101858. URL: https://www.sciencedirect.com/science/article/pii/ S1474034622003160 , doi: https://doi.org/10.1016/j.aei.2022.101858 .Lei, D., Xu, M., Wang, S., 2024. A conditional diffusion model for probabilistic estimation of traffic states at sensor-free locations. Trans-portation Research Part C: Emerging Technologies 166, 104798. URL: https://www.sciencedirect.com/science/article/pii/ S0968090X2400319X , doi: https://doi.org/10.1016/j.trc.2024.104798 .Li, S., Cui, Y., Xu, J., Li, L., Meng, L., Yang, W., Zhang, F., Zhou, X., 2025a. Unifying lane-level traffic prediction from a graph structural perspective: Benchmark and baseline. IEEE Transactions on Knowledge and Data Engineering . Li, S., Yang, W., Cui, Y., Liu, X., Meng, L., Ma, L., Zhang, F., 2025b. Fine-grained traffic inference from road to lane via spatio-temporal graph node generation, in: Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2, Association for Computing Machinery, New York, NY, USA. p. 1529–1540. URL: https://doi.org/10.1145/3711896.3736961 , doi: 10.1145/3711896.3736961 .Liang, S., Chang, X., Wu, C., Yan, H., Bai, Y., Liu, X., Zhang, H., Yuan, Y., Zeng, S., Xu, M., et al., 2026. Persistent autoregressive mapping with traffic rules for autonomous driving, in: Proceedings of the AAAI Conference on Artificial Intelligence, pp. 6862–6870. Liao, B., Chen, S., Wang, X., Cheng, T., Zhang, Q., Liu, W., Huang, C., 2022. Maptr: Structured modeling and learning for online vectorized hd map construction. arXiv preprint arXiv:2208.14437 . Liao, G., Li, J., Ye, X., 2024. Vlm2scene: Self-supervised image-text-lidar learning with foundation models for autonomous driving scene understanding. Proceedings of the AAAI Conference on Artificial Intelligence 38, 3351–3359. URL: https://ojs.aaai.org/index.php/ AAAI/article/view/28121 , doi: 10.1609/aaai.v38i4.28121 .Luo, J., Liu, P., Xu, W., Zhao, T., Biljecki, F., 2025. A perception-powered urban digital twin to support human-centered urban planning and sus-tainable city development. Cities 156, 105473. URL: https://www.sciencedirect.com/science/article/pii/S0264275124006875 ,doi: https://doi.org/10.1016/j.cities.2024.105473 .Luo, S., Chen, W., Tian, W., Liu, R., Hou, L., Zhang, X., Shen, H., Wu, R., Geng, S., Zhou, Y., et al., 2024. Delving into multi-modal multi-task foundation models for road scene understanding: From learning paradigm perspectives. IEEE Transactions on Intelligent Vehicles . Mao, Z., Li, Z., Li, D., Bai, L., Zhao, R., 2022. Jointly contrastive representation learning on road network and trajectory, in: Proceedings of the 31st ACM International Conference on Information & Knowledge Management, pp. 1501–1510. Miller, K., Horner, J., Adler, J., Sanchez, R., 2021. Decision Support for Traffic Management Systems—Current Practices. Final Report FHWA-HRT-21-108. Federal Highway Administration, U.S. Department of Transportation. Washington, DC. September 2017–November 2021. Naumann, A., Hertlein, F., Grimm, D., Zipfl, M., Thoma, S., Rettinger, A., Halilaj, L., Luettin, J., Schmid, S., Caesar, H., 2023. Lanelet2 for nuscenes: Enabling spatial semantic relationships and diverse map-based anchor paths, in: 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW), pp. 3248–3257. doi: 10.1109/CVPRW59228.2023.00327 .Oord, A.v.d., Li, Y., Vinyals, O., 2018. Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748 . Perez, E., Strub, F., De Vries, H., Dumoulin, V., Courville, A., 2018. Film: Visual reasoning with a general conditioning layer, in: Proceedings of the AAAI conference on artificial intelligence. Perna, M., Pinto, B., Mendes, J., Dias, R., Obrist, F., Rito, P., Sargento, S., Raposo, D., Pinto, F., 2025. Innovating urban mobility with digital twins: Data-driven traffic visualization and testing, in: 2025 IEEE Wireless Communications and Networking Conference (WCNC), pp. 1–6. 
+
+Rei Tamaru et al.: Preprint submitted to Elsevier Page 18 of 19 Behavior-Grounded Lane Representation Learning for Multi-Task Traffic Digital Twins 
+
+doi: 10.1109/WCNC61545.2025.10978641 .Poggenhans, F., Pauls, J.H., Janosovits, J., Orf, S., Naumann, M., Kuhnt, F., Mayr, M., 2018. Lanelet2: A high-definition map framework for the future of automated driving, in: 2018 21st International Conference on Intelligent Transportation Systems (ITSC), pp. 1672–1679. doi: 10.1109/ITSC.2018.8569929 .Rivera, E., Lübberstedt, J., Uhlemann, N., Lienkamp, M., 2025. Scenario understanding of traffic scenes through large visual language models, in: Proceedings of the Winter Conference on Applications of Computer Vision, pp. 1037–1045. Tamaru, R., Li, P., Ran, B., 2025. Geo-orbit: A federated digital twin framework for scene-adaptive lane geometry detection. arXiv preprint arXiv:2507.08743 . Wang, C., Huang, J., Wang, Y., Lin, Z., Jin, X., Jin, X., Weng, D., Wu, Y., 2024a. A deep spatiotemporal trajectory representation learning framework for clustering. IEEE Transactions on Intelligent Transportation Systems 25, 7687–7700. doi: 10.1109/TITS.2024.3350339 .Wang, K., Li, Z., Nonomura, K., Yu, T., Sakaguchi, K., Hashash, O., Saad, W., 2024b. Smart mobility digital twin based automated vehicle navigation system: A proof of concept. IEEE Transactions on Intelligent Vehicles 9, 4348–4361. doi: 10.1109/TIV.2024.3368109 .Wang, X., Fang, Z., Huang, C., Hu, D., Chen, L., Gao, Y., 2025. GTR: A general, multi-view, and dynamic framework for trajectory representation learning, in: Forty-second International Conference on Machine Learning. URL: https://openreview.net/forum?id=ehcWKZ2nEn .Wang, Z., Gupta, R., Han, K., Wang, H., Ganlath, A., Ammar, N., Tiwari, P., 2022. Mobility digital twin: Concept, architecture, case study, and future challenges. IEEE Internet of Things Journal 9, 17452–17467. doi: 10.1109/JIOT.2022.3156028 .Wu, K., Li, P., Cheng, Y., Parker, S.T., Ran, B., Noyce, D.A., Ye, X., 2025. A digital twin framework for physical-virtual integration in v2x-enabled connected vehicle corridors. IEEE Transactions on Intelligent Transportation Systems 26, 14407–14420. doi: 10.1109/TITS.2025.3564351 .Xu, D., Tang, Y., Ju, J., Yu, Z., Zheng, J., Gu, T., Guo, H., 2025a. Cross-city traffic state prediction based on knowledge transfer framework. Expert Systems with Applications 272, 126747. URL: https://www.sciencedirect.com/science/article/pii/S0957417425003690 ,doi: https://doi.org/10.1016/j.eswa.2025.126747 .Xu, G., Chen, J., Wang, Z., et al., 2025b. Enhancing traffic safety analysis with digital twin technology: integrating vehicle dynamics and environmental factors into microscopic traffic simulation. Scientific Reports 15, 44404. doi: 10.1038/s41598-025-31930-1 .Xu, H., Berres, A., Yoginath, S.B., Sorensen, H., Nugent, P.J., Severino, J., Tennille, S.A., Moore, A., Jones, W., Sanyal, J., 2023. Smart mobility in the cloud: Enabling real-time situational awareness and cyber-physical control through a digital twin for traffic. IEEE Transactions on Intelligent Transportation Systems 24, 3145–3156. doi: 10.1109/TITS.2022.3226746 .Zhang, L., Long, C., 2023. Road network representation learning: A dual graph-based approach. ACM Trans. Knowl. Discov. Data 17. URL: 
+
+https://doi.org/10.1145/3592859 , doi: 10.1145/3592859 .Zhou, J., Yu, M., Guo, Y., Li, B., Ying, S., Li, Z., 2025. A high-definition map architecture for transportation digital twin system construction. International Journal of Applied Earth Observation and Geoinformation 144, 104822. URL: https://www.sciencedirect.com/science/ article/pii/S1569843225004698 , doi: https://doi.org/10.1016/j.jag.2025.104822 .
+
+Rei Tamaru et al.: Preprint submitted to Elsevier Page 19 of 19
