@@ -1,0 +1,217 @@
+Title: M^2E-UAV: A Benchmark and Analysis for Onboard Motion-on-Motion Event-Based Tiny UAV Detection
+
+URL Source: https://arxiv.org/pdf/2605.10496v1
+
+Published Time: Tue, 12 May 2026 03:26:04 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# M2E-UAV: A Benchmark and Analysis for Onboard Motion-on-Motion Event-Based Tiny UAV Detection 
+
+Weiqi Yan 1∗ Lixin Chen 1∗ Xiangrui Hou 1 Zhipeng Cai 2†
+
+Youbiao Wang 1 Yangyang Shi 2 Yu Zang 1† Cheng Wang 11Fujian Key Laboratory of Urban Intelligent Sensing and Computing, School of Informatics, Xiamen University, Xiamen, China 
+
+> 2
+
+Meta, Menlo Park, USA 
+
+{yanweiqi199888, czptc2h, shiyang1983}@gmail.com {23020241154341, 23020251154347, 36920241153251}@stu.xmu.edu.cn zangyu7@126.com, cwang@xmu.edu.cn 
+
+## Abstract 
+
+Tiny UAV detection from an onboard event camera is difficult when the observer and target move at the same time. In this motion-on-motion regime, ego-motion ac-tivates background edges across buildings, vegetation, and horizon structures, while the UAV may appear as a sparse event cluster. To explore this practical problem, we present M 2E-UAV, a benchmark and analysis setup for onboard motion-on-motion event-based tiny UAV detection. The processed M 2E-UAV benchmark contains 87,223 training samples and 21,395 validation samples across four scene families: sunny building-forest, sunny farm-village, sunset building-forest, and sunset farm-village. We provide M 2E-Point, a point-based event baseline, and M 2E-Point + IMU, an IMU-conditioned variant, to analyze the role of inertial cues under on-board motion-on-motion detection. M 2E-Point encodes events as [x, y, t, p ] point sets, extracts local event structure with EdgeConv, and predicts event-level UAV foreground scores, from which bounding boxes are derived via DBSCAN. Our validation-stage analysis shows that point-based event modeling is a strong baseline, while simple IMU conditioning provides only marginal aggregate gains. Under the train/validation split, M 2E-Point achieves 0.9673 F1 and 0.5501 mAP50-95, while the IMU-conditioned variant reaches 0.5561 mAP50-95 with only marginal aggre-gate changes, serving as an initial baseline for future exploration in this domain. Code will be ready in https://github.com/Wickyan/M2E-UAV. 
+
+## 1 Introduction 
+
+Tiny UAV detection is important for safety, inspection, and collision avoidance, but it remains difficult for onboard perception. Conventional RGB or frame cameras can be affected by fast motion, motion blur, illumination changes, and the limited spatial footprint of distant UAVs. Event cameras are attractive for this regime because they respond asynchronously to brightness changes and capture high-temporal-resolution motion cues [ 3 ]. However, onboard motion-on-motion tiny UAV detection is harder than static-observer detection: the sensing platform and target UAV both move, and ego-motion activates cluttered background edges across buildings, vegetation, and horizon structures. Existing event-based UAV, flying-object, and tracking datasets are related to this setting, but they do not fully cover the target problem. Many provide frame-level or bounding-box-level supervision, and 
+
+> ∗Equal contribution.
+> †Corresponding author. Preprint.
+> arXiv:2605.10496v1 [cs.CV] 11 May 2026
+
+Figure 1: Teaser of the M 2E-UAV onboard motion-on-motion setting. Left: schematic and real data-collection scene in which a carrier UAV observes a tiny target UAV. Right: actual onboard event-camera data under sensor ego-motion, where background structures induce dense event clutter around sparse target evidence. existing benchmarks often lack one or more of the following properties: onboard observer motion, synchronized IMU, 720p event sensing, point-level or event-level UAV foreground supervision, and systematic comparison across event-frame, event-tensor, and event-point representations. This gap motivates a benchmark specifically for onboard motion-on-motion event-based tiny UAV detection. Figure 1 summarizes the proposed setting: the left panel illustrates the real onboard collection scenario in which a carrier UAV observes a tiny target UAV, while the right panel shows actual event-camera observations under sensor ego-motion, where background structures create dense event clutter around sparse target evidence. We construct M 2E-UAV as the benchmark, dataset, and task definition for onboard motion-on-motion event-based tiny UAV detection. M 2E-UAV provides 1280 ×720 event data and synchronized event-IMU packets, where event and IMU are synchronized by an STM32-based trigger synchronization board. The processed benchmark contains 87,223 training samples and 21,395 validation samples across four scene families: sunny building-forest, sunny farm-village, sunset building-forest, and sunset farm-village. 2D UAV bounding boxes are annotated at 10 Hz, sparse boxes are temporally propagated/interpolated, and the resulting supervision is lifted to point-level/event-level UAV foreground labels. Beyond dataset construction, this paper evaluates representative baselines across event representa-tions, including event-frame detectors, event-tensor methods, event-point methods, and point-based baselines with and without IMU. We provide M 2E-Point as an initial point-based event baseline and M 2E-Point + IMU as its IMU-conditioned variant. These baselines should be interpreted as point-based foreground-scoring models with detection-style box conversion, rather than native box-regression detectors. The validation-stage analysis shows that point-based event modeling is a strong starting point, while simple IMU conditioning provides only marginal aggregate gains. Our contributions are: • We define onboard motion-on-motion event-based tiny UAV detection and construct M 2E-UAV, a 720p synchronized event-IMU benchmark covering four scene families with point-level/event-level UAV foreground supervision derived from temporally propagated 10 Hz bounding-box annotations. • We establish a unified validation protocol and evaluate representative event-frame, event-tensor, and event-point baselines, enabling an initial comparison of event representations for onboard tiny UAV detection under observer motion. • We provide M 2E-Point and M 2E-Point + IMU as initial point-based baselines. Our anal-ysis shows that point-based event modeling is a strong starting point, while simple IMU conditioning yields only marginal aggregate gains, motivating future motion-aware fusion. 
+
+## 2 Related Work 
+
+Event-based object detection. Event-based object detection has been studied through several input representations. A common direction converts events into frame-like or voxel-like tensors and then applies image-style or video-style detection backbones. Recent event-native detectors 2further process event streams with recurrent or transformer-based architectures, such as RVT [ 4] and SAST [ 10 ]. These methods show that event tensors can support object detection under high-speed and high-dynamic-range conditions. However, onboard motion-on-motion tiny UAV detection presents a different difficulty: ego-motion can activate dense background edges, while the target UAV may appear as only a sparse event cluster. This motivates our benchmark comparison across accumulated event frames, native event tensors, and event point sets. 
+
+Event-based UAV and flying-object benchmarks. Several recent datasets study UAVs, drones, flying objects, or event-based tracking. F-UAV-D targets fast UAV detection using dynamic vision sensors and embedded inference [ 9]. NeRDD introduces synchronized RGB-event drone detection data [ 7], and FRED provides a large RGB-event drone dataset for drone perception [ 8 ]. EV-Flying studies in-the-wild recognition of flying objects using event cameras [ 6 ]. EV-UAV focuses on event-based tiny object detection and provides event-level annotations for anti-UAV scenarios [ 2]. In addition, event-based tracking benchmarks such as VisEvent [ 15 ], EventVOT [ 16 ], and CRSOT [ 18 ]provide related perspectives on event or RGB-event tracking. These datasets are complementary to our work, but they do not jointly cover the M 2E-UAV setting: onboard observer motion, synchronized event-IMU sensing, 1280 ×720 event data, tiny UAV targets, and point-level/event-level supervision derived from temporally propagated 10 Hz bounding boxes. 
+
+Point-based event modeling. Point-set neural networks provide a natural tool for sparse geometric data. DGCNN introduces EdgeConv to capture local geometric relationships in point clouds [ 17 ], while KPConv [ 13 ] and RandLA-Net [ 5] provide representative point-cloud segmentation architec-tures. COSeg [ 1 ] is also included as a point-set baseline in our benchmark protocol. Although these methods were not originally designed for onboard event-based tiny UAV detection, they provide useful modeling primitives for event packets represented as [x, y, t, p ] point sets. In M 2E-UAV, the target UAV often appears as a small sparse event structure, making point-based event modeling a strong baseline to evaluate. 
+
+Event-IMU fusion and motion cues. IMU measurements can provide auxiliary motion information for onboard perception, especially when the sensor platform is moving. In M 2E-UAV, IMU is included as a synchronized modality rather than as the central claimed contribution. In this paper, the IMU branch is kept as a simple FiLM-style conditioned variant of M 2E-Point, where inertial measurements modulate the event representation through feature-wise affine parameters [ 11 ]. Our validation-stage analysis shows that this simple IMU conditioning gives only marginal aggregate gains, suggesting that stronger motion-aware event-IMU fusion remains an open direction. 
+
+## 3 Benchmark Setup 
+
+3.1 Hardware platform and synchronization 
+
+M2E-UAV is built around an onboard sensing platform for motion-on-motion tiny UAV detection. The sensing platform contains an onboard event camera and an IMU mounted on the carrier UAV. Both the event camera and IMU are mounted underneath the carrier UAV and connected to the platform through a vibration-damping plate. To ensure temporal alignment between the asynchronous event stream and inertial measurements, the two sensors are synchronized through a dedicated STM32-based trigger synchronization board. The processed benchmark is therefore organized as synchronized event-IMU packet pairs, which is important for studying onboard motion-on-motion detection where observer motion directly affects the event stream. The detection task uses only event and IMU modalities, and the paired IMU stream is treated as a synchronized auxiliary modality for analysis rather than as the central claimed innovation. 
+
+3.2 Event-IMU packet construction 
+
+Each processed benchmark sample contains one event packet and its temporally matched IMU packet. The event packet is represented as 
+
+E = {(xi, y i, t i, p i)}Ni=1 , (1) 3Figure 2: M2E-UAV data collection and benchmark construction. The top row shows the onboard sensing platform, including the carrier UAV, event camera, IMU, vibration-damping mount, and STM32-based trigger synchronization board. The bottom diagram summarizes how synchronized event and IMU streams are organized into matched event-IMU packets and paired with event-level UAV/background labels for benchmark evaluation. The packet construction and label lifting steps are detailed in Sections 3.2 and 3.4. where (xi, y i) is the event location, ti is the timestamp inside the packet, and pi is polarity. Events remain asynchronous event data before being converted into the representation required by each baseline, such as accumulated event frames, native event tensors, or event point sets. The processed event packet stores event coordinates, timestamps, polarities, and binary UAV/background foreground labels. For M 2E-Point inputs, each sampled event is represented by [x, y, t, p ]: image coordinates are normalized by the sensor resolution, timestamps are normalized within the packet, and polarity is mapped to {− 1, 1}. The sampler uses 8,192 events per packet while retaining positive UAV events when available. The matched IMU archive stores orientation, angular velocity, and linear acceleration. The model input is a 10-D vector containing four quaternion entries, three angular-velocity entries, and three linear-acceleration entries. Every event packet in the train and validation splits has a corresponding IMU packet, which makes event-only and event-IMU baselines directly comparable under the same sample index. 4Figure 3: Scene-family showcase. The montage covers sunny/sunset illumination and building-forest/farm-village backgrounds. 
+
+3.3 Scene families and split 
+
+> Table 1 summarizes the train/validation packet counts across the four illumination-background regimes. Each sample is a matched event-IMU pair with 1280 ×720 event resolution. The scenes cover different background struc-tures and illumination conditions under onboard observer motion; additional dataset-format details are provided in Appendix A.
+
+Table 1: Scene families. Train and vali-dation packets across the four illumination-background regimes. Scene family Train packets Val packets Sunny building-forest 24,345 5,671 Sunny farm-village 28,432 7,109 Sunset building-forest 14,547 3,638 Sunset farm-village 19,899 4,977 
+
+3.4 Annotation pipeline 
+
+We generate event-level supervision from sparse frame annotations. First, 2D UAV bounding boxes are annotated at 10 Hz. The sparse frame boxes are then propagated between adjacent labeled frames through temporal propagation and temporal interpolation, and this label propagation forms spatiotemporal supervision. Similar to event-level label generation from box annotations in EV-UAV [ 2], the propagated spatiotemporal supervision is lifted to the corresponding event packets through spatiotemporal lifting. This event-level label generation produces point-level/event-level UAV foreground labels. The resulting labels support event-level foreground scoring. Detection-style boxes can later be derived from predicted foreground events during evaluation: foreground events are selected by a probability threshold of 0.5, clustered using DBSCAN with ϵ = 15 .0 pixels and min _samples = 3 , and the largest valid cluster is converted to a bounding box. These AP values are detection-style metrics derived from event-level predictions. They support the present evaluation protocol, but they should not be read as native box-detector results or held-out benchmark results. 
+
+3.5 Dataset comparison 
+
+Table 2 compares M 2E-UAV with representative event-based UAV, flying-object, and tracking datasets. The summarized properties are compiled from the benchmark and task definitions reported in the corresponding papers. The comparison focuses on properties that are central to onboard motion-on-motion tiny UAV detection: event resolution, UAV-centric collection, tiny-target setting, observer motion, synchronized IMU, and annotation granularity. Unlike datasets that provide only frame-level or bounding-box-level supervision, M 2E-UAV provides point-level/event-level UAV foreground labels derived from temporally propagated 10 Hz bounding-box annotations. 5Table 2: Comparison of event-based datasets along properties relevant to onboard tiny UAV detection.                                                                   
+
+> Dataset Resolution UAV-centric Tiny target Observer motion IMU Annotation granularity EED [12] 240 ×180 ××✓×frame-level VisEvent [15] 346 ×260 ××××frame-level EventVOT [16] 1280 ×720 ××××frame-level F-UAV-D [9] 1280 ×720 ✓×××frame-level EV-UAV [2] 346 ×240 ✓✓××point-level EV-Flying [6] 1280 ×720 ××××frame-level NeRDD [7] 1280 ×720 ✓×××frame-level CRSOT [18] 1280 ×720 ✓×✓×frame-level FRED [8] 1280 ×720 ✓×××frame-level Ours 1280 ×720 ✓✓✓✓point-level
+
+Figure 4: Method-level overview of M 2E-Point and its optional IMU-conditioned variant. The event branch samples [x, y, t, p ] points, extracts local event features with EdgeConv, and aggregates them into a global packet feature. The optional IMU-conditioned variant modulates the global feature via FiLM. Local features and the packet feature are fused for event-level foreground scoring, and DBSCAN converts predicted foreground clusters into a detection-style box. 
+
+## 4 Method 
+
+4.1 Overview 
+
+M2E-Point is the main point-based baseline developed for M 2E-UAV. It keeps each event packet as a sampled [x, y, t, p ] point set, extracts local event geometry with EdgeConv, predicts event-level UAV foreground scores, and converts the predicted foreground cluster into a detection-style box using DBSCAN. M 2E-Point + IMU is an optional analysis variant that uses synchronized IMU measurements to modulate the global event feature through lightweight FiLM conditioning. The design is motivated by a representation mismatch in onboard motion-on-motion event packets. Ego-motion activates dense structured background events along buildings, vegetation, and horizon boundaries, whereas the tiny UAV often appears as a sparse local event cluster. M 2E-Point therefore preserves sparse event evidence and models local point geometry directly, while treating IMU as an auxiliary analysis cue rather than the central contribution. Figure 4 summarizes this pipeline. 64.2 Event and IMU representation 
+
+An event packet is represented as an unordered point set. For event i, M 2E-Point uses the normalized input feature 
+
+ei = [¯ xi, ¯yi, ¯ti, ¯pi], ¯xi = xi
+
+1280 , ¯yi = yi
+
+720 . (2) Timestamps are normalized within each sampled packet to ¯ti ∈ [0 , 1] by subtracting the packet minimum timestamp and dividing by the packet time span when the span is nonzero. Polarity is mapped to ¯pi ∈ {− 1, 1}. Coordinate normalization makes the two image axes numerically comparable, timestamp normalization removes packet-duration scale, and polarity remapping gives a signed event attribute. This representation preserves the spatial location, packet-level timing, and polarity of each event without collapsing the packet into a dense image, which is useful when the UAV occupies only a small sparse event cluster. The synchronized IMU input is used only by the M 2E-Point + IMU analysis variant. It is a 10-D vector containing orientation, angular velocity, and linear acceleration: 
+
+u = [ qw, q x, q y , q z , ω x/5.0, ω y /5.0, ω z /5.0, a x/20 .0, a y /20 .0, a z /20 .0] . (3) The quaternion entries are used directly, while angular velocity and linear acceleration are scaled by 5.0 and 20.0, respectively, to keep the inertial channels in a numerically stable range for the conditioning MLP. 
+
+4.3 Packet sampling strategy 
+
+Each packet is converted to a fixed-size point set of 8192 sampled events. The sampler prioritizes positive UAV events whenever they are available, and background events fill the remaining budget. Training uses random sampling, while validation uses deterministic sampling with a fixed seed. This foreground-preserving sampling rule prevents rare UAV events from disappearing during fixed-size point sampling. 
+
+4.4 Local event encoder 
+
+The event branch encodes local event geometry with two EdgeConv blocks [ 17 ]. Given event features, EdgeConv constructs local graph features from an event and its neighbors, applies a shared MLP, and aggregates neighborhood responses by max pooling. EdgeConv models local event geometry because neighboring events around a tiny UAV can form a compact sparse structure even when the full packet is dominated by ego-motion-induced background events. The first EdgeConv block maps the 4-D event input to 64 channels, and the second maps 64 channels to 128 channels: 
+
+{ei}8192  
+
+> i=1
+
+→ { h(1)  
+
+> i
+
+∈ R64 }8192  
+
+> i=1
+
+→ { h(2)  
+
+> i
+
+∈ R128 }8192  
+
+> i=1
+
+. (4) A 1 × 1 convolution maps the 128-D local feature to 256 channels, and global max pooling produces a packet-level event feature g ∈ R256 . The local EdgeConv features are preserved for point-wise foreground scoring, so sparse target evidence can remain available after packet-level aggregation. 
+
+4.5 IMU-conditioned FiLM modulation 
+
+M2E-Point + IMU uses the same event encoder as M 2E-Point and adds a lightweight FiLM modulation branch for analysis. Because IMU is a packet-level motion cue rather than an event-wise measurement, M2E-Point + IMU uses it to modulate the global event feature instead of concatenating it to every event point. The conditioning MLP maps u to FiLM parameters [11]: 
+
+[γ(u), β (u)] = MLP( u), γ(u), β (u) ∈ R256 . (5) The global event feature is then modulated as 
+
+˜g = g ⊙ (1 + γ(u)) + β(u). (6) This is the only fusion step in the optional IMU-conditioned variant. The IMU branch does not overwrite local event neighborhoods; it applies a learned affine adaptation to the global packet representation while keeping the local event geometry pathway unchanged. 74.6 Point-wise foreground scoring and event-to-box conversion 
+
+For M 2E-Point, the packet feature g is broadcast to every sampled event and concatenated with the 128-D local EdgeConv feature. For M 2E-Point + IMU, the modulated packet feature ˜g is broadcast in the same way. The prediction head outputs one UAV foreground logit zi for each sampled event, and the foreground probability is si = σ(zi).For detection-style evaluation, event foreground probabilities are thresholded at 0.5. The selected foreground events are clustered in image coordinates with DBSCAN using ϵ = 15 .0 pixels and 
+
+min _samples = 3 . The largest valid non-noise cluster is converted to an axis-aligned bounding box. This conversion matches the benchmark supervision and evaluation protocol: training uses event-level foreground labels, while evaluation reports detection-style boxes derived from predicted foreground clusters. 
+
+4.7 Loss and training objective 
+
+The point-based baselines are trained with event-level binary foreground labels. For sampled event labels yi ∈ { 0, 1} and logits zi, the main-result objective is 
+
+L = Lfocal (z, y ; α = 0 .95 , γ = 2 .0) + 1 .0 LDice (z, y ). (7) The focal term uses α = 0 .95 and γ = 2 .0, and the Dice term uses dice _weight = 1 .0. With 
+
+pi = σ(zi), pt,i = yipi + (1 − yi)(1 − pi), and αt,i = αy i + (1 − α)(1 − yi), the focal term is 
+
+Lfocal = − 1
+
+Ns
+
+X
+
+> i
+
+αt,i (1 − pt,i )γ log pt,i , (8) where i indexes sampled events in a fixed-size packet and Ns is the number of sampled points. The loss is therefore averaged over sampled points to keep a consistent scale across packets; in our fixed-size sampling protocol, Ns = 8192 balances computational efficiency, memory, and retention of rare UAV events through foreground-preserving sampling. The Dice term is computed on foreground probabilities as 
+
+LDice = 1 − 2 P 
+
+> i
+
+piyi + ϵ
+
+P 
+
+> i
+
+pi + P 
+
+> i
+
+yi + ϵ , (9) with ϵ used only for numerical stability. This focal-plus-Dice objective is the final main-result loss. It is used because UAV foreground events are sparse relative to the dominant background event population, so the training objective must emphasize rare positive events while still encouraging overlap between predicted and labeled foreground sets. 
+
+## 5 Experiments 
+
+5.1 Reporting protocol 
+
+This submission uses the train/validation split described in Section 3.3 and Table 1. The M 2E-Point baselines are trained with AdamW, cosine annealing, batch size 16, 8,192 sampled events per packet, and 50 epochs; additional implementation and compute details are provided in Appendix B. The checkpoint is selected according to validation performance. Under this split, the validation set serves two purposes: checkpoint selection and validation-stage reporting. We report validation-split results and leave held-out test evaluation to a separate benchmark release. The following benchmark and variant tables report validation-split evidence under a unified protocol. 
+
+5.2 Benchmark comparison protocol 
+
+Table 3 reports representative baselines evaluated under the unified validation protocol. The baseline set spans event-frame, event-tensor, and event-point representations: YOLOv10 on event images covers a dense image-style detector applied to event accumulations [ 14 ]; RVT and SAST cover recurrent and sparse event-detector families [ 4, 10 ]; KPConv, RandLA-Net, and COSeg cover point-set modeling directions [ 1, 5, 13 ]; M 2E-Point isolates the event branch without inertial conditioning; and M 2E-Point + IMU measures the corresponding IMU-conditioned variant. 8Table 3: Benchmark comparison on the validation split. Best results are shown in bold , and second-best results are underlined. Method Representation F1 ↑ mAP50 ↑ mAP50-95 ↑                                    
+
+> YOLOv10 Event frame 0.7283 0.6349 0.2566 RVT [4] Voxel grid 0.8643 0.8186 0.3815 SAST [10] Voxel grid 0.6815 0.5519 0.3285 EV-UAV [2] Point set 0.0863 0.3761 0.1512 KPConv [13] Point set 0.4741 0.4289 0.2550 RandLA-Net [5] Point set 0.3880 0.0228 0.0117 COSeg [1] Point set 0.6254 0.5920 0.3124 M2E-Point Point set 0.9673 0.7491 0.5501 M2E-Point + IMU (ours) Point set + IMU 0.9671 0.7539 0.5561
+
+Table 4: Variant analysis of M 2E-Point on the validation split. Best results are shown in bold ,and second-best results are underlined. Variant IoU ↑ F1 ↑ mAP50 ↑ mAP50-95 ↑                
+
+> M2E-Point 0.9366 0.9673 0.7491 0.5501 M2E-Point + IMU 0.9363 0.9671 0.7539 0.5561
+> M2E-Point + IMU w/o FiLM 0.9355 0.9667 0.7209 0.5062 M2E-Point w/o EdgeConv 0.3718 0.5421 0.2059 0.1637
+
+The benchmark comparison shows a clear representation effect. Frame and tensor baselines provide useful coarse localization, with RVT achieving the strongest mAP50, but stricter mAP50-95 remains lower. Generic point-set transfers are weaker, while M 2E-Point provides a strong point-set baseline. The IMU-conditioned variant gives only marginal aggregate gain, indicating that representation choice is currently more influential than simple global inertial conditioning. 
+
+5.3 Analysis Variant analysis. Table 4 compares the point-only, IMU-conditioned, and diagnostic variants under the same validation protocol. The point-only baseline gives the highest IoU and F1, while the IMU-conditioned variant slightly improves mAP50 and mAP50-95; the large drop of the EdgeConv-free variant highlights the importance of local event geometry. 
+
+Qualitative analysis. Figure 5 visualizes one representative M 2E-Point + IMU packet from point-level foreground scoring to DBSCAN-based target selection. The example shows that high foreground scores concentrate near the tiny UAV and yield a compact detection-style box under nearby ego-motion clutter. 
+
+Figure 5: Detailed packet-level visualization of point-level prediction and clustering. Foreground-score colors indicate the model-estimated UAV foreground probability for each sampled event, from low-score blue/green points to medium-score yellow points and high-score red/purple points. In the DBSCAN view, light gray points are sampled inference points, dark gray or black points are unclustered foreground candidates, colored points denote DBSCAN clusters, and the highlighted cluster is selected as the target cluster. The lower row zooms into the tiny-UAV region to show sparse target evidence and nearby clutter. 96 Conclusion 
+
+We presented M 2E-UAV, a large synchronized event-IMU benchmark for onboard motion-on-motion event-based tiny UAV detection, with event-level UAV supervision across four scene families. To-gether with M 2E-Point and M 2E-Point + IMU, the validation split establishes a reference protocol for future event-only and event-IMU comparisons. 
+
+Limitations. M2E-UAV currently focuses on four representative illumination-background regimes and uses a validation-stage protocol to establish the first reference results for onboard motion-on-motion event-based tiny UAV detection. Future releases can further expand the benchmark with more weather, altitude, distance, and target-motion conditions. 
+
+## References 
+
+[1] Zhaochong An, Guolei Sun, Yun Liu, Fayao Liu, Zongwei Wu, Dan Wang, Luc Van Gool, and Serge Belongie. Rethinking few-shot 3d point cloud semantic segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024. [2] Nuo Chen, Chao Xiao, Yimian Dai, Shiman He, Miao Li, and Wei An. Event-based tiny object detection: A benchmark dataset and baseline. In Proceedings of the IEEE/CVF International Conference on Computer Vision , 2025. [3] Guillermo Gallego, Tobi Delbruck, Garrick Orchard, Chiara Bartolozzi, Brian Taba, Andrea Censi, Stefan Leutenegger, Andrew J. Davison, Jorg Conradt, Kostas Daniilidis, and Davide Scaramuzza. Event-based vision: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence , 44(1):154–180, 2022. [4] Mathias Gehrig and Davide Scaramuzza. Recurrent vision transformers for object detection with event cameras. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023. [5] Qingyong Hu, Bo Yang, Linhai Xie, Stefanos Rosa, Zixiang Guo, Zhizhong Wang, Niki Trigoni, and Andrew Markham. Randla-net: Efficient semantic segmentation of large-scale point clouds. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020. [6] Gabriele Magrini, Federico Becattini, Giovanni Colombo, and Pietro Pala. Ev-flying: An event-based dataset for in-the-wild recognition of flying objects. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) , pages 4947–4955, 2025. doi: 10.1109/ CVPRW67362.2025.00487. [7] Gabriele Magrini, Federico Becattini, Pietro Pala, Alberto Del Bimbo, and Antonio Porta. Neuromorphic drone detection: An event-rgb multimodal approach. In Computer Vision – ECCV 2024 Workshops ,volume 15646 of Lecture Notes in Computer Science , pages 259–275. Springer, 2025. doi: 10.1007/ 978-3-031-92460-6_16. [8] Gabriele Magrini, Niccolò Marini, Federico Becattini, Lorenzo Berlincioni, Niccolò Biondi, Pietro Pala, and Alberto Del Bimbo. Fred: The florence rgb-event drone dataset. In Proceedings of the 33rd ACM International Conference on Multimedia , pages 13170–13176, 2025. doi: 10.1145/3746027.3758271. [9] Jakub Mandula, Jonas Kühne, Luca Pascarella, and Michele Magno. Towards real-time fast unmanned aerial vehicle detection using dynamic vision sensors. In Proceedings of the 2024 IEEE International Instrumentation and Measurement Technology Conference (I2MTC) , pages 1–6, 2024. doi: 10.1109/ I2MTC60896.2024.10561168. [10] Yansong Peng, Hebei Li, Yueyi Zhang, Xiaoyan Sun, and Feng Wu. Scene adaptive sparse transformer for event-based object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024. [11] Ethan Perez, Florian Strub, Harm de Vries, Vincent Dumoulin, and Aaron Courville. Film: Visual reasoning with a general conditioning layer. In Proceedings of the AAAI Conference on Artificial Intelligence , 2018. [12] Timo Stoffregen, Guillermo Gallego, Tom Drummond, Lindsay Kleeman, and Davide Scaramuzza. Event-based motion segmentation by motion compensation. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , pages 7244–7253, 2019. [13] Hugues Thomas, Charles R. Qi, Jean-Emmanuel Deschaud, Beatriz Marcotegui, Francois Goulette, and Leonidas J. Guibas. Kpconv: Flexible and deformable convolution for point clouds. In Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019. 
+
+10 [14] Ao Wang, Hui Chen, Lihao Liu, Kai Chen, Zijia Lin, Jungong Han, and Guiguang Ding. Yolov10: Real-time end-to-end object detection. arXiv preprint arXiv:2405.14458 , 2024. [15] Xiao Wang, Jianing Li, Lin Zhu, Zhipeng Zhang, Zhe Chen, Xin Li, Yaowei Wang, Yonghong Tian, and Feng Wu. Visevent: Reliable object tracking via collaboration of frame and event flows. IEEE Transactions on Cybernetics , 54(3):1997–2010, 2024. doi: 10.1109/TCYB.2023.3318601. [16] Xiao Wang, Shiao Wang, Chuanming Tang, Lin Zhu, Bo Jiang, Yonghong Tian, and Jin Tang. Event stream-based visual object tracking: A high-resolution benchmark dataset and a novel baseline. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , pages 19248–19257, 2024. [17] Yue Wang, Yongbin Sun, Ziwei Liu, Sanjay E. Sarma, Michael M. Bronstein, and Justin M. Solomon. Dynamic graph cnn for learning on point clouds. ACM Transactions on Graphics , 38(5):146:1–146:12, 2019. [18] Yabin Zhu, Xiao Wang, Chenglong Li, Bo Jiang, Lin Zhu, Zhixiang Huang, Yonghong Tian, and Jin Tang. Crsot: Cross-resolution object tracking using unaligned frame and event cameras. IEEE Transactions on Multimedia , 27:6529–6542, 2025. doi: 10.1109/TMM.2025.3586135. 
+
+11 A Additional Dataset Details 
+
+Dataset statistics. The processed synchronized event-IMU files occupy 21.4 GB in total. The annotated UAV boxes have an average size of 22 .91 × 11 .90 pixels, corresponding to only 0.0296% 
+
+of the 1280 × 720 image area. This quantitatively reflects the tiny-target nature of M 2E-UAV. Table 5 reports the hardware configuration used for data collection. Table 5: Hardware configuration of the M 2E-UAV data-collection platform. Component Specification Carrier UAV DJI Matrice 300 RTK Target UAV DJI Mini 2, 159 × 203 × 56 mm Event camera SilkyEvCam HD, IMX636 CMOS sensor, 8 mm lens IMU FDI Systems DETA100D4G Synchronization STM32-based trigger synchronization board Each event sample stores arrays for x, y, timestamp, polarity, and event-level foreground label. Each IMU sample stores one orientation quaternion, one angular velocity vector, and one linear acceleration vector. The train and validation splits contain fully matched event and IMU files. 
+
+## B Training and Evaluation Details 
+
+Training uses batch size 16, 8,192 sampled events, AdamW with learning rate 10 −3, cosine annealing, and 50 epochs. During validation, the dataloader uses deterministic sampling with a fixed seed. All reported baseline experiments are conducted on a single NVIDIA RTX 4090 GPU. Training M 2E-Point + IMU for 50 epochs takes approximately 20 hours. Table 6 summarizes the implementation settings used for the reported validation-stage result. Table 6: Implementation details used for the validation-stage M 2E-Point + IMU result.                        
+
+> Item Current setting Event representation Normalized [x, y, t, p ]point set Sampled events per packet 8,192 IMU representation Quaternion, angular velocity / 5.0, linear acceleration / 20.0 Optimizer AdamW Learning rate 10 −3
+> Epochs 50 Compute hardware Single NVIDIA RTX 4090 GPU Training time Approximately 20 hours for M 2E-Point + IMU, 50 epochs Loss Focal loss + Dice loss; α= 0 .95 ,γ= 2 .0,dice _weight = 1.0
+> Foreground threshold 0.5 Box derivation DBSCAN with ϵ= 15 .0pixels and min _samples = 3 ;largest cluster to bounding box
+
+12

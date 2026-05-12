@@ -1,0 +1,367 @@
+Title: Neuromorphic Monocular Depth Estimation with Uncertainty Modeling
+
+URL Source: https://arxiv.org/pdf/2605.10675v1
+
+Published Time: Tue, 12 May 2026 02:44:26 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# Neuromorphic Monocular Depth Estimation with Uncertainty Modeling 
+
+1st Viktor Bergkvist 
+
+Swedish Defence Research Agency 
+
+Link¨ oping, Sweden viktor.bergkvist@foi.se 
+
+2nd Felix Rydell 
+
+Swedish Defence Research Agency 
+
+Kista, Sweden felix.rydell@foi.se 
+
+3rd Per-Erik Forss´ en 
+
+Link¨ oping University 
+
+Link¨ oping, Sweden per-erik.forssen@liu.se 
+
+4th David Gustafsson 
+
+Swedish Defence Research Agency 
+
+Link¨ oping, Sweden david.gustafsson@foi.se 
+
+5th Johan Rideg 
+
+Swedish Defence Research Agency 
+
+Link¨ oping, Sweden johan.rideg@foi.se 
+
+Abstract —Event cameras offer distinct advantages over con-ventional frame-based sensors, including microsecond-level tem-poral resolution, high dynamic range, and low bandwidth. In this paper, we predict per-pixel depth distributions from monocular event streams using deep neural networks. We es-timate uncertainty using Gaussian, log-normal, and evidential learning frameworks. We compare six event representations: spatio-temporal voxel grids with 1, 5, 10, and 20 temporal bins, the Compact Spatio-Temporal Representation (CSTR), and Time-Ordered Recent Event (TORE) volumes. Our U-Net-based models are trained on synthetic data and then fine-tuned on real sequences. We evaluate performance using absolute relative error, root mean squared error, and the area under the sparsification error. Quantitative results show that the representations perform similarly, while 10 bin log-normal and 5 bin evidential learning perform best across metrics. Our experiments demonstrate that uncertainty estimation can be successfully integrated into event-based monocular depth estimation, and be used to indicate pixels with reliable depth. 
+
+Index Terms —Event Camera, Monocular, Depth Estimation, Uncertainty Quantification. 
+
+I. I NTRODUCTION 
+
+Camera based depth estimation is a fundamental computer vision problem with many practical applications. It is an en-abling technique for localization, path planning, and collision avoidance, which in turn are used for autonomous systems, including self-driving vehicles and robotics, and augmented reality platforms. However, in many real-world scenarios, conventional frame-based cameras struggle under challenging lighting conditions and highly dynamic environments, where motion blur and limited dynamic range can degrade depth estimation performance. Event cameras provide a promising alternative to con-ventional frame-based sensors for depth estimation. These devices are built on a relatively recent imaging technology inspired by biological vision systems [1]. Unlike traditional cameras, event cameras operate asynchronously: each pixel independently monitors changes in brightness and triggers an 
+
+event whenever a significant intensity variation is detected. This sensing principle offers several benefits. For instance, event cameras provide microsecond-level temporal resolution, enabling the capture of fast motion without inducing blur. Because each pixel acts independently, event cameras achieve very low latency, without the need to wait for a global shutter or exposure cycle. Furthermore, they exhibit an exceptionally high dynamic range, which allows them to operate more effectively across challenging lighting conditions. Monocular depth estimation infers scene depth collected from a single camera, which is particularly relevant for small surveillance drones, where mounting multiple cameras suffi-ciently far apart to provide a meaningful stereo baseline is often impractical. To the best of our knowledge, we are the first to do monoc-ular depth estimation with uncertainty using event cameras. We train neural networks to predict depth by optimizing one of three per-pixel probabilistic models: Gaussian, log-normal, and evidential distributions. These approaches are compared against a model trained on grayscale images and a baseline depth estimation model that predicts depth without uncertainty. Due to the asynchronous and sparse nature of event data, methods developed for frame-based cameras cannot be applied directly to event data. Instead, one typically converts the raw event stream into an event representation that makes the input compatible with existing deep learning architectures. We consider and compare six event representations: spatio-temporal voxel grids with varying temporal bin sizes [2], [3], the compact spatio-temporal representation (CSTR) [4], and time-ordered recent event volumes (TORE) [5]. Supervised depth prediction requires a large amount of annotated event data. Obtaining such ground-truth data at scale is often impractical [6]. One strategy to circumvent limited data is to pretrain on simulated data and fine-tune on real data. In our work, we leverage the BlinkVision synthetic indoor video dataset by Li et al., which provides pixel-perfect ground-truth depth [7]. All scenes are rendered entirely in Blender 1.Event data for these videos is then generated using the physics-
+
+> 1https://www.blender.org/
+> arXiv:2605.10675v1 [cs.CV] 11 May 2026
+
+based DVS-Voltmeter simulator, which models the circuitry of a real dynamic vision sensor and is chosen for its realistic noise characteristics [8]. We fine-tune our depth estimation models on a real-world dataset to expose them to realistic noise and domain shift [9]. We consider the indoor setting in this paper, due to the convenience of finite depths. 
+
+Contributions 
+
+Our main contributions are listed as follows:  
+
+> •
+
+Uncertainty estimation: We compare three different uncertainty models for depth estimation: Gaussian, log-normal, and an evidential learning approach. These ex-hibit similar performance across the board, although the results depend on the choice of event representation.  
+
+> •
+
+Event representations: We compare six different event representations for monocular depth estimation: spatio-temporal voxel (1, 5, 10, 20 bins), CSTR, and TORE. Our experiments suggest that each representation is a valid choice for depth estimation, although performance varies depending on the uncertainty model. 
+
+Organization 
+
+This paper is structured as follows. In Section II, we explore related work. In Section III, we define the different event representations and the model architecture we use, as well as training details. In Section IV, we explain the experiments we conduct. In Section V, we present the qualitative and quantitative results. Additional results are provided in the Supplementary Material. Finally, in Section VI, we summarize and conclude the paper. II. R ELATED WORK 
+
+A. Geometric-based multiview depth estimation from events 
+
+Early approaches to depth estimation with event cameras rely on adapting the asynchronous event data for classical geometric methods, i.e., feature matching, pose estimation, and triangulation. These typically produce sparse or semi-dense depth measurements rather than full dense depth maps [3]. To match events, some authors use standard stereo vision tech-niques applied to synthetic frames created by accumulating events over time [10], while others leverage the simultaneous and temporal correlation of events detected across the different sensors [11], [12]. Rebecq et. al. [13] introduced an event-based multi-view stereo algorithm that accumulates events on a depth volume, assuming the cameras’ motions are known. Another strategy is to compute optical flow and convert it to depth via motion equations. Gallego et al. [14], [15] proposed a contrast maximization framework, where a hy-pothesized optical flow is evaluated by how sharply it warps events into an image. Contrast maximization has, however, exhibited a tendency to overfit [2]. Shiba et al. [16] tackle this problem by partitioning the image into tiles and introducing a multi-reference focus loss that averages edge sharpness over three timestamps, ensuring that motion-compensated images remain sharp. Inspired by DTAM [17], Zhou et al. [18] proposed to max-imize photometric consistency by optimizing a certain energy function in a stereo setting. Their algorithm produces a semi-dense reconstruction by exploiting spatio-temporal consistency of events triggered across both image planes. Cai and Bideau [19] propose a region-based monocular depth estimation using an active vision approach, mimicking biological gaze stabilization. 
+
+B. Learning-based monocular depth estimation from events 
+
+Deep learning has enabled a shift from sparse, geometric methods toward dense monocular depth prediction using event data. Broadly speaking, current approaches fall into three categories: fully supervised networks trained on paired event-and depth data, multimodal fusion architectures that combine events with for example IMU data, and self-supervised meth-ods that exploit physical consistency in the event stream. In [2], Zhu et al. developed an unsupervised framework that simultaneously predicts optical flow, ego-motion, and sparse depth from the events. Their method introduced a discretized event volume (voxel grid) representation that captures the spatio-temporal distribution of events. Hidalgo-Carrio, Gehrig, and Scaramuzza introduced E2Depth, a supervised approach using recurrent encoder-decoder model (based on the U-Net architecture [20]) with ConvLSTM layers that process a spatio-temporal voxel grid of events [3] that was trained on a large synthetic dataset. We choose this model as the baseline for our paper, because it is the only method that uses depth supervision and is purely event based. Another supervised method by Gehrig et al. [21] used an asynchronous recurrent network that integrated both event streams (as voxel grids) and regular intensity frames. Departing from purely data-driven approaches, Meng et al. utilize sensor ego-motion [22], constructing a cost volume based on the sharpness of Image of Warped Events (IWE) across various depth hypotheses. Bartolomei et al. [23] make use of a Vision Foundation Model to create synthetic depth data and to train an event-based student model with a recurrent transformers-based ar-chitecture. Like us they also fine-tune on MVSEC [9]. III. M ETHODOLOGY 
+
+First, we briefly describe the different event representations used in this paper. Second, we present the model architecture we use to predict depth and uncertainty. 
+
+A. Event representations 
+
+Consider an event camera image plane of size H × W .An event ek = ( uk, t k, p k) consists of a pixel position uk ∈
+
+H × W , a timestamp tk ∈ R, and a polarity pk ∈ {− 1, +1 }.Suppose that I(uk, t k) denotes the light intensity at pixel uk
+
+at time tk, and let ∆t denote the time since the last event in that pixel. In a noise-free scenario, the event is triggered if the brightness increment since its last event 
+
+∆ log I(uk, t k) := log I(uk, t k) − log I uk, t k − ∆tk
+
+, (1) 
+
+> Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026
+
+reaches a signed threshold pkC, for some C > 0, meaning that 
+
+∆ log I(uk, t k) = pkC [1]. The polarity pk indicates whether the brightness increased or decreased. An event batch E =
+
+{(ui, t i, p i)} is a collection of events over a time-window ∆T .Below we present three event representations, which provide useful structure, but inevitably result in information loss. We use the notation 1x=y to be 1 precisely when x = y holds and 0 otherwise. 
+
+Spatio-temporal voxel grids. The idea of voxel grids is to divide a time-window into bins and simply count events in those, normalizing with respect to time [2], [3]. In this direction, partition the time-window ∆T into equally sized temporal bins indexed by b ∈ {0, 1, . . . , B − 1}. For atimestamp ti, the bin function kb(ti) := max(0 , 1 − | b − t∗ 
+
+> i
+
+|),where t∗ 
+
+> i
+
+= B−1∆T (ti − t0) is the normalized time, is 0 for any 
+
+t that is outside the interval [b, b + 1] . Inside a bin, kb(ti)
+
+tells us how far away ti is from the bin end time. Using this bin function, we define the spatio-temporal voxel grid as the 
+
+B × H × W -tensor 
+
+E(b, u) = 
+
+> N
+
+X
+
+> i=1
+
+pi1u=ui kb(ti). (2) The use of spatio-temporal voxel grids have two primary challenges. First, generating spatio-temporal voxel grids can be computationally demanding. Second, using voxel grids may lead to high memory requirements due to high input dimensionality [13], [24]. 
+
+Compact spatio-temporal representation (CSTR). In con-strast to voxel grids, CSTR does not bin events temporally, but more clearly distinguishes between negative and positive polarities. Consider the per-polarity event count C(u, p ) and the normalized event counts ˆC(u):
+
+C(u, p ) := 
+
+> N
+
+X
+
+> i=1
+
+1ui=u1pi=p,
+
+ˆC(u) := C(u, −1) + C(u, +1) max u{C(u, −1) + C(u, +1) } .
+
+(3) We further define the sum of normalized timestamps S(u, p )
+
+and the pixel-wise mean normalized timestamp ¯Ts(u, p ) for each polarity: 
+
+S(u, p ) := 
+
+> N
+
+X
+
+> i=1
+
+1ui=u1pi=p
+
+ti − t0
+
+∆T ,
+
+¯Ts(u, p ) := 
+
+
+
+S(u, p )
+
+C(u, p ) , C(u, p )̸ = 0 ,
+
+0, otherwise .
+
+(4) Finally, the CSTR is constructed by concatenating the two polarity-specific mean-timestamp channels with the normal-ized event-count channel [4]: 
+
+CSTR( u) :=  ¯Ts(u, +1) ˆC(u) ¯Ts(u, −1)  , (5) yielding a compact 3 × H × W tensor. Flickering light sources and hot pixels can heavily affect the normalized event-count channel, still, CSTR preserves temporal context under high event overlap and remains directly compatible with off-the-shelf three-channel architectures. 
+
+Time-ordered recent event (TORE) volumes. Time sur-faces are H × W matrices where each entry encodes the time of the latest event at that location. Time-ordered recent event (TORE) volumes generalize these by storing the times of the 
+
+K latest events, and making a distinction between polarity [5]. In more detail, for a fixed polarity p and pixel u, let tk be time of the k-th most recent event at u of polarity p at time 
+
+t. The TORE volume is then defined as the 2 × K × H × W
+
+tensor 
+
+TORE( p, k, u) := log( t − tk + 1) . (6) To manage noise and computational efficiency, these values are clipped from below by log( τ ′) and from above by log( τ ),for some τ, τ ′.
+
+B. Neural network architecture 
+
+The depth prediction model we use is a recurrent encoder-decoder framework inspired by [3], structured similarly to U-Net [20]. The input event data representation first passes through a convolutional head layer, producing an initial feature map with 32 channels. Following that, the architecture consists of three recurrent convolutional encoder layers, each composed of a downsampling convolution with a kernel size of 5 and stride of 2, followed by a ConvLSTM module with a kernel size of 3. Each encoder layer doubles the number of feature channels from the previous layer, resulting in a final encoded representation of 256 channels. See Figure 1. Following the encoder layers, two residual blocks are applied, each using convolutional operations with a kernel size of 3 and including summation over skip connections to facilitate gradient flow and feature refinement. Afterward, the architecture includes three decoder layers, each performing bilinear upsampling followed by convolutional refinement with a kernel size of 5. Symmetric skip connections with summation are used between corresponding encoder and decoder layers to enhance the preservation of spatial information. Finally, the output is produced by a convolution whose number of channels depends on the uncertainty formulation and a kernel size of 1. For Gaussian and log-normal models the network predicts two channels corresponding to the depth estimate and an uncertainty parameter, while the evidential model predicts four channels representing the parameters of a Normal–Inverse-Gamma distribution. The network is unrolled for 20 time steps to capture temporal coherence from the asyn-chronous event stream. ReLU activations are used throughout, except for the final prediction layer. The networks predict depth directly in metric units, and the ground-truth depths from the dataset are used without normalization during training. This simplifies the interpretation of both predicted depths and uncertainty estimates. In contrast, the network in [3] predicts a normalized log-depth map 
+
+ˆDk ∈ [0 , 1] W ×H , which is converted to metric depth through the following mapping: 
+
+ˆDm,k = Dmax e(−α(1 − ˆDk )) . (7)  
+
+> Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026 Fig. 1. Overview of the network architecture used for predicting depth and uncertainty. The blue arrows denote skip connections.
+
+In our experiments, we retain this formulation for the E2Depth baseline, using Dmax = 35 and α = 8 , which were chosen to better suit the indoor depth range considered in this work. 
+
+C. Uncertainty prediction and loss functions 
+
+Three different depth distribution prediction networks are trained by optimizing the losses below. In our experiments, they are compared to the E2Depth [3] approach, which min-imizes squared depth errors, the sum of depth errors, and a multi-scale gradient-matching loss. 
+
+Gaussian depth estimation. The Gaussian depth estimation predicts mean μk(θ) and standard deviation σk(θ) > 0 (we apply softplus to enforce positivity throughout), with objective 
+
+fGD (θ, k ) := 1
+
+σk(θ)√2π e− (yk −μk (θ)) 2  
+
+> 2σk(θ)2
+
+. (8) Depth is estimated as μk(θ) and variance as σ(θ)2.
+
+Log-normal depth estimation. Depth cannot be negative, therefore log-normal depth estimation network is a natural alternative. It outputs μk(θ) and scale σk(θ) > 0, with objective 
+
+fLD (θ, k ) := 1
+
+ykσk(θ)√2π e− (log yk −μk (θ)) 2  
+
+> 2σk(θ)2
+
+. (9) The depth is estimated as the mean eμk (θ)+ σk (θ)2/2 of the log-normal distribution, and the variance is (eσk (θ)2
+
+−
+
+1) e2μk (θ)+ σk (θ)2
+
+.
+
+Evidential depth estimation. There are essentially two types of errors: aleatoric (inherent in data) and epistemic (due to model). Evidential deep learning (EDL) constitutes an attempt to separate these two uncertainties [25]. Our evidential approach estimates four parameters: location m(θ), evidence 
+
+κ(θ) > 0, confidence about variance α(θ) > 1, and level of noise β(θ) > 0. In this case, the objective is 
+
+fED (θ, k ) := fStudent −t(yk | location , scale , ν df ), (10) where location = m, scale = 
+
+q β(1+ κ) 
+
+> κα
+
+, and νdf = 2 α.Depth is estimated as the mean m, and the variance is estimated as βκ(α−1) . We interpret βα−1 as the aleatoric error and βκ(α−1) as the epistemic error. Evidential deep learning has previously been used for monocular depth estimation using RGB frames [26]. For the probabilistic objectives fGD , fLD , and fED , we minimize the negative-loglikelihood during training: 
+
+L = − 1
+
+N
+
+> N
+
+X
+
+> k=1
+
+log f (θ, k ). (11) In the evidential learning case, we add a term λ|yk − m|(2 κ +
+
+α), for λ = 0 .25 , which heavily penalizes the objective if 
+
+|yk − m| is big, and guides the network to output small κ
+
+when predictions are poor or data is scarce. IV. E XPERIMENTS 
+
+We predict per-pixel depth distributions from event data by training the networks described in Section III-B in two stages. First we train on a synthetic dataset, and second we fine-tune on real data. We use the loss functions described in Section III-C. For the log-normal loss, we consider all event representations to be able to compare and contrast the performance of the different representations. For the Gaussian and evidential approaches, we restrict to 5 bin and CSTR, while for E2Depth, we restrict to 5 bin only. We train the E2Depth baseline using the same synthetic pretraining and MVSEC fine-tuning protocol as the proposed models, rather than using an external pretrained checkpoint. Since the real dataset contains grayscale images, we also train a model on these using the log-normal loss. The models are evaluated using two error measurements for depth prediction and two error measurements for the uncertainty modelling. We describe datasets, data preprocessing, and evaluation metrics below. All experiments were implemented in PyTorch and were conducted on a workstation equipped with an Intel Core Ultra 9 285K CPU, 96 GB of RAM, and an NVIDIA RTX 5090 GPU. Training was run for 200 epochs with a batch size of 20 and with the Adam optimizer [27]. The models are first trained on synthetic data with learning rate 10 −4. During fine-tuning on real data the learning rate is reduced to 10 −5 and weight decay of 10 −5 is applied. 
+
+> Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026
+
+A. Datasets 
+
+BlinkVision. BlinkVision provides photorealistic simulated renderings [7]. It contains 24 indoor sequences of length ranging from 10 to 25 seconds. We use 20 sequences for training and 4 for validation. For every rendered viewpoint the dataset has an HDR RGB frame, a metric depth map as well as several other modalities (normals, object masks, etc.). Each sequence is internally sampled and interpolated to a higher frame rate for the event generation. Event streams for the sequences are generated with the physics-based DVS-Voltmeter simulator, chosen for its realistic noise model [8]. In some frames, we have observed that isolated pixels or groups of pixels have falsely high values far beyond the scene range, while at geometric discontinuities depth is occasionally reported as exactly zero. The choice of parameter Dmax = 35 
+
+clips all synthetic depths, helps mitigate the former issue. In addition, we mask out zero-valued pixels during both training and evaluation. 
+
+MVSEC indoor. The indoor-flying sequences of the Multi Vehicle Stereo Event Camera (MVSEC) dataset provide real-world event and depth data captured in a motion-capture arena [9]. The scenes typically depict a room with objects such as barrels and chairs. The sequences are captured by a hexacopter carrying a stereo DAVIS-346B rig (event cameras) and a Velodyne Puck LITE LiDAR ( 360 ◦ horizontal FOV, 30 ◦
+
+vertical FOV, 20 Hz) mounted overhead. Ground-truth 6 DoF pose is measured at 100 Hz by a Vicon motion-capture system. There are four sequences of length ranging from about 20 to about 94 seconds. 2 are used for training, 1 for validation, and 1 for test (indoor flying 1). MVSEC contains grayscale images, which we also train on to compare results with event data. In contrast to the synthetic data, LiDAR returns are sparse with a limited vertical field of view. 
+
+B. Data preprocessing 
+
+Samples consist of non-overlapping windows of events spanning ∆T = 50 milliseconds, converted into the different representations described in Section IV-A. This means that we use event data from such intervals to estimate depth at the end of the interval. Spatio-temporal voxel grids with different temporal resolutions (1, 5, 10, 20 bins) are generated to explore the impact of temporal resolution on depth prediction performance. The non-zero values in the voxel grids are normalized to have zero mean and unit variance. For the TORE volumes, we fix K = 3 (as in [28]). We consider 
+
+τ = 5 × 10 4 microseconds (this choice differs from [5], but suits our setting better) and we set τ ′ = 150 . The volume of shape 2 × K × H × W is collapsed into 2K × H × W by concatenating the polarity and temporal dimensions. The depth maps and the different event representations from the BlinkVision dataset were spatially downsampled from 
+
+960 ×540 to 480 ×270 , enabling training in a reasonable time. Depth maps were downsampled using nearest-neighbour inter-polation to prevent the interpolation of new depth values, thus retaining discrete depth levels. TORE representations specifi-cally utilized min pooling for downsampling. This choice was intentional to retain the most recent event timestamp in each layer, thereby preserving temporal precision and preventing thin structures or event lines from becoming overly smoothed. Voxel grids and CSTR representations, employed bilinear interpolation for downsampling. Random horizontal flips to both synthetic and real samples are applied to improve generalization. 
+
+C. Metrics for evaluation 
+
+In the Gaussian depth estimation case, assume that yk for 
+
+k = 1 , . . . , N are per-pixel real depth and ˆyk are estimated depths with standard deviation σk. We compute absolute rela-tive errors (AbsRels) and root mean squared errors (RMSEs) as AbsRel := 1
+
+N
+
+> N
+
+X
+
+> k=1
+
+|yk − ˆyk|
+
+yk
+
+,
+
+RMSE := 
+
+vuut 1
+
+N
+
+> N
+
+X
+
+> k=1
+
+(yk − ˆyk)2.
+
+(12) We also consider the Area Under the Sparsification Error (AUSE), which quantifies how well a model’s predicted un-certainty correlates with its prediction errors [29]. Let Err 
+
+denote the mean absolute error (MAE) 1
+
+> N
+
+PNk=1 |yk − ˆyk|. Let 
+
+α ∈ [0 , 1] and define Err pred (α) be the MAE of the (1 − α)-fraction of the dataset with the lowest predicted uncertainty (variance), and Err oracle (α) be the MAE of the corresponding fraction the lowest prediction errors. In symbols, the AUSE is: AUSE =
+
+Z 10
+
+ Err pred (α) − Err oracle (α)Err 
+
+
+
+dα. (13) While the AUSE is effective for comparing the trustworthi-ness of model outputs, it has limitations. It lacks a clear upper bound and its interpretability is relative rather than absolute [29]. In the EDL case, Err pred (α) is computed with respect to the fraction with the lowest predicted epistemic error. V. R ESULTS 
+
+The quantitative results for the different uncertainty models and event representations are summarized in Table I. The table reports error metrics for various combinations of uncertainty models and event representations. For each configuration, we evaluate performance over three pixel subsets: (1) all pixels in the image; (2) only pixels that generated events within the considered time window, denoted by (M), which account for approximately 10 % of all pixels; and (3) the 10 % of pixels with the lowest predicted uncertainty, denoted by (C), selected to match the proportion of event-triggered pixels in (M). Among the log-normal variants, the 10-bin voxel grid achieves the best overall performance. The degradation ob-served with 20 bins could stem from the increased representa-tional complexity of the input, which could make optimization 
+
+> Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026
+
+more challenging within the same training schedule. The CSTR and TORE representations yield comparable results, although TORE shows a slight advantage on the uncertainty-conditioned subset (C). For the Gaussian models, performance appears largely in-dependent of the event representation. However, CSTR yields better results on the (C) metrics compared to the 5-bin voxel grid. This behavior is not observed for the log-normal or EDL formulations. The EDL 5-bin configuration achieves the lowest overall error, although it does not obtain the best AUSE score. In contrast, EDL with CSTR performs comparably to the log-normal model with 20 bins and represents one of the weaker configurations. These results suggest practical trade-offs rather than a single best event representation. Voxel grids provide a simple and effective baseline; in our experiments, intermediate temporal resolution was preferable, with 10 bins performing best for the log-normal model, whereas 20 bins did not improve accuracy despite retaining finer temporal structure. Since no repre-sentation consistently dominates across uncertainty models and metrics, the final choice may depend on system-level constraints such as memory use, inference speed, and the complexity of constructing the representation in the target application. The event-masked metrics (M) provide a coarse test of whether pixels with recent event activity are systematically easier or harder to predict. The gap between dense evalua-tion and event-masked evaluation is relatively small across methods, indicating that predictions on event-generating pixels are broadly representative of predictions over the full valid image. Thus the presence of events at a pixel does not by itself strongly explain prediction quality. This does not rule out finer-grained dependencies such as local event rate or polarity balance. The baseline E2Depth model achieves the best overall performance, with a 21% lower RMSE compared to the log-normal 10-bin configuration. This gap should be interpreted with care: E2Depth predicts depth and includes a multi-scale gradient-matching term, whereas the other models both predict depth and estimate uncertainty. The present experiments do not isolate which of these design choices explain the performance difference. The comparison therefore highlights a trade-off be-tween depth accuracy and uncertainty aware prediction rather than establishing an advantage of a particular loss formulation. The sparsification curves for selected event representations are shown in Figure 2. The Gaussian and log-normal 5-bin variants exhibit noticeable increases in error toward the right end of the curve (i.e., spikes as α → 1), indicating suboptimal ranking of highly uncertain predictions. In contrast, the EDL 5-bin configuration does not display this behavior, suggesting a more reliable ordering in high-uncertainty regions. Among all methods, the log-normal 10-bin model achieves the lowest AUSE, whereas the remaining configurations yield comparable AUSE values. Example depth predictions produced by the different models are shown in Figure 3. For this scene, the visual differences between our methods are subtle, which is consistent with the comparable quantitative performance observed across event representations. The predictions of E2Depth appear visually sharper, likely due to the use of a multi-scale gradient match-ing loss, which explicitly encourages the preservation of fine structural details. Figure 4 compares predicted uncertainty maps across all methods. Black means low standard deviation, or epistemic error, and white means high. Ground truth is the same as in Figure 3. VI. D ISCUSSION AND FUTURE WORK 
+
+The goal of this work has been to develop and evaluate monocular depth estimation networks that predict per-pixel depth together with uncertainty estimates from a single event camera stream. To this end, six event data representations were compared in combination with Gaussian, log-normal, and evidential deep learning (EDL) uncertainty modelling. The models were initially trained on synthetic BlinkVision sequences and subsequently fine-tuned on real data from the MVSEC dataset. Depth and uncertainty estimation perfor-mance were evaluated using absolute relative error (AbsRel), root mean squared error (RMSE), and the area under the sparsification error (AUSE). In our experiments, the log-normal 10-bin and EDL 5-bin configurations achieved the best overall performance, although differences were generally modest. This suggests that the choice of event representation and uncertainty modelling has limited impact on depth accuracy within our experimental setting. Table I further demonstrates that the predicted uncertainty successfully identifies pixels with low depth error. At a 10 % retention rate, RMSE decreases by a factor of 4.8 and AbsRel by a factor of 2 in the log-normal 10-bin setting. Compared to the naive event-mask criterion M (which selects pixels that re-ceived events during the observation window), the uncertainty-based selection reduces AbsRel by approximately 1.5–2x across all tested variants. This indicates that the uncertainty estimates provide a reliable signal for identifying accurate predictions, largely independent of the specific uncertainty model or event representation. Given the relatively small differences in raw accuracy across event representations, practical considerations such as inference speed, memory consumption, and suitability for real-time deployment may ultimately be the most decisive factors when selecting a representation for practical use. A systematic evaluation of these aspects is left for future work. From this perspective, it would also be valuable to explore additional event representations beyond those considered here. Promising alternatives include the Rasterized Event Point Cloud (RasEPC) and the Decoupled Event Voxel (DEV) [30]. Stacked TORE volumes also represent an interesting direction for further investigation [28]. Finally, it can be noted that our predicted depth maps tend to be smooth, whereas actual depth is piecewise smooth , with sharp depth discontinuities. Earlier work has addressed this by 
+
+> Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026
+
+Method Repr. AbsRel RMSE AUSE AbsRel(M) RMSE(M) AbsRel(C) RMSE(C) Log-normal 1 bin 0.2456 0.7259 0.2294 0.2628 0.6899 0.1613 0.2080 Log-normal 5 bin 0.2015 0.6218 0.2609 0.2128 0.5693 0.1331 0.1938 Log-normal 10 bin 0.1914 0.5941 0.1785 0.2019 0.5538 0.0919 0.1226 
+
+Log-normal 20 bin 0.3333 0.7915 0.2443 0.3296 0.7195 0.1780 0.2364 Log-normal CSTR 0.2145 0.6633 0.2585 0.2237 0.6041 0.1542 0.2302 Log-normal TORE 0.2251 0.6429 0.2388 0.2582 0.6325 0.1295 0.1796 Gaussian 5 bin 0.2177 0.6664 0.2328 0.2403 0.6354 0.1500 0.2011 Gaussian CSTR 0.2178 0.6466 0.2150 0.2410 0.6257 0.1214 0.1725 EDL 5 bin 0.1757 0.5788 0.2368 0.1870 0.5370 0.1117 0.1522 EDL CSTR 0.2776 0.8038 0.2183 0.2927 0.7457 0.1440 0.2156 E2Depth 5 bin 0.1484 0.4667 - 0.1698 0.4503 - -Log-normal Grayscale 0.2752 0.7093 0.2984 0.3194 0.7260 0.2556 0.3218 TABLE I EVALUATION OF THE UNCERTAINTY MODELS AND EVENT REPRESENTATIONS ON THE TEST SEQUENCE IN TERMS OF ABSOLUTE RELATIVE ERROR , ROOT MEAN SQUARED ERROR , AREA UNDER THE SPARSIFICATION ERROR . (M) CONSIDERS ONLY PIXELS THAT GENERATED EVENTS WITHIN THE CONSIDERED TIME WINDOW , APPROXIMATELY 10 % OF ALL PIXELS . (C) CONSIDERS THE PIXELS WITH LOWEST PREDICTED UNCERTAINTY , SELECTED TO MATCH THE PROPORTION OF EVENT -TRIGGERED PIXELS IN (M). T HE BEST VALUES (APART FROM E2D EPTH ) FOR EACH METRIC ARE HIGHLIGHTED IN BOLD . T HE TEST DATASET IS MVSEC INDOOR FLYING 1. 
+
+Gauss, 5 bin LogNorm, 5 bin EDL, 5 bin 
+
+Fig. 2. Sparsification curves for some combinations of uncertainty models and event representations tested on MVSEC indoor flying 1. 
+
+incorporating a gradient matching loss term [3], which would probably be beneficial for our networks as well. Another way to improve the sharpness is to integrate self-attention into our encoder–decoder pipeline. This has proven beneficial in monocular depth estimation from RGB images [31]. REFERENCES [1] G. Gallego, T. Delbruck, G. Orchard, C. Bartolozzi, B. Taba, A. Censi, S. Leutenegger, A. J. Davison, J. Conradt, K. Daniilidis, and D. Scara-muzza, “Event-based vision: A survey,” IEEE transactions on pattern analysis and machine intelligence , vol. 44, no. 1, pp. 154–180, 2022. [2] A. Z. Zhu, L. Yuan, K. Chaney, and K. Daniilidis, “Unsupervised event-based learning of optical flow, depth and egomotion,” in Conference on Computer Vision and Pattern Recognition (CVPR) , 2019. [3] J. Hidalgo-Carrio, D. Gehrig, and D. Scaramuzza, “Learning monocular dense depth from events,” IEEE International Conference on 3D Vision.(3DV) , 2020. [Online]. Available: {http://rpg.ifi.uzh.ch/docs/ 3DV20 Hidalgo.pdf }
+
+[4] Z. A. El Shair, A. Hassani, and S. A. Rawashdeh, “Cstr: A compact spatio-temporal representation for event-based vision,” IEEE Access , pp. 102 899–102 916, 2023. [5] R. W. Baldwin, R. Liu, M. Almatrafi, V. Asari, and K. Hirakawa, “Time-ordered recent event (TORE) volumes for event cameras,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 2, pp. 2519–2532, 2023. [6] L. Yang, B. Kang, Z. Huang, X. Xu, J. Feng, and H. Zhao, “Depth anything: Unleashing the power of large-scale unlabeled data,” in CVPR ,2024. [7] Y. Li, Y. Shen, Z. Huang, W. B. Shuo Chen, X. Shi, F.-Y. Wang, K. Sun, H. Bao, Z. Cui, G. Zhang, and H. Li, “Blinkvision: A benchmark for optical flow, scene flow and point tracking estimation using rgb frames and events,” in European Conference on Computer Vision (ECCV) , 2024. [8] S. Lin, Y. Ma, Z. Guo, and B. Wen, “Dvs-voltmeter: Stochastic process-based event simulator for dynamic vision sensors,” in 
+
+Computer Vision – ECCV 2022 , 2022. [Online]. Available: https: //doi.org/10.1007/978-3-031-20071-7 34 [9] A. Z. Zhu, D. Thakur, T. ¨Ozaslan, B. Pfrommer, V. Kumar, and K. Daniilidis, “The multivehicle stereo event camera dataset: An event camera dataset for 3d perception,” IEEE Robotics and Automation Letters , vol. 3, no. 3, pp. 2032–2039, 2018. [10] J. Kogler, C. Sulzbachner, M. Humenberger, and F. Eibensteiner, “Address-event based stereo vision with bio-inspired silicon retina imagers,” in Advances in Theory and Applications of Stereo Vision ,A. Bhatti, Ed. Rijeka: IntechOpen, 2011, ch. 9. [Online]. Available: https://doi.org/10.5772/12941 [11] L. A. Camunas-Mesa, T. Serrano-Gotarredona, S. H. Ieng, R. B. Benosman, and B. Linares-Barranco, “On the use of orientation filters for 3d reconstruction in event-driven stereo vision,” 
+
+Frontiers in Neuroscience , vol. Volume 8 - 2014, 2014. [Online]. Available: https://www.frontiersin.org/journals/neuroscience/articles/10. 3389/fnins.2014.00048 [12] P. Rogister, R. Benosman, S.-H. Ieng, P. Lichtsteiner, and T. Delbruck, “Asynchronous event-based binocular stereo matching,” IEEE Transac-tions on Neural Networks and Learning Systems , vol. 23, no. 2, pp. 347–353, 2012. [13] H. Rebecq, G. Gallego, E. Mueggler, and D. Scaramuzza, “EMVS: Event-based multi-view stereo—3D reconstruction with an event camera in real-time,” Int. J. Comput. Vis. , vol. 126, pp. 1394–1414, Dec. 2018. Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026 Events Ground truth E2Depth, 5 Bin LogNorm, Grayscale    
+
+> LogNorm, CSTR Gauss, CSTR LogNorm, 5 Bin EDL, 5 Bin
+
+Fig. 3. Comparison of depth predictions for six combinations of uncertainty modeling approaches and event representations. Orange indicates closer regions, while purple denotes greater depth. The predicted depth maps are visually similar across methods; however, E2Depth produces smoother results, likely due to the use of a multi-scale gradient matching loss.     
+
+> LogNorm, Grayscale LogNorm, 5 Bin Gauss, CSTR LogNorm, CSTR EDL, 5 Bin
+
+Fig. 4. Comparison of predicted uncertainty across methods. Black indicates low predictive standard deviation (or epistemic uncertainty), while white corresponds to high uncertainty. The input events and ground truth depth are the same as those shown in Figure 3. The EDL 5-bin configuration exhibits overall lower predicted uncertainty, indicating higher confidence in depth predictions. [14] G. Gallego, H. Rebecq, and D. Scaramuzza, “A unifying contrast maximization framework for event cameras, with applications to motion, depth, and optical flow estimation,” in 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2018, pp. 3867–3876. [15] G. Gallego, M. Gehrig, and D. Scaramuzza, “ Focus Is All You Need: Loss Functions for Event-Based Vision ,” in 2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . IEEE Computer Society, 2019. [Online]. Available: https: //doi.ieeecomputersociety.org/10.1109/CVPR.2019.01256 [16] S. Shiba, Y. Aoki, and G. Gallego, “Secrets of event-based optical flow,” in European Conference on Computer Vision (ECCV) , 2022, pp. 628– 645. [17] R. A. Newcombe, S. J. Lovegrove, and A. J. Davison, “Dtam: Dense tracking and mapping in real-time,” in 2011 international conference on computer vision . IEEE, 2011, pp. 2320–2327. [18] Y. Zhou, G. Gallego, H. Rebecq, L. Kneip, H. Li, and D. Scaramuzza, “Semi-dense 3d reconstruction with a stereo event camera,” in Proceed-ings of the European conference on computer vision (ECCV) , 2018, pp. 235–251. [19] N. Cai and P. Bideau, “ Active Event Alignment for Monocular Distance Estimation ,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE Computer Society, 2025, pp. 2464– 2473. [20] O. Ronneberger, P. Fischer, and T. Brox, “U-net: Convolutional networks for biomedical image segmentation.” International Conference on Med-ical image computing , 2015. [21] D. Gehrig, M. R¨ uegg, M. Gehrig, J. Hidalgo-Carrio, and D. Scaramuzza, “Combining events and frames using recurrent asynchronous multimodal networks for monocular depth prediction,” IEEE Robotic and Automation Letters. (RA-L) , 2021. [Online]. Available: http://rpg.ifi.uzh. ch/docs/RAL21 Gehrig.pdf [22] H. Meng, C. Zhong, S. Tang, L. JunJia, W. Lin, Z. Bing, Y. Chang, G. Chen, and A. Knoll, “Learning monocular depth from events via egomotion compensation,” 2024, arXiv preprint arXiv:2412.19067, sub-mitted Dec. 26, 2024. [23] L. Bartolomei, E. Mannocci, F. Tosi, M. Poggi, and S. Mattoccia, “Depth anyevent: A cross-modal distillation paradigm for event-based monoc-ular depth estimation,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2025, pp. 19 669–19 678. [24] X. Yin, H. Shi, J. Chen, Z. Wang, Y. Ye, K. Yang, and K. Wang, “Explor-ing event-based human pose estimation with 3d event representations,” 
+
+Computer Vision and Image Understanding , p. 104189, 2024. [25] M. Sensoy, L. Kaplan, and M. Kandemir, “Evidential deep learning to quantify classification uncertainty,” Advances in neural information processing systems , vol. 31, 2018. [26] A. Amini, W. Schwarting, A. Soleimany, and D. Rus, “Deep evidential regression,” Advances in neural information processing systems , vol. 33, pp. 14 927–14 937, 2020. [27] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in Proceedings of the 3rd International Conference on Learning Representations (ICLR) , 2015. [Online]. Available: https://arxiv.org/abs/1412.6980 [28] R. Liu, R. W. Baldwin, V. Asari, and K. Hirakawa, “Tore-based disparity estimation in stereo event-only vision,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops , 2021, cVPR 2021 Workshop on Event-Based Vision DSEC Competition Submission 1. [On-line]. Available: https://dsec.ifi.uzh.ch/wp-content/uploads/sourcenova/ uni-comp/cvprw-2021-competition/submissions/10/details.pdf [29] S. Kristoffersson Lind, Z. Xiong, P.-E. Forss´ en, and V. Kr¨ uger, “Uncertainty quantification metrics for deep regression,” Pattern Recognition Letters , vol. 186, pp. 91–97, 2024. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S0167865524002733 [30] X. Yin, H. Shi, J. Chen, Z. Wang, Y. Ye, K. Yang, and K. Wang, “Explor-ing event-based human pose estimation with 3d event representations,” 
+
+Computer Vision and Image Understanding , 2023. [31] G. Yang, H. Tang, M. Ding, N. Sebe, and E. Ricci, “Transformer-based attention networks for continuous pixel-wise prediction,” in ICCV , 2021. Accepted to the Challenges and Opportunities of Neuromorphic Field Robotics and Automation IEEE ICRA Workshop - 2026

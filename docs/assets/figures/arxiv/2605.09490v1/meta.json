@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-001.webp",
+      "caption": "Table 6: Cross-scale validation on GSM8K (n = 50). The hierarchy preserves accuracy across 7B– 32B while eviction catastrophically fails at every scale. 7B/14B use fp16; 32B uses int4 quantization. 95% Clopper-Pearson CIs in brackets.",
+      "page": 11,
+      "index": 1,
+      "width": 682,
+      "height": 257
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-002.webp",
+      "caption": "Figure 9: Token tier distribution during generation. The hierarchy dynamically assigns tokens to tiers as the chain grows, with T0 (HBM) capacity remaining bounded.",
+      "page": 21,
+      "index": 2,
+      "width": 566,
+      "height": 271
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-003.webp",
+      "caption": "Figure 11: Latency breakdown per sample (averaged). Transfer overhead (GPU↔CPU) constitutes only 5–7% of total inference time.",
+      "page": 22,
+      "index": 3,
+      "width": 567,
+      "height": 304
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-004.webp",
+      "caption": "Figure 10: End-to-end accuracy and throughput comparison. Hierarchy configurations (green) achieve comparable accuracy to the full baseline (blue) with modest throughput reduction. Eviction (red) collapses in accuracy.",
+      "page": 22,
+      "index": 4,
+      "width": 816,
+      "height": 273
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-005.webp",
+      "caption": "Table 10: End-to-end system prototype results on GSM8K (n = 50, int8 model, RTX 5080). Hierarchy configurations match or exceed full-cache accuracy while keeping only 30–50% of KV cache tokens in HBM. 95% CIs in brackets.",
+      "page": 14,
+      "index": 5,
+      "width": 660,
+      "height": 194
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-006.webp",
+      "caption": "Figure 7: Latency breakdown for hierarchy configurations. Transfer overhead (GPU↔CPU offload + prefetch) constitutes only 5–7% of total inference time; model computation dominates.",
+      "page": 14,
+      "index": 6,
+      "width": 527,
+      "height": 282
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-007.webp",
+      "caption": "Figure 1: Attention importance distribution of reasoning tokens (DeepSeek-R1-Distill-Qwen-7B, GSM8K, n = 50). (a) Histogram showing long-tail distribution on log scale. (b) CDF confirming that 80% of tokens have near-zero importance. (c) Importance concentration: top-20% tokens capture 56.5% of total importance.",
+      "page": 3,
+      "index": 7,
+      "width": 817,
+      "height": 214
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-008.webp",
+      "caption": "Figure 2: Streaming eviction accuracy vs. KV-cache budget. Attention-based scoring outperforms random, but both exhibit a cliff effect below 70% budget. At 50% budget, accuracy drops to 0%.",
+      "page": 3,
+      "index": 8,
+      "width": 480,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-009.webp",
+      "caption": "Figure 5: PCIe transfer latency across all 28 KV layers (RTX 5080, PCIe Gen5 x16, fp16 KV cache). Transfer cost scales linearly with token count. At the 64-token eviction interval, latency is <2 ms.",
+      "page": 13,
+      "index": 9,
+      "width": 522,
+      "height": 363
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-010.webp",
+      "caption": "Figure 6: PCIe bandwidth utilization. Throughput saturates above 64 tokens at ∼22 GB/s (GPU→CPU) and ∼15 GB/s (CPU→GPU), 24–35% of the theoretical 63 GB/s peak.",
+      "page": 13,
+      "index": 10,
+      "width": 521,
+      "height": 411
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-011.webp",
+      "caption": "Table 3: Memory hierarchy vs. pure eviction on GSM8K (DeepSeek-R1-Distill-Qwen-7B, n = 50). 95% Clopper-Pearson CIs in brackets. At the same eviction ratio, the hierarchy approach (offload to DDR) vastly outperforms pure eviction (permanent removal). Quantization of offloaded entries degrades accuracy.",
+      "page": 8,
+      "index": 11,
+      "width": 762,
+      "height": 307
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-012.webp",
+      "caption": "Table 2: H2O eviction baseline vs. our memory hierarchy on GSM8K (n = 50). Our hierarchy at 5% eviction outperforms H2O at every budget level. 95% CIs in brackets.",
+      "page": 8,
+      "index": 12,
+      "width": 506,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-013.webp",
+      "caption": "Table 14: Landscape of KV-cache optimization. Our approach is the first to combine reasoning-aware scoring with tiered offloading.",
+      "page": 17,
+      "index": 13,
+      "width": 606,
+      "height": 244
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-014.webp",
+      "caption": "Figure 4: Eviction ratio sweep. The sweet spot is 3–5% eviction. 8-bit quantization of offloaded tokens degrades accuracy significantly.",
+      "page": 9,
+      "index": 14,
+      "width": 480,
+      "height": 321
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-015.webp",
+      "caption": "Figure 3: Memory hierarchy vs. pure eviction. At equivalent eviction ratios, the hierarchy (which offloads to DDR rather than discarding) substantially outperforms pure eviction. Pure eviction collapses at ≥30% eviction.",
+      "page": 9,
+      "index": 15,
+      "width": 602,
+      "height": 361
+    },
+    {
+      "url": "assets/figures/arxiv/2605.09490v1/fig-016.webp",
+      "caption": "Figure 8: Distribution of rank correlations between attention-based and gradient-based importance scores across 50 GSM8K samples. The near-zero mean Spearman ρ (−0.13) indicates the two methods rank tokens in fundamentally different orders.",
+      "page": 16,
+      "index": 16,
+      "width": 612,
+      "height": 218
+    }
+  ]
+}

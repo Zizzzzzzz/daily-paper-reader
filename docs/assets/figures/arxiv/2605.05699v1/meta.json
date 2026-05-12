@@ -1,0 +1,54 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-001.webp",
+      "caption": "Figure 1: Quantization is free on Apple Silicon: int4 KV cache outpaces fp16 at every tested context length on Gemma-3 1B, and at short context on Qwen2.5-1.5B. (a) End-to-end model.generate latency vs fp16 baseline. Negative values mean int4 is faster : −3 to −8% on Gemma across 256 to 4096 prefix; −0.7 to −2.6% on Qwen up to 1K. (b) Persistent memory ratio: 3–3.3× on full-attention layers (Qwen, Gemma full-attention); 5–20× at the cache level on Gemma’s mostly-sliding-attention stack. (c) Quality: ∆PPL matches the Python reference within fp32 rounding noise; bit-exact round-trip on roundtrip tests. The mechanism is bandwidth-driven: a 3× compressed cache transfers 3× less from main memory per decode step, and the kernel’s ∼25 ns/vec overhead is below what compression saves on Apple’s unified memory.",
+      "page": 2,
+      "index": 1,
+      "width": 960,
+      "height": 238
+    },
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-002.webp",
+      "caption": "Figure 2: ∆PPL vs KV-cache bit width on SmolLM2-{135M, 360M, 1.7B} with per-token scaling. Error bars are ±1 seed standard deviation (three seeds for 135M / 360M; one seed for 1.7B). SRHT and SRFT curves lie within each other’s error bars at every bit width; both cut identity degradation 5–6× at 4-bit and ∼15× at 3-bit. Robust across GQA (135M, 360M) and MHA (1.7B).",
+      "page": 7,
+      "index": 2,
+      "width": 960,
+      "height": 247
+    },
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-003.webp",
+      "caption": "Figure 5: Left: raw GFLOPS for a length-8 complex DFT expressed as a 16 × 16 real matrix multiply, col-batched vs row-batched, compared to the AMX FP32 single-core peak (∼ 350GFLOPS). Right: same configurations in ns per DFT, vs Apple’s tuned vDSP fft zop. Col-batched sgemm beats vDSP by 3.4× at B=1024 but loses at B ≥ 262K when the output no longer fits in L2.",
+      "page": 13,
+      "index": 3,
+      "width": 960,
+      "height": 264
+    },
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-004.webp",
+      "caption": "Figure 3: End-to-end decode latency (ms/token, lower is better) for 256-token prompt + 128 new tokens, averaged over five iterations. Eager-mode SRFT pays a consistent 12–17% dispatch tax vs SRHT because the PyTorch/MPS pipeline dispatches four separate kernels per layer per step. The fused Metal kernel closes that gap: on SmolLM2-360M it matches SRHT within 1%, on SmolLM2-1.7B it is 5% faster than SRHT because each layer holds more KV vectors and the kernel’s constant dispatch cost amortizes better, and on Qwen2.5-1.5B (head dim = 128) it lands within 1% of SRHT using the D=128 kernel variant.",
+      "page": 8,
+      "index": 4,
+      "width": 960,
+      "height": 231
+    },
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-005.webp",
+      "caption": "Figure 4: Metal kernel throughput as ns per vector vs batch size, for D=64 / D=128 and int8 / int4 output. Int4 and int8 variants track each other to within 3% because the butterfly FLOPs dominate the runtime; halving the store bandwidth only shaves the bandwidth-bound tail at very large batches.",
+      "page": 9,
+      "index": 5,
+      "width": 759,
+      "height": 426
+    },
+    {
+      "url": "assets/figures/arxiv/2605.05699v1/fig-006.webp",
+      "caption": "Table 8: End-to-end model.generate on Apple M1 with SRFTInt4Cache(scaled g32 + per-channel λ). ∗ Gemma’s ”memory ratio” is between fp16-on-all-26-layers and int4-on-only-the-few-full-attention-layers (rest are sliding-window fp16); apples-to-apples within full-attention is ∼ 3.2×. † At Qwen 2K prefix, model.generate produced only nnew=2 tokens before EOS (vs 64 with fp16): the dequant-prefix cache + int4 storage doubles peak memory (5527 vs 4447MB) which combined with quantization noise across Qwen’s 28-layer full-attention stack tipped logits to early EOS. Workaround: fp16 fallback above ∼1.5K on full-attention stacks.",
+      "page": 16,
+      "index": 6,
+      "width": 706,
+      "height": 227
+    }
+  ]
+}
