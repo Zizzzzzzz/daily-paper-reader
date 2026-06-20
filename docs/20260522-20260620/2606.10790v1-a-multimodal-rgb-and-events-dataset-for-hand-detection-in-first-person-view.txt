@@ -1,0 +1,196 @@
+Title: A Multimodal RGB and Events Dataset for Hand Detection in First-Person View
+
+URL Source: https://arxiv.org/pdf/2606.10790v1
+
+Published Time: Wed, 10 Jun 2026 00:59:25 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# A Multimodal RGB and Events Dataset for Hand Detection in First-person View 
+
+Bharghav Kota 
+
+Zurich University of Applied Sciences 
+
+W¨ adenswil, Switzerland kotv@zhaw.ch 
+
+Yulia Sandamirskaya 
+
+Zurich University of Applied Sciences 
+
+W¨ adenswil, Switzerland sank@zhaw.ch 
+
+Abstract —Existing hand detection algorithms work on images and the detection rate is restricted by the frame rate of the cam-era. In hand detection applications for moving robotic systems, conventional cameras cause motion blur, especially in darker lightning conditions. We can leverage the use of event-based cameras which possess a high dynamic range, high temporal resolution, and low power consumption. Recent work has shown that using a stereo setup of an event-based and a frame-based cameras improves detection accuracy and the bandwidth-latency tradeoff. The main bottleneck in using event-based cameras in object detection and recognition tasks is a relatively low amount of training data. In this work, we propose a methodology and an exemplary synthetic event-based hand dataset from an egocentric, first-person view perspective. The data is synthesised from the existing RGB Egohands dataset with v2e toolbox. Parameters of the v2e toolbox are varied to provide versions of the dataset with different lighting conditions and scales. Ground truth detections are generated with a finetuned YOLOv8 model which is applied to the RGB images in Egohands dataset and interpolated on the high-temporal resolution events. We use the multimodal dataset to perform hand detections with the existing object detection algorithms which use a multimodal setup of event and RGB cameras and demonstrate performance comparable to the state-of-the-art. 
+
+Index Terms —Event based Cameras, Hand detection dataset, Graph Neural Networks (GNNs). 
+
+I. I NTRODUCTION 
+
+Unlike traditional cameras that output intensity frames, event cameras have emerged that output asynchronous pixel-by-pixel event streams [1]. These events are emitted when a photoreceptor circuit detects a change in light intensity at a particular pixel resulting in an event stream that is sparse and has a high temporal resolution [2]. This makes event cameras to feature high dynamic range, microsecond latency and thus low motion blur, and low power consumption. A camera with these properties becomes indispensible in the field of robotics and embedded vision [3], [4], [5], [6],where the systems are power and computationally constrained. As an event camera does not generate images, traditional pretrained (e.g., convolutional) neural networks cannot be leveraged for performing detection or tracking tasks directly. There is a need to develop algorithms that take advantage of the sparsity and high temporal resolution of an event camera while competing with the performance metrics of a deep learning approach. The first step would be to rethink the data representation of an event stream and a wide variety of work has been done in this regard. CNNs could be leveraged by ac-cumulating events in a particular time interval into frames [7], [8], [9], [10], [11], but this approach reduces the advantage of an event camera’s low latency [11]. A more robust yet another frame-based approach is a motion-compensated event frame [12] which involves warping the events to align with a chosen reference frame, based on a defined motion model. By doing so, the accurate spatial edge structures over extended time intervals can be preserved. Non frame-based approaches have also emerged that take advantage of the temporal resolution such as time surfaces [13]. This is a 2D representation where the most recent timestamp of an event that has occurred at each pixel is retained and normalized to a range [0,1]. Several non-learning based methods have taken advantage of time surfaces to do detection tasks and visual SLAM, e.g. event FAST [14]. High-frequency hand detection and pose estimation are critical components in robotic systems particularly for tasks involving intention recognition [15], human-robot interaction and object handovers [16]. It is challenging to perform high rate-detections with RGB cameras because we are limited by the frame-rate of the camera. Solutions to this would be to interpolate detections in the blind times between frames or use high FPS cameras which would increase hardware costs, power consumption and computation budget of a robot. Event-based cameras can be used to perform high-rate detections because of their ability to capture per-pixel intensity changes at a microsecond level resolution and low latency advan-tages [17], [18]. But event-based approaches currently face limitations in accuracy due to two main factors: the sensors’ inability to detect slowly changing signals and the inefficiency of existing processing techniques that transform event streams into frame- based formats for analysis using convolutional neural networks [19], [20], [21]. [18] proposed a novel method to process events sparsely and asynchronously as temporally evolving graphs. This model can be trained on batches of events, taking advantage of back-propagation, and allows hierarchical learning using standard graph neural networks algorithms. Unlike AEGNN that uses a monocular event stream to perform object recognition and detection, DAGr [17] proposed a hybrid event and frame-based object detector that fused a CNN for frames with an asynchronous graph neural network for events [17]. DAGr performs superior to AEGNN as it combines the advantages of 
+
+> arXiv:2606.10790v1 [cs.CV] 9 Jun 2026
+
+frame-based processing for rich context information and high accuracy detection with the sparsity and high rate of an event stream, thus improving the latency-bandwidth tradeoff. DAGr and AEGNN have been tested on popular automotive event-based datasets like NCARS [22] and DSEC [23], [24], which feature dynamic driving scenarios. Their strong perfor-mance in these settings suggests that similar approaches could be effective in robotics, especially in dynamic environments and on mobile robots. A key challenge in assistive, human-centered robotics is detecting human hands, which is crucial for tasks such as object handover and understanding user in-tent. However, there is currently a lack of event-based datasets that show hands in dynamic, first person view —situations that reflect how a robot would perceive and interact with the world around it. In this work, we propose a dataset EventEgoHands 
+
+that is derived from the frame based dataset - Egohands [25]. The RGB dataset provides manually labeled ground truths for 2.12% of all frames in video sequences. The proposed 
+
+EventEgoHands is multimodal with synchronised events and frames and we extend these ground truths to the entire dataset by fine-tuning a YOLOv8 model and running inference on the frames where the ground truths were not provided in 
+
+EgoHands . We then train EventEgoHands on the DAGr model to perform high-rate hand detections. II. B ACKGROUND 
+
+A. Graph Neural Networks 
+
+A graph is a data structure G = {V, E } consisting of nodes/vertices V and edges E that connect these nodes. Information can be stored on in the graph as node features 
+
+or edge features [26]. 
+
+Message passing with graphs involves exchanging infor-mation between nodes in a graph along the edges they’re connected to. The purpose of message passing is to aggregate information from neighboring nodes to encode contextual graph information. 
+
+Graph Convolution [27]: Through message passing, each node updates its representation by combining its own features with those of its connected nodes weighted by the graph struc-ture. This enables graph-convolutional networks to capture both local and global dependencies. 
+
+H(l+1) = σ
+
+ ˜D− 12 ˜A ˜D− 12 H(l)W (l)
+
+(1) where:  
+
+> •
+
+H(l) ∈ RN ×Fl is the node feature matrix at layer l, 
+
+> •
+
+W (l) ∈ RFl×Fl+1 is the trainable weight matrix,  
+
+> •
+
+˜A = A + I is the adjacency matrix with added self-loops,  
+
+> •
+
+˜D is the diagonal degree matrix of ˜A, 
+
+> •
+
+σ(·) is an activation function such as ReLU. This operation performs feature aggregation from a node’s local neighborhood, normalized by the degrees of the nodes to prevent scale distortion and over-smoothing. It enables the model to learn representations that capture both node features and graph topology. 
+
+Fig. 1: Accumulated event frame (event accumulation for 33ms) 
+
+Fig. 2: RGB frame from EgoHands B. Event Based Cameras 
+
+The Dynamic Vision Camera (DVS) pixel operates through a circuit sensitive to change in illumination which is governed by bias currents that define both the detection threshold and analog bandwidth [2]. The incident light induces a logarithmic voltage Vp change at the photoreceptor which is then inverted and amplified. This voltage Vd is then compared with the on and off thresholds and the pixel emits an event. This triggers a reset that stores the updated intensity across the capacitor 
+
+C. Understanding how the pixel circuit works is important to understand the impact of the parameter tuning in the v2e event-generation toolbox [28]. 
+
+C. Event Graphs 
+
+Event streams are typically represented with the address event representation where each event is in the format of 
+
+(x, y, t, p ). x and y represent the pixel coordinates, t is the timestamp of the event with microsecond resolution, and 
+
+p = {0, 1} is the binary polarity to indicate a increase or decrease in light intensity. An event graph is constructed in a spatiotemporal space with x, y, t as the axes where a node in the graph represents an event. The edges of the graph are constructed by joining nodes within a spatio-temporal distance 
+
+R from each other [18]. 
+
+D. v2e 
+
+v2e (Video-to-Events) is a toolbox that generates realistic synthetic DVS events from intensity frames [28]. Unlike other event-generating simulators such as ESIM [29] and adv2e [30], v2e incorporates serveral aspects of a real DVS behavior such Fig. 3: Events overlayed with RGB Frame 
+
+Fig. 4: Faery render of Clean events as pixel-level Gaussian event threshold mismatch, intensity-dependant noise, finite intensity dependent bandwidth, tem-poral noise, and leak events [31]. As a result of simulating DVS non-idealities, v2e can better model pixels in bad lighting conditions which is an important application of the DVS. The pipeline of v2e receives intensity frames and optionally interpolates frames with the SuperSloMo model [32] which predicts the bidirectional optic flow vectors from consecutive frames to perform interpolation at any desired timestamp between the original inputs. It then computes logarithmic intensity of each pixel and detects changes in log intensity that exceed pixel-specific thresholds, trigerring synthetic ON or OFF events while also optionally adding temporal noise and simulating leak events. III. D ATASET PIPELINE 
+
+The following subsections talk about the pipeline that was used to generate different versions of EventEgoHands dataset. 
+
+EventEgoHands is a synthetic dataset generated using the v2e (video-to-events) simulator from the existing RGB egocentric hands dataset: Egohands .
+
+A. RGB Egohands Dataset description  
+
+> •
+
+Dataset Size : The dataset consists of 48 videos, each 90 seconds long, with 2700 frames (30fps) and each frame is of the resolution 720x1280px.  
+
+> •
+
+Classes : The dataset contains 4 class labels: y our left, your right, my left, my right. These labels reflect adistinction between ”your” and ”mine,” as the dataset was captured with two individuals sitting opposite each other. The actions were recorded using a Google Glass device, 
+
+Fig. 5: Faery render of Noisy events and the labels are categorized from the perspective of the person whose glasses were recording.  
+
+> •
+
+Labels : From each of the 48 videos, 100 frames were randomly sampled, and the hands were manually anno-tated. This process resulted in a substantial dataset with 15,053 ground-truth labeled hands. 
+
+B. Generating Synthetic Events 
+
+TABLE I: Overview of EventEgoHands and their versions                      
+
+> Version Upsampling Factor Scale Factor Events Model
+> v1 11Clean v2 14Clean v3 12Clean v4 41 2Clean v5 41 2Noisy v6 41 2Mixed
+
+TABLE II: v2e parameters for ”clean” and ”noisy” dataset versions. θ and σθ represent event threshold and threshold variation respectively.            
+
+> Clean Noisy
+> θ(0.2 ON , 0.2 OFF )(0.2 ON , 0.2 OFF )
+> σθ0.02 0.03 Shot Noise 5 Hz 0 Hz Leak Events 0.1 Hz 0 Hz Cutoff Freq. 0 Hz 30 Hz
+
+EventEgoHands is generated by using the v2e toolbox and we provide various versions of this dataset with different event generation models of a DVS Pixel. Different versions of 
+
+EventEgoHands is summarised in Table I. Upsampling Factor 
+
+is a parameter that is calculated from the v2e parameter 
+
+timestamp resolution and controls temporal upsampling of the the video from the source fps to achieve at least the set timestamp resolution. The orginal resolution of the dataset (scale factor 1) is 720x1280px and we create different ver-sions where the events and images are downsampled to 360x640px (scale factor 2) and 180x320px (scale factor 4). “Clean” and “Noisy” are parameter presets in the v2e toolbox where “Clean” turns off noise, sets unlimited bandwidth and makes threshold variation small, whereas “Noisy” sets a limited bandwidth and adds leak events and shot noise. Leak events are ON events that real DVS pixels randomly emit caused by junction leakage and parasitic photocurrent in the change detector reset switch. Shot noise is the temporal noise rate of ON+OFF events in darkest parts of a scene which are reduced in the brighter parts. Figure 4 and Figure 5 show frames rendered from Clean and Noisy event models respectively to give a comparison of the two event models. These renderings are generated at the exact same timestamp with the help of the Faery library (https://github.com/aestream/ faery). Table II provides the values of the above mentioned parameters. IV. R ESULTS 
+
+A. Dataset  
+
+> •
+
+Overview : The dataset consists of 48 .h5 files for event streams which are synchronized with 48 RGB video sequences - each of 90secs, at 30fps. We also generate a key in the event file ” timeidx ” which holds indices of the events that occur immediately after the timestamp of a particular frame. With the help of this indices list, we can speed up the process of slicing events exactly at the timestamp window to feed to the model for training. The frame resolution depends on the dataset version, which we provide at scales of 4, 2, and 1. For example, a scale of 4 indicates that the frame has been downsampled by a factor of 4. Figure 6 and Figure 7 show the event rate plots (events/s over time) for the example sequence 
+
+CARDS COURTYARD B T , comparing the Clean and 
+
+Noisy event models.  
+
+> •
+
+Classes : Unlike EgoHands we provide a single class “hand” instead of differentiating between right and left hands.  
+
+> •
+
+Labels :All hands in the dataset are labeled with bounding boxes at each frame timestamp, resulting in a total of 393,561 bounding boxes across 129,600 frames. Refer to Table I for a comparision of different dataset ver-sions with the respecting upsampling factor, scale factor and the DVS model used to generate events. EventEgoHands 
+
+dataset and training code is open-sourced at: https://github. com/SynthSyntax/EventEgoHands. 
+
+B. Implementation details 
+
+On EventEgoHands, we train the DAGr model with a batch size of 16, the learning rate of 2 × 10 −4 AdamW optimizer [33]. We train the network using a single image along with 33 ms of preceding events, aligning with the 30 Hz label frequency. 
+
+C. EventEgoHands Hand Detection 
+
+This sections presents experiments done on the EventEgo-Hands dataset with the DAGr model. We train this model from scratch with a single class ”hand”. The entire dataset consists of 48 videos and we create a test, train and validation split 
+
+Fig. 6: Event rate - Clean modelling 
+
+Fig. 7: Event rate - Noisy modelling with 30, 10 and 8 videos respectively. We retain this split for all the dataset versions that are used to train the model. The weights obtained from different dataset versions are then used to run inference on a common test dataset and these hand detection metrics are presented in Table III. This paper uses the COCO metrics [34] for testing the model where mAP (mean average precision) is calculated at various IoU (intersection over union) thresholds. mAP 50 is at an IoU of 0.5, mAP 75 
+
+as at an IoU of 0.75 and the overall mAP is averaged across IoU thresholds from 0.50 to 0.95 in steps of 0.05. Figure 8 shows the convergence plot of the IoU loss during training. The consistent decrease in loss indicates that the model is effectively learning to improve its bounding box predictions. These plots are derived in the case of using training data that is a mix of Clean and Noisy events. Additionally, the validation mAP (.50:.05:.95) plot in Figure 9 shows that the mAP peaks TABLE III: Comparison of different Egohands dataset versions on detection performance.                      
+
+> Version mAP 50 mAP 75 mAP
+> v1 0.912 0.687 0.645 v2 0.923 0.712 0.616 v3 0.932 0.763 0.655 v4 0.932 0.786 0.674 v5 0.891 0.584 0.532 v6 0.931 0.817 0.697
+
+Fig. 8: IoU loss convergence plot while training 
+
+Fig. 9: validation mAP metric plot around 100k training steps, after which it begins to decline slightly. This suggests that the model starts to overfit beyond this point, as it continues to improve on the training data (as seen from the decreasing loss) but no longer generalizes as well to the validation set. We trained the DAGr model on training data with “Clean” and “Noisy” presets in the v2e toolbox (refer to parameters in Table II) and also used a training data which combined a mix of events in both conditions. It can be seen that the mAP obtained from v2 (scale factor of 4) has a lower mAP compared to all other versions with Clean events. This result can be attributed to the downsampling being quite significant in events and the network fails to perform interframe detec-tions effectively. We found scale2 to be ideal in retaining enough event data and at the same time compressing the original size of the dataset significantly thus increasing the training speed. Another interesting observation is the jump of accuracy between models trained with v3 and v4. This is because in v4, the events are generated by first upsampling the source fps of the video by a factor of 41 and then generating events synthetically. A more finegrained timestamp resolution of frames ensures that the events generated are modelled closer to the real DVS events and this gave an 0.02 mAP increment. Naturally, the mAP from Clean events in v4 is found to be higher compared to the model trained with Noisy 
+
+events (v5) because of ideal v2e parameters. Interestingly, training the model with data consisting of a combination of events from Noisy and Clean (v6) gives us another 0.02 mAP increment approximately. This result shows us that by incorporating a broad set of synthesis parameters, it improves model generalization on real event data and the difference in network performance between real and synthetic event data can be minimized. V. CONCLUSION AND FURTHER WORK 
+
+This paper presents a multimodal events and frames dataset 
+
+EventEgoHands synthesised from the v2e toolbox. We provide various versions of this dataset by tuning v2e parameters and scales. Our experiments are run on Graph Neural Network based detection algorithm, trained with various dataset ver-sions. We show that by simulating the noise and motion blur non-idealities of an event camera, we can bridge the gap between network performance in real and synthetic event data. Future work includes creating an event-based Hands dataset in first-person view with more variation in lighting conditions, skin tones and activity being performed. Further, this dataset can also be used to perform inference with evGNN [35], an event-driven GNN based accelerator for vision on the edge for real-time robotic applications. REFERENCES [1] G. Gallego, T. Delbr¨ uck, G. Orchard, C. Bartolozzi, B. Taba, A. Censi, S. Leutenegger, A. J. Davison, J. Conradt, K. Daniilidis et al. , “Event-based vision: A survey,” IEEE transactions on pattern analysis and machine intelligence , vol. 44, no. 1, pp. 154–180, 2020. [2] P. Lichtsteiner, C. Posch, and T. Delbruck, “A 128 ×128 120 db 15 μslatency asynchronous temporal contrast vision sensor,” IEEE Journal of Solid-State Circuits , vol. 43, no. 2, pp. 566–576, 2008. [3] D. Falanga, K. Kleber, and D. Scaramuzza, “Dynamic obstacle avoid-ance for quadrotors with event cameras,” Science Robotics , vol. 5, no. 40, p. eaaz9712, 2020. [4] J. J. Hagenaars, F. Paredes-Vall´ es, S. M. Boht´ e, and G. C. De Croon, “Evolved neuromorphic control for high speed divergence-based land-ings of mavs,” IEEE Robotics and Automation Letters , vol. 5, no. 4, pp. 6239–6246, 2020. [5] N. J. Sanket, C. M. Parameshwara, C. D. Singh, A. V. Kuruttukulam, C. Ferm¨ uller, D. Scaramuzza, and Y. Aloimonos, “Evdodgenet: Deep dynamic obstacle dodging with event cameras,” in 2020 IEEE Interna-tional Conference on Robotics and Automation (ICRA) . IEEE, 2020, pp. 10 651–10 657. [6] S. Sun, G. Cioffi, C. De Visser, and D. Scaramuzza, “Autonomous quadrotor flight despite rotor failure with onboard vision sensors: Frames vs. events,” IEEE Robotics and Automation Letters , vol. 6, no. 2, pp. 580–587, 2021. [7] D. Gehrig, A. Loquercio, K. G. Derpanis, and D. Scaramuzza, “End-to-end learning of representations for asynchronous event-based data,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019, pp. 5633–5643. [8] H. Rebecq, R. Ranftl, V. Koltun, and D. Scaramuzza, “High speed and high dynamic range video with an event camera,” IEEE transactions on pattern analysis and machine intelligence , vol. 43, no. 6, pp. 1964–1980, 2019. [9] S. Tulyakov, D. Gehrig, S. Georgoulis, J. Erbach, M. Gehrig, Y. Li, and D. Scaramuzza, “Time lens: Event-based video frame interpolation,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 16 155–16 164. [10] A. Z. Zhu, L. Yuan, K. Chaney, and K. Daniilidis, “Unsupervised event-based learning of optical flow, depth, and egomotion,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2019, pp. 989–997. [11] K. Huang, S. Zhang, J. Zhang, and D. Tao, “Event-based simultaneous localization and mapping: A comprehensive survey,” arXiv preprint arXiv:2304.09793 , 2023. [12] T. Stoffregen, G. Gallego, T. Drummond, L. Kleeman, and D. Scara-muzza, “Event-based motion segmentation by motion compensation,” in 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , 2019, pp. 7244–7253. [13] X. Lagorce, G. Orchard, F. Galluppi, B. E. Shi, and R. B. Benosman, “Hots: a hierarchy of event-based time-surfaces for pattern recognition,” 
+
+IEEE transactions on pattern analysis and machine intelligence , vol. 39, no. 7, pp. 1346–1359, 2016. [14] E. Mueggler, C. Bartolozzi, and D. Scaramuzza, “Fast event-based corner detection,” 2017. [15] D. Song, N. Kyriazis, I. Oikonomidis, C. Papazov, A. Argyros, D. Burschka, and D. Kragic, “Predicting human intention in visual observations of hand/object interactions,” in 2013 IEEE International Conference on Robotics and Automation , 2013, pp. 1608–1615. [16] V. Ortenzi, A. Cosgun, T. Pardi, W. P. Chan, E. Croft, and D. Kuli´ c, “Object handovers: A review for robotics,” IEEE Transactions on Robotics , vol. 37, no. 6, pp. 1855–1873, 2021. [17] D. Gehrig and D. Scaramuzza, “Low-latency automotive vision with event cameras,” Nature , vol. 629, no. 8014, pp. 1034–1040, 2024. [18] S. Schaefer, D. Gehrig, and D. Scaramuzza, “Aegnn: Asynchronous event-based graph neural networks,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 12 371–12 381. [19] Z. Sun, N. Messikommer, D. Gehrig, and D. Scaramuzza, “Ess: Learning event-based semantic segmentation from still images,” in European Conference on Computer Vision . Springer, 2022, pp. 341–357. [20] E. Perot, P. De Tournemire, D. Nitti, J. Masci, and A. Sironi, “Learning to detect objects with a 1 megapixel event camera,” Advances in Neural Information Processing Systems , vol. 33, pp. 16 639–16 652, 2020. [21] I. Alonso and A. C. Murillo, “Ev-segnet: Semantic segmentation for event-based cameras,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , 2019, pp. 0–0. [22] A. Sironi, M. Brambilla, N. Bourdis, X. Lagorce, and R. Benosman, “HATS: histograms of averaged time surfaces for robust event-based object classification,” CoRR , vol. abs/1803.07913, 2018. [Online]. Available: http://arxiv.org/abs/1803.07913 [23] M. Gehrig, W. Aarents, D. Gehrig, and D. Scaramuzza, “DSEC: A stereo event camera dataset for driving scenarios,” 2021. [24] M. Gehrig, M. Millh¨ ausler, D. Gehrig, and D. Scaramuzza, “E-raft: Dense optical flow from event cameras,” in International Conference on 3D Vision (3DV) , 2021. [25] S. Bambach, S. Lee, D. J. Crandall, and C. Yu, “Lending a hand: Detect-ing hands and recognizing activities in complex egocentric interactions,” in Proceedings of the IEEE international conference on computer vision ,2015, pp. 1949–1957. [26] Z. Wu, S. Pan, F. Chen, G. Long, C. Zhang, and P. S. Yu, “A comprehensive survey on graph neural networks,” IEEE transactions on neural networks and learning systems , vol. 32, no. 1, pp. 4–24, 2020. [27] T. N. Kipf and M. Welling, “Semi-supervised classification with graph convolutional networks,” arXiv preprint arXiv:1609.02907 , 2016. [28] T. Delbruck, Y. Hu, and Z. He, “V2e: From video frames to realistic dvs event camera streams,” arXiv e-prints , pp. arXiv–2006, 2020. [29] H. Rebecq, D. Gehrig, and D. Scaramuzza, “Esim: an open event camera simulator,” in Conference on robot learning . PMLR, 2018, pp. 969– 982. [30] X. Jiang, F. Zhou, and J. Lin, “Adv2e: Bridging the gap between analogue circuit and discrete frames in the video-to-events simulator,” 
+
+arXiv preprint arXiv:2411.12250 , 2024. [31] Y. Nozaki and T. Delbruck, “Temperature and parasitic photocurrent effects in dynamic vision sensors,” IEEE Transactions on Electron Devices , vol. 64, no. 8, pp. 3239–3245, 2017. [32] H. Jiang, D. Sun, V. Jampani, M.-H. Yang, E. Learned-Miller, and J. Kautz, “Super slomo: High quality estimation of multiple intermediate frames for video interpolation,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 9000–9008. [33] I. Loshchilov and F. Hutter, “Decoupled weight decay regularization,” 
+
+arXiv preprint arXiv:1711.05101 , 2017. [34] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Doll´ ar, and C. L. Zitnick, “Microsoft coco: Common objects in context,” in Computer vision–ECCV 2014: 13th European conference, zurich, Switzerland, September 6-12, 2014, proceedings, part v 13 .Springer, 2014, pp. 740–755. [35] Y. Yang, A. Kneip, and C. Frenkel, “Evgnn: An event-driven graph neural network accelerator for edge vision,” IEEE Transactions on Circuits and Systems for Artificial Intelligence , 2024.

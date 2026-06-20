@@ -1,0 +1,907 @@
+Title: EarlyTom: Early Token Compression Completes Fast Video Understanding
+
+URL Source: https://arxiv.org/pdf/2605.30010v1
+
+Published Time: Fri, 29 May 2026 01:27:18 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# EarlyTom : Early Token Compression Completes Fast Video Understanding 
+
+## Hesong Wang 1,2,3,⋆ , Xin Jin 2,⋆ , Lu Lu 3,†, Chenhaowen Li 3, Jian Chen 3, Qiang Liu 3, Huan Wang 2,†
+
+1Zhejiang University 2Westlake University 3Alibaba Cloud Computing 
+
+{wanghesong, jinxin86, wanghuan }@westlake.edu.cn ll200214@alibaba-inc.com 
+
+## https://viridisgreen.github.io/EarlyTom Tokenizer           
+
+> Projector
+> Vision
+> Encoder Frame merging
+> Spatial selection
+> Prompt Input
+> <system> Describe this video.
+> Large Language Model
+> Video Input
+> ...
+> (Avg. : 58.2)
+> (Avg. : 58.8)
+> (Avg. : 56.2)
+> (Avg. : 54.1)
+> (Avg. : 58.4)
+> (Avg. : 57.3)
+> (Avg. : 58.2)
+> (Avg. : 57.6)
+> Better
+
+Figure 1. Left : This paper aims to improve the inference efficiency of video understanding based on video large language models (LLMs). Latency profiling suggests the major speed bottleneck lies in the vision encoder part instead of the LLM. Knowing this, we introduce 
+
+EarlyTom , a training-free token compression method designed for the early stage ( i.e. , vision encoder) of video LLMs. EarlyTom features two core components: (1) early-stage visual token compression achieved via inner vision encoder frame merging, and (2) a spatial token selection strategy that further increases compression effectiveness without introducing bias. Right : Scatter plot illustrating the relationship between FLOPs and throughput, along with the average performance across four widely used video understanding benchmarks (MVBench, EgoSchema, LongVideoBench, and VideoMME) for several training-free state-of-the-art methods. EarlyTom achieves state-of-the-art performance while maintaining accuracy comparable to full-token methods. 
+
+## Abstract 
+
+Video large language models (Video-LLMs) have demon-strated strong capabilities in video understanding tasks. However, their practical deployment is still hindered by the inefficiency introduced by processing massive amounts of visual tokens. Although recent approaches achieve ex-tremely low token retention ratios while maintaining accu-racy comparable to full-token baselines, most of them per-form compression only at the late stage of prefilling, leaving the efficiency of the vision encoder unoptimized. In this pa-per, we first show that vision encoding contributes a large portion to the time-to-first-token (TTFT). Therefore, instead of compressing visual tokens only after the vision encoder, performing compression inside the encoder still leaves sub-stantial room for exploration. Based on this insight, we pro-pose EarlyTom, a training-free token compression frame-work that performs early-stage visual token compression in-side the vision encoder, enabling significantly better TTFT reduction and higher throughput. In addition, we intro-
+
+> ⋆
+
+Equal contribution. †Corresponding author. Work done while Hes-ong Wang was an intern at Alibaba Cloud Computing. 
+
+duce a decoupled spatial token selection strategy that im-proves the overall compression effectiveness. EarlyTom re-duces TTFT by up to 2.65 × and FLOPs by up to 61% on a single NVIDIA A100 GPU for the LLaVA-OneVision-7B model, while maintaining accuracy comparable to the full-token baseline. These improvements substantially enhance the practicality of deploying Video-LLMs in real-world pro-duction scenarios. 
+
+## 1. Introduction 
+
+Video large language models (Video-LLMs) [1, 5, 19, 21, 24, 29, 38, 44, 46, 49] have demonstrated impressive capability in video understanding tasks. However, effi-ciently processing large volumes of visual tokens is com-putationally expensive, which significantly limits the prac-tical deployment of Video-LLMs in real-world scenarios. Although existing methods have made notable progress in compressing vision tokens to improve efficiency, most of them overlook the vision encoder itself. As illustrated in Figure 3, the vision encoding stage consumes 36.3% of the total time-to-first-token (TTFT) in the baseline, and this issue becomes even more pronounced in state-of-the-1
+
+> arXiv:2605.30010v1 [cs.CV] 28 May 2026
+
+art methods such as HoliTom and VisionZip, where it rises to 55.8% and 68.4%, respectively. As a result, there is still large room to improve the performance of Video-LLMs. As summarized in prior works [32, 33, 35], most existing token compression methods operate either after the vision encoder or inside the LLM. Inner-LLM token compression methods, such as FastV [4], SparseVLM [50], and Pyramid-Drop [40], focus on compressing tokens within the LLM and therefore provide limited reduction in TTFT. On the other hand, outer-LLM strategies (e.g., VisionZip [43] and LLaVAPruMerge [31]) compress tokens before entering the LLM, offering higher but still limited TTFT reduction. Hy-brid approaches such as HoliTom [32], FastVID [34], and DyCoke [35] attempt to combine both paradigms but still face constrained acceleration, which fundamentally restricts their practicality in compute-bound applications like large-scale video retrieval. Addressing TTFT bottlenecks in video LLMs remains an open challenge. To better understand the problem, we profile the TTFT composition across several state-of-the-art methods. The results in Figure 3 reveal that vision encoding accounts for a major portion of TTFT, especially in methods already op-timized for LLM prefill latency. In addition, existing com-pression methods introduce non-trivial computational over-head, which further increases TTFT. These observations motivate us to design a token compression mechanism that acts early inside the vision encoder while minimizing extra overhead for faster and efficient inference. In this paper, we present EarlyTom , an efficient token compression framework designed for extreme performance. Specifically, we propose (1) an inner vision encoder frame merge strategy that compresses redundant visual informa-tion during the encoding process, and (2) a decoupled to-ken selection strategy co-designed at the system level to further reduce visual tokens with minimal latency. On LLaVA-OneVision-7B, with only 10% token retention, Ear-lyTom achieves 2.65 × TTFT reduction and 1.3 × through-put speedup, while maintaining competitive downstream quality across diverse video understanding benchmarks. Our main contributions are summarized as follows: (a) We propose an inner vision encoder frame merge mechanism that compresses redundant visual informa-tion during vision encoding, effectively reducing vi-sual tokens with negligible overhead and significantly reducing time-to-first-token. (b) We introduce a decoupled token selection strategy that performs efficient, low-latency token reduction, further shrinking vision tokens and enabling substantial end-to-end acceleration without sacrificing accuracy. (c) Extensive experiments on LLaVA-OneVision-0.5B/7B demonstrate that EarlyTom achieves state-of-the-art acceleration performance, delivering extremely fast TTFT while maintaining comparable accuracy. 
+
+## 2. Related Work 
+
+Intra-encoder token compression. Intra-encoder methods perform token compression within the vision encoder or projector, before tokens are fed into the language model. ToMe [2] reduces tokens in the vision encoder depend-ing on the similarity of key tokens, which improves ef-ficiency and acceleration. PiToMe [36] proposes an en-ergy score to preserve informative tokens; large similar clusters are merged, while unique tokens with low energy are retained. LLaVAPruMerge [31] selects cluster cen-ters based on attention scores from the [CLS] tagged to-kens, then merges the remaining tokens with lower atten-tion scores through KNN clustering [12] and a weighted cluster center update mechanism. VisionZip [43] retains visual tokens with higher attention scores, then merges the remaining tokens through clustering. FiCoCo [13] in-tegrates multi-dimensional redundant evaluations, token-adaptive association matching, and weighted fusion strate-gies through a “filtering-association-compression” process. MustDrop [25] proposes merging similar neighborhood to-kens while retaining key tokens in the visual encoder, and by employing dual attention filtering during the prefilling stage to eliminate text-irrelevant tokens. TokenPacker [23] introduces an efficient visual projector with a coarse-to-fine design: it first generates low-resolution point queries via bilinear interpolation, then refines them by injecting high-resolution multi-level visual features through a region-to-point module. MergeMix [15] proposes a preference tun-ing by building augmented samples and training with token merge for efficiency. 
+
+Pre-LLM token compression. Pre-LLM methods perform token compression before the language model and after the vision encoder, treating the compression as a plug-and-play module. DyCoke [35] proposes a training-free two-stage compression pipeline that merges redundant frame to-kens through cross-frame temporal compression, followed by dynamic KV cache pruning during decoding to elimi-nate spatial redundancy while dynamically preserving key tokens. FastVID [34] analyzes video redundancy from tem-poral and visual density perspectives, proposing dynamic temporal segmentation and density-driven spatio-temporal pruning. It segments videos and prunes based on local “in-formation density”. PVC [42] proposes a training strat-egy that progressively encodes each frame and adaptively compresses redundant tokens by leveraging temporal re-dundancy. VScan [47] conducts systematic empirical re-search on how LLM handles visual tokens, merging them during visual encoding and introducing fine-grained prun-ing at intermediate model layers. HoliTom [32] emphasizes global and redundancy-aware holistic compression, reduc-ing tokens by outer-LLM spatio-temporal segmentation and merging while incorporating a robust inner-LLM merging 2... ... ... 
+
+Token id Token id Token id 
+
+> Video Frames
+
+Figure 2. The video sink tokens. We visualize videos across datasets to illustrate the video attention sinking phenomenon: certain tokens (specific frames/regions) consistently attract disproportionately high attention (as shown in the attention score heatmaps), revealing that existing top-K-based token compression methods overlook semantic information in other frames and limit video context understanding. Baseline HoliTom VisionZip Ours 
+
+> 0
+> 200
+> 400
+> 600
+> 800
+> Latency (ms)
+> 889 ms
+> 556 ms
+> 458 ms
+> 336 ms
+> 1.60x
+> 1.94x
+> 2.65x
+> Vision Encoding
+> Visual Token Processing
+> LLM Prefill
+> System Overhead
+
+Figure 3. Time-to-first-token (TTFT) latency composition. We break down TTFT into four parts: vision encoding, visual token processing, LLM prefill, and system overhead. In the baseline, vision encoding takes 323 ms, accounting for 36.3% of the total, indicating that this stage still has substantial room for optimiza-tion. For state-of-the-art methods like HoliTom and VisionZip, vision encoding remains the largest component, occupying 55.8% (324 ms) and 68.4% (325 ms), respectively. In addition, HoliTom introduces extra token-processing overhead, increasing this com-ponent by 121.9% (+78 ms) compared to the baseline. In contrast, our method reduces vision encoding time directly inside the en-coder, achieving a 2.65 × TTFT reduction over the baseline while adding almost no additional overhead, evaluated under 10% token retention on an NVIDIA A100 GPU. 
+
+strategy. QueCC [22] analyzes the trade-off between visual tokens and LLM size via inference-time scaling laws, show-ing that under fixed compute, visual reasoning favors larger LLMs with aggressive token compression, and proposes a query-aware method for extreme compression. 
+
+## 3. Method 
+
+In this section, we present EarlyTom, a training-free to-ken compression framework for efficient video LLM infer-ence. The overall pipeline is illustrated in Figure 4 and de-tailed in the following sections. 
+
+3.1. Preliminaries and Analysis 
+
+Video-LLM inference. The inference process of video LLMs can be divided into three main stages: vision encod-ing, LLM prefilling, and decoding. During vision encoding, video frames are transformed into embedding representa-tions, which are then aligned to the LLM embedding space through a projector to form video tokens. These video to-kens are subsequently concatenated with text tokens and fed into the LLM during the prefilling stage. Finally, the LLM generates responses in an autoregressive manner during de-coding. Our method primarily focuses on optimizing the vision encoding and pre-prefilling stages to reduce latency while preserving accuracy. 
+
+Profiling of time-to-first-token. To identify the primary bottlenecks in video LLM inference, we decompose the time-to-first-token latency into four components: vision en-coding, visual token processing, LLM prefill, and system overhead. As illustrated in Figure 3, vision encoding oc-cupies a substantial portion of TTFT. In the baseline set-ting, vision encoding accounts for 36.3% of the total TTFT, and this proportion becomes even more pronounced when applying LLM-prefill–optimized methods such as HoliTom and VisionZip, where it rises to 55.8% and 68.4%, respec-tively. Meanwhile, HoliTom introduces additional compres-sion overhead during the visual token processing stage, fur-ther increasing the first-token latency. 
+
+Video sink tokens. To analyze how visual tokens contribute 3Tokenizer t   
+
+> Large Language Model 𝑓
+> Pruned Single Token
+
+... 
+
+> Tokens in Frame
+> Vision Tokens
+
+...   
+
+> Visual Token Spatial Compression
+> Text Tokens
+
+Stage I: Inner -Vision 
+
+Encoder Frame Merging       
+
+> Streaming frame segmentation
+> 12345
+
+... ...     
+
+> Middle frame merge
+> 12345
+
+... ...          
+
+> sim 1>sim 2
+> sim 1>τ
+> 📌 📌
+> 12345
+
+... ...      
+
+> 32w1*+ w 2*
+> Weighted frame merge
+> Vision Encoder g
+> Projector 𝑝
+> Prompt Input
+> <system> Describe this video.
+
+... 
+
+> Video Input ( 10s~50min )
+
+Stage II: Decoupled Spatial Selection                               
+
+> Divide into dynamic/static
+> 12345678
+> Dynamic tokens
+> 2467
+> Static tokens
+> 1358
+> Top -K selection
+> 2467
+> Local window top -K selection
+> 1358
+> 13582467
+> Full Tokens within One Frame 7
+> 7Compressed Tokens within One Frame Single Token
+
+Figure 4. Overall pipeline of EarlyTom. Our method consists of two main stages for efficient video token compression. Stage I : Inner-vision encoder frame merging performs temporal compression inside the vision encoder. The video is adaptively segmented based on streaming frame similarity, redundant middle frames are merged using a local-optimal criterion, and merged representations are further refined with weighted fusion to reduce early-stage temporal redundancy. Stage II : Decoupling selection conducts spatial token reduction after vision encoding. Merged frame features are decomposed into dynamic and static token sets: dynamic frames undergo global Top-K selection, while static frames use local-window selection to preserve spatial distribution. The selected tokens from both paths are recombined and fed into the LLM for decoding. Together, these two stages enable early temporal compression and balanced spatial sampling, significantly accelerating Video LLM inference while maintaining semantic fidelity. 
+
+to cross-frame information, we visualize SigLIP [45] atten-tion maps across video frames. We find that certain spatial patch locations consistently receive unusually high atten-tion, forming vertical stripes across frames even when vi-sual content changes. Some works [6, 9, 11, 16, 39, 51, 53, 54] have shown that these correspond to sink tokens, whose query/key vectors exhibit abnormally large norms. Formally, for attention A (i, j ) = QiK⊤ 
+
+> j
+> √d
+
+, sink tokens sat-isfy |Qsink |2 ≫ | Qp|2, forcing A (sink , j ) to dominate re-gardless of content. Thus, raw attention scores from SigLIP cannot directly indicate token importance, since a portion of attention is absorbed by these structural attractors rather than meaningful visual regions. Based on the above analysis, we propose EarlyTom, which consists of two core components: (1) an inner–vision encoder frame compression stage that improves prefill effi-ciency with minimal overhead, and (2) a decoupled spatial token selection stage that provides additional token com-pression without introducing bias into the visual features. 
+
+3.2. Inner Vision Encoder Frame Compression 
+
+As analyzed in Section 3.1, compressing redundant frames within the vision encoder, which is in the early pre-fill stage, is crucial for further enhancing model efficiency and performance. Based on this observation, we propose an inner vision encoder frame merge strategy. 
+
+Streaming frame segmentation. Given an input video, we perform frame merging at several selected layers in the vi-sion encoder as illustrated in Figure 5. Specifically, we first divide the video into segments according to frame similarity in a streaming manner, which is computed by averaging the cosine similarities of tokens at corresponding spatial posi-tions. For two consecutive frames, we calculate their cosine similarity and update the score with an Exponential Moving Average (EMA) over time. When the similarity score drops below a predefined threshold, we treat this point as a seg-ment boundary, which is described in the equation below: 
+
+ˆst = αs t + (1 − α)ˆ st−1, break if ˆst < τ seg , (1) where α denotes the EMA smoothing factor, st denotes the cosine similarity between frame t and t − 1, and ˆst is the EMA-smoothed similarity. We split the two frames when the ˆst is smaller than the threshold τseg .
+
+Middle frame merge. We adopt a local optimal strategy for the middle frames (i.e., frames within a segment excluding the first and last frames). Two frames are merged if and only if (1) their similarity is higher than a predefined threshold and (2) this similarity is larger than that between the next pair of frames. This process is defined as: 
+
+merge( Fi, F i+1 ) iff 
+
+(
+
+si > τ merge 
+
+si > s i+1 
+
+, (2) where si is the similarity between Fi and Fi+1 , and τmerge 
+
+is the merging threshold. This merging strategy ensures that only the most similar frames are merged, helping remove redundancy while keeping temporal consistency. 4Frame Index    
+
+> Cosine Similarity
+> Density
+> Token Hidden State
+> (a) Frames Compression (b) Distribution of Tokens Figure 5. Frames compression and distribution of features. (a) Illustrates the cosine similarity changes across different frame in-dices for network layers at indices 6 and 20 during frame com-pression in the vision encoder. (b) The distribution of raw tokens, top-K sampling, and our method. This subfigure shows that our method is closer to vanilla top-K selection.
+
+Weighted frame merge. To further improve the quality of merged representations, we use a weighted merging scheme as illustrated in the equation below: 
+
+ˆF = siFi + si+1 Fi+1 
+
+si + si+1 
+
+, (3) where Fi and Fi+1 are the frame features and si, si+1 are their corresponding similarity scores. Each pair of frames is weighted by its similarity with the following frame. This weighting makes the merged frame representation more concentrated around semantically important content and re-duces ambiguity caused by uneven temporal variation. 
+
+3.3. Decoupled Spatial Token Selection 
+
+In video feature tokens, we observe that certain vision sink tokens, as illustrated in Figure 2, consistently appear across all frames, receive high attention scores, and oc-cupy the same positions along the sequence length. Ex-isting methods, such as FastVID [34] and HoliTom [32], employ Top-K sampling for spatial token merging, which may introduce inherent bias and cause significant distribu-tion shifts across frames as shown in Figure 5. To address this issue, we propose a decoupled sampling strategy that divides all frames into dynamic and static parts and applies distinct sampling schemes for each. Moreover, we adopt a system co-design approach to further enhance efficiency. 
+
+Decoupling frames into dynamic and static. After merg-ing frames in the vision encoder, we first divide the merged video frames ˆF ∈ RN ×L×D into a dynamic part ˆF d ∈
+
+RT ×L×D and a static part ˆF s ∈ R(N −T )×L×D . The di-vision strategy is similar to the streaming segmentation de-scribed in Section 3.2: we designate the head and tail frames within each segment as dynamic frames, while treating the middle frames as static frames, as we empirically observe that head and tail frames possess the highest discriminative power per segment. Next, we independently compress the dynamic and static frames using their respective strategies. 
+
+Global top-K selection. For each dynamic frame, we per-form a global Top-K selection based on its per-token atten-tion scores. This process is defined as: 
+
+ˆˆF di = ˆF di [Ii, :] , I i = TopK (Ai, ˆr), i ∈ [1 , T ], (4) where Ai denotes the per-token attention scores of frame 
+
+Fi, Ii represents the indices of the selected tokens, and ˆr is the re-scaled selection ratio used to achieve the predefined compression rate, incorporated with stage 1, defined as: 
+
+ˆr = r
+
+( B−NB ) ∗ L , (5) where B is the number of initial frames (e.g., 32 for LLaVA-OneVision). By performing global importance-based com-pression, this process further improves the compression ratio while preserving the most motion-sensitive tokens across the entire temporal dimension. 
+
+Local window top-K selection. For static frames, our goal is to compress them while preserving their original distribu-tion as much as possible, thereby avoiding unnecessary bias introduced by sink tokens. To this end, we apply a local-window Top-K selection strategy to the static frames. We first divide them into M local windows of equal size: 
+
+{W1, W 2, . . . , W m}, M =
+
+l Lw
+
+m
+
+, w =
+
+j L
+
+ˆr
+
+k
+
+. (6) Within each window Wi, we select the token with the max-imum attention score, finally, we observe compressed static frames ˆˆF s. With this technique, the compressed static frames exhibit a distribution that is closer to the original one, thereby mitigating the negative effects caused by the bias introduced by vision sinks. For all dynamic frames ˆˆF d and static frames ˆˆF s, we con-catenate them according to their initial order: 
+
+ˆˆF = Gather ( ˆˆF d, ˆˆF s), (7) which serves as the input for LLM decoding. 
+
+System co-design. To further improve execution effi-ciency, we offload part of the static token selection to the CPU. We empirically observe that dynamic token selec-tion is more time-consuming due to its larger candidate set. As described in Section 3.1, all frames are first di-vided into similarity-based segments; accordingly, we per-form segment-wise static token selection on the CPU, while the GPU determines which dynamic tokens should be pre-served. With this CPU–GPU heterogeneous computation, we further leverage otherwise idle CPU computational ca-pacity, thereby increasing processing speed while maintain-ing overall cost-efficiency. 5Table 1. Performance and accuracy comparison with SoTA methods across benchmarks. Best results are in bold, second-best results are underlined. Time-to-first-token is denoted as TTFT for simplicity. All efficiency results are measured on a single NVIDIA A100 GPU. 
+
+Method Before LLM Retained Ratio Prefilling FLOPs (T) ↓
+
+FLOPs Ratio ↓
+
+TTFT (ms) ↓
+
+Throughput (tokens/s) ↑
+
+MVBench 
+
+↑
+
+EgoSchema 
+
+↑
+
+LongVideo Bench ↑
+
+VideoMME 
+
+↑
+
+Avg. ↑
+
+Score %LLaVA-OV-7B 100% 82.6 100% 889.9 24.4 58.3 60.4 56.4 58.6 58.4 100 FastV [4] ECCV’24 100% 51.1 61.9% 820.0 28.4 55.9 57.5 56.7 56.1 56.5 96.7 PyramidDrop [40] CVPR’25 100% 51.8 62.7% 813.4 28.3 56.1 58.0 54.1 56.4 56.2 96.2 DyCoke [35] CVPR’25 25% 50.5 61.1% 905.6 21.1 53.1 59.5 49.5 54.3 54.1 92.6 VisionZip [43] CVPR’25 25% 50.5 61.1% 516.6 29.4 57.9 60.3 56.5 58.2 58.2 99.7 PruneVid [14] ACL’25 25% 50.5 61.1% 703.6 29.4 57.4 59.9 55.7 57.4 57.6 98.6 FastVID [34] NeurIPS’25 25% 50.5 61.1% 581.6 26.9 56.5 58.2 56.3 58.0 57.3 98.1 HoliTom [32] NeurIPS’25 25% 49.0 59.3% 661.3 29.9 58.4 61.2 56.7 58.9 58.8 100.7 
+
+EarlyTom 25% 36.5 44.2% 426.3 32.9 57.4 60.5 56.3 58.5 58.2 99.7 VisionZip [43] CVPR’25 20% 48.7 58.9% 495.0 29.8 57.7 59.8 55.2 57.9 57.7 98.8 PruneVid [14] ACL’25 20% 49.0 59.3% 662.1 29.5 57.2 59.7 54.7 56.9 57.1 97.8 FastVID [34] NeurIPS’25 20% 48.7 58.9% 546.6 27.6 56.3 57.9 57.1 57.9 57.3 98.1 HoliTom [32] NeurIPS’25 20% 47.5 57.5% 622.3 30.0 58.7 61.0 57.1 58.6 58.8 100.7 
+
+EarlyTom 20% 35.1 42.4% 415.3 33.4 57.8 60.6 55.6 58.0 58.1 99.3 VisionZip [43] CVPR’25 15% 46.9 56.8% 475.9 32.1 56.5 59.8 54.4 56.1 56.7 97.1 PruneVid [14] ACL’25 15% 47.5 57.5% 574.1 27.1 56.8 59.7 55.4 56.6 57.1 97.8 FastVID [34] NeurIPS’25 15% 46.9 56.8% 530.8 28.7 56.0 57.4 56.2 57.7 56.8 97.3 HoliTom [32] NeurIPS’25 15% 46.0 55.7% 572.7 27.5 58.1 61.2 56.4 57.3 58.2 99.7 
+
+EarlyTom 15% 33.6 40.7% 390.6 30.4 57.5 60.2 54.4 56.9 57.3 98.1 VisionZip [43] CVPR’25 10% 45.2 54.7% 458.5 28.5 53.5 58.0 49.3 53.4 53.5 91.6 PruneVid [14] ACL’25 10% 45.9 55.6% 592.2 28.6 56.2 59.8 54.5 56.0 56.6 96.9 FastVID [34] NeurIPS’25 10% 45.2 54.7% 502.1 28.3 55.9 56.5 56.3 57.3 56.5 96.7 HoliTom [32] NeurIPS’25 10% 44.6 54.0% 556.6 29.0 57.3 61.2 56.3 56.8 57.9 99.1 
+
+EarlyTom 10% 32.2 39.0% 336.2 31.6 56.5 60.1 52.4 55.8 56.2 96.2 
+
+## 4. Experiments 
+
+4.1. Settings 
+
+Benchmarks and metrics. In our paper, we choose four mainstream video understanding tasks for our evaluation: MVBench [20], EgoSchema [30], LongVideoBench [37], and VideoMME [10]. The videos in these tasks vary in length and scenario difficulty, providing a comprehensive perspective for evaluating the effectiveness and generaliza-tion of our method. To evaluate the efficiency of our ap-proach, we report time-to-first-token (TTFT), throughput, and TFLOPs. These metrics capture both the latency and compute efficiency of our method, highlighting its practical benefits for large-scale or long-form video processing. 
+
+State-of-the-art methods. To evaluate the performance of our method, we compare our method with some main-stream token compression methods in Video-LLMs, i.e., FastV [4], PyramidDrop [40], DyCoke [35], VisionZip [43], FastVid [34], PruneVid [14], and HoliTom [32]. For their accuracy results, we report results from HoliTom. 
+
+Implementations. Our method is implemented based on the LLaVA-OneVision-0.5B/7B model [19]. We incorpo-rate the inner-LLM merging technique from HoliTom [32] into our framework and develop a custom Triton kernel to ensure computational efficiency. All experiments are conducted on NVIDIA A100 and RTX 4090 GPUs. The reported time-to-first-token (TTFT) is measured using the NVIDIA Nsight Systems profiler. For throughput evalua-tion, we report the average result of ten inference runs af-ter warm-up. The prefilling FLOPs are computed follow-ing the HoliTom [32] benchmark protocol, which consists of both vision encoding and LLM prefilling FLOPs. In accordance with the official LLaVA-OneVision configura-tion, 32 video frames are uniformly sampled as visual in-puts, and the vision encoder employs a pretrained SigLIP model [45]. Detailed configurations for hyperparameter selection are provided in Table 8 in the Appendix. All benchmark evaluations are performed using the LMMs-Eval framework [18, 48]. 
+
+FLOPs and throughput. In our paper, we evaluate in-ference performance using FLOPs and throughput. Since both the vision encoder and the LLM decoder are built on Transformer architectures, the computation of FLOPs follows the same formulation. The computational cost mainly comes from the multi-head self-attention (MHA) and the feed-forward network (FFN). Following previous works [4, 32, 35, 40], the FLOPs for processing Li vision tokens at layer i with hidden size D and FFN intermediate size M , can be expressed as 4LiD2 + 2 L2 
+
+> i
+
+D + 2 LiDM .HoliTom [32] reports that only about 2% of FLOPs occur 6Table 2. Cross-backbone comparison on performance and accuracy. Best results are in bold, second-best results are underlined. Time-to-first-token is denoted as TTFT for simplicity. All efficiency results are measured on a single NVIDIA A100 GPU.                                                                                                                                                                                                    
+
+> Method Before LLM Retained Ratio Prefilling FLOPs (T) ↓
+> FLOPs Ratio ↓
+> TTFT (ms) ↓
+> Throughput (tokens/s) ↑
+> MVBench
+> ↑
+> EgoSchema
+> ↑
+> LongVideo Bench ↑
+> VideoMME
+> ↑
+> Avg. ↑
+> Score %LLaVA-OV-0.5B 100% 45.3 100% 413.7 42.7 45.5 26.8 45.8 43.7 40.5 100 FastVID [34] NeurIPS’25 25% 42.4 93.6% 409.9 25.9 44.7 25.3 44.9 42.1 39.3 97.0 VisionZip [43] CVPR’25 25% 42.4 93.6% 368.6 41.1 45.6 27.7 45.9 42.9 40.5 100.0 HoliTom [32] NeurIPS’25 25% 42.3 93.4% 519.4 35.2 45.8 27.6 46.2 44.4 41.0 101.2
+> EarlyTom 25% 29.9 66.0% 331.5 47.8 45.5 27.4 46.3 43.4 40.7 100.4 FastVID [34] NeurIPS’25 20% 42.3 92.4% 412.6 28.8 43.8 25.7 44.3 41.6 38.9 96.0 VisionZip [43] CVPR’25 20% 42.3 93.4% 368.5 42.3 45.1 27.5 44.8 42.7 40.0 98.8 HoliTom [32] NeurIPS’25 20% 42.2 93.2% 499.4 38.3 45.5 27.7 45.9 44.1 40.8 100.7
+> EarlyTom 20% 29.8 65.8% 313.1 40.6 45.2 27.5 44.7 43.7 40.3 99.5 FastVID [34] NeurIPS’25 15% 42.1 92.9% 411.3 29.4 43.1 25.3 44.7 40.7 38.5 95.1 VisionZip [43] CVPR’25 15% 42.1 92.9% 367.1 37.8 44.6 26.9 44.9 42.3 39.7 98.0 HoliTom [32] NeurIPS’25 15% 42.1 92.9% 473.9 34.1 45.4 27.6 46.4 43.4 40.7 100.4
+> EarlyTom 15% 29.7 65.6% 311.1 35.1 44.8 27.0 44.9 42.3 39.8 98.3 FastVID [34] NeurIPS’25 10% 42.0 92.7% 408.5 31.9 42.7 24.7 44.2 40.7 38.1 94.1 VisionZip [43] CVPR’25 10% 42.0 92.7% 366.1 38.7 43.2 25.8 42.6 40.0 37.9 93.6 HoliTom [32] NeurIPS’25 10% 42.0 92.7% 457.1 39.6 45.0 27.3 44.5 43.3 40.0 98.8
+> EarlyTom 10% 29.6 65.3% 280.1 43.9 44.3 26.8 44.5 41.8 39.4 97.3
+
+during the decoding stage, and the majority of the computa-tion lies in the prefilling (encoder) stage. However, different from HoliTom, we evaluate not only the LLM decoder but also the effectiveness and efficiency of the vision encoder. Therefore, the FLOPs of the whole inference pipeline are computed according to Equation (8): FLOPs =
+
+> Tv
+
+X
+
+> i=1
+
+ 4LiD2 + 2 L2 
+
+> i
+
+D + 2 LiDM | {z }
+
+> Vision Encoder FLOPs per layer
+
++
+
+> Tt
+
+X
+
+> i=1
+
+ 4LiD2 + 2 L2 
+
+> i
+
+D + 2 LiDM | {z }
+
+> LLM Decoder FLOPs per layer
+
+.
+
+(8) Compared with some outer-LLM token compression meth-ods, performing token compression early within the vision encoder reduces the number of tokens entering the LLM, thereby significantly decreasing FLOPs and improving in-ference efficiency. For throughput evaluation, we use the same video input for all methods and measure the total run-time r. The throughput is reported as the average generated tokens per second over ten runs (with two warm-up passes): Throughput = Avg (Pri=1 tokens time ).
+
+4.2. Main Results 
+
+Performance comparison with state-of-the-art methods. 
+
+Table 1 presents a comprehensive comparison of EarlyTom against a range of state-of-the-art training-free token com-pression methods, focusing on FLOPs, TTFT, and through-put. As shown in Table 1, prior methods such as Pyramid-Drop [40], VisionZip [43], PruneVid [14], and FastVID [34] significantly reduce the FLOPs of the prefill stage. How-ever, these approaches largely rely on late-stage compres-sion and operate after vision encoding, leaving the vision encoder as a dominant bottleneck. As a result, although their retained-token ratios fall to as low as 10–25%, the corresponding TTFT still ranges from 458 ms to 661 ms, and the throughput fluctuates between 27.5 and 32.1 to-kens/s. In contrast, EarlyTom fundamentally shifts the com-pression point to an early stage inside the vision encoder, thereby optimizing one of the most expensive portions of TTFT. Consequently, EarlyTom achieves the lowest TTFT among all training-free approaches, only 336.2 ms with a 10% retained-token ratio, outperforming all other compared methods by a clear margin. Meanwhile, EarlyTom maintains a FLOPs budget of 36.5T under a retention ratio of 25%, achieving signifi-cantly higher efficiency than the full-token baseline (82.6T) and other token compression methods. The results indicate that EarlyTom not only reduces the computational burden but also fundamentally improves system-level efficiency by co-optimizing both vision-encoding and LLM-prefill costs. Even under more aggressive compression ratios, Early-Tom maintains low TTFT and high throughput simulta-neously, outperforming methods such as VisionZip [43], PruneVid [14], and FastVID [34]. This consistent dom-inance across multiple retention configurations highlights the superiority of EarlyTom in optimizing early-stage to-ken compression and its ability to deliver balanced improve-ments in both latency and system efficiency. Overall, Early-Tom sets a new benchmark for inference efficiency in video LLMs, significantly outperforming all existing training-free methods in FLOPs, TTFT, and throughput. 7Table 3. Frame merging effectiveness varies across different initial compression layers. We report with a compression ratio of 0.2.                                     
+
+> #Layer TTFT ↓Throughput ↑MVBench ↑VideoMME ↑EgoSchema ↑Avg. ↑
+> Layer 4 380.0 31.6 57.4 57.9 60.4 58.6 Layer 6 387.1 32.3 57.8 58.1 60.4 58.9
+> Layer 8 421.1 30.7 57.5 58.0 60.4 58.6 Layer 10 436.9 31.1 57.4 58.0 60.6 58.7
+
+Table 4. Ablation study of different token sampling ways. We report the throughput and accuracy of three video tasks. In all results, we set the retain ratio to 0.2.                          
+
+> Sampling Throughput ↑MVBench ↑VideoMME ↑EgoSchema ↑Avg. ↑
+> Random 35.3 57.0 56.6 59.8 57.8 Top-K 31.5 57.5 57.3 60.4 58.4
+> EarlyTom 33.4 57.8 58.1 60.6 58.8
+
+Accuracy comparison with state-of-the-art methods. Al-though EarlyTom is designed for improving efficiency, it also maintains accuracy comparable to a full-token baseline across multiple benchmarks. Table 1 shows results across four widely used video understanding benchmarks. Under all configurations, EarlyTom achieves an average accuracy of more than 96% compared with the full-token baseline, which is competitive with other training-free state-of-the-art methods. Meanwhile, EarlyTom achieves this accuracy while reducing TTFT by up to 2.65 ×, demonstrating that the substantial efficiency gains do not come at the cost of model performance. In more challenging compression sce-narios such as the 15% and 10% settings, other methods often show noticeable degradation in benchmark perfor-mance. For instance, VisionZip [43] suffers a noticeable accuracy drop under aggressive pruning, whereas Early-Tom maintains stable performance, with only a 4% decrease compared to the full-token output, while VisionZip [43] drops by nearly 9%. This indicates that EarlyTom preserves relevant features more effectively than late-stage pruning strategies. In summary, EarlyTom achieves near-baseline accuracy while significantly outperforming all prior ap-proaches in computational efficiency, proving its practical value for real-world, latency-sensitive deployments. 
+
+Comparison across different backbones. To evaluate the robustness and generality of EarlyTom, we apply EarlyTom to a smaller backbone, LLaVA-OV-0.5B, and report results in Table 2. Similar to the observations on the 7B model, EarlyTom achieves substantial TTFT and FLOPs reductions and throughput improvements across all compression set-tings, while maintaining benchmark accuracy within a nar-row margin of the full-token baseline across the four bench-marks, demonstrating that early-stage compression gener-alizes well even under lightweight vision-encoder architec-tures. This robustness is further evidenced across differ-ent retained-token settings: EarlyTom yields consistent im-provements in efficiency with stable accuracy regardless of the size of the backbone. These results confirm that Ear-
+
+Table 5. Ablation study on the compression module of our method. The stage-1 retention ratio is averaged due to its sample-dependent behavior, as the redundancy strongly depends on the input sample.                              
+
+> Method Retained Ratio MVBench ↑VideoMME ↑EgoSchema ↑Avg. ↑
+> Vanilla 100% 58.3 58.6 60.4 59.1 Only stage-1 73.9% 57.9 57.0 60.3 58.4 Only stage-2 20% 57.3 57.6 60.4 58.4
+> EarlyTom 20% 57.8 58.1 60.6 58.8
+
+lyTom is architecture-agnostic and capable of delivering strong acceleration without sacrificing quality. 
+
+4.3. Ablation Studies 
+
+Contribution of compression modules. As shown in Ta-ble 5, the temporal merge achieves 98.8% of the baseline ac-curacy while retaining approximately 73.9% of the tokens. The spatial token selection module reaches the same accu-racy with a retention rate of 20%. When both frame merge and spatial selection are jointly applied, our method further improves performance, achieving an accuracy of 58.8, sur-passing either individual module. 
+
+Impact of different frame merging layers. Table 3 demonstrates that initiating the merging process from layer 4 yields the lowest TTFT, but results in a noticeable accu-racy degradation. In contrast, starting from layer 6 achieves the best balance between accuracy and throughput. Since our frame merging primarily depends on the hidden states produced by the vision encoder, this also explains why throughput and TTFT do not scale proportionally. 
+
+Effectiveness of the proposed local window sampling. 
+
+Table 4 shows that the top-K selection is slower than ran-dom sampling because it requires a global ranking over all tokens with complexity O(N log K), whereas random sampling only generates K indices with complexity O(K).As a result, top-K selection incurs extra computational and memory overhead, while random sampling cannot retain the most informative tokens. Our local window sampling combines the strengths of both methods, achieving a better trade-off between efficiency and accuracy. 
+
+## 5. Conclusion 
+
+In this paper, we propose EarlyTom , a training-free to-ken compression framework for fast Video LLM inference. Benefiting from early-stage frame merging within the vi-sion encoder and a further decoupled spatial token selec-tion strategy, EarlyTom achieves up to a 2.65 × reduction in TTFT and a 61% reduction in FLOPs, while keeping com-parable accuracy to the full-token baseline. These results demonstrate the effectiveness and efficiency of EarlyTom, revealing its strong potential in video understanding tasks and laying a solid foundation for the deployment of Video LLMs in real-world production environments. 8Acknowledgement 
+
+This paper is supported by Young Scientists Fund of the National Natural Science Foundation of China (NSFC) (No. 62506305), Zhejiang Leading Innovative and Entrepreneur Team Introduction Program (No. 2024R01007), Key Re-search and Development Program of Zhejiang Province (No. 2025C01026), Scientific Research Project of West-lake University (No. WU2025WF003). It is also sup-ported by the research funds of the National Talent Program, Hangzhou Municipal Talent Program and Alibaba Innova-tive Research Program. 
+
+## References 
+
+[1] Shuai Bai, Keqin Chen, Xuejing Liu, Jialin Wang, Wenbin Ge, Sibo Song, Kai Dang, Peng Wang, Shijie Wang, Jun Tang, et al. Qwen2.5-vl technical report. arXiv preprint arXiv:2502.13923 , 2025. 1 [2] Daniel Bolya, Cheng-Yang Fu, Xiaoliang Dai, Peizhao Zhang, Christoph Feichtenhofer, and Judy Hoffman. Token merging: Your vit but faster. In ICLR , 2023. 2 [3] Junjie Chen, Xuyang Liu, Zichen Wen, Yiyu Wang, Siteng Huang, and Honggang Chen. Variation-aware vision to-ken dropping for faster large vision-language models. arXiv preprint arXiv:2509.01552 , 2025. 3 [4] Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Junyang Lin, Chang Zhou, and Baobao Chang. An image is worth 1/2 tokens after layer 2: Plug-and-play inference acceleration for large vision-language models. In ECCV , 2024. 2, 6 [5] Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo Chen, Sen Xing, Muyan Zhong, Qinglong Zhang, Xizhou Zhu, Lewei Lu, et al. Internvl: Scaling up vision foundation mod-els and aligning for generic visual-linguistic tasks. In CVPR ,2024. 1 [6] Timoth´ ee Darcet, Maxime Oquab, Julien Mairal, and Piotr Bojanowski. Vision transformers need registers. In ICLR ,2024. 4 [7] Wenjie Du, Li Jiang, Keda Tao, Xue Liu, and Huan Wang. Which heads matter for reasoning? rl-guided kv cache com-pression. arXiv preprint arXiv:2510.08525 , 2025. 3 [8] Sicheng Feng, Gongfan Fang, Xinyin Ma, and Xinchao Wang. Efficient reasoning models: A survey. Transactions on Machine Learning Research , 2025. 3 [9] Wenfeng Feng and Guoying Sun. Edit: Enhancing vi-sion transformers by mitigating attention sink through an encoder-decoder architecture. In OCSA , 2026. 4 [10] Chaoyou Fu, Yuhan Dai, Yongdong Luo, Lei Li, Shuhuai Ren, Renrui Zhang, Zihan Wang, Chenyu Zhou, Yunhang Shen, Mengdan Zhang, et al. Video-mme: The first-ever comprehensive evaluation benchmark of multi-modal llms in video analysis. In CVPR , 2025. 6 [11] Xiangming Gu, Tianyu Pang, Chao Du, Qian Liu, Fengzhuo Zhang, Cunxiao Du, Ye Wang, and Min Lin. When attention sink emerges in language models: An empirical view. In 
+
+ICLR , 2025. 4 [12] Gongde Guo, Hui Wang, David Bell, Yaxin Bi, and Kieran Greer. Knn model-based approach in classification. In OTM ,2003. 2 [13] Yuhang Han, Xuyang Liu, Zihan Zhang, Pengxiang Ding, Junjie Chen, Honggang Chen, Donglin Wang, Qingsen Yan, and Siteng Huang. Filter, correlate, compress: Training-free token reduction for mllm acceleration. In AAAI , 2026. 2 [14] Xiaohu Huang, Hao Zhou, and Kai Han. Prunevid: Visual token pruning for efficient video large language models. In 
+
+ACL , 2025. 6, 7 [15] Xin Jin, Siyuan Li, Siyong Jian, Kai Yu, and Huan Wang. Mergemix: A unified augmentation paradigm for visual and multi-modal understanding. arXiv preprint arXiv:2510.23479 , 2025. 2 [16] Seil Kang, Jinyeong Kim, Junhyeok Kim, and Seong Jae Hwang. See what you are told: Visual attention sink in large multimodal models. In ICLR , 2025. 4 [17] Zicheng Kong, Dehua Ma, Zhenbo Xu, Alven Yang, Yi-wei Ru, Haoran Wang, Zixuan Zhou, Fuqing Bie, Liuyu Xi-ang, Huijia Wu, et al. Omni-rrm: Advancing omni reward modeling via automatic rubric-grounded preference synthe-sis. arXiv preprint arXiv:2602.00846 , 2026. 3 [18] Bo Li, Peiyuan Zhang, Kaichen Zhang, Fanyi Pu, Xinrun Du, Yuhao Dong, Haotian Liu, Yuanhan Zhang, Ge Zhang, Chunyuan Li, and Ziwei Liu. Lmms-eval: Accelerating the development of large multimoal models, 2024. 6 [19] Bo Li, Yuanhan Zhang, Dong Guo, Renrui Zhang, Feng Li, Hao Zhang, Kaichen Zhang, Peiyuan Zhang, Yanwei Li, Zi-wei Liu, et al. Llava-onevision: Easy visual task transfer. 
+
+TMLR , 2025. 1, 6 [20] Kunchang Li, Yali Wang, Yinan He, Yizhuo Li, Yi Wang, Yi Liu, Zun Wang, Jilan Xu, Guo Chen, Ping Luo, et al. Mvbench: A comprehensive multi-modal video understand-ing benchmark. In CVPR , 2024. 6 [21] KunChang Li, Yinan He, Yi Wang, Yizhuo Li, Wenhai Wang, Ping Luo, Yali Wang, Limin Wang, and Yu Qiao. Videochat: Chat-centric video understanding. Science China Information Sciences , page 200102, 2025. 1 [22] Kevin Y. Li, Sachin Goyal, Jo˜ ao Dias Semedo, and J. Zico Kolter. Inference optimal vlms need fewer visual tokens and more parameters. In International Conference on Learning Representations , 2024. 3 [23] Wentong Li, Yuqian Yuan, Jian Liu, Dongqi Tang, Song Wang, Jie Qin, Jianke Zhu, and Lei Zhang. Tokenpacker: Efficient visual projector for multimodal llm. IJCV , pages 1–19, 2025. 2 [24] Yanwei Li, Chengyao Wang, and Jiaya Jia. Llama-vid: An image is worth 2 tokens in large language models. In ECCV ,2024. 1 [25] Ting Liu, Liangtao Shi, Richang Hong, Yue Hu, Quanjun Yin, and Linfeng Zhang. Multi-stage vision token dropping: Towards efficient multimodal large language model. arXiv preprint arXiv:2411.10803 , 2024. 2 [26] Xuyang Liu, Xiyan Gui, Yuchao Zhang, and Linfeng Zhang. Mixing importance with diversity: Joint optimization for kv cache compression in large vision-language models. arXiv preprint arXiv:2510.20707 , 2025. 3 
+
+9[27] Xuyang Liu, Yiyu Wang, Junpeng Ma, and Linfeng Zhang. Video compression commander: Plug-and-play inference ac-celeration for video large language models. In EMNLP ,2025. [28] Xuyang Liu, Ziming Wang, Junjie Chen, Yuhang Han, Yingyao Wang, Jiale Yuan, Jun Song, Siteng Huang, and Honggang Chen. Global compression commander: Plug-and-play inference acceleration for high-resolution large vision-language models. In AAAI , 2026. 3 [29] Muhammad Maaz, Hanoona Rasheed, Salman Khan, and Fahad Khan. Video-chatgpt: Towards detailed video un-derstanding via large vision and language models. In Pro-ceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 12585–12602, 2024. 1 [30] Karttikeya Mangalam, Raiymbek Akshulakov, and Jitendra Malik. Egoschema: A diagnostic benchmark for very long-form video language understanding. In NeurIPS , 2023. 6 [31] Yuzhang Shang, Mu Cai, Bingxin Xu, Yong Jae Lee, and Yan Yan. Llava-prumerge: Adaptive token reduction for efficient large multimodal models. In ICCV , 2025. 2 [32] Kele Shao, Keda Tao, Can Qin, Haoxuan You, Yang Sui, and Huan Wang. Holitom: Holistic token merging for fast video large language models. In NeurIPS , 2025. 2, 5, 6, 7 [33] Kele Shao, Keda Tao, Kejia Zhang, Sicheng Feng, Mu Cai, Yuzhang Shang, Haoxuan You, Can Qin, Yang Sui, and Huan Wang. When tokens talk too much: A survey of multimodal long-context token compression across images, videos, and audios. arXiv preprint arXiv:2507.20198 , 2025. 2 [34] Leqi Shen, Guoqiang Gong, Tao He, Yifeng Zhang, Sicheng Zhao, Guiguang Ding, et al. Fastvid: Dynamic density prun-ing for fast video large language models. In NeurIPS , 2025. 2, 5, 6, 7 [35] Keda Tao, Can Qin, Haoxuan You, Yang Sui, and Huan Wang. Dycoke: Dynamic compression of tokens for fast video large language models. In CVPR , 2025. 2, 6 [36] Chau Tran, Duy MH Nguyen, Manh-Duy Nguyen, TrungTin Nguyen, Ngan Le, Pengtao Xie, Daniel Sonntag, James Y Zou, Binh Nguyen, and Mathias Niepert. Accelerating transformers with spectrum-preserving token merging. In 
+
+NeurIPS , 2024. 2 [37] Haoning Wu, Dongxu Li, Bei Chen, and Junnan Li. Longvideobench: A benchmark for long-context interleaved video-language understanding. In NeurIPS , 2024. 6 [38] Yecheng Wu, Zhuoyang Zhang, Junyu Chen, Haotian Tang, Dacheng Li, Yunhao Fang, Ligeng Zhu, Enze Xie, Hongxu Yin, Li Yi, et al. Vila-u: a unified foundation model inte-grating visual understanding and generation. arXiv preprint arXiv:2409.04429 , 2024. 1 [39] Guangxuan Xiao, Yuandong Tian, Beidi Chen, Song Han, and Mike Lewis. Efficient streaming language models with attention sinks. In ICLR , 2025. 4 [40] Long Xing, Qidong Huang, Xiaoyi Dong, Jiajie Lu, Pan Zhang, Yuhang Zang, Yuhang Cao, Conghui He, Jiaqi Wang, Feng Wu, et al. Pyramiddrop: Accelerating your large vision-language models via pyramid visual redundancy re-duction. In CVPR , 2025. 2, 6, 7 [41] Minhao Xiong, Zichen Wen, Zhuangcheng Gu, Xuyang Liu, Rui Zhang, Hengrui Kang, Jiabing Yang, Junyuan Zhang, Weijia Li, Conghui He, et al. Prune2drive: A plug-and-play framework for accelerating vision-language models in autonomous driving. arXiv:2508.13305 , 2025. 3 [42] Chenyu Yang, Xuan Dong, Xizhou Zhu, Weijie Su, Jiahao Wang, Hao Tian, Zhe Chen, Wenhai Wang, Lewei Lu, and Jifeng Dai. Pvc: Progressive visual token compression for unified image and video processing in large vision-language models. In CVPR , 2025. 2 [43] Senqiao Yang, Yukang Chen, Zhuotao Tian, Chengyao Wang, Jingyao Li, Bei Yu, and Jiaya Jia. Visionzip: Longer is better but not necessary in vision language models. In 
+
+CVPR , 2025. 2, 6, 7, 8 [44] Shusheng Yang, Jihan Yang, Pinzhi Huang, Ellis Brown, Zi-hao Yang, Yue Yu, Shengbang Tong, Zihan Zheng, Yifan Xu, Muhan Wang, et al. Cambrian-s: Towards spatial supersens-ing in video. arXiv preprint arXiv:2511.04670 , 2025. 1 [45] Xiaohua Zhai, Basil Mustafa, Alexander Kolesnikov, and Lucas Beyer. Sigmoid loss for language image pre-training. In ICCV , 2023. 4, 6 [46] Boqiang Zhang, Kehan Li, Zesen Cheng, Zhiqiang Hu, Yuqian Yuan, Guanzheng Chen, Sicong Leng, Yuming Jiang, Hang Zhang, Xin Li, et al. Videollama 3: Frontier multi-modal foundation models for image and video understand-ing. arXiv preprint arXiv:2501.13106 , 2025. 1 [47] Ce Zhang, Kaixin Ma, Tianqing Fang, Wenhao Yu, Hong-ming Zhang, Zhisong Zhang, Haitao Mi, and Dong Yu. Vs-can: Rethinking visual token reduction for efficient large vision-language models. TMLR , 2025. 2 [48] Kaichen Zhang, Bo Li, Peiyuan Zhang, Fanyi Pu, Joshua Adrian Cahyono, Kairui Hu, Shuai Liu, Yuanhan Zhang, Jingkang Yang, Chunyuan Li, and Ziwei Liu. Lmms-eval: Reality check on the evaluation of large multimodal models. arXiv preprint arXiv:2407.12772 , 2024. 6 [49] Yuanhan Zhang, Jinming Wu, Wei Li, Bo Li, Zejun Ma, Zi-wei Liu, and Chunyuan Li. Video instruction tuning with synthetic data. arXiv preprint arXiv:2410.02713 , 2024. 1 [50] Yuan Zhang, Chun-Kai Fan, Junpeng Ma, Wenzhao Zheng, Tao Huang, Kuan Cheng, Denis A Gudovskiy, Tomoyuki Okuno, Yohei Nakata, Kurt Keutzer, et al. Sparsevlm: Vi-sual token sparsification for efficient vision-language model inference. In ICML , 2025. 2 [51] Shiyu Zhao, Zhenting Wang, Felix Juefei-Xu, Xide Xia, Miao Liu, Xiaofang Wang, Mingfu Liang, Ning Zhang, Dim-itris N Metaxas, and Licheng Yu. Accelerating multimodal large language models by searching optimal vision token re-duction. In CVPR , 2025. 4 [52] Junhan Zhu, Hesong Wang, Mingluo Su, Zefang Wang, and Huan Wang. Obs-diff: Accurate pruning for diffusion mod-els in one-shot. arXiv preprint arXiv:2510.06751 , 2025. 3 [53] Jiedong Zhuang, Lu Lu, Ming Dai, Rui Hu, Jian Chen, Qiang Liu, and Haoji Hu. St3: Accelerating multimodal large lan-guage model by spatial-temporal visual token trimming. In 
+
+AAAI , 2025. 4 [54] Zayd MK Zuhri, Erland Hilman Fuadi, and Alham Fikri Aji. Softpick: No attention sink, no massive activations with rec-tified softmax. arXiv preprint arXiv:2504.20966 , 2025. 4 
+
+10 EarlyTom : Early Token Compression Completes Fast Video Understanding 
+
+# Supplementary Material 
+
+## Overview 
+
+Due to page limitations in the main paper, we present additional quantitative experiments, detailed latency anal-yses, qualitative visualizations, and implementation details in this supplementary material. The content is organized as follows: • Section A evaluates the generalizability of our method on a different video-LLM architecture. Specifically, we provide extensive efficiency and accuracy results on the LLaVA-Video-7B benchmark to verify the robustness of EarlyTom across different backbones. Furthermore, we extend our evaluation to the Qwen2.5-VL architecture, comparing EarlyTom against two native token reduction baselines. We also conduct fine-grained ablation studies to investigate the individual contribution of each compo-nent within our framework on Qwen architecture. • Section B presents a fine-grained decomposition of the time-to-first-token (TTFT) latency. We analyze the spe-cific contributions of vision encoding, visual token pro-cessing, and LLM prefilling to the total latency on both LLaVA-OneVision-7B and 0.5B models across different settings. • Section C provides additional visualizations of the atten-tion sink phenomenon. By visualizing attention heatmaps from the vision encoder, we further substantiate the moti-vation behind our decoupled spatial token selection strat-egy. • Section D details the implementation of our framework, providing the pseudocode for the two core components: the inner-vision encoder frame merging and the decou-pled spatial token selection .• Section E presents the future work of EarlyTom, includ-ing potential directions for system co-design, heteroge-neous inference optimization, and acceleration for the de-coding stage in multimodal models. 
+
+## A. Generalizability Analysis on LLaVA-Video and Qwen2.5-VL 
+
+To further verify the effectiveness and broad applica-bility of our framework, we extend our evaluation to the LLaVA-Video-7B model and Qwen2.5-VL-7B model. 
+
+Efficiency analysis. As detailed in Table 6, EarlyTom consistently delivers substantial improvements in computa-tional efficiency across all tested token retention settings. By performing frame merging directly within the vision en-coder, our method effectively reduces the prefilling FLOPs. For instance, at a 15% retention rate, EarlyTom reduces the FLOPs ratio to 35.1% and achieves a time-to-first-token of 947.4 ms, representing a 6.8 × speedup compared to the full-token baseline (6429.3 ms). The efficiency advantages are also corroborated on the Qwen2.5-VL-7B backbone (Table 7). Specifically, while trivial baselines like Average Pooling and Uniform Subsampling result in a 16.6% FLOPs ratio, EarlyTom further optimizes this to 12.2% (67.7T), achieving a significantly faster TTFT (3667 ms) than both the full model and the native token reduction baselines. 
+
+Accuracy and trade-off. Table 6 presents a comprehen-sive comparison of accuracy and efficiency. EarlyTom maintains competitive performance on standard video un-derstanding benchmarks, achieving an average score of 56.43% while operating with significantly reduced compu-tational overhead. These results demonstrate that EarlyTom can successfully generalize to the LLaVA-Video architec-ture, providing an efficient inference solution that balances high throughput with reliable model performance. This ro-bust generalizability is further evidenced by our results on the Qwen2.5-VL-7B backbone (Table 7). At a 15% to-ken retention ratio, EarlyTom achieves an average score of 62.2%, which significantly outperforms the Uniform Sub-sampling and Average Pooling baselines. Notably, Early-Tom maintains higher accuracy than these trivial baselines while utilizing even fewer FLOPs, demonstrating a superior Pareto frontier in the accuracy-efficiency trade-off. 
+
+Ablation studies. To investigate the individual contribu-tion of our proposed modules, we conduct fine-grained ab-lation studies on the Qwen2.5-VL architecture, as summa-rized in Table 7. We observe that both decoupled spatial token selection and weighted frame merging are essential for maintaining optimal performance under aggressive com-pression. Specifically, removing the spatial selection mod-ule leads to a performance drop from 62.2% to 61.4%, in-dicating its critical role in identifying and preserving in-formative regions across frames. Similarly, excluding the weighted merging strategy results in a decline to 61.3%, underscoring the importance of our importance-aware ag-gregation. These results confirm that the synergy between spatial selection and temporal merging is the key to Ear-lyTom’s ability to preserve high-fidelity visual information while reducing token redundancy. 1Table 6. Efficiency comparison with SoTA methods on the LLaVA-Video-7B model. Best results are in bold, second-best results are underlined. Time-to-first-token is denoted as TTFT for simplicity. All efficiency results are measured on a single NVIDIA A100 GPU. 
+
+Model Method Before LLM Retained Ratio Prefilling FLOPs (T) ↓
+
+FLOPs Ratio ↓
+
+TTFT (ms) ↓
+
+Throughput (tokens/s) ↑
+
+MVBench 
+
+↑
+
+EgoSchema 
+
+↑
+
+LongVideo Bench ↑
+
+VideoMME 
+
+↑
+
+Avg. ↑
+
+Score %LLaVA-Video-7B Vanilla 100% 246.2 100% 6429.3 8.1 60.4 57.2 58.9 64.3 60.2 100 FastV [4] ECCV’24 100% 158.2 64.3% 3494.3 10.0 54.3 54.1 55.0 58.8 55.6 92.4 PyramidDrop [40] CVPR’25 100% 159.4 64.7% 3494.8 10.1 55.9 54.3 54.7 61.9 56.7 94.2 VisionZip [43] CVPR’25 15% 159.4 64.7% 3241.4 14.2 56.7 54.7 54.7 60.7 56.7 94.2 HoliTom [32] NeurIPS’25 15% 156.6 63.6% 1669.5 17.1 57.7 54.8 56.2 62.1 57.7 95.8 
+
+EarlyTom 15% 86.4 35.1% 947.4 16.7 55.8 54.7 53.9 61.3 56.4 93.7 
+
+Table 7. Experiment results on trivial baselines and ablation studies. All results are obtained on Qwen2.5-VL-7B with a maximum of 768 frames and a retain ratio of 15%. Efficiency metrics are measured under a 23k-token context length on a single NVIDIA A100 GPU.                                                                   
+
+> Method Prefilling FLOPs (T) ↓
+> FLOPs Ratio ↓
+> TTFT (ms) ↓MVBench ↑VideoMME ↑Avg. Score Short Medium Long Average Qwen2.5-VL-7B 554.7 100% 6842 67.1 76.0 66.0 55.1 65.7 66.4 Average Pooling 91.9 16.6% 4609 56.8 66.4 57.3 51.1 58.3 57.6 Uniform Subsampling 91.9 16.6% 4578 57.7 68.6 59.6 55.0 60.8 59.3 EarlyTom w/o Decoupled Spatial Token Selection 67.7 12.2% 3667 60.7 71.0 61.6 53.6 62.0 61.4 EarlyTom w/o Weighted Frame Merging 67.7 12.2% 3667 60.7 70.5 62.3 52.7 61.8 61.3
+> EarlyTom 67.7 12.2% 3667 62.5 70.7 61.6 53.6 61.9 62.2
+
+Table 8. Details of the hyperparameters on LLaVA-OneVision.                                                                             
+
+> Retained Ratio w. Inner LLM EMA factor
+> αMVBench
+> ↑
+> EgoSchema
+> ↑
+> LongVideo Bench ↑
+> VideoMME
+> ↑
+> LLaVA-OneVision-7B
+> 25% ✓0.9 τseg =0.8 τseg =0.7 τseg =0.8 τseg =0.6 [6,14,20] [10,21,23] [6,21,23] [10,21,23] 20% ✓0.9 τseg =0.8 τseg =0.6 τseg =0.6 τseg =0.5 [6,14,20] [10,21,23] [10,21,23] [8,21,23] 15% ✓0.9 τseg =0.8 τseg =0.5 τseg =0.5 τseg =0.4 [6,14,20] [10,21,23] [10,21,23] [8,21,23] 10% ✓0.9 τseg =0.65 τseg =0.3 τseg =0.3 τseg =0.3 [8,14,20] [10,21,23] [10,21,23] [10,21,23]
+> LLaVA-OneVision-0.5B
+> 25% ✓0.9 τseg =0.8 τseg =0.7 τseg =0.8 τseg =0.6 [8,21,23] [10,21,23] [6,21,23] [8,21,23] 20% ✓0.9 τseg =0.8 τseg =0.6 τseg =0.6 τseg =0.5 [8,21,23] [10,21,23] [10,21,23] [8,21,23] 15% ✓0.9 τseg =0.8 τseg =0.5 τseg =0.5 τseg =0.4 [8,21,23] [10,21,23] [10,21,23] [8,21,23] 10% ✓0.9 τseg =0.65 τseg =0.3 τseg =0.3 τseg =0.3 [8,21,23] [10,21,23] [10,21,23] [8,21,23]
+
+## B. Detailed Analysis of TTFT Latency Decom-position 
+
+In this section, we provide a fine-grained visualiza-tion of the Time-to-First-Token (TTFT) latency composi-tion for both LLaVA-OneVision-7B (Figure 7) and LLaVA-OneVision-0.5B (Figure 8) under varying token retention rates (10%, 15%, 20%, and 25%). The total latency is de-composed into four components: Vision Encoding, Visual Token Processing, LLM Prefill, and System Overhead. 
+
+Analysis on LLaVA-OneVision-7B. As illustrated in Figure 7, the vision encoding stage constitutes a dominant portion of the total latency for the Baseline, HoliTom, and VisionZip. While existing methods like HoliTom and Vi-sionZip effectively reduce the LLM prefill latency through token reduction, they fail to address the high computational cost of the vision encoder. Moreover, HoliTom introduces significant computational overhead during the Visual To-ken Processing stage, which partially offsets the gains from reduced prefill time. In contrast, EarlyTom directly com-presses redundancy within the vision encoder, achieving a substantial reduction in encoding latency. Consequently, our method achieves the lowest total TTFT across all set-tings, delivering a speedup of up to 2.65 × compared to the baseline at a 10% retention rate. 
+
+Analysis on LLaVA-OneVision-0.5B. The advantages of our approach are consistent across model scales. Figure 8 presents the results on the smaller 0.5B backbone. A no-table observation is that on this lightweight model, the com-putational overhead introduced by comparison methods be-comes more detrimental. Specifically, HoliTom exhibits a higher total latency than the Baseline (e.g., 0.90 × speedup at 10% retention) because the time saved in the LLM prefill stage is insufficient to outweigh the extra cost of its token processing module. Conversely, EarlyTom maintains its su-periority by minimizing both vision encoding time and pro-cessing overhead. Even with the smaller potential for pre-fill acceleration in the 0.5B model, our method achieves a robust speedup of 1.48 × (at 10% retention), validating the effectiveness of our early-stage compression strategy. 
+
+## C. Visualization of the Attention Sink Phe-nomenon Across Diverse Video Samples 
+
+In this section, we provide additional visualizations to further substantiate the analysis of the “Attention Sink” phe-2nomenon discussed in the main paper. Figure 6 displays the attention heatmaps extracted from the SigLIP vision en-coder across a diverse set of video samples. 
+
+Observation. A consistent pattern emerges across all ex-amples: distinct vertical stripes appear in the heatmaps, in-dicating that certain spatial tokens maintain exceptionally high attention scores throughout the entire video sequence. These tokens, often referred to as “attention sinks,” act as static attractors within the feature space, dominating the at-tention distribution regardless of the changing visual con-tent in dynamic frames. 
+
+Motivation for Our Design. This visualization highlights a critical insight for token compression: simply ranking to-kens by attention magnitude might bias the selection to-wards these static sink tokens, potentially overlooking less prominent but semantically rich dynamic features. Rec-ognizing this inherent distribution characteristic, EarlyTom adopts a Decoupled Spatial Token Selection strategy. By distinguishing between static frames (where sinks are sta-ble) and dynamic frames, and applying tailored selection mechanisms for each, our method ensures that the com-pressed token set preserves both the necessary structural in-formation (sinks) and the crucial motion-sensitive details, leading to a more robust and balanced video representation. 
+
+## D. Pseudocode of EarlyTom 
+
+In this section, we provide the detailed pseudocode for the two core components of EarlyTom to facilitate imple-mentation. Algorithm 1 outlines the inner-vision encoder frame merging process, which performs adaptive stream-ing segmentation and weighted merging to reduce temporal redundancy. Algorithm 2 illustrates the decoupled spatial token selection strategy, describing how dynamic and static frames are processed via distinct selection mechanisms to ensure balanced spatial information preservation. 
+
+## E. Future Work 
+
+EarlyTom reveals that the inference budget is mainly dominated by the prefill stage in VLMs. Although exist-ing methods [3, 7, 17, 26–28, 41, 52] have proposed vari-ous techniques for efficient inference, they primarily focus on algorithm-level improvements rather than system-level optimizations. How to jointly leverage system design and algorithmic techniques in a heterogeneous manner remains an open problem. Meanwhile, recent reasoning models [8] have exhibited strong scene understanding capabilities, yet they still suffer from lengthy generation steps during the de-coding stage. Therefore, accelerating inference and improv-ing efficiency via system–algorithm co-design is essential and worthy of further exploration. 
+
+Algorithm 1 Inner-Vision Encoder Frame Merging 
+
+Input: Frame features F ∈ RB×L×D, hyperparameters 
+
+α, τ seg , τ merge .
+
+Output: Merged frame features ˆFout ∈ RN ×L×D .
+
+Streaming Frame Segmentation in Equation (1) 
+
+S ← SegmentBySimilarity (F, α, τ seg ), Fmerged list ← [ ] 
+
+for each segment Sseg = {F0, . . . , F k} in S do 
+
+Fmid ← [ ] , i ← 1
+
+Iterate over Middle Frames within the Segment 
+
+while i < k do 
+
+Compute Pairwise Frame Similarities 
+
+si ← Sim (Fi, F i+1 ), si+1 ← Sim (Fi+1 , F i+2 )
+
+Middle Frame Merge Condition in Equation (2) 
+
+if si > τ merge and si > s i+1 then 
+
+Weighted Frame Merge in Equation (3) 
+
+ˆFm ← WeightedMerge (si, F i, s i+1 , F i+1 )
+
+Fmid .append ( ˆFm); i ← i + 2 
+
+else 
+
+Fmid .append (Fi); i ← i + 1 
+
+end if end while 
+
+Assemble Merged Segment 
+
+Fseg out ← Concat (F0, F mid , F k)
+
+Fmerged list .append (Fseg out )
+
+end for 
+
+Concatenate All Merged Segments 
+
+ˆFout ← Concatenate (Fmerged list )
+
+Return ˆFout 
+
+Algorithm 2 Decoupled Spatial Token Selection 
+
+Input: Features ˆF and attentions A from vision encoder, segment list S, target ratio r.
+
+Output: Final compressed features ˆˆF .
+
+Decouple Frames into Dynamic and Static Sets 
+
+ˆF d, A d ← [ ] , [ ] ˆF s, A s ← [ ] , [ ] 
+
+for each segment Sseg = { ˆF0, . . . , ˆFk} in S do 
+
+ˆF d.append ( ˆF0, ˆFk); Ad.append (A0, A k)ˆF s.append ( ˆF1: k−1); As.append (A1: k−1)
+
+end for 
+
+Compute Re-scaled Retention Ratio in Equation (5) 
+
+ˆr = r  
+
+> (B−NB)∗L
+
+Compress Dynamic Frames via Global Top-K Selection 
+
+ˆˆF d ← GlobalTopKSelection ( ˆF d, A d, ˆr)
+
+Compress Static Frames via Local-window Selection 
+
+ˆˆF s ← LocalWindowSelection ( ˆF s, A s, ˆr)
+
+Gather and Reorder Selected Tokens in Temporal Order 
+
+ˆˆF ← GatherAndReorder ( ˆˆF d, ˆˆF s)
+
+Return ˆˆF
+
+3... ... ... 
+
+... ... ... 
+
+> Video Frames
+> Token id
+> Video Frames
+> Token id
+> Video Frames
+> Token id
+> Video Frames
+> Token id
+> Video Frames
+> Token id
+> Video Frames
+> Token id
+
+Figure 6. Additional visualizations of attention score distributions. We present the attention heatmaps from the SigLIP vision encoder across six randomly selected videos. The consistent vertical stripes (highlighted in bright colors) indicate that specific spatial tokens accumulate disproportionately high attention scores throughout the temporal sequence. This observation confirms that attention “sinks” are a widely existing structural characteristic in the vision encoder, motivating the design of our decoupled token selection strategy. 
+
+4Baseline HoliTom VisionZip Ours 
+
+0
+
+200 
+
+400 
+
+600 
+
+800 
+
+> Latency (ms)
+
+889 ms 
+
+556 ms 
+
+458 ms 
+
+336 ms 
+
+1.60x 
+
+1.94x 
+
+2.65x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (a) 10% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+200 
+
+400 
+
+600 
+
+800 
+
+> Latency (ms)
+
+889 ms 
+
+572 ms 
+
+475 ms 
+
+390 ms 
+
+1.55x 
+
+1.87x 
+
+2.28x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (b) 15% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+200 
+
+400 
+
+600 
+
+800 
+
+> Latency (ms)
+
+889 ms 
+
+622 ms 
+
+495 ms 
+
+415 ms 
+
+1.43x 
+
+1.80x 
+
+2.14x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead 
+
+(c) 20% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+200 
+
+400 
+
+600 
+
+800 
+
+> Latency (ms)
+
+889 ms 
+
+661 ms 
+
+516 ms 
+
+426 ms 
+
+1.34x 
+
+1.72x 
+
+2.09x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (d) 25% token retention rate. 
+
+Figure 7. Time-to-first-token (TTFT) comparison on the LLaVA-OneVision-7B model. We report the latency breakdown (vision encoding, token processing, LLM prefill, and system overhead) across different methods. 
+
+5Baseline HoliTom VisionZip Ours 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+> Latency (ms)
+
+413 ms 
+
+457 ms 
+
+366 ms 
+
+280 ms 
+
+0.90x 
+
+1.13x 
+
+1.48x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (a) 10% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+> Latency (ms)
+
+413 ms 
+
+473 ms 
+
+367 ms 
+
+311 ms 
+
+0.87x 
+
+1.13x 
+
+1.33x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (b) 15% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500 
+
+> Latency (ms)
+
+413 ms 
+
+499 ms 
+
+368 ms 
+
+313 ms 
+
+0.83x 
+
+1.12x 
+
+1.32x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead 
+
+(c) 20% token retention rate. Baseline HoliTom VisionZip Ours 
+
+0
+
+100 
+
+200 
+
+300 
+
+400 
+
+500 
+
+> Latency (ms)
+
+413 ms 
+
+519 ms 
+
+368 ms 
+
+331 ms 
+
+0.80x 
+
+1.12x 
+
+1.25x 
+
+Vision Encoding 
+
+Visual Token Processing 
+
+LLM Prefill 
+
+System Overhead (d) 25% token retention rate. 
+
+Figure 8. Time-to-first-token (TTFT) comparison on the LLaVA-OneVision-0.5B model. We report the latency breakdown (vision encod-ing, token processing, LLM prefill, and system overhead) across different methods. 
+
+6

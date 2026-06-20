@@ -1,0 +1,807 @@
+Title: EventRadar: Long-Range Visual UAV Discovery through Spatiotemporal Event Sensing
+
+URL Source: https://arxiv.org/pdf/2606.11285v1
+
+Published Time: Thu, 11 Jun 2026 00:03:46 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# EventRadar: Long-Range Visual UAV Discovery through Spatiotemporal Event Sensing 
+
+Zhiting Zhou 1, Xingchen Liu 2, Xinglin Yu 3, Jiashen Chen 4, Haoyang Wang 1, Jingao Xu 5, Yunhao Liu 6, and Xinlei Chen 1
+
+> 1
+
+Shenzhen International Graduate School, Tsinghua University; 2Sun Yat-sen University; 3Harbin Institute of Technology, Shenzhen 
+
+> 4
+
+Northwest University; 5The University of Hong Kong; 6Tsinghua University {zhou-zt21,haoyang-22,yunhao}@mails.tsinghua.edu.cn; chen.xinlei@sz.tsinghua.edu.cn liuxc7@mail2.sysu.edu.cn; 220210522@stu.hit.edu.cn; 2022115102@stumail.nwu.edu.cn; jingaoxu@hku.hk 
+
+Abstract 
+
+Unauthorized unmanned aerial vehicle (UAV) activity around air-ports, public venues, and other sensitive sites has made protected-airspace monitoring increasingly important. A practical sensing system must search a wide angular region, find small long-range targets, and return both bearing support and UAV-specific evidence before a restricted perimeter is breached. Existing UAV detection paths often rely on spatially organized evidence, such as body ex-tent, silhouette, or track continuity. At long range, however, these cues become difficult to preserve and verify as the target footprint weakens and its image-plane support shrinks. EventRadar follows a complementary cue: propeller-induced temporal periodicity, which recent event-camera sensing studies have shown can reveal UAV-specific motion after appearance becomes weak. We extend this cue to kilometer-scale active sensing with an event-camera prototype. Scene-Anchored Geometry Evidence (SAGE) fuses scanning events with IMU pose to maintain a bearing-indexed scene memory, sep-arating transient candidate support from persistent background clutter. Comb-guided Harmonic-Group Learned Iterative Shrink-age and Thresholding Algorithm (CHG-LISTA) then treats each candidate as a weak high-rate timing signal and recovers phase-insensitive harmonic evidence with fixed compute. Compared with related event-camera baselines on 700–1500 m UAV event record-ings, EventRadar achieves 0.990 mAP .3 and 0.949 F1 .3, reduces FN .3
+
+to 0.009, and shows real-time feasibility in prototype profiling. 
+
+Keywords 
+
+Event Camera, Anti-UAV, Protected Airspace, Long-range Visual Discovery, Propeller Sensing, Active Vision 
+
+1 Introduction 
+
+The global anti-UAV market is projected to grow from USD 4.48 bil-lion in 2025 to USD 14.51 billion by 2030, reflecting rising demand to protect airports, energy facilities, public venues, and other sensi-tive sites from unauthorized UAV activity [ 9, 11 , 18 ]. Safeguarding these environments requires pre-emptive detection of unauthorized UAV activity before a restricted perimeter is breached. A practi-cal protected-airspace sensing system must continuously search a wide angular region, identify small long-range UAVs, and return actionable bearing data together with UAV-specific evidence while suppressing false positives [8]. Existing UAV detection methods can be broadly viewed through two paths. The traditional path seeks spatially organized evidence. Across radar [ 7, 24 ], acoustic [ 14 , 27 , 28 ], thermal, and visual sys-tems [ 10 , 15 , 20 ], the evidence often appears as body extent, sil-houette, local contrast, event density [ 33 ], track continuity [ 4], Active Scan  
+
+> Km-Range yaw
+> pitch
+
+Figure 1: EventRadar. 
+
+propeller-local structure [ 23 , 25 , 31 ], or other spatially organized cues. Such cues are effective when the target leaves sufficient or-ganized evidence in the sensing stream, but far-range protected-airspace sensing makes this assumption increasingly fragile. As the UAV’s physical footprint weakens and its image-plane sup-port shrinks, spatially organized cues become difficult to preserve and verify. Table 1 gives a compact visual summary of these cue behaviors under long-range drone-detection stressors. A more recent path exploits temporal evidence induced by pro-peller rotation. The continuous rotation of UAV propellers gen-erates stable, high-frequency periodic micro-motion [ 14 , 23 , 29 ]. This dynamic signature is difficult to exploit with conventional frame cameras, whose frame-rate and spatial-sampling limits keep recognition tied to appearance cues [ 10 , 20 ]. Event cameras, with asynchronous microsecond-level temporal resolution, provide a high-rate interface for observing such periodic signals, and recent work has shown their potential for UAV identity verification, and internal flight-state inference [ 5, 30 ]. These studies show that tem-poral propeller sensing has become a promising evidence channel for UAV perception, with figure 2 illustrates this cue shift. We therefore ask: Can temporal propeller evidence extend the effective identification distance of visual UAV detection systems? 
+
+Our work. To answer this question, we propose EventRadar , a long-range UAV detection system driven by periodic micro-motion of UAV propellers. EventRadar actively sweeps distant airspace to identify candidate bearings, subsequently isolating and verifying targets within these proposed regions, as shown in Figure 1. Rather than attempting to recover complete spatial appearance from just a 
+
+> 1
+> arXiv:2606.11285v1 [cs.CV] 9 Jun 2026
+
+Table 1: Cue behavior under long-range drone-detection stressors. EvDetMAV [33] EVPropNet [23] effqpdet [25] EV-SpSegNet [4] EventRadar *
+
+Cue † Layout event morphology Shape prior propeller response Rate burst event density Point cloud frame stack + x-y-t tube Harmonic ROI spectrum 
+
+700 m 35 57 79 
+
+> Hz
+
+1500 m 65 87 109 
+
+> Hz
+
+Cue behavior layout vanishes at range shape response drifts rate cue is ambiguous trajectory breaks in motion harmonic peak remains   
+
+> †For the four spatial baselines, long range removes the evidence each cue needs: layout/morphology loses body support, shape-prior response loses resolved blades, rate bursts mix with clutter/noise peaks, and point-cloud x-y-t tubes fragment under sparse motion.
+> *EventRadar uses harmonic ROI spectra; this cue can remain visible because rotor frequency is set by propeller actuation rather than projected size.
+
+few pixels, EventRadar treats each candidate direction as a continu-ous, high-rate temporal observation and verifies whether it carries distinct propeller-periodic evidence. However, making EventRadar a practical system in the wild and elevating the effective identification distance of visual UAV detection systems face two challenges. 
+
+• C1: Spatially, where to see: scanning motion-induced environment events overwhelm the faint UAV event stream, obscuring candidate bearings. Event cameras are highly sensitive to dynamic brightness changes. When the sensor actively scans expansive airspace, camera motion triggers dense background events across the image plane. As a result, weak UAV-triggered signals can be overwhelmed by environmental clutter before the system can isolate a candidate bearing, making far-range protected-airspace sensing a candidate discovery problem, rather than merely a local object detection task. 
+
+• C2: Temporally, how to see: UAV periodic micro-motions are tran-sient and weak across only a few pixels, hindering reliable long-range recognition. Once a candidate region is proposed, the system must verify it from a short and noisy event window. Because event gen-eration depends on dynamic contrast, the captured signal rarely resembles a clean sinusoid. Instead, the temporal sequence can con-tain spatial drift, missing actuation cycles, and non-target transients. Recovering reliable rotor-periodic evidence from such fragmented event timing is therefore central to long-range UAV identification. EventRadar is organized around two core designs. 
+
+• To solve C1 , we propose the Scene-Anchored Geometry Evidence module ( SAGE ), driven by the insight that active visual sensing makes events move rapidly on the image plane, while the underly-ing background structure remains more stable in a world-centric di-rectional space. SAGE tightly fuses the asynchronous event stream with real-time IMU and gimbal pose data to construct and maintain a bearing-indexed scene memory. In this representation, scanning events are accumulated as stable scene evidence rather than isolated image-plane detections, allowing the system to identify candidate bearings under wide-area active sensing. 
+
+• To solve C2 , we propose the Comb-guided Harmonic-Group LISTA module ( CHG-LISTA ) for temporal verification. Rather than treating a microscopic candidate as a static image patch, CHG-LISTA treats its asynchronous events as a weak, high-rate temporal observation. It acts as a fixed-budget harmonic-evidence recovery module that converts each candidate Region of Interest (ROI) into an event signal, removes slow drift, pools phase-insensitive har-monic groups, and scores local spectral ratios as rotor-frequency evidence. By directly scoring harmonic structure, CHG-LISTA trans-lates fragmented temporal cues into candidate-level verification evidence for final UAV recognition. In summary, this paper makes the following contributions. 
+
+(i) We extend temporal propeller sensing to kilometer-scale UAV discovery, showing that propeller-periodic event evidence can re-main useful after spatial appearance becomes unreliable at distance. 
+
+(ii) We propose EventRadar, an active rotating event-camera sensing prototype, combining SAGE for scene-anchored candidate discov-ery and CHG-LISTA for candidate-level temporal verification. 
+
+(iii) We evaluate EventRadar on long-range UAV detection tasks from 700 m to 1.5 km and compare it with related event-camera base-lines, demonstrating stronger detection availability, missed-target control, and prototype real-time feasibility. 
+
+2 Background and Related Work 2.1 Anti-UAV Sensing and Long-Range Evidence 
+
+Anti-UAV systems differ in the evidence they expose to a response loop. Radar and mmWave sensing can estimate range, velocity, angle, radar cross section, tracks, and micro-motion signatures [ 7,19 , 24 , 31 ]. Radio Frequency (RF) systems monitor control, telemetry, video, Wi-Fi, Bluetooth, or other emissions, while acoustic systems use motor and rotor spectra together with array-based direction cues [ 6, 14 , 27 , 28 ]. These channels can support detection under favorable conditions, but long-range protected-airspace monitoring stresses their discriminative evidence: radar cross section, clutter,    
+
+> 2700m RGB 700m Event
+
+Range Up
+
+Shape Fades    
+
+> 1500m RGB 1500m Event
+
+Clearer Peak     
+
+> 700m FFT
+> 1500m FFT
+> 700m CHG
+> 1500m CHG
+
+Spatial Cues Fade Temporal Periodicity Persists Harmonic Evidence Verifies Figure 2: Long-range event-sensing observation. 
+
+multipath, radio silence or interference, outdoor attenuation, wind, and array geometry can all make a small UAV difficult to verify. This paper focuses on the evidence interface provided by event-based optical sensing. A visual response loop needs candidate bear-ing and image-plane support, but at long range a UAV may occupy only a few pixels. The central question is not whether non-visual sensing is useful, but how an optical or event system can still pro-vide UAV-specific evidence when spatial appearance becomes weak. 
+
+2.2 Visual and Event-Based Small-Object Detection 
+
+Visual small-object detectors localize targets from spatial cues such as local contrast, edges, texture, silhouette, motion consistency, or learned appearance features [ 10 , 15 , 20 ]. These cues support near-range localization, but their discriminative value decreases as distance reduces the target to tiny image support. The detector may still find a suspicious point or blob, while the evidence needed to verify that it is a UAV has already degraded. Event cameras change the sensing principle by reporting asyn-chronous brightness-threshold crossings with high temporal res-olution, but many event-camera detectors still choose spatial or motion-density representations. Existing methods often convert events into frames, voxels, tensors, point-cloud-like features, den-sity maps, local motion cues, recurrent features, or trajectory con-sistency before detection or segmentation [ 4, 13 , 16 , 17 , 21 , 32 ]. Such cues are useful for candidate discovery, yet they remain brittle for far-range UAV verification: compact density peaks and short tracks can also arise from swept background edges, moving clouds, sensor noise, vibration, birds, or other small objects [13, 17, 32]. 
+
+2.3 Frequency Signatures for UAV Verification 
+
+Frequency-domain signatures provide a complementary way to read target evidence because they describe periodic physical pro-cesses rather than spatial appearance. Radar and mmWave systems use micro-Doppler or blade-induced rotary structure to separate UAVs from other objects [ 7, 19 , 31 ]. Acoustic sensing observes rotor E 
+
+> Event
+> Windows
+> Camera
+> Pose
+> $4 Scene-Anchored
+> Spatial Evidence
+> Organization
+> $5 Temporal Harmonic
+> Evidence Recovery
+> Angular
+> Bearing
+> ROI Support
+> Peak Freq
+> +Confidence
+> Protected
+> Scan
+> Support
+> Airspace cue
+> Foreground
+> ROIs
+> Scene-achored
+> Evidence Map
+> Harmonic
+> Group Prior Harmonic
+> Freq Cue
+
+Figure 3: Overview of EventRadar. 
+
+tones, blade-pass frequencies, and harmonic structure [ 14 , 27 , 28 ]. Event cameras have also been used to estimate flicker or repetitive visual signals [ 1, 3, 12 , 22 ], and propeller-focused event-camera works show that rotor motion can generate visual timing evidence in controlled or shorter-range settings [2, 23, 25, 26, 29]. These works show that periodic evidence can be discriminative, but long-range active event sensing introduces a coupled problem. The system must first find tiny candidate support inside dense scan-induced background events, then recover reliable harmonic evidence from a short and noisy event window. Existing methods address parts of this pipeline, but they do not provide a unified path from background-aware long-range candidate discovery to candidate-level propeller-frequency verification. This gap motivates EventRadar’s separation between SAGE spatial evidence organiza-tion and CHG-LISTA temporal harmonic evidence recovery. 
+
+3 System Overview 
+
+Figure 3 shows how EventRadar turns the frequency-cue insight into a practical sensing framework. The input is a stream of scan-ning events together with time-aligned camera attitude from the gimbal and IMU. The spatial stage, SAGE , organizes event evidence in a scene-anchored, bearing-indexed representation. This repre-sentation gives candidate discovery scene context: transient local evidence, distinguished from persistent background, can be pro-posed for temporal harmonic recovery. 
+
+> 3
+
+The temporal stage receives candidate regions, their bearing con-text, and their local event support. Each candidate ROI is converted into a short high-rate event-count signal and passed to CHG-LISTA 
+
+to report propeller-frequency confidence for each candidate. Thus, EventRadar uses SAGE to discover candidate regions and CHG-LISTA to test whether those regions carry UAV-specific propeller cues. The output of EventRadar is a protected-airspace cue: candi-date bearing, bbox support, frequency estimate, and confidence can guide the next scan decision. 
+
+4 Spatial Evidence Organization for Candidate Discovery 4.1 Design Insight and Workflow 
+
+At long range, a moving UAV often appears not as a recognizable object, but as a small event cluster sustained by motion. Morphology, texture, and silhouette may be too weak to discriminate the target, so candidate discovery must first identify spatiotemporal event support whose continuity makes it worth temporal verification. Active scanning complicates this cue because static background structures are deliberately swept across the sensor and can form compact short-window peaks. The useful distinction appears in a scene-anchored coordinate frame: background events tend to recur at stable world directions, whereas a moving target traces neighboring directions and is transient at each one. SAGE organizes scanning events in a scene-anchored direction space, preserving image-plane ROI support while using a bearing-indexed angular memory to separate persistent background context from transient, spatially continuous candidates for harmonic verification. This spatial layer outputs candidate support, bearing estimates, and scene context, rather than making a final decision by only geometry. The module proceeds in three steps. It first maps image-plane events into scene-anchored directional evidence using camera pose (Section 4.2), then accumulates this evidence as an angular scene memory that captures persistent background context (Section 4.3), and finally combines local event support with this scene context to propose candidate regions, bearings, and bbox support for temporal harmonic verification (Section 4.4). 
+
+4.2 From Image Events to Directional Evidence 
+
+For an event or candidate pixel u = (𝑢, 𝑣, 1)⊤, EventRadar first maps the pixel to a camera-frame unit ray using the camera calibration and undistortion model: 
+
+p𝑐 = 𝐾 −1 𝑓 −1 (u)∥𝐾 −1 𝑓 −1 (u)∥ 2
+
+. (1) With a time-aligned camera-to-world rotation 𝑅 𝑡 from gimbal feed-back in our prototype, or from IMU attitude and sensor fusion in other mountings, the scene-anchored viewing ray is 
+
+p𝑠 = 𝑅 𝑡 p𝑐 . (2) When the base is fixed, 𝑅 𝑡 can be constructed from the measured yaw and pitch of the gimbal plus the camera-to-gimbal calibra-tion. With a rigidly mounted IMU, the rotation can instead be ob-tained from the interpolated camera attitude. In either case, the pose stream defines a common polar direction space in which image-plane events from different scan poses can be compared. Pixel view Polar view 
+
+Pixel event 𝐀 
+
+Figure 4: Scene-anchored coordinate geometry. 
+
+Figure 4 illustrates the coordinate geometry used by the spa-tial layer. The point is not the coordinate conversion itself, but the physical meaning of the two coordinate systems. The image coordinate u locates event evidence on the two-dimensional im-age plane, while the spatial vector p𝑠 locates the viewed direc-tion in the scene-frame coordinate system. During active scanning, background-induced events may move to different image locations, but projection through the current pose maps them to similar spa-tial vectors. A tiny moving UAV, in contrast, may appear only as a weak local image cluster and remain difficult to identify from spatial appearance alone; its usefulness comes from the time-local, motion-induced support introduced in Section 4.1. The projection step therefore supplies the common coordinate frame needed to compare persistent scene directions with transient moving support. 
+
+4.3 Angular Scene Evidence Accumulation 
+
+Once events are expressed as p𝑠 = (𝑝 𝑠 𝑥 , 𝑝 𝑠 𝑦 , 𝑝 𝑠 𝑧 ), they are indexed by azimuth and elevation: 
+
+𝜆 = atan2 (𝑝 𝑠 𝑥 , 𝑝 𝑠 𝑧 ), 𝜑 = arcsin (− 𝑝 𝑠 𝑦 ). (3) The accumulated representation stores polar angular scene evi-dence as a bearing-indexed memory. Persistent structures, such as horizon lines, buildings, and static texture, reappear in nearby angular bins during repeated scans. A small UAV candidate, by con-trast, is expected to form a local vector cluster that moves through neighboring angular bins, so its support is spatially continuous but not persistent at one fixed scene direction. This memory is defined by three operations. First, calibration turns each event pixel into an undistorted camera-frame unit ray, so nearby pixels represent nearby viewing directions rather than arbi-trary image samples. Second, the time-aligned scan pose, supplied in our prototype by the gimbal angle stream, rotates those rays into a common scene frame. Third, the resulting scene-frame vectors are accumulated as a regional-density-managed unit-sphere event map. The underlying memory stores scene-frame unit rays, while latitude–longitude cells regulate angular density and provide the polar readout used for visualization and candidate context. Event counts, recency, and local temporal statistics can then be attached to this directional support. In our prototype realization, events are undistorted into unit rays, accumulated on a sphere under es-timated rotations, maintained as a global event-sphere map, and rasterized into polar panoramic event maps. We use this representa-tion as scene context for proposal, while treating candidate stability and false-candidate suppression as evaluation targets rather than assumed consequences of the projection step. 
+
+> 4Transient
+> Persistence
+
+Figure 5: Transient–persistent evidence for ROI proposal. 
+
+The temporal statistic used for this context is a persistence ratio over a recent scan window: for each angular cell, we measure the fraction of short time bins in which that cell keeps producing events. This makes the temporal cue visible without adding a separate time axis. A persistent background direction, hot pixel pattern, or repeatedly swept static edge remains active across many bins and is therefore assigned high persistence. A moving UAV activates neighboring directions along a continuous path, but it stays in any single direction only briefly; its response is spatially continuous yet temporally transient. In the transient–persistent visualization, red denotes low-persistence transient support and blue denotes high-persistence background context. 
+
+4.4 Background-Aware Candidate Proposal 
+
+Candidate proposal combines local event evidence with the scene-anchored polar representation. Figure 5(a) shows how local image-plane support is interpreted through the polar scene memory, so proposal is conditioned on both recent local activity and scene-persistent context. A local event cluster is considered a candidate when, in the polar representation, it carries enough recent support to form a time signal and exhibits the spatiotemporal pattern ex-pected from a moving object: temporal transience together with spa-tial motion relative to persistent background context. In Figure 5(b), this appears as a red trajectory-like support pattern separated from the blue persistent scene response. This proposal layer can use adaptive event clusters and event-count peaks as local evidence, but the bearing-indexed memory provides the background-aware context needed for active scanning. Figure 5 summarizes the proposal interface. SAGE does not need to decide whether the object is a UAV. Instead, it identifies can-didate support that deserves temporal harmonic verification. The geometry-aware layer preserves the image ROI needed to extract events, the polar bearing needed for scan context, and the local support needed to rank candidate readouts. The output is a set of candidate regions 
+
+C𝑡 = {( Ω𝑚 , 𝜆 𝑚 , 𝜑 𝑚 , 𝑏 𝑚 , 𝑡 𝑚 )} 𝑀 𝑡 
+
+> 𝑚 =1
+
+, (4) where Ω𝑚 is the image or event-window ROI used for local temporal extraction, (𝜆 𝑚 , 𝜑 𝑚 ) is its polar bearing, 𝑏 𝑚 is the local bbox support, and 𝑡 𝑚 is the event-window timestamp. The proposal score should be interpreted as candidate support, not as a final UAV decision. SAGE produces candidate regions, bearing estimates, and scene context that define the input contract for temporal harmonic recov-ery. Given this candidate support, CHG-LISTA recovers propeller-frequency evidence inside each region as described in Section 5. Local Peak 
+
+> Scoring
+> Harmonic
+> Group Prior
+> E
+> Candidate Event
+> Binned
+> Count
+> Series
+> Slow-Drift
+> Removal
+> Fixed-Step
+> Recovery
+> Harmonic
+> Group
+> Selection
+> Bin Events
+> CHG-LISTA Core
+> Weak Freq
+> Labels
+> Model
+> Initialization
+> Offline Support
+> Harmonic
+> Group
+> Spectrum
+> Peak Freq
+> +Confidence
+
+Figure 6: CHG-LISTA workflow. 
+
+Bearing memory and scan scheduling can build on the same scene-anchored representation, while the central role here is to provide stable spatial evidence for candidate discovery under wide-area active sensing. 
+
+5 Temporal Harmonic Evidence Recovery for Candidate Verification 5.1 Design Insight and Workflow 
+
+SAGE narrows the search to candidate support, but the events inside that support are not a clean rotor waveform. At long range, the signal is often a short, low-count pulse train with missing cycles, arbitrary phase, and slow drift from scan motion or background activity. A direct appearance verifier has too little spatial structure to read, while a raw Fast Fourier Transform (FFT) peak is brittle because propeller evidence spreads across harmonics and competes with a changing local spectral floor. The design insight behind CHG-LISTA is to verify a candidate by recovering a compact harmonic explanation rather than by de-tecting a single spectral peak. CHG-LISTA first forms the candi-date event signal (Section 5.2), prepares a nuisance-rejected har-monic representation (Section 5.3), recovers group-level evidence with fixed compute (Section 5.4), and converts the recovered spec-trum into candidate-level frequency and confidence evidence (Sec-tion 5.5). The weak frequency-supervision path in Figure 6 supports training and auditing, and is described with the implementation details in Section 6.1. 
+
+5.2 Temporal Signal Formation from Candidate Events 
+
+5.2.1 Candidate event binning. Given a candidate support Ω
+
+from SAGE and an event window of length 𝑇 , the temporal stage uses the events inside that support as its measurement. This readout is tied to an existing candidate and is not a separate semantic de-tection result. Each event is 𝑒 𝑖 = (𝑥 𝑖 , 𝑦 𝑖 , 𝑡 𝑖 , 𝑝 𝑖 ), where (𝑥 𝑖 , 𝑦 𝑖 ) is the pixel location, 𝑡 𝑖 is the timestamp, and 𝑝 𝑖 is the polarity. EventRadar forms an 𝑁 -sample count series by binning the events in Ω over the window: 
+
+𝑠 Ω [𝑛 ] =∑︁ 
+
+> 𝑖
+
+1{( 𝑥 𝑖 , 𝑦 𝑖 ) ∈ Ω, 𝑡 𝑖 − 𝑡 0 ∈ [ 𝑛𝑇 /𝑁 , (𝑛 + 1)𝑇 /𝑁 )} . (5) The online verifier uses this event-count signal as the input to harmonic recovery. Polarity is not used in the online forward pass, only in the weak-supervision procedure described in Section 6.1.  
+
+> 5(a) local rotor event volume (b) far-range candidate
+> (c) summed event count
+> (d) harmonic-group evidence
+
+Figure 7: Candidate event formation and temporal readout. 
+
+Figure 7 illustrates this readout. Panel (a) shows the local rotor-induced event volume, panel (b) shows the far-range candidate sup-port that pools the remaining activity, panel (c) shows the summed count signal defined in Eq. 5, and panel (d) shows why this signal is later interpreted as harmonic-group evidence rather than as a single spectral peak. 
+
+5.2.2 Verifier output contract. Temporal evidence formation outputs s ∈ R𝑁 , a candidate-level time series. This representation intentionally discards most within-ROI spatial detail and keeps only the timing evidence needed for harmonic recovery. The following modules estimate rotor frequency and confidence from this signal, so the boundary with SAGE remains clean: SAGE supplies the candidate support, while CHG-LISTA supplies harmonic evidence for that candidate. 
+
+5.3 Harmonic Representation Preparation 
+
+The count series from Section 5.2 is next converted into a representa-tion suitable for sparse harmonic recovery. The conversion has two goals. First, propeller evidence should be represented as a harmonic group, because an event-camera blade signal is pulse-like and rarely concentrates at one isolated sinusoid. Second, slow count variation from body drift, gimbal sweep, illumination changes, and static background edges should be removed before the solver searches for rotor periodicity. CHG-LISTA therefore forms a signed, nuisance-rejected residual and represents that residual with phase-insensitive harmonic groups. 
+
+5.3.1 Propeller harmonic-group prior. A multirotor UAV gen-erates repeated brightness changes around blade edges as the pro-pellers rotate. In an event camera, these changes appear as threshold-crossing pulses rather than as a clean sinusoid. The useful frequency cue is therefore not a single isolated spectral line. A weak pro-peller signal can spread across the rotor frequency, blade-pass fre-quency, and higher harmonics, with the observed envelope depend-ing on blade visibility, contrast, duty cycle, and the event-generation threshold [14, 23, 29]. This observation leads to the harmonic-group prior used by CHG-LISTA. Instead of assigning each frequency bin an independent atom, CHG-LISTA treats the harmonics that share one candidate base frequency as one structured unit. The group collects evidence at 𝑓 𝑞 , 2𝑓 𝑞 , 3𝑓 𝑞 , . . . while preserving a single rotor-frequency identity. This design is crucial for far-range candidates, as sparse events and missing cycles can weaken individual harmonics even when the overall group reflects propeller motion. After removing slow nuisance motion, the candidate signal is modeled as a few harmonic groups: 
+
+𝑧 (𝑡 ) =
+
+> 𝑄
+
+∑︁ 
+
+> 𝑞 =1
+
+∑︁ ℎ∈ H 
+
+𝑎 𝑞,ℎ cos (2𝜋ℎ𝑓 𝑞 𝑡 + 𝜙 𝑞,ℎ ) + 𝜂 (𝑡 ), (6) where 𝑄 is small, H is the harmonic set, 𝑓 𝑞 is a candidate rotor 1×
+
+frequency, and 𝜂 (𝑡 ) includes event noise and residual background motion. Under this model, a positive frequency cue should be ex-plainable as a compact propeller-frequency group, not merely as a high event count. 
+
+5.3.2 Slow-drift removal. Before building harmonic groups, CHG-LISTA removes slow nuisance variation from the candidate time series. Let s ∈ R𝑁 be the binned signal and let 
+
+𝑃 = [1, t, t2, . . . , t𝑞 ] ∈ R𝑁 × ( 𝑞 +1) (7) be the nuisance subspace spanned by low-order time polynomials. The projection 
+
+𝑃 ⊥ = 𝐼 − 𝑃 (𝑃 ⊤𝑃 )†𝑃 ⊤ (8) removes this subspace, producing ˜s = s𝑃 ⊤⊥ . Unless otherwise stated, EventRadar uses a first-order polynomial nuisance model. The projected signal is normalized with a median and median absolute deviation: 
+
+z = ˜s − median (˜s)
+
+1.4826 MAD (˜s) + 𝜖 . (9) The residual remains signed. This choice preserves contrast-change and phase information for the following cosine and sine dictionary, whereas rectification would discard both. 
+
+5.3.3 Phase-insensitive harmonic groups. The harmonic model must also absorb unknown initial phase. CHG-LISTA therefore builds one real-valued quadrature comb group for each candidate base frequency 𝑓 𝑗 :
+
+𝐷 𝑗 (𝑡 ) = 𝑤 ℎ cos (2𝜋ℎ𝑓 𝑗 𝑡 ), 𝑤 ℎ sin (2𝜋ℎ𝑓 𝑗 𝑡 ) ℎ∈ H , (10) where H = {1, 2, 3} by default and 𝑤 ℎ = 1/ℎ is a simple attenua-tion heuristic that prevents higher harmonics from dominating the group score. The cosine/sine pair is equivalent to a two-channel complex representation and absorbs unknown initial phase without requiring complex-valued deployment kernels. The group there-fore acts like a comb template: it pools energy across 𝑓 𝑗 , 2𝑓 𝑗 , 3𝑓 𝑗 , . . . 
+
+while preserving a single base-frequency identity. Stacking all groups yields a dictionary 𝐷 ∈ R𝑁 × ( 2| H | 𝐹 ) for 𝐹 
+
+candidate frequencies. Each atom is normalized. Accordingly, 𝐷 is 
+
+> 6
+
+X0
+
+> X: group
+> coefficients
+
+XK  
+
+> fixed K unfolded layers
+> L1L
+> match
+> suppress
+> 2L
+> match
+> suppress
+> K
+
+... ̂̂
+
+(a) Sketch-space inputs (b) Fixed-step coefficient recovery 
+
+(c) Harmonic evidence   
+
+> 1c
+> 1s
+> 2c
+> 2s
+> 3c
+> 3s
+> harmonic coeffs.
+> lower
+> target
+> higher
+> freq. groups
+> 1c
+> 1s
+> 2c
+> 2s
+> 3c
+> 3s
+> harmonic coeffs.
+> 050 100
+> time
+> observed
+
+event signal z  
+
+> sketch y
+> 1x 3x
+> templates
+
+template groups D  
+
+> sketched
+> 40 120 80
+> frequency
+> surviving
+> group
+> group-energy spectrum
+> 2x
+
+y
+
+A
+
+> Recovered X
+> match
+> suppress
+
+Weak coefficient groups suppressed 
+
+> one group
+> templates A
+
+Figure 8: Fixed-step CHG-LISTA recovery scheme. 
+
+initialized with the event-domain harmonic-comb basis and refined during training, preserving the structured harmonic prior while accommodating sensor-specific pulse shapes, contrast responses, and lens-dependent artifacts. 
+
+5.4 Fixed-Step Harmonic Recovery 
+
+After the harmonic representation is built, CHG-LISTA recovers frequency evidence with a fixed computation budget. Direct sparse solvers are a natural fit for this structure, but their support selec-tion and repeated least-squares updates make online latency data-dependent. CHG-LISTA therefore keeps the group-sparse recovery objective and unfolds a small, fixed number of solver steps into trainable layers. Figure 8 summarizes this fixed-budget path. The detrended candidate signal and harmonic dictionary are mapped into a compact sketch pair (y, 𝐴 ); the unfolded layers then alter-nate residual matching and group-wise suppression to produce the coefficient tensor 𝑋 𝐾 and its group-energy spectrum. In this design, recovery is performed over frequency-indexed harmonic groups, not isolated spectral coefficients, and the compute budget is fixed by construction. 
+
+5.4.1 Group-sparse recovery objective. Let z ∈ R𝑁 denote the detrended and normalized candidate signal. A sparse binary sketch matrix Φ ∈ R𝑀 ×𝑁 maps it to 
+
+y = Φz, (11) and the sketched dictionary is 𝐴 = Φ𝐷 . The coefficient tensor 𝑋 ∈
+
+R𝐹 × | H | × 2 stores, for each candidate base frequency, all harmonic and quadrature coefficients. The recovery objective is 
+
+min 
+
+> 𝑋
+
+12 ∥y − Φ𝐷 vec (𝑋 )∥ 22 + 𝜆 
+
+> 𝐹
+
+∑︁ 
+
+> 𝑗 =1
+
+∥𝑋 𝑗 ∥2. (12) Equation 12 connects the previous module to the solver: polynomial projection constructs z, the dictionary 𝐷 encodes Eq. 6, and the group penalty asks the model to explain a window with only a few propeller candidates. 
+
+5.4.2 Unfolded LISTA layers. Each layer performs a residual correction followed by harmonic-group soft thresholding: 
+
+𝑋 𝑘 +1 = 𝜂 𝜃 𝑘 
+
+
+
+𝑋 𝑘 + 𝛼 𝑘 𝐴 ⊤ (y − 𝐴 vec (𝑋 𝑘 )) 
+
+
+
+. (13) The step size 𝛼 𝑘 and thresholds 𝜃 𝑘 are learned through softplus-parameterized variables. By default, Φ is fixed and 𝐷 is learnable. This choice keeps the measurement path deterministic while allow-ing the harmonic atoms to adapt to real event-camera responses. 
+
+5.4.3 Group shrinkage and spectrum. The shrinkage operator is applied to an entire frequency group: 
+
+𝜂 𝜃 (𝑋 𝑗 ) = max 
+
+
+
+1 − 𝜃 𝑗 
+
+∥𝑋 𝑗 ∥2 + 𝜖 , 0
+
+
+
+𝑋 𝑗 . (14) Group-wise shrinkage keeps the learned layers tied to the harmonic recovery objective. The network learns a few steps to recover a com-pact harmonic explanation rather than arbitrary spatial templates. After 𝐾 layers, CHG-LISTA forms a group spectrum 
+
+𝑟 𝑗 = ∥𝑋 𝐾 𝑗 ∥2, 𝑗 = 1, . . . , 𝐹 . (15) 
+
+5.5 Local Peak Scoring and Candidate Evidence 
+
+The group spectrum recovered in Section 5.4 still has to be in-terpreted before it becomes candidate evidence. Its absolute scale changes with distance, sky region, scan speed, and event density, so a raw maximum of 𝑟 𝑗 is not directly comparable across candidates or windows. CHG-LISTA scores each peak relative to its local spec-tral floor and reports a candidate-level frequency-confidence pair. This keeps harmonic evidence available after spatial localization without using an early frequency gate to discard low-SNR targets. 
+
+5.5.1 Local peak scoring. A raw spectrum peak is brittle be-cause local spectral floor can rise or fall with background activity and event density. CHG-LISTA uses a local spectral-ratio score.    
+
+> 7Non-cooperative
+> Multirotor UAV
+> Sensor
+> Platform (a) Real-time experimental scenario Sensor
+> Platform
+> Non-cooperative
+> Multirotor UAV (b) Long-range experimental scenario Lens
+> 2-DoF
+> Gimbal Event
+> Camera
+> STM32F4
+> &IMU (c) Sensor Platform DJI M30T
+> DJI MAVIC3 P ro (d) UAV
+
+Figure 9: Experimental setup of EventRadar. The panels show the outdoor collection scene, sensing device, and target UAVs. 
+
+For each frequency bin 𝑗 , the implementation excludes a small guard region around 𝑗 and averages neighboring reference bins: 
+
+𝑛 𝑗 = 1
+
+|T 𝑗 |∑︁ ℓ ∈ T 𝑗 
+
+𝑟 ℓ . (16) It then reports the local ratio 
+
+𝑐 𝑗 = 𝑟 𝑗 
+
+𝑛 𝑗 + 𝜖 . (17) The verifier reports ˆ𝑗 = arg max 𝑗 𝑐 𝑗 , ˆ𝑓 = 𝑓 ˆ𝑗 , ˆ𝑐 = 𝑐 ˆ𝑗 .
+
+5.5.2 Peak frequency and confidence evidence. SAGE pro-vides the candidate support Ω𝑚 before CHG-LISTA. Given this support, CHG-LISTA returns a peak score ˆ𝑐 𝑚 and peak frequency 
+
+ˆ𝑓 𝑚 . These values are kept as candidate-level harmonic evidence: they can support a candidate with stable harmonic structure, flag weak labels as ambiguous, or provide frequency metadata for later system modules. Proposal-time frequency gating is evaluated sep-arately from the default pipeline so that candidate ranking and harmonic evidence recovery remain auditable. 
+
+6 Implementation 6.1 Algorithm Implementation 
+
+Weak frequency labels. Long-range UAV recordings rarely con-tain synchronized motor telemetry. We therefore derive weak fre-quency labels from bbox annotations to indicate whether a can-didate window contains the propeller-periodic cue used by CHG-LISTA. These labels supervise training and support error audits; they are not online detector inputs and do not change the forward pass in Section 5. 
+
+Label construction. For each annotated window, the labeler evaluates the target-region events against the local background. It accepts a label only when the frequency estimate has harmonic or base-frequency support, is separable from nearby background events, and remains stable across short sub-windows. Rejected windows keep a compact reason, such as weak evidence, harmonic ambiguity, background domination, or unstable temporal support. 
+
+Training objective. The training path maps each synthetic or accepted weak label to the nearest candidate frequency bin and trains over the local spectral-ratio vector. The loss also preserves sketch-domain data consistency and group sparsity: 
+
+L = Lfreq + 𝜆 𝑑 ∥y − 𝐴 vec (𝑋 𝐾 )∥ 22 + 𝜆 𝑠 
+
+1
+
+𝐹 ∑︁ 𝑗 
+
+𝑟 𝑗 . (18) This keeps learning tied to a reconstructive harmonic explanation rather than only to a class label. 
+
+Candidate-level harmonic evidence. At inference time, SAGE provides candidate support Ω𝑚 , and CHG-LISTA applies the recov-ery and local scoring path defined in Section 5.5. For each candidate, the verifier returns the peak frequency ˆ𝑓 𝑚 and local spectral-ratio confidence ˆ𝑐 𝑚 . We treat this pair as candidate-level harmonic evi-dence: it indicates whether the localized support contains a com-pact propeller-frequency explanation. In the default inference path, this evidence is produced after candidate proposal and does not participate in bbox generation. Proposal-time frequency gating is evaluated only as a separate ablation. 
+
+6.2 Platform Implementation 
+
+Hardware platform. Figure 9 summarizes the real-world experi-mental setup, including two field scenes, the sensing device, and the UAV target. The real-time scene shows the outdoor prototype set-ting used to evaluate online sensing feasibility, while the long-range scene shows the far-distance collection setting used for detection and robustness experiments. The device view shows the event-camera gimbal platform, which consists of a Prophesee EVK4 HD event camera with an IMX636ES sensor, a long-focal-length lens, a RoboMaster Development Board Type C with an integrated BMI088 IMU, and a 2-Degree of Freedom (DoF) gimbal with yaw and pitch axes. The UAV view shows the target UAVs used in our experiments: the DJI M30T and DJI MAVIC 3 Pro Cine. 
+
+7 Evaluation 
+
+We evaluate EventRadar in five parts. Section 7.1 defines the data, annotations, baselines, and metrics; Section 7.2 reports long-range detection performance; Section 7.3 tests robustness across deploy-ment conditions; Section 7.4 isolates the proposal-support and frequency-scoring choices; and Section 7.5 reports system over-head and real-time feasibility. 
+
+7.1 Experimental Methodology 
+
+Field studies. We implement EventRadar as a real-time long-range UAV sensing prototype and evaluate it in outdoor field studies. The field corpus contains more than 116 GB of raw event recordings collected with our active observation platform, covering UAV ob-servations from 700 m to 1.5 km across range, flight state, viewing angle, lighting, target speed, UAV model, and distractor conditions. For repeatable comparison, all methods are evaluated on recorded event streams replayed through the same sensing pipeline. 
+
+> 8
+
+Table 2: Range-balanced static-window detection comparison Method (a) Detection quality (b) Error trade-off Method Cue P.3 ↑ R.3 ↑ F1 .3 ↑ mAP .3 ↑ R.5 ↑ CHR ↑ FN .3 ↓ FP/win .3 ↓ CErr ↓
+
+EventRadar Harmonic 0.911 0.991 0.949 0.990 0.876 1.000 0.009 0.098 2.24 EV-SpSegNet Point cloud 0.814 0.813 0.814 0.778 0.702 0.991 0.187 0.182 2.22 
+
+EvDetMAV Propeller str. 0.263 0.249 0.252 0.210 0.173 0.360 0.751 0.111 2.82 EVPropNet Sim. propeller 0.110 0.169 0.130 0.038 0.062 0.311 0.831 1.751 3.32 effqpdet Density burst 0.000 0.000 0.000 0.000 0.000 0.000 – – –F1@.3 mAP@.3 R@.5 CHR 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Score
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(a) Balanced scores. 700 900 1100 1300 1500  
+
+> Distance (m)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> F1@.3
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(b) F1 vs. range. 700 900 1100 1300 1500  
+
+> Distance (m)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Center-hit recall
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(c) Center-hit recall. 0.0 0.5 1.0 1.5 2.0  
+
+> FP/window@.3
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> FN rate@.3
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(d) Error trade-off. 
+
+Figure 10: Static-window detection trends Ground-truth annotations and protocols. For quantitative scoring, we build over 13k time-aligned bbox annotations on the field recordings. These annotations are used only after inference to compute detection and robustness metrics. We use stratified replay protocols rather than random frame sampling: the main detection benchmark is range-balanced, the robustness studies are condition-stratified factor audits, and the ablations are reported as distance-macro summaries. Frequency-related labels and diagnostics follow the weak-supervision procedure described in Section 6.1. 
+
+Comparative methods. We compare EventRadar with related event-camera baselines that cover three cue families. 
+
+(i) Event point-cloud methods: EV-SpSegNet [ 4] treats the event stream as a sparse spatiotemporal point cloud and segments tiny UAV targets from point-cloud continuity. 
+
+(ii) Propeller spatial-structure methods: EvDetMAV [ 33 ] detects rotary-wing MAVs from structured propeller-event patterns, while EVProp-Net [ 23 ] trains on simulated propeller events and recognizes pro-peller morphology from event-derived spatial representations. 
+
+(iii) Event-density burst methods: effqpdet [ 25 ] detects rotating-propeller activity from local event-density bursts in high-resolution event streams. 
+
+Metrics and evaluation scope. Detection quality is reported with precision, recall, F1, and mAP at IoU thresholds 0.3 and 0.5. Because protected-airspace response cueing is sensitive to missed targets and extra candidate boxes, we also report center-hit recall (CHR), false-negative rate (FN), false positives per target-present window (FP/win), image-plane center error (CErr), and normalized center error (NCE). CHR measures whether a predicted bbox center falls inside the target bbox, FN .3 is 1 − R.3, FP/win counts IoU-unmatched predicted boxes normalized by the number of annotated replay windows, CErr is mean center error in pixels, and NCE divides the top-1 center error by the target-bbox diagonal. 
+
+7.2 Overall Performance 
+
+7.2.1 UAV Detection. Table 2 shows that EventRadar delivers the strongest long-range event-camera bbox detection. On the target-present static-window benchmark, EventRadar reaches 0.990 mAP .3 and 0.949 F1 .3, while the strongest baseline, EV-SpSegNet, reaches 0.778 and 0.814, respectively. The larger difference appears in missed-target control: EventRadar reduces FN .3 to 0.009, over one order of magnitude lower than EV-SpSegNet. This pattern is consistent with the cue used by each baseline. EV-SpSegNet exploits spatiotemporal continuity in sparse event point clouds, which is effective when the target trace is clear but becomes sensitive to fragmented long-range event support and background event structures. EvDetMAV and EVPropNet focus on propeller-local evidence, through event clustering or morphology learned from simulated events, so their outputs often remain partial propeller regions under the full-body bbox metric. effqpdet relies on local event-density bursts and produces no valid positive bbox in this long-range protocol. 
+
+7.2.2 Range-wise Stability. Figure 10 explains where the overall gain comes from. Under the static-window protocol, EventRadar saturates CHR in every distance bin, so the detector keeps a usable target cue even when IoU-based box tightness varies. Its F1 .3 is 0.889 at 700 m, 0.923 at 800 m, and 0.962 from 900 m to 1500 m. EV-SpSegNet becomes highly accurate on the cleaner 900–1500 m static bins, but its 700–800 m recall and extra-box behavior reduce the macro score. EvDetMAV is strong on the nearest static bins but is not stable at longer range, and EVPropNet remains dominated by unmatched boxes. The stable center-hit and F1 trends indicate that EventRadar can maintain reliable UAV cues at long range. 
+
+7.2.3 Missed-target and False-alarm Trade-off. Table 2(b) and Figure 10(d) evaluate the error trade-off most relevant to protected-airspace cueing: preserving target availability while limiting extra unmatched boxes in the annotated replay. EventRadar gives the 
+
+> 9
+
+Table 3: Flight-state robustness under range-stratified replay 
+
+Method Static Translation Spin Method F1 .3 ↑ CHR ↑ FN .3 ↓ CErr ↓ F1 .3 ↑ CHR ↑ FN .3 ↓ CErr ↓ F1 .3 ↑ CHR ↑ FN .3 ↓ CErr ↓
+
+EventRadar 0.949 1.000 0.009 2.24 0.566 0.760 0.396 3.90 0.264 0.329 0.720 3.67 EV-SpSegNet 0.814 0.991 0.187 2.22 0.158 0.209 0.893 4.34 0.082 0.084 0.947 3.88 EvDetMAV 0.252 0.360 0.751 2.82 0.176 0.213 0.822 6.15 0.222 0.338 0.778 3.39 
+
+EVPropNet 0.130 0.311 0.831 3.32 0.075 0.422 0.898 10.27 0.090 0.364 0.893 6.41 10 20 30 40 50 60 70 80 90 
+
+> Angle (deg)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> CH@1
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(a) Angle: CH@1 Day Dusk Night  
+
+> Lighting
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Detected
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(b) Lighting: detected 5 10 15  
+
+> Speed (m/s)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> CH@1
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(c) Speed: CH@1 M30T Mini3  
+
+> UAV model
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> CH@1
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(d) Model: CH@1 10 20 30 40 50 60 70 80 90   
+
+> Angle (deg)
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> NCE
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(e) Angle: NCE Day Dusk Night    
+
+> Lighting
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> NCE
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(f) Lighting: NCE 5 10 15    
+
+> Speed (m/s)
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> NCE
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(g) Speed: NCE M30T Mini3    
+
+> UAV model
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> NCE
+> EventRadar
+> EV-SpSegNet
+> EvDetMAV
+> EVPropNet
+
+(h) Model: NCE 
+
+Figure 11: Condition-stratified robustness summary. 
+
+strongest balance, reducing FN .3 to 0.009 while keeping FP/win .3 at 0.098 under the same replay normalization. EV-SpSegNet localizes detected targets with a center error close to EventRadar, but its missed-target rate and unmatched-box load are both higher. The propeller- and density-based baselines fail on one side of the trade-off: EvDetMAV misses many targets, EVPropNet produces a large unmatched-box load, and effqpdet produces no valid positive boxes. These patterns show that EventRadar provides the most reliable long-range UAV cue among the evaluated event-camera baselines. 
+
+7.3 Robustness Evaluation 
+
+The robustness experiments vary one deployment factor at a time while keeping the detector, thresholds, and scan policy fixed. These condition-stratified audits report both detection quality and sta-bility, because a robust anti-UAV system must avoid both missed detections and unstable boxes. 
+
+7.3.1 Impact of UAV Flight State. We evaluate flight-state ro-bustness on the 700–1500 m long-range batch. Table 3 reports the state-conditioned metrics. The audit groups annotated replay seg-ments into three motion states: static or hovering, translational motion (3–5 m/s UAV speed), and spin-candidate motion. All meth-ods use the same label-centered matching protocol as the overall long-range detection benchmark. Table 3 shows that motion state is a much stronger stressor than range within the normal long-range batch. EventRadar has the high-est F1 .3 and the lowest FN .3 in all three states. In the static subset, it reaches 0.949 F1 .3, saturates CHR, and keeps FN .3 at 0.009, matching the controlled overall benchmark. Under translation, the score drops to 0.566 F1 .3 and 0.760 CHR, but it remains well above EV-SpSegNet, EvDetMAV, and EVPropNet in balanced detection quality. The cue families explain the main failure modes. EV-SpSegNet depends on point-cloud continuity in the event stream, so translation and spin fragment the target trace and sharply reduce recall. EvDetMAV and EVPropNet rely on propeller spatial structure, either through structured propeller-event patterns or morphology learned from simulated propeller events; these spatial cues become less stable when the target state changes from static support to translational or spin-candidate motion. 
+
+7.3.2 Impact of Viewing Angle. We evaluate labeled viewing-angle sequences from 10 ◦ to 90 ◦ while keeping the detector and window length fixed. This factor study is designed to test whether the target remains findable under changing aspect. Figure 11(a,e) summarizes the valid angle rows with CH@1 on the top row and NCE medians with P90 ticks on the bottom row. EventRadar keeps full center-hit availability across all valid viewing angles. Its NCE median stays between 0.070 and 0.243, with the lowest error near the mid-angle 50 ◦ view. EV-SpSegNet and EvDet-MAV also localize the center consistently in this controlled angle 
+
+> 10
+
+subset, while EVPropNet is unstable across aspect changes and fails at several high-angle views. These results show that EventRadar maintains aspect-stable target availability and center localization for event-based target discovery. 
+
+7.3.3 Impact of Lighting. We audit lighting robustness on man-ually labeled event sequences under daytime, dusk, and night con-ditions. This subset is designed to test whether the target remains findable under changing event contrast, so Figure 11(b,f) reports detection availability together with top-1 normalized center error (NCE). For missed detections, the NCE value is penalized so that failures remain visible in the aggregate figure. EventRadar keeps full detection availability across all three light-ing conditions, with NCE medians of 0.131, 0.096, and 0.092 for daytime, dusk, and night, respectively. EvDetMAV is very accurate in daytime and dusk but produces no valid detection in the night subset, while EV-SpSegNet and EVPropNet show either missed detections or large error tails under low light. These results show that EventRadar maintains lighting-stable target availability and center localization under changing event contrast. 
+
+7.3.4 Impact of Target Speed. We evaluate speed-controlled DJI M30T sequences at 90 ◦, 100 m, with target speeds of 5 m/s, 10 m/s, and 15 m/s. All methods use the same center-localization protocol as the angle and lighting studies. Figure 11(c,g) shows that higher target speed substantially re-duces detection stability beyond the 5 m/s matched setting. At 5 m/s, EventRadar reaches 0.963 CH@1 with an NCE median of 0.262. At 10 and 15 m/s, CH@1 drops to 0.233 and 0.145. EV-SpSegNet and EvDetMAV remain competitive in NCE at 10 m/s but collapse in top-1 center-hit rate, while EVPropNet remains dominated by false or off-target localizations. These results define a clear speed-related robustness boundary for the current prototype; under the 15 m/s condition, EventRadar still preserves the strongest loose-center success among the compared event-camera methods. 
+
+7.3.5 Impact of UAV Size. We study whether detection quality changes with UAV size and apparent scale using matched low-speed rows: 5 m/s, 90 ◦ view, and 100 m range. This comparison includes DJI M30T and DJI MAVIC3 Pro windows under the same detector, scan policy, and center-localization protocol. Figure 11(d,h) shows that EventRadar remains stable across the two evaluated UAV sizes under matched slow motion. For Even-tRadar, CH@1 is 0.963 on M30T and reaches full center-hit availabil-ity on MAVIC3 Pro, while the NCE medians stay in the 0.26–0.29 range. EV-SpSegNet and EvDetMAV are also strong in this low-speed setting, whereas EVPropNet is dominated by missed or false localizations. These results indicate that UAV size has limited impact on target availability in this matched setting. 
+
+7.3.6 Kite Distractor Case Study. We use the kite data only as a qualitative distractor case study. Candidate kite windows are screened from the pure-kite recording. Figure 12 illustrates the intended claim boundary. The UAV ref-erence has a compact target ROI and a strong, narrow rotor-band harmonic response, with a 136 Hz peak and a local spectral ratio of 255.6. The kite window is visually obvious and produces strong event support from the kite body, but its ROI spectrum is concen-trated at the low edge of the searched band, with a 20 Hz peak and UAV Kite   
+
+> (a) Event accumulation with ROI. UAV Kite
+> (b) Local frequency-evidence map. UAV Kite
+> (c) ROI harmonic spectrum.
+
+Figure 12: Qualitative UAV–kite frequency evidence. 
+
+a lower local ratio of 130.2. We therefore use this example only to show that visually active non-UAV objects can generate event support whose frequency evidence differs qualitatively from the UAV reference. 
+
+7.4 Controlled Module Ablation 
+
+We use controlled module-replacement ablations for the two in-terfaces in EventRadar. In each test, the surrounding protocol is fixed and only one module output is replaced: proposal-side local support before temporal readout, or candidate-level scoring on a fixed proposal pool. 
+
+7.4.1 Proposal-Side Support. The proposal-side ablation keeps the downstream evaluation protocol fixed and changes how local event support is formed before CHG-LISTA. Fixed tile scans uni-form 32 ×32 image tiles and scores them with a frame-style classifier. 
+
+Frame adaptive forms connected components on an accumulated event frame. Adaptive support uses the local event-support pro-posal described in Section 4.4, preserving compact event clusters as candidate regions for later temporal readout. 
+
+7.4.2 Frequency Scoring. The frequency-scoring ablation freezes the adaptive-support candidate pool and replaces only the scalar score assigned to each candidate. Event count uses raw event den-sity. FFT peak uses the strongest spectral peak. CS score uses the compact-sensing reconstruction score. CHG-LISTA score applies the harmonic-group scorer from Section 5. 
+
+> 11
+
+0% 25% 50% 75% 100% 
+
+Latency / deadline 
+
+CS-100 
+
+Evt-100 
+
+Evt-50 
+
+Evt-20 P90 Median (a) Online trace. 0 5 10 
+
+Latency / 100 ms 
+
+EventRadar (fast) 
+
+EventRadar (full) 
+
+EV-SpSegNet 
+
+EvDetMAV 
+
+EVPropNet   
+
+> Tail Median
+
+(b) Runtime audit. 0% 20% 40% 60% 80% 100% 
+
+Share of latency 
+
+CS-100 
+
+Evt-100 
+
+Evt-50 Read Cand. Score Other (c) Breakdown. 
+
+Figure 13: System overhead and real-time feasibility of the EventRadar prototype. Table 4: Controlled proposal-support and frequency-scoring ablations. 
+
+Proposal R.3 ↑ AP .3 ↑ R.5 ↑ AP .5 ↑ F1 .3 ↑ CErr ↓
+
+Fixed tile 0.116 0.020 0.017 0.002 0.105 9.02 Frame adaptive 0.766 0.764 0.522 0.404 0.682 2.19 Adaptive support 0.911 0.905 0.700 0.571 0.456 2.62 Scorer Top1 .3 ↑AP .3 ↑ mAP .3 ↑ R.3 ↑ F1 .3 ↑ mAP .5 ↑
+
+Event count 0.088 0.165 0.064 0.149 0.074 0.034 FFT peak 0.630 0.663 0.629 0.663 0.331 0.418 CS score 0.856 0.865 0.853 0.866 0.433 0.488 
+
+CHG-LISTA score 0.928 0.928 0.920 0.928 0.464 0.505 
+
+In the compact headers, AP denotes mAP for the proposal-support ablation and candidate AP for the frequency-scoring ablation. Ta-ble 4 shows that fixed tiling is too coarse for kilometer-range UAVs, while adaptive support preserves the highest recall and AP at both IoU thresholds. With the same candidate pool fixed, CHG-LISTA reaches 0.928 Top1 .3 and 0.920 mAP .3, ahead of CS, FFT peak, and raw event count. These replacements support the deployed boundary: SAGE preserves localized event candidates, and CHG-LISTA supplies the candidate-level harmonic evidence used to select among them. 
+
+7.5 System Overhead and Real-Time Feasibility 
+
+Because EventRadar targets a scanning prototype, we profile the Jetson Orin implementation on the same online path used by the prototype: events are replayed in timestamp order, windowed by the scan-loop stride, and converted to bbox predictions before the next window arrives. Figure 13 reports latency relative to the window deadline, an implementation breakdown, and a detector-runtime audit. In the figure labels, CS denotes the compact-sensing bbox path, Evt denotes the fast event-candidate path, and Cand. denotes candidate generation. The audit uses two input protocols: cached 100 ms event windows aligned with Sections 7.2–7.3 for fair detector comparison, and a continuous timestamp-ordered replay trace for scan-loop feasibility. Figure 13(a) shows that the fast event-candidate path leaves a large scan-loop margin on Jetson Orin, while the compact-sensing bbox path is accurate but close to the 100 ms deadline. Figure 13(b) shows the system-level timing boundary: EventRadar’s fast path stays comfortably real-time, the full path is near the deadline, and the pinned original EvDetMAV and EVPropNet rows are too slow under their recorded runtime protocols. Figure 13(c) explains this gap: GPU Multiple Measurement Vector-Orthogonal Matching Pur-suit (MMV-OMP) scoring dominates the compact-sensing path, whereas event-support ranking keeps the fast online candidate path lightweight. 
+
+8 Conclusion 
+
+EventRadar reframes protected-airspace UAV detection as long-range visual UAV discovery under wide-area active sensing. The central idea is simple: propeller-induced temporal periodicity can remain detectable after spatial morphology becomes unreliable. The system therefore uses SAGE to distinguish tiny moving targets from persistent backgrounds via spatiotemporal correlation, store candidate event clusters in a bearing -indexed scene memory, and then apply CHG-LISTA to recover temporal harmonic evidence from those clusters through a harmonic - evidence module. In this way, UAV identification is achieved simultaneously over long -range and wide-area operations. 
+
+References                         
+
+> [1] David El-Chai Ben-Ezra, Ron Arad, Ayelet Padowicz, and Israel Tugendhaft. 2026. Probabilistic Approach for Detection of High-Frequency Periodic Signals Using an Event Camera. New Mathematics and Natural Computation 22, 01 (2026), 99–110. [2] Luca Berlincioni, Gabriele Magrini, Federico Becattini, Pietro Pala, and Alberto Del Bimbo. 2026. DDHF: Real-Time Drone Detection in Event Cameras via Per-Pixel Frequency Analysis. arXiv:2603.08386 [cs.CV] https://arxiv.org/abs/2603.08386 [3] Megan Birch, James Rick, Adrish Kar, Jason Zutty, and Joseph L. Greene. 2026. Frequency-Domain Event-Based Imaging for Selective Surveillance. arXiv:2605.15392 [physics.optics] https://arxiv.org/abs/2605.15392 [4] Nuo Chen, Chao Xiao, Yimian Dai, Shiman He, Miao Li, and Wei An. 2025. Event-based Tiny Object Detection: A Benchmark Dataset and Baseline. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) . IEEE/CVF, Honolulu, HI, USA, 7209–7218. https://openaccess.thecvf.com/content/ICCV2025/html/Chen_Event-based_Tiny_ Object_Detection_A_Benchmark_Dataset_and_Baseline_ICCV_2025_paper.html [5] Xuecheng Chen, Jingao Xu, Wenhua Ding, Haoyang Wang, Xinyu Luo, Ruiyang Duan, Jialong Chen, Xueqian Wang, Yunhao Liu, and Xinlei Chen. 2026. Count every rotation and every rotation counts: Exploring drone dynamics via propeller sensing. In Proceedings of the 2026 ACM/IEEE International Conference on Embedded Artificial Intelligence and Sensing Systems .746–760. [6] Florin-Lucian Chiper, Alexandru Martian, Calin Vladeanu, Ion Marghescu, Razvan Craciunescu, and Octavian Fratu. 2022. Drone Detection and Defense Systems: Survey and a Software-Defined Radio-Based Solution. Sensors 22, 4 (2022), 1453. [7] Angelo Coluccia, Gianluca Parisi, and Alessio Fascista. 2020. Detection and classification of multirotor drones in radar sensor networks: A review. Sensors 20, 15 (2020), 4172. [8] Cybersecurity and Infrastructure Security Agency. 2025. Unmanned Aircraft System Detection Technology Guidance. Retrieved June 5, 2026 from https://www.cisa.gov/resources-tools/ resources/unmanned-aircraft-system-detection-technology-guidance [9] Cybersecurity and Infrastructure Security Agency. 2026. Protect Critical Infrastructure and Public Gatherings. Retrieved June 5, 2026 from https://www.cisa.gov/topics/physical-security/ be-air-aware/protect-critical-infrastructure-and-public-gatherings [10] Yifei Dong, Fengyi Wu, Sanjian Zhang, Guangyu Chen, Yuzhi Hu, Masumi Yano, Jingdong Sun, Siyu Huang, Feng Liu, Qi Dai, et al .2025. Securing the Skies: A Comprehensive Survey on Anti-UAV Methods, Benchmarking, and Future Directions. In Proceedings of the Computer Vision and Pattern Recognition Conference . 6659–6673. 12
+
+[11] Federal Aviation Administration. 2026. Restricting Drones Near Critical Infrastructure Sites. Retrieved June 5, 2026 from https://www.faa.gov/newsroom/restricting-drones-near-critical-infrastructure-sites [12] Luis Garcia Rodriguez, Jonas Konrad, Dominik Drees, and Benjamin Risse. 2025. S-ROPE: Spectral Frame Representation of Periodic Events. In Computer Vision – ECCV 2024 Workshops (Lecture Notes in Computer Science, Vol. 15646) . Springer, Milan, Italy, 307–324. doi:10.1007/978-3-031-92460-6_19 [13] Mathias Gehrig and Davide Scaramuzza. 2023. Recurrent Vision Transformers for Object Detection with Event Cameras. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 13884–13893. [14] Gabriel Jekaterynczuk and Zbigniew Piotrowski. 2025. Outdoor Microphone Range Tests and Spectral Analysis of UAV Acoustic Signatures for Array Development. Sensors 25, 22 (2025), 7057. doi:10.3390/s25227057 [15] Yanyi Lyu, Zhunga Liu, Huandong Li, Dongxiu Guo, and Yimin Fu. 2023. A real-time and lightweight method for tiny airborne object detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition . 3016–3025. [16] Gabriele Magrini, Lorenzo Berlincioni, Federico Becattini, Luca Cultrera, and Pietro Pala. 2025. Drone Detection with Event Cameras. In Proceedings of the IEEE/CVF Interna-tional Conference on Computer Vision (ICCV) Workshops . IEEE/CVF, Honolulu, HI, USA, 4762–4773. https://openaccess.thecvf.com/content/ICCV2025W/NeVi/html/Magrini_Drone_ Detection_with_Event_Cameras_ICCVW_2025_paper.html [17] Gabriele Magrini, Luca Berlincioni, Federico Becattini, Pietro Pala, and Alberto Del Bimbo. 2025. EV-Flying: An Event-Based Dataset for In-The-Wild Recognition of Flying Objects. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops .4947–4955. [18] MarketsandMarkets. 2025. Anti-Drone Market Size, Share & Trends, 2025 To 2030. Retrieved June 5, 2026 from https://www.marketsandmarkets.com/Market-Reports/anti-drone-market-177013645.html [19] Ram M. Narayanan, Bryan Tsang, and Ramesh Bharadwaj. 2023. Classification and Discrimina-tion of Birds and Small Drones Using Radar Micro-Doppler Spectrogram Images. Signals 4, 2 (2023), 337–358. https://www.mdpi.com/2624-6120/4/2/18 [20] Denis Ojdanić, Andreas Sinn, Christopher Naverschnigg, and Georg Schitter. 2023. Feasibility analysis of optical UAV detection over long distances using robotic telescopes. IEEE Trans. Aerospace Electron. Systems 59, 5 (2023), 5148–5157. [21] Etienne Perot, Pierre de Tournemire, Davide Nitti, Jonathan Masci, and Amos Sironi. 2020. Learning to Detect Objects with a 1 Megapixel Event Camera. In Advances in Neural Information Processing Systems , Vol. 33. 16639–16652. [22] Bernd Pfrommer. 2022. Frequency Cam: Imaging Periodic Signals in Real-Time. arXiv:2211.00198 [cs.CV] https://arxiv.org/abs/2211.00198 [23] Nitin J. Sanket, Chahat Deep Singh, Chethan M. Parameshwara, Cornelia Fermüller, Guido C. H. E. de Croon, and Yiannis Aloimonos. 2021. EVPropNet: Detecting Drones by Finding Propellers for Mid-Air Landing and Following. In Robotics: Science and Systems XVII . Robotics: Science and Systems Foundation, Virtual. doi:10.15607/RSS.2021.XVII.074 [24] Ulzhalgas Seidaliyeva, Lyazzat Ilipbayeva, Kyrmyzy Taissariyeva, Nurzhigit Smailov, and Eric T. Matson. 2024. Advances and Challenges in Drone Detection and Classification Techniques: A State-of-the-Art Review. Sensors 24, 1 (2024), 125. doi:10.3390/s24010125 [25] Radim Špetlík, Tereza Uhrová, and Jiří Matas. 2025. Efficient Real-Time Quadcopter Propeller Detection and Attribute Estimation with High-Resolution Event Camera. In Image Analysis .Springer, 245–260. doi:10.1007/978-3-031-95911-0_16 [26] T. C. Stewart, M. Drouin, M. Picard, F. B. D. Dizeu, Antony Orth, and Guillaume Gagné. 2022. A Virtual Fence for Drones: Efficiently Detecting Propeller Blades with a DVXplorer Event Camera. In Proceedings of the 17th International Conference on Systems . doi:10.1145/3546790.3546800 [27] Yimiao Sun, Weiguo Wang, Luca Mottola, Ruijin Wang, and Yuan He. 2022. Aim: Acoustic inertial measurement for indoor drone localization and tracking. In Proceedings of the 20th ACM Conference on Embedded Networked Sensor Systems . 476–488. [28] Diana Tejera-Berengue, Fangfang Zhu-Zhou, Manuel Utrilla-Manso, Roberto Gil-Pita, and Manuel Rosa-Zurera. 2024. Analysis of distance and environmental impact on UAV acoustic detection. Electronics 13, 3 (2024), 643. [29] Ravi Kumar Thakur, Luis Granados Segura, Jan Klivan, Radim Špetlík, Tobiáš Vinklárek, Matouš Vrba, and Martin Saska. 2026. Relative State Estimation using Event-Based Propeller Sensing. arXiv:2604.18289 [cs.RO] https://arxiv.org/abs/2604.18289 [30] Haoyang Wang, Jingao Xu, Xinyu Luo, Ting Zhang, Xuecheng Chen, Ruiyang Duan, Yunhao Liu, Jianfeng Zheng, Weijie Hong, Xiaoqiang Ji, et al . 2026. mme-loc: Facilitating accurate drone landing with ultra-high-frequency localization. IEEE Transactions on Mobile Computing 
+
+(2026). [31] Wenhao Xu, Chuyu Wang, Qiancheng Jin, Yanling Bu, Lei Xie, and Sanglu Lu. 2025. mmUAVsense: mmWave Radar-based UAV Detection via Fine-grained Rotary Sensing. In 2025 IEEE 45th International Conference on Distributed Computing Systems (ICDCS) . IEEE, 593–603. [32] Weiqi Yan, Lixin Chen, Xiangru Hou, Zhipeng Cai, Youbiao Wang, Yangyang Shi, Yu Zang, and Cheng Wang. 2026. M 2E-UAV: A Benchmark and Analysis for Onboard Motion-on-Motion Event-Based Tiny UAV Detection. arXiv:2605.10496 [cs.CV] https://arxiv.org/abs/2605.10496 [33] Yin Zhang, Zian Ning, Xiaoyu Zhang, Shiliang Guo, Peidong Liu, and Shiyu Zhao. 2025. EvDet-MAV: Generalized MAV Detection From Moving Event Cameras. IEEE Robotics and Automation Letters 10, 8 (2025), 8236–8243. doi:10.1109/LRA.2025.3585389 13

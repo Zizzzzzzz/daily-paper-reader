@@ -1,0 +1,659 @@
+Title: DCP-Prune: Ultra-Low Token Pruning with Distribution Consistency Preservation
+
+URL Source: https://arxiv.org/pdf/2606.16633v1
+
+Published Time: Tue, 16 Jun 2026 02:42:52 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# DCP-Prune: Ultra-Low Token Pruning with Distribution Consistency Preservation 
+
+Xifeng Xue 1, Xiaokang Wang 2, Zirui Li 1, Ming-Ming Cheng 1, Guolei Sun 1*1College of Computer Science, Nankai University, Tianjin, China 
+
+> 2
+
+Nanjing University of Posts and Telecommunications, Nanjing, China 
+
+Abstract 
+
+Recent vision token pruning methods effec-tively preserve model performance under mod-erate token budgets but become unstable under ultra-low token budget. Our analysis shows that as the pruning budget decreases, accuracy degradation is often accompanied by larger feature distribution shifts. Critically, the de-gree of this distribution shift strongly corre-lates with performance degradation. To better characterize this phenomenon, we introduce a lightweight distribution consistency metric to estimate the distribution shift between re-tained and full tokens. Motivated by these observations, we propose a two-stage prun-ing framework consisting of Anchor-Context Graph Recovery (ACGR) and Text-Aware To-ken Cluster Selection (TATCS). Specifically, ACGR transfers contextual information before token removal, while TATCS dynamically re-selects representative tokens when severe dis-tribution shift is detected. Extensive experi-ments demonstrate that our method achieves superior and more stable performance under ultra-low token budget. Notably, it retains 92.1% of the upper-bound average performance on LLaVA-1.5-7B with only 16 visual tokens. The code will be released at: https://github. com/EMVision-NK/DCP-Prune .
+
+1 Introduction 
+
+Vision-language models (VLMs) have recently demonstrated strong performance across a broad range of multimodal tasks, including visual ques-tion answering (Dai et al., 2023; Alayrac et al., 2022; Huang et al., 2023; Li et al., 2023a), image understanding (Zhu et al., 2024; Liu et al., 2023; Chen et al., 2022, 2024b), and multimodal dia-logue (Li et al., 2024c; Wang et al., 2024b; Li et al., 2024a; Wang et al., 2024c). However, the compu-tational cost of VLMs grows rapidly with increas-ingly complex visual inputs. In VLMs, the number 
+
+> *Corresponding author.
+
+of visual tokens scales rapidly with higher image resolutions (Guo et al., 2024; Dehghani et al., 2023; Dong et al., 2024), multi-image inputs (Wang et al., 2023; Ye et al., 2023; Moon et al., 2024; Chen et al., 2023), and video sequences (Li et al., 2024b; Arnab et al., 2021; Bain et al., 2021; Sun et al., 2019). As a result, memory usage and inference latency increase substantially, posing a significant obstacle to practical deployment and making visual token pruning a critical research problem. Existing visual token pruning methods are gen-erally categorized into importance-oriented meth-ods and coverage-oriented methods, and both have shown strong performance under moderate token budgets (Jiang et al., 2025; Zhang et al., 2025c; Tan et al., 2025; Zhang et al., 2025a). However, their performance often becomes unsatisfactory under 
+
+ultra-low token budgets. Specifically, importance-oriented methods preserve salient tokens, but often suffer from redundancy and loss of contextual infor-mation under aggressive compression (Shang et al., 2025; Sun et al., 2025; Yang et al., 2025b; Li et al., 2025b). In contrast, coverage-oriented methods pri-oritize spatial or semantic diversity, but may retain tokens that are less informative for reasoning (Kim et al., 2025; Chen et al., 2025; Zhang et al., 2025b; Yu et al., 2026). Consequently, under ultra-low token budget, both strategies progressively drive retained tokens away from the original feature dis-tribution, degrading performance. The distribution shift between retained and full tokens leads to performance degradation under ultra-low token budget (Zhang et al., 2026; Duan et al., 2022). To better characterize this phe-nomenon, we introduce a lightweight distribution consistency metric: 
+
+D(Xk, X f ) = Tr(Σ k) + d Var( μk)Tr(Σ f ) + d Var( μf ) ,κ = |D (Xk, X f ) − 1|,
+
+(1) where Xf and Xk denote the full and kept token 1
+
+> arXiv:2606.16633v1 [cs.CV] 15 Jun 2026 Figure 1: (a) Relationship between kept tokens, distribution deviation ( κ), and accuracy for LLaVA-1.5-7B on POPE dataset. (b) Performance comparison under the ultra-low budget of 16 retained tokens.
+
+sets, respectively. Tr(Σ) measures feature disper-sion, while Var( μ) reflects shifts in channel-wise feature statistics. Using this metric, Fig. 1(a) shows that reducing the token budget consistently enlarges the distributional discrepancy between retained and full tokens, accompanied by severe performance degradation. This aligned trend suggests that dis-tributional discrepancy serves as an informative indicator of pruning regimes prone to performance degradation. Motivated by the relation between distributional discrepancy and performance degradation, we de-sign a two-stage framework for ultra-low visual to-ken pruning. During progressive pruning, Anchor-Context Graph Recovery (ACGR) transfers con-textual information from tokens to be discarded into retained tokens, thereby alleviating loss of semantic information and maintaining token dis-tribution under aggressive pruning. At the final pruning stage, Text-Aware Token Cluster Selec-tion (TATCS) is triggered under significant feature distribution shifts to reselect representative tokens with textual guidance, helping retain task-relevant visual information while improving feature distri-bution consistency. As illustrated in Fig. 1(b), our framework achieves much better performance un-der ultra-low token budget, compared with existing methods. Our contributions are threefold: 
+
+(1) We observe that ultra-low token pruning in-duces distribution shift between retained and full tokens, and further introduce a lightweight metric to quantify this shift, showing that the discrepancy closely aligns with performance degradation. 
+
+(2) We propose a two-stage pruning framework consisting of Anchor-Context Graph Recovery (ACGR) and Text-Aware Token Cluster Selection (TATCS) to respectively mitigate contextual infor-mation loss and distribution shift under ultra-low token budget. 
+
+(3) Extensive experiments on various VLMs demonstrate that our method consistently outper-forms existing pruning methods under ultra-low token budget, retaining 92.1% performance on LLaVA-1.5-7B with 16 tokens under (97.2% reduc-tion) and 91.9% performance on LLaVA-NeXT-7B with 80 tokens under (97.2% reduction). 
+
+2 Related Works 
+
+Visual Token Pruning in VLMs. Visual token pruning has emerged as an effective strategy for im-proving VLMs efficiency by removing redundant visual tokens during inference. Early studies show that many visual tokens contribute little to predic-tions and can be safely pruned based on attention or feature responses (Chen et al., 2024a). Subsequent work improves token selection by incorporating information flow or transformation dynamics, such as (Tong et al., 2025). Other approaches attempt to balance token importance and diversity (Deng et al., 2025) or explicitly model redundancy and diversity in token selection (Fang et al., 2026). De-spite these advances, most methods select tokens by importance or coverage, largely overlooking dis-tributional consistency. Under ultra-low token bud-gets, retained tokens can deviate from the original feature distribution, making it harder to preserve a compact yet representative subset. 
+
+Distribution Consistency in Token Pruning. 
+
+Under ultra-low token pruning, retained visual to-ken distributions progressively deviate from the original full token distribution. Recent studies on visual token pruning show that aggressive com-pression introduces selection bias and weakens 2Figure 2: Overview of the proposed two-stage ultra-low token pruning framework. ACGR transfers contextual information from pruned context tokens to retained anchor tokens to alleviate semantic loss. TATCS mitigates distribution drift by reselecting representative tokens using text-aware semantic similarity. 
+
+fine-grained visual understanding (Endo et al., 2025). More broadly, distribution modeling has been widely used to characterize representation dis-crepancy. For example, (Liang et al., 2025) models semantic features with Gaussian distributions for feature alignment, while (Zhang et al., 2023) the-oretically analyzes divergence measures between Gaussian feature distributions. These studies sug-gest that feature distributions can be characterized through their statistical properties, providing a way to assess representation mismatch. In contrast, most existing visual token pruning methods focus on token importance or diversity, without explicitly considering whether the retained subset preserves the original statistical structure. Under aggressive pruning, this mismatch becomes more pronounced, making the retained tokens less representative and degrading multimodal reasoning performance. 
+
+3 Method 
+
+3.1 Overview 
+
+Given a set of d-dimensional visual tokens Xf ∈
+
+RN ×d, our objective is to select a compact kept subset Xk ∈ RK×d under an ultra-low token bud-get ( K ≪ N ). During progressive pruning, the retained tokens should preserve task-relevant vi-sual semantics while retaining complementary con-textual information. Meanwhile, the kept tokens representations should remain consistent with the original full token distribution under ultra-low to-ken budget. In this paper, we propose a two-stage prun-ing framework, illustrated in Fig. 2. During pro-gressive pruning, ACGR is employed to aggre-gate contextual information from discarded tokens into retained anchor tokens prior to token removal, thereby preserving richer visual semantics under aggressive compression. At the final pruning stage, where severe distribution shift may arise, TATCS is introduced to perform text-aware representative token reselection from the original token pool, help-ing maintain feature distribution consistency under ultra-low token budget. 
+
+3.2 Anchor-Context Graph Recovery 
+
+Under ultra-low token budget, directly discarding visual tokens inevitably removes complementary semantic and spatial information. As pruning inten-sifies, the contextual relationships among tokens are increasingly disrupted, making the remaining tokens less representative of the original visual se-mantics. To address this issue, we propose Anchor-Context Graph Recovery (ACGR), which transfers contextual information from discarded contextual tokens to retained anchor tokens before pruning, thereby preserving richer visual semantics under aggressive pruning. Given the token set X = {xi}Mi=1 at the current pruning stage, we first perform score and partition 
+
+by computing an overall importance score for each 3token as: 
+
+si = scls  
+
+> i
+
++ scos  
+
+> i
+
++ svar  
+
+> i
+
++ sabl  
+
+> i
+
+. (2) Here, scls  
+
+> i
+
+, scos  
+
+> i
+
+, svar  
+
+> i
+
+, and sabl  
+
+> i
+
+measure CLS rele-vance, feature non-redundancy, transformation vari-ation, and attention-ablation impact, respectively. These criteria jointly capture global semantic im-portance, redundancy suppression, feature dynam-ics, and token influence through attention inter-actions. Detailed formulations and normalization strategies are provided in Appendix A. Based on the resulting scores si, the token set X is then par-titioned into an anchor set Xa = {xaj }Ma 
+
+> j=1
+
+and a context set Xc = {xci }Mc
+
+> i=1
+
+, where Ma and Mc de-note the numbers of retained anchor tokens and discarded context tokens, respectively. Instead of directly discarding context tokens, ACGR constructs a semantic-spatial context-to-anchor graph to transfer complementary informa-tion from Xc to Xa. Since semantically similar and spatially nearby tokens are more likely to pro-vide complementary information, we measure to-ken affinity using both semantic and spatial similar-ity . Accordingly, the edge weight between context token xci and anchor token xaj is defined as 
+
+eij = cos( xci , x aj ) · exp − ∥pci − paj ∥22
+
+τ
+
+!
+
+. (3) where pci and paj denote token grid coordinates, and 
+
+τ controls spatial decay. To suppress noisy informa-tion transfer, each anchor token retains only its top-
+
+kn context neighbors. Finally, the retained anchor tokens are updated through residual aggregation over the context-to-anchor graph :
+
+˜xaj = xaj + α X 
+
+> i∈N kn (j)
+
+¯eij xci , (4) where ¯eij = eij / P  
+
+> i∈N kn (j)
+
+eij denotes the nor-malized edge weight, Nkn (j) denotes the top-kn
+
+neighbors of xaj , and α is the fusion coefficient. The recovered anchor set ˜Xa = {˜xaj }Ma 
+
+> j=1
+
+main-tains the same token budget as direct pruning while incorporating complementary semantic-spatial in-formation from discarded tokens. As a result, ACGR mitigates the representation degradation caused by progressive pruning under aggressive compression. 
+
+3.3 Text-Aware Token Cluster Selection 
+
+Although ACGR alleviates contextual information loss during progressive pruning, the retained token subset can still gradually drift from the original feature distribution under ultra-low token budget, reducing the representativeness of the kept tokens. To address this, TATCS is activated at the final pruning stage when significant distribution shift is detected, performing text-aware token reselection from X to restore distributional consistency. At the final pruning stage, we first compute the distribution consistency metric κ using Eq. 1 be-tween the retained anchor tokens Xa and the input token set X. When κ > δ , where δ is a prede-fined instability threshold, the retained subset is considered to exhibit severe distribution drift and becomes less representative of the original visual semantics. Under this condition, TATCS is applied at the final pruning stage to perform text-aware token reselection and restore feature distribution consistency. A statistical interpretation of κ is pro-vided in Appendix B. Then, under the target token budget K, we per-form greedy representative initialization on X to obtain a representative token subset. Specifically, during each greedy selection step, every candidate token xi ∈ U is evaluated by 
+
+Gi = 1
+
+|U |
+
+X 
+
+> xj∈U
+
+cos( xi, x j )−max  
+
+> xp∈S
+
+cos( xi, x p)+ˆ acls  
+
+> i
+
+,
+
+(5) where S and U denote the selected token set and the unselected candidate token set, respectively, with 
+
+U = X at initialization, and ˆacls  
+
+> i
+
+is the normalized CLS attention score. At each iteration, the token with the largest gain Gi is added to S. The pro-cess is repeated until K representative tokens are selected, and the selected token set S = {zk}Kk=1 
+
+is used as the initial cluster centers. Given the text feature t extracted from the input text, we define a text-aware semantic similarity 
+
+between token xi and cluster center zk by jointly modeling their visual similarity and text-alignment consistency: 
+
+sim ik = cos( xi, z k) − | cos( xi, t ) − cos( zk, t )| ,
+
+(6) where the first term captures visual similarity, while the second term enforces consistency in text rele-vance between tokens assigned to the same cluster. Based on this similarity, each token is assigned through text-aware assignment: 
+
+ci = arg max  
+
+> k
+
+sim ik . (7) The cluster centers are then iteratively updated 4by averaging the assigned token features: 
+
+˜zk =
+
+PMi=1 I[ci = k]xi
+
+PMi=1 I[ci = k] , (8) where I[·] is the indicator function and ˜zk denotes the iteratively updated cluster center. After iterative refinement, we perform cluster reselection by selecting representative tokens as 
+
+x∗ 
+
+> k
+
+= xi∗ , i∗ = arg max i:ci=k sim ik , to obtain the final compact token set Xout = {x∗
+
+> k
+
+}Kk=1 . By apply-ing text-aware token cluster selection only when significant distribution deviation occurs, TATCS maintains feature distribution consistency while improving the semantic representativeness of re-tained tokens under ultra-low token budget. 
+
+4 Experiments 
+
+4.1 Experiment Settings Models. We evaluate the effectiveness of our pro-posed token pruning strategy under ultra-low token budget on a set of representative vision-language models, including LLaVA-1.5 (Liu et al., 2024a), LLaVA-NeXT (Liu et al., 2024b), Video-LLaVA (Lin et al., 2024), and Qwen2-VL (Wang et al., 2024b), covering both image and video understand-ing tasks. Specifically, image understanding is eval-uated on five widely used benchmarks: GQA (Hud-son and Manning, 2019), MME (Fu et al., 2023), POPE (Li et al., 2023b), SQA (Lu et al., 2022), and TextVQA (Singh et al., 2019), while video under-standing is evaluated on TGIF (Jang et al., 2017), MSVD (Chen and Dolan, 2011), and MSRVTT (Xu et al., 2016). We compare against a set of recent competitive methods, including VisionZip (Yang et al., 2025a), HoloV (Zou et al., 2025), FlowCut (Tong et al., 2025), PRUNESID (Fang et al., 2026), and SCOPE (Deng et al., 2025). 
+
+Implementation Details. Our method is entirely training-free and operates exclusively at inference time. For ACGR, pruning is applied every two Transformer layers in the vision encoder, progres-sively and uniformly reducing the token budget from the initial visual token number N to the tar-get budget K, while using kn = 5 , a spatial decay factor τ = 10 , and a fusion coefficient α = 0 .1
+
+across all experiments. In TATCS, which is only potentially activated at the final pruning layer, re-selection is triggered when the threshold δ = 0 .1
+
+is exceeded. Meanwhile, text features are extracted either from the text encoder aligned with the visual embedding space, when available (Radford et al., 2021), or otherwise from the aligned LLM text representations. All methods are evaluated under identical backbone and inference settings to ensure a fair comparison. 
+
+4.2 Main Results Results on LLaVA 1.5. Table 1 reports the per-formance of different methods on LLaVA-1.5-7B under varying token budgets. As the token bud-get decreases, the performance advantage of our method becomes progressively more pronounced. Specifically, our method achieves 96.3% accuracy at 64 tokens, surpassing the strongest method by 0.5%. The gain further increases to 0.7% at 32 to-kens and reaches 2.7% at 16 tokens. These results highlight the effectiveness and robustness of our method, particularly in ultra-low token budget. Moreover, existing methods degrade more rapidly as the token budget becomes more restric-tive, whereas our method remains more stable. When the token budget is reduced from 64 to 16, the accuracy of SCOPE declines from 95.8% to 89.4%, while our method only drops from 96.3% to 92.1%. Even more pronounced degradation is observed in FlowCut, whose accuracies decrease from 94.4% to 82.3%. These results suggest that our method is more robust under ultra-low token pruning and better preserves representation quality. Furthermore, under the ultra-low token budget of 16 tokens, our method achieves the best perfor-mance across all evaluated benchmarks. In par-ticular, it reaches 81.5% on POPE, outperforming SCOPE by 4.6%, and achieves 55.1% on GQA, which is also higher than SCOPE at 53.4%. These results show that our method exhibits slower per-formance degradation as the token budget becomes more aggressive. Overall, the results demonstrate that our method consistently maintains stronger per-formance than existing approaches under ultra-low token budget. 
+
+Results on LLaVA-NeXT. We further evaluate our method on LLaVA-NeXT-7B, which contains up to 2880 visual tokens, posing a higher risk of feature distribution inconsistency under ultra-low token pruning. As shown in Table 2, our method also achieves strong performance on LLaVA-NeXT-7B, which contains substantially more visual tokens. Under moderate pruning with 160 retained tokens, differ-ent methods achieve relatively similar performance, 5Table 1: Performance comparison under different visual token settings on LLaVA-1.5-7B. The vanilla number of visual tokens is 576, and the last column reports the average accuracy proportion w.r.t. the vanilla. The en-tries marked with † are reported from the corresponding original papers.                                                                                                                                
+
+> Method GQA MME POPE SQA TextVQA Avg.
+> Upper Bound, 576 Tokens (100.0%)
+> Vanilla 61.9 1862 85.9 69.5 58.2 100.0%
+> Retain 64 Tokens (↓88 .9%)
+> VisionZip 55.1 †1690 †80.9 †69.0 †55.5 †93.7% HoloV 55.3 †1715 †80.3 †69.5 †55.4 †94.0% FlowCut 55.6 †1744 †80.4 †69.1 †55.6 †94.4% PRUNESID 57.1 †1733 †83.8 †67.8 †54.2 †94.7% SCOPE 58.3 †1698 †83.9 †68.6 †56.6 †95.8% Ours 58.5 1719 86.5 68.3 55.7 96.3%
+> Retain 32 Tokens (↓94 .4%)
+> VisionZip 51.9 1581 74.7 68.8 53.1 89.2% HoloV 52.8 1598 76.1 68.8 53.7 90.2% FlowCut 51.9 1558 75.5 68.3 52.6 88.8% PRUNESID 54.8 1592 82.1 67.8 52.5 91.5% SCOPE 56.4 1655 82.4 68.4 54.8 93.7% Ours 57.0 1654 85.0 68.6 54.3 94.4%
+> Retain 16 Tokens (↓97 .2%)
+> VisionZip 47.0 1350 66.6 67.8 49.8 81.8% HoloV 48.9 1444 70.6 68.1 50.7 84.8% FlowCut 48.2 1357 71.1 67.2 47.4 82.3% PRUNESID 50.3 1436 74.5 67.3 49.5 85.4% SCOPE 53.4 1562 76.9 68.2 52.0 89.4% Ours 55.1 1624 81.5 69.3 52.1 92.1%
+
+while our method still slightly outperforms SCOPE in average accuracy, demonstrating that our method remains effective even when the original model contains substantially more visual tokens. The advantage of our method becomes increas-ingly pronounced as the token budget decreases. At 80 and 40 retained tokens, our method surpasses SCOPE by 1.2% and 3.0% in average accuracy, respectively. Under the most aggressive setting with only 20 retained tokens, our method still pre-serves 80.7% of the upper-bound performance and exceeds all baselines by at least 4.7%, while com-peting methods are at or below 76.0%. The gains are particularly evident on GQA, MME, and POPE. Under the 20 token setting, our method outperforms SCOPE by 4.1% on GQA and 8.2% on POPE. These results show that our method maintains stronger performance under ex-treme compression. 
+
+Results on Video-LLaVA. We further evaluate our method on Video-LLaVA under aggressive vi-sual token pruning. Because video understanding requires capturing both spatial and temporal depen-dencies, it is more sensitive to token reduction. As shown in Table 3, our method achieves the best average performance under both token bud-gets, retaining 79.52% and 69.89% of the vanilla 
+
+Table 2: Performance comparison under different visual token settings on LLaVA-NeXT-7B. The vanilla number of visual tokens is 2880, and the last column reports the average accuracy proportion w.r.t. the vanilla.                                                                                                                                                                      
+
+> Method GQA MME POPE SQA TextVQA Avg.
+> Upper Bound, 2880 Tokens (100.0%)
+> Vanilla 64.2 1842 86.4 70.2 61.3 100.0%
+> Retain 160 Tokens (↓94 .4%)
+> VisionZip 55.5 †1630 †84.2 68.3 †56.2 †92.3% HoloV 57.2 1675 81.4 67.1 52.3 91.0% FlowCut 57.6 †1746 †79.9 †66.5 57.6 †93.1% PRUNESID 58.9 †1704 †76.9 †67.1 †59.1 93.1% SCOPE 60.0 1700 †83.5 67.4 †56.8 †94.2% Ours 59.7 1764 84.6 67.5 55.3 94.6%
+> Retain 80 Tokens (↓97 .2%)
+> VisionZip 52.3 1534 75.2 68.3 53.4 87.2% HoloV 48.7 1432 69.1 67.7 46.9 81.3% FlowCut 54.9 1550 78.5 68.3 55.2 89.6% PRUNESID 56.3 1642 78.9 66.8 49.9 88.9% SCOPE 57.6 1636 79.1 68.2 53.0 90.7% Ours 58.7 1692 80.8 67.1 53.3 91.9%
+> Retain 40 Tokens (↓98 .6%)
+> VisionZip 44.1 1150 62.4 65.5 47.0 74.7% HoloV 44.3 1229 62.2 66.5 43.4 74.6% FlowCut 50.7 1401 72.6 68.7 50.3 83.8% PRUNESID 49.4 1261 66.1 67.5 45.6 78.5% SCOPE 54.3 1515 73.0 68.4 48.4 85.5% Ours 56.1 1655 76.5 66.7 50.0 88.5%
+> Retain 20 Tokens (↓99 .3%)
+> VisionZip 42.3 1134 65.2 67.3 43.4 73.9% HoloV 41.2 1051 56.2 64.5 41.1 69.0% FlowCut 40.6 1012 53.6 65.2 41.0 68.0% PRUNESID 44.8 1002 54.3 67.0 39.0 69.2% SCOPE 47.8 1298 60.4 67.3 42.4 76.0% Ours 51.9 1379 68.6 68.0 43.9 80.7%
+
+accuracy with only 128 and 64 visual tokens, re-spectively. In particular, our method shows clear ad-vantages on TGIF, reaching 33.60% at 128 tokens and 30.57% at 64 tokens, outperforming SCOPE by 7.85% and 10.10%, respectively. It also con-sistently surpasses FlowCut across all datasets and token budgets. This suggests that even under ag-gressive pruning, our method preserves most of the original performance. This demonstrates the effectiveness of our framework on video language tasks. These findings indicate that substantial re-dundancy exists in video inputs, suggesting that aggressive token pruning can significantly improve the efficiency of video LLMs without causing se-vere performance degradation. 
+
+Results on Qwen2-VL. Table 4 presents the per-formance comparison on Qwen2-VL-7B under a 95% token reduction ratio. Our method achieves the best average performance of 89.3%, outper-forming SCOPE and FlowCut by 1.5% and 3.5%, respectively, further demonstrating its effective-ness under ultra-low token budget. Moreover, our method achieves the best performance on GQA, MME, POPE, and SQA under ultra-low token bud-6Table 3: Performance comparison on Video-LLaVA under different visual token settings. The vanilla number of visual tokens is 2048, and the last column reports the average accuracy proportion w.r.t. the vanilla.                                      
+
+> Method TGIF MSVD MSRVTT Avg.
+> Upper Bound, 2048 Tokens (100.0%)
+> Vanilla 45.70 68.09 54.49 100.0%
+> Retain 128 Tokens (↓93 .8%)
+> FlowCut 29.39 46.16 37.45 66.95% SCOPE 25.75 60.06 44.81 75.59% Ours 33.60 52.76 47.70 79.52%
+> Retain 64 Tokens (↓96 .9%)
+> FlowCut 25.80 38.38 31.39 56.82% SCOPE 20.47 55.55 40.81 67.09% Ours 30.57 50.24 37.59 69.89%
+
+Table 4: Performance comparison on Qwen2-VL-7B under 95% token reduction ratio. The last column re-ports the average accuracy proportion w.r.t. the vanilla.                                  
+
+> Method GQA MME POPE SQA TextVQA Avg.
+> Upper Bound (100.0%)
+> Vanilla 61.9 2302 88.8 84.6 81.3 100.0%
+> Retain 5% Tokens (↓95 .0%)
+> FlowCut 50.7 2036 79.3 78.2 62.4 85.8% SCOPE 52.1 2085 81.2 78.3 65.2 87.8% Ours 54.3 2134 82.7 79.1 64.6 89.3%
+
+get, with particularly significant gains on GQA and MME, where it surpasses SCOPE by 2.2% and 49 points, respectively. These results demonstrate the consistent advantages of our approach across diverse multimodal understanding benchmarks. 
+
+4.3 Distribution Consistency and Ablation Analysis Distribution Consistency and Performance Cor-relation. As illustrated in Fig. 1(a), reducing the token budget progressively increases the dis-tribution deviation κ, while the downstream accu-racy consistently decreases. Under moderate to-ken budgets, both κ and accuracy change relatively smoothly. However, under ultra-low token budget, 
+
+κ increases more rapidly and is accompanied by substantially larger performance degradation as the pruning budget is further reduced. This consistent trend indicates that larger distribution deviation is generally associated with lower accuracy under ultra-low token budget. To further examine this relationship, Table 5 re-ports the absolute Pearson correlation coefficient between κ and downstream accuracy across token budgets ranging from 10 to 100. Strong corre-
+
+Table 5: Absolute Pearson correlations between κ and accuracy across token budgets from 10 to 100.                      
+
+> Method GQA POPE TextVQA
+> VisionZip 0.95 0.90 0.94 HoloV 0.86 0.95 0.82 FlowCut 0.96 0.99 0.96 PRUNESID 0.98 0.98 0.83 SCOPE 0.98 0.93 0.82 Ours 0.97 0.94 0.87
+
+Table 6: Effect of ACGR and TATCS on performance and feature distribution consistency under ultra-low to-ken pruning on LLaVA-1.5-7B. Each entry reports the 
+
+accuracy / κ, where smaller κ (Eq. 1) indicates better feature distribution consistency.                       
+
+> Dataset Tokens w/o TATCS w/o ACGR ACGR+TATCS
+> GQA 16 37.8 / 1.06 50.5 / 0.78 55.1 / 0.66
+> 32 37.5 / 0.42 54.1 / 0.34 57.0 / 0.21
+> 64 37.7 / 0.43 56.7 / 0.15 58.5 / 0.07
+> POPE 16 50.2 / 1.07 72.9 / 0.85 81.5 / 0.71
+> 32 49.5 / 0.56 79.1 / 0.49 85.0 / 0.23
+> 64 50.2 / 0.46 82.6 / 0.10 86.5 / 0.07
+
+lations are consistently observed across different benchmarks and pruning methods. In particular, the correlations on GQA remain above 0.86 for all methods, while POPE consistently achieves values at or above 0.90. TextVQA also exhibits high cor-relations ranging from 0.82 to 0.96. These results show that, under ultra-low token budget, the strong correlation between distribution deviation and ac-curacy exists across different pruning strategies and benchmarks. Therefore, κ can serve as an effective lightweight indicator for analyzing the behavior of aggressive compression. 
+
+Ablation Analysis on ACGR and TATCS. Re-moving ACGR consistently degrades performance, with the degradation becoming more severe as the token budget decreases, demonstrating the impor-tance of ACGR during progressive pruning. As shown in Table 6, removing ACGR on POPE leads to accuracy drops of 3.9%, 5.9%, and 8.6% at to-ken budgets of 64, 32, and 16, respectively. The progressively larger performance gap suggests that ACGR provides greater benefits under more aggres-sive pruning settings. These results indicate that en-riching retained tokens with contextual information before token removal helps alleviate performance degradation under ultra-low token budget. Removing TATCS causes substantial perfor-mance degradation across both datasets, highlight-ing its importance under ultra-low token pruning. 7Table 7: Efficiency comparison on POPE under the 32 tokens setting. ∆ is the speed-up computed w.r.t. the vanilla. Our method clearly outperforms existing methods while maintaining comparable efficiency.                                                                         
+
+> Method Tokens Accuracy Time (s) ∆
+> Vanilla 576 85.9 2147 1.0×
+> VisionZip 32 74.7 901 2.4×
+> HoloV 32 76.1 876 2.5 ×
+> FlowCut 32 75.5 856 2.5 ×
+> PRUNESID 32 82.1 930 2.3×
+> SCOPE 32 82.4 884 2.4×
+> Ours 32 85.0 895 2.4×
+> Table 8: Performance drop after removing each compo-nent under ultra-low token pruning on LLaVA-1.5-7B. Rows "w/o scos
+> i", "w/o svar
+> i", and "w/o sabl
+> i" remove the corresponding ACGR score terms in Eq. 2; "w/o Text" removes the text-aware term of TATCS in Eq. 6.
+> GQA POPE Component 64 32 16 64 32 16 w/o scos
+> i-0.2 -0.6 -0.3 -0.7 -1.1 -0.4 w/o svar
+> i-0.4 -0.3 -0.5 -0.4 -0.2 -0.1 w/o sabl
+> i-0.3 -0.1 -0.8 -0.7 -0.9 -0.5 w/o Text -0.2 -0.2 -0.3 -0.5 -0.7 -0.5
+
+As shown in Table 6, without TATCS, the accu-racy on GQA remains around 37.5%-37.8% even as the token budget increases from 16 to 64, while a similar trend is observed on POPE, where the accuracy stays around 50% across different token budgets. Meanwhile, κ remains consistently high without TATCS. These results suggest that simply increasing the number of retained tokens does not necessarily improve performance under ultra-low token pruning. In contrast, TATCS substantially re-duces κ and consistently improves accuracy across different token budgets, indicating its effectiveness under ultra-low token budget. 
+
+4.4 Component and Efficiency Analysis 
+
+Table 7 compares our method with existing prun-ing approaches under the same 32 token budget. All pruning methods achieve about 2.3 × to 2.5 ×
+
+acceleration over the Vanilla model, demonstrating the efficiency benefits of aggressive token reduc-tion. Among them, our method achieves the high-est accuracy of 85.0%, outperforming the strongest baseline SCOPE by 2.6% while maintaining a com-parable inference time of 895s versus 884s. Al-though FlowCut is slightly faster, it suffers from noticeable accuracy degradation under the same ultra-low token budget. These results show that our method achieves a better balance between accu-racy and efficiency while maintaining comparable acceleration. 
+
+Effect of Individual Components. Table 8shows that different ACGR score terms play com-plementary roles under ultra-low token pruning. Specifically, scos  
+
+> i
+
+and svar  
+
+> i
+
+complement the scls 
+
+> i
+
+score by modeling feature redundancy and transfor-mation dynamics, respectively. In addition, sabl  
+
+> i
+
+fur-ther incorporates token influence through attention-ablation estimation, providing an additional impor-tance signal beyond individual token saliency. This becomes increasingly beneficial under more aggres-sive pruning, where tokens with larger influence on other tokens may not always be assigned high importance by standard saliency-based estimation. Removing the text-aware term in TATCS consis-tently degrades performance across various token budgets and benchmarks. As shown in Table 8, its removal causes performance drops on both GQA and POPE, with a more noticeable 0.7% decline on POPE at 32 tokens. This suggests that text-aware guidance becomes particularly important for hallucination-sensitive benchmarks such as POPE, where preserving text-relevant visual evidence is more critical for accurate prediction. Without text-aware guidance, visually salient but text-irrelevant tokens may dominate the clustering process, losing important visual information and thereby degrad-ing accuracy under ultra-low token budget. 
+
+5 Conclusion 
+
+In this paper, we investigate ultra-low visual token pruning from the perspective of feature distribution consistency and show that aggressively reducing the token budget induces significant distribution shift in kept token representations, accompanied by performance degradation. To address this is-sue, we propose ACGR to transfer complementary contextual information from pruned tokens to re-tained anchor tokens before removal, and TATCS to mitigate distribution shift through text-aware repre-sentative token reselection. Extensive experiments on multiple vision-language models demonstrate that our method consistently achieves superior per-formance under ultra-low token budget, retaining 92.1% of the upper-bound performance on LLaVA-1.5-7B using only 16 visual tokens. Overall, our findings highlight the importance of preserving fea-ture distribution consistency for ultra-low visual token pruning. 8Limitations 
+
+Although the proposed framework achieves strong performance under ultra-low token pruning, a no-ticeable gap still exists compared with using full visual tokens. Similar to existing pruning strategies, aggressive token compression inevitably causes partial information loss, making it difficult to fully preserve visual semantics under ultra-low token budget. We will explore more effective semantic preservation and adaptive token allocation strate-gies to further improve the balance between effi-ciency and performance. 
+
+References 
+
+Kazuki Adachi, Shin’Ya Yamaguchi, and Atsutoshi Ku-magai. 2023. Covariance-aware feature alignment with pre-computed source statistics for test-time adap-tation to multiple image corruptions. In IEEE In-ternational Conference on Image Processing , pages 800–804. Jean-Baptiste Alayrac, Jeff Donahue, Pauline Luc, Antoine Miech, Iain Barr, Yana Hasson, Karel Lenc, Arthur Mensch, Katherine Millican, Malcolm Reynolds, and 1 others. 2022. Flamingo: a visual language model for few-shot learning. In Advances in Neural Information Processing Systems , pages 23716–23736. Anurag Arnab, Mostafa Dehghani, Georg Heigold, Chen Sun, Mario Luˇ ci´ c, and Cordelia Schmid. 2021. Vivit: A video vision transformer. In IEEE/CVF In-ternational Conference on Computer Vision , pages 6836–6846. Vincent Arsigny, Pierre Fillard, Xavier Pennec, and Nicholas Ayache. 2006. Log-euclidean metrics for fast and simple calculus on diffusion tensors. Mag-netic Resonance in Medicine: An Official Journal of the International Society for Magnetic Resonance in Medicine , 56(2):411–421. Max Bain, Arsha Nagrani, Gül Varol, and Andrew Zis-serman. 2021. Frozen in time: A joint video and im-age encoder for end-to-end retrieval. In IEEE/CVF International Conference on Computer Vision , pages 1728–1738. Daniel Bolya, Cheng-Yang Fu, Xiaoliang Dai, Peizhao Zhang, Christoph Feichtenhofer, and Judy Hoffman. 2022. Token merging: Your vit but faster. arXiv preprint arXiv:2210.09461 .Hila Chefer, Shir Gur, and Lior Wolf. 2021. Trans-former interpretability beyond attention visualization. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 782–791. David Chen and William B Dolan. 2011. Collecting highly parallel data for paraphrase evaluation. In 
+
+Annual Meeting of the Association for Computational Linguistics: Human Language Technologies , pages 190–200. Keqin Chen, Zhao Zhang, Weili Zeng, Richong Zhang, Feng Zhu, and Rui Zhao. 2023. Shikra: Unleashing multimodal llm’s referential dialogue magic. arXiv preprint arXiv:2306.15195 .Liang Chen, Haozhe Zhao, Tianyu Liu, Shuai Bai, Jun-yang Lin, Chang Zhou, and Baobao Chang. 2024a. An image is worth 1/2 tokens after layer 2: Plug-and-play inference acceleration for large vision-language models. In European Conference on Computer Vi-sion , pages 19–35. Xi Chen, Xiao Wang, Soravit Changpinyo, Anthony J Piergiovanni, Piotr Padlewski, Daniel Salz, Sebas-tian Goodman, Adam Grycner, Basil Mustafa, Lucas Beyer, and 1 others. 2022. Pali: A jointly-scaled multilingual language-image model. arXiv preprint arXiv:2209.06794 .Yuan Chen, Zichen Wen, Yuzhou Wu, Xuyang Liu, Shuang Chen, Junpeng Ma, Weijia Li, Conghui He, and Linfeng Zhang. 2025. Ipcv: Information-preserving compression for mllm visual encoders. 
+
+arXiv preprint arXiv:2512.18747 .Zhe Chen, Jiannan Wu, Wenhai Wang, Weijie Su, Guo Chen, Sen Xing, Muyan Zhong, Qinglong Zhang, Xizhou Zhu, Lewei Lu, and 1 others. 2024b. Internvl: Scaling up vision foundation models and aligning for generic visual-linguistic tasks. In IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition ,pages 24185–24198. Wenliang Dai, Junnan Li, Dongxu Li, Anthony Tiong, Junqi Zhao, Weisheng Wang, Boyang Li, Pascale N Fung, and Steven Hoi. 2023. Instructblip: Towards general-purpose vision-language models with instruc-tion tuning. In Advances in Neural Information Pro-cessing Systems , pages 49250–49267. Mostafa Dehghani, Basil Mustafa, Josip Djolonga, Jonathan Heek, Matthias Minderer, Mathilde Caron, Andreas Steiner, Joan Puigcerver, Robert Geirhos, Ibrahim M Alabdulmohsin, and 1 others. 2023. Patch n’ pack: Navit, a vision transformer for any aspect ratio and resolution. In Advances in Neural Informa-tion Processing Systems , pages 2252–2274. Jinhong Deng, Wen Li, Joey Tianyi Zhou, and Yang He. 2025. Scope: Saliency-coverage oriented token pruning for efficient multimodel llms. arXiv preprint arXiv:2510.24214 .Xiaoyi Dong, Pan Zhang, Yuhang Zang, Yuhang Cao, Bin Wang, Linke Ouyang, Songyang Zhang, Haodong Duan, Wenwei Zhang, Yining Li, and 1 others. 2024. Internlm-xcomposer2-4khd: A pioneer-ing large vision-language model handling resolutions from 336 pixels to 4k hd. In Advances in Neural In-formation Processing Systems , pages 42566–42592. 
+
+9David C Dowson and B.V Landau. 1982. The fréchet distance between multivariate normal distributions. 
+
+Journal of multivariate analysis , 12(3):450–455. Yuanzhi Duan, Yue Zhou, Peng He, Qiang Liu, Shukai Duan, and Xiaofang Hu. 2022. Network pruning via feature shift minimization. In Asian Conference on Computer Vision , pages 4044–4060. Mark Endo, Xiaohan Wang, and Serena Yeung-Levy. 2025. Feather the throttle: Revisiting visual token pruning for vision-language model acceleration. In 
+
+IEEE/CVF International Conference on Computer Vision , pages 22826–22835. Zhengyao Fang, Pengyuan Lyu, Chengquan Zhang, Guangming Lu, Jun Yu, and Wenjie Pei. 2026. Prune redundancy, preserve essence: Vision token com-pression in vlms via synergistic importance-diversity. 
+
+arXiv preprint arXiv:2603.09480 .Mohsen Fayyaz, Soroush Abbasi Koohpayegani, Farnoush Rezaei Jafari, Sunando Sengupta, Hamid Reza Vaezi Joze, Eric Sommerlade, Hamed Pirsi-avash, and Jürgen Gall. 2022. Adaptive token sam-pling for efficient vision transformers. In European Conference on Computer Vision , pages 396–414. Chaoyou Fu, Peixian Chen, Yunhang Shen, Yulei Qin, Mengdan Zhang, Xu Lin, Jinrui Yang, Xiawu Zheng, Ke Li, Xing Sun, Yunsheng Wu, Rongrong Ji, Caifeng Shan, and Ran He. 2023. Mme: A compre-hensive evaluation benchmark for multimodal large language models. arXiv preprint arXiv:2306.13394 .Zonghao Guo, Ruyi Xu, Yuan Yao, Junbo Cui, Zanlin Ni, Chunjiang Ge, Tat-Seng Chua, Zhiyuan Liu, and Gao Huang. 2024. Llava-uhd: an lmm perceiving any aspect ratio and high-resolution images. In European Conference on Computer Vision , pages 390–406. Shaohan Huang, Li Dong, Wenhui Wang, Yaru Hao, Saksham Singhal, Shuming Ma, Tengchao Lv, Lei Cui, Owais Khan Mohammed, Barun Patra, and 1 others. 2023. Language is not all you need: Align-ing perception with language models. In Advances in Neural Information Processing Systems , pages 72096–72109. Xun Huang and Serge Belongie. 2017. Arbitrary style transfer in real-time with adaptive instance normal-ization. In IEEE/CVF International Conference on Computer Vision , pages 1501–1510. Drew A Hudson and Christopher D Manning. 2019. Gqa: A new dataset for real-world visual reasoning and compositional question answering. In IEEE/CVF Conference on Computer Vision and Pattern Recog-nition , pages 6700–6709. Sergey Ioffe and Christian Szegedy. 2015. Batch nor-malization: Accelerating deep network training by reducing internal covariate shift. In International Conference on Machine Learning , pages 448–456. Ryuto Ishibashi and Lin Meng. 2025. Automatic prun-ing rate adjustment for dynamic token reduction in vision transformer. Applied Intelligence , 55(5):342. Yunseok Jang, Yale Song, Youngjae Yu, Youngjin Kim, and Gunhee Kim. 2017. Tgif-qa: Toward spatio-temporal reasoning in visual question answering. In 
+
+IEEE/CVF Conference on Computer Vision and Pat-tern Recognition , pages 2758–2766. Ahmadreza Jeddi, Negin Baghbanzadeh, Elham Dolatabadi, and Babak Taati. 2025. Similarity-aware token pruning: Your vlm but faster. arXiv preprint arXiv:2503.11549 .Yutao Jiang, Qiong Wu, Wenhao Lin, Wei Yu, and Yiyi Zhou. 2025. What kind of visual tokens do we need? training-free visual token pruning for multi-modal large language models from the perspective of graph. In AAAI Conference on Artificial Intelligence , pages 4075–4083. Youngeun Kim, Youjia Zhang, Huiling Liu, Aecheon Jung, Sunwoo Lee, and Sungeun Hong. 2025. Zoo-prune: Training-free token pruning via zeroth-order gradient estimation in vision-language models. arXiv preprint arXiv:2509.24837 .Ao Li, Yuxiang Duan, Jinghui Zhang, Congbo Ma, Yu-tong Xie, Gustavo Carneiro, Mohammad Yaqub, and Hu Wang. 2025a. Transprune: Token transition prun-ing for efficient large vision-language model. arXiv preprint arXiv:2507.20630 .Bo Li, Yuanhan Zhang, Dong Guo, Renrui Zhang, Feng Li, Hao Zhang, Kaichen Zhang, Peiyuan Zhang, Yanwei Li, and Ziwei Liu. 2024a. Llava-onevision: Easy visual task transfer. arXiv preprint arXiv:2408.03326 .Feng Li, Renrui Zhang, Hao Zhang, Yuanhan Zhang, Bo Li, Wei Li, Zejun Ma, and Chunyuan Li. 2024b. Llava-next-interleave: Tackling multi-image, video, and 3d in large multimodal models. arXiv preprint arXiv:2407.07895 .Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. 2023a. Blip-2: Bootstrapping language-image pre-training with frozen image encoders and large lan-guage models. In International Conference on Ma-chine Learning , pages 19730–19742. Kaiyuan Li, Xiaoyue Chen, Chen Gao, Yong Li, and Xinlei Chen. 2025b. Balanced token pruning: Ac-celerating vision language models beyond local opti-mization. arXiv preprint arXiv:2505.22038 .Peihua Li, Jiangtao Xie, Qilong Wang, and Zilin Gao. 2018. Towards faster training of global covariance pooling networks by iterative matrix square root nor-malization. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 947–955. Yanwei Li, Chengyao Wang, and Jiaya Jia. 2024c. Llama-vid: An image is worth 2 tokens in large lan-guage models. In European Conference on Computer Vision , pages 323–340. 
+
+10 Yifan Li, Yifan Du, Kun Zhou, Jinpeng Wang, Xin Zhao, and Ji-Rong Wen. 2023b. Evaluating object hallucination in large vision-language models. In 
+
+Conference on Empirical Methods in Natural Lan-guage Processing , pages 292–305. Chen Liang, Weihua Chen, Xin Zhao, Junyan Wang, Lijun Cao, and Junge Zhang. 2025. Distribution optimization under gaussian hypothesis for domain adaptive semantic segmentation. In IEEE/CVF Win-ter Conference on Applications of Computer Vision ,pages 9280–9290. Youwei Liang, Chongjian Ge, Zhan Tong, Yibing Song, Jue Wang, and Pengtao Xie. 2022. Not all patches are what you need: Expediting vision trans-formers via token reorganizations. arXiv preprint arXiv:2202.07800 .Bin Lin, Yang Ye, Bin Zhu, Jiaxi Cui, Munan Ning, Peng Jin, and Li Yuan. 2024. Video-llava: Learn-ing united visual representation by alignment before projection. In Conference on Empirical Methods in Natural Language Processing , pages 5971–5984. Haotian Liu, Chunyuan Li, Yuheng Li, and Yong Jae Lee. 2024a. Improved baselines with visual instruc-tion tuning. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 26296–26306. Haotian Liu, Chunyuan Li, Yuheng Li, Bo Li, Yuanhan Zhang, Sheng Shen, and Yong Jae Lee. 2024b. Lla-vanext: Improved reasoning, ocr, and world knowl-edge. Haotian Liu, Chunyuan Li, Qingyang Wu, and Yong Jae Lee. 2023. Visual instruction tuning. In Advances in Neural Information Processing Systems , pages 34892–34916. Sifan Long, Zhen Zhao, Jimin Pi, Shengsheng Wang, and Jingdong Wang. 2023. Beyond attentive tokens: Incorporating token importance and diversity for effi-cient vision transformers. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10334–10343. Pan Lu, Swaroop Mishra, Tanglin Xia, Liang Qiu, Kai-Wei Chang, Song-Chun Zhu, Oyvind Tafjord, Peter Clark, and Ashwin Kalyan. 2022. Learn to explain: Multimodal reasoning via thought chains for science question answering. In Advances in Neural Informa-tion Processing Systems , pages 2507–2521. Seungwhan Moon, Andrea Madotto, Zhaojiang Lin, Tushar Nagarajan, Matt Smith, Shashank Jain, Chun-Fu Yeh, Prakash Murugesan, Peyman Heidari, Yue Liu, and 1 others. 2024. Anymal: An efficient and scalable any-modality augmented language model. In Conference on Empirical Methods in Natural Lan-guage Processing , pages 1314–1332. Alec Radford, Jong Wook Kim, Chris Hallacy, Aditya Ramesh, Gabriel Goh, Sandhini Agarwal, Girish Sas-try, Amanda Askell, Pamela Mishkin, and Jack Clark. 2021. Learning transferable visual models from nat-ural language supervision. In International Confer-ence on Machine Learning , pages 8748–8763. Yongming Rao, Wenliang Zhao, Benlin Liu, Jiwen Lu, Jie Zhou, and Cho-Jui Hsieh. 2021. Dynamicvit: Ef-ficient vision transformers with dynamic token spar-sification. In Advances in Neural Information Pro-cessing Systems , pages 13937–13949. Yuzhang Shang, Mu Cai, Bingxin Xu, Yong Jae Lee, and Yan Yan. 2025. Llava-prumerge: Adaptive token reduction for efficient large multimodal models. In 
+
+IEEE/CVF International Conference on Computer Vision , pages 22857–22867. Amanpreet Singh, Vivek Natarajan, Meet Shah, Yu Jiang, Xinlei Chen, Dhruv Batra, Devi Parikh, and Marcus Rohrbach. 2019. Towards vqa models that can read. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 8317–8326. Baochen Sun, Jiashi Feng, and Kate Saenko. 2017. Cor-relation alignment for unsupervised domain adap-tation. In Domain Adaptation in Computer Vision Applications , pages 153–171. Springer. Baochen Sun and Kate Saenko. 2016. Deep coral: Cor-relation alignment for deep domain adaptation. In 
+
+European Conference on Computer Vision , pages 443–450. Chen Sun, Austin Myers, Carl Vondrick, Kevin Mur-phy, and Cordelia Schmid. 2019. Videobert: A joint model for video and language representation learning. In IEEE/CVF International Conference on Computer Vision , pages 7464–7473. Yizheng Sun, Yanze Xin, Hao Li, Jingyuan Sun, Chenghua Lin, and Riza Theresa Batista-Navarro. 2025. Lvpruning: An effective yet simple language-guided vision token pruning approach for multi-modal large language models. In Findings of the As-sociation for Computational Linguistics , pages 4299– 4308. Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic attribution for deep networks. In Inter-national Conference on Machine Learning , pages 3319–3328. Xudong Tan, Peng Ye, Chongjun Tu, Jianjian Cao, Yaoxin Yang, Lin Zhang, Dongzhan Zhou, and Tao Chen. 2025. Tokencarve: Information-preserving vi-sual token compression in multimodal large language models. arXiv preprint arXiv:2503.10501 .Jintao Tong, Wenwei Jin, Pengda Qin, Anqi Li, Yix-iong Zou, Yuhong Li, Yuhua Li, and Ruixuan Li. 2025. Flowcut: Rethinking redundancy via informa-tion flow for efficient vision-language models. arXiv preprint arXiv:2505.19536 .Dmitry Ulyanov, Andrea Vedaldi, and Victor Lem-pitsky. 2016. Instance normalization: The miss-ing ingredient for fast stylization. arXiv preprint arXiv:1607.08022 .
+
+11 Hongjie Wang, Bhishma Dedhia, and Niraj K Jha. 2024a. Zero-tprune: Zero-shot token pruning through leveraging of the attention graph in pre-trained transformers. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 16070–16079. Peng Wang, Shuai Bai, Sinan Tan, Shijie Wang, Zhi-hao Fan, Jinze Bai, Keqin Chen, Xuejing Liu, Jialin Wang, and Wenbin Ge. 2024b. Qwen2-vl: Enhanc-ing vision-language model’s perception of the world at any resolution. arXiv preprint arXiv:2409.12191 .Weihan Wang, Qingsong Lv, Wenmeng Yu, Wenyi Hong, Ji Qi, Yan Wang, Junhui Ji, Zhuoyi Yang, Lei Zhao, Xixuan Song, and 1 others. 2024c. Cogvlm: Visual expert for pretrained language models. In Ad-vances in Neural Information Processing Systems ,pages 121475–121499. Wenhai Wang, Zhe Chen, Xiaokang Chen, Jiannan Wu, Xizhou Zhu, Gang Zeng, Ping Luo, Tong Lu, Jie Zhou, Yu Qiao, and 1 others. 2023. Visionllm: Large language model is also an open-ended decoder for vision-centric tasks. In Advances in Neural Informa-tion Processing Systems , pages 61501–61513. Junyi Wu, Bin Duan, Weitai Kang, Hao Tang, and Yan Yan. 2024. Token transformation matters: Towards faithful post-hoc explanation for vision transformer. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 10926–10935. Jun Xu, Tao Mei, Ting Yao, and Yong Rui. 2016. Msr-vtt: A large video description dataset for bridging video and language. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 5288–5296. Senqiao Yang, Yukang Chen, Zhuotao Tian, Chengyao Wang, Jingyao Li, Bei Yu, and Jiaya Jia. 2025a. Vi-sionzip: Longer is better but not necessary in vision language models. In IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pages 19792– 19802. Sihan Yang, Runsen Xu, Chenhang Cui, Tai Wang, Dahua Lin, and Jiangmiao Pang. 2025b. Vflowopt: A token pruning framework for lmms with visual in-formation flow-guided optimization. In IEEE/CVF International Conference on Computer Vision , pages 23924–23934. Qinghao Ye, Haiyang Xu, Guohai Xu, Jiabo Ye, Ming Yan, Yiyang Zhou, Junyang Wang, Anwen Hu, Pengcheng Shi, Yaya Shi, and 1 others. 2023. mplug-owl: Modularization empowers large lan-guage models with multimodality. arXiv preprint arXiv:2304.14178 .Hanxun Yu, Wentong Li, Xuan Qu, Song Wang, Junbo Chen, and Jianke Zhu. 2026. Visiontrim: Unified vision token compression for training-free mllm ac-celeration. arXiv preprint arXiv:2601.22674 .Ce Zhang, Kaixin Ma, Tianqing Fang, Wenhao Yu, Hongming Zhang, Zhisong Zhang, Yaqi Xie, Ka-tia Sycara, Haitao Mi, and Dong Yu. 2025a. Vs-can: Rethinking visual token reduction for effi-cient large vision-language models. arXiv preprint arXiv:2505.22654 .Hao Zhang, Mengsi Lyu, Chenrui He, Yulong Ao, and Yonghua Lin. 2025b. Trimtokenator: Towards adap-tive visual token pruning for large multimodal mod-els. arXiv preprint arXiv:2509.00320 .Jianwei Zhang, Chaoning Zhang, Sihan Cao, Wang Liu, Pengcheng Zheng, Jiaxin Huang, Caiyan Qin, Yalan Ye, Wei Dong, and Yang Yang. 2026. Rcp: Represen-tation consistency pruner for mitigating distribution shift in large vision-language models. arXiv preprint arXiv:2604.04972 .Qizhe Zhang, Aosong Cheng, Ming Lu, Renrui Zhang, Zhiyong Zhuo, Jiajun Cao, Shaobo Guo, Qi She, and Shanghang Zhang. 2025c. Beyond text-visual atten-tion: Exploiting visual cues for effective token prun-ing in vlms. In IEEE/CVF International Conference on Computer Vision , pages 20857–20867. Yufeng Zhang, Jialu Pan, Li Ken Li, Wanwei Liu, Zhen-bang Chen, Xinwang Liu, and Ji Wang. 2023. On the properties of kullback-leibler divergence between multivariate gaussian distributions. In Advances in Neural Information Processing Systems , pages 58152–58165. Deyao Zhu, Xiaoqian Shen, Xiang Li, and Mohamed Elhoseiny. 2024. Minigpt-4: Enhancing vision-language understanding with advanced large lan-guage models. In International Conference on Learn-ing Representations , pages 18378–18394. Xin Zou, Di Lu, Yizhou Wang, Yibo Yan, Yuanhuiyi Lyu, Xu Zheng, Linfeng Zhang, and Xuming Hu. 2025. Don’t just chase "highlighted tokens" in mllms: Revisiting visual holistic context retention. arXiv preprint arXiv:2510.02912 .
+
+12 A Detailed Definitions of Token Importance Scores 
+
+To better assess token importance under ultra-low token budget, we combine multiple complementary criteria from different perspectives, including se-mantic relevance, redundancy suppression, feature transformation dynamics, and attention interaction effects. Given the patch tokens in the current layer 
+
+X = {xi}Mi=1 , the overall importance score of to-ken xi is defined as 
+
+si = scls  
+
+> i
+
++ scos  
+
+> i
+
++ svar  
+
+> i
+
++ sabl  
+
+> i
+
+. (9) 
+
+CLS relevance score. To estimate the semantic importance of visual tokens, we introduce a CLS-guided relevance score based on the attention from the CLS token to each image patch. Tokens re-ceiving higher CLS attention are regarded as more semantically informative and are thus more likely to be preserved during pruning (Zhang et al., 2025c; Liang et al., 2022; Long et al., 2023). Let A(h)0,i de-note the attention weight from the CLS token to patch i at head h, where H is the number of atten-tion heads. We first average the attention weights across heads and then normalize them across all tokens: 
+
+αcls  
+
+> i
+
+= 1
+
+H
+
+> H
+
+X
+
+> h=1
+
+A(h)0,i . (10) 
+
+scls  
+
+> i
+
+= αcls 
+
+> i
+
+PMj=1 αcls  
+
+> j
+
++ ε . (11) 
+
+Cosine non-redundancy score. To suppress re-dundancy among visual tokens, we measure the average cosine similarity between each token and all remaining tokens. Tokens that are less similar to others are considered to contain more unique information and are therefore assigned higher non-redundancy scores (Bolya et al., 2022; Jeddi et al., 2025; Wang et al., 2024a). Specifically, we com-pute the average cosine similarity of each token to all other tokens and transform it into a non-redundancy score: 
+
+ci = 1 − 1
+
+M − 1
+
+> M
+
+X 
+
+> j=1
+> j̸=i
+
+cos( xi, x j ). (12) 
+
+scos  
+
+> i
+
+= ci
+
+PMj=1 cj + ε . (13) 
+
+Transformation variation score. Tokens ex-hibiting larger feature updates through the atten-tion and FFN branches are considered to encode richer semantic information and are therefore as-signed higher importance scores (Ishibashi and Meng, 2025; Wu et al., 2024). This component fol-lows the transition-based perspective in TransPrune (Li et al., 2025a). Let xin  
+
+> i
+
+, xatt  
+
+> i
+
+, and xffn  
+
+> i
+
+denote the patch feature at the layer input, after the atten-tion branch, and after the FFN branch in the same layer, respectively. We first measure the transfor-mation magnitude of token i in the attention and FFN branches by cosine distance: 
+
+datt  
+
+> i
+
+= 1 −cos( xin  
+
+> i
+
+, x att  
+
+> i
+
+), dffn  
+
+> i
+
+= 1 −cos( xin  
+
+> i
+
+, x ffn  
+
+> i
+
+).
+
+(14) The distances are then normalized across all patch tokens with a softmax operation: 
+
+patt  
+
+> i
+
+= exp( datt  
+
+> i
+
+)
+
+PMj=1 exp( datt  
+
+> j
+
+) , pffn  
+
+> i
+
+= exp( dffn  
+
+> i
+
+)
+
+PMj=1 exp( dffn  
+
+> j
+
+) .
+
+(15) To further account for the change in feature magni-tude, we compute the norm ratios: 
+
+ratt  
+
+> i
+
+= ∥xatt  
+
+> i
+
+∥2
+
+∥xin  
+
+> i
+
+∥2 + ε , rffn  
+
+> i
+
+= ∥xffn  
+
+> i
+
+∥2
+
+∥xin  
+
+> i
+
+∥2 + ε . (16) The final transformation variation score is com-puted by combining the normalized transformation weights and magnitude ratios: 
+
+svar  
+
+> i
+
+= patt  
+
+> i
+
+ratt  
+
+> i
+
++ pffn  
+
+> i
+
+rffn  
+
+> i
+
+. (17) 
+
+Attention-ablation impact score. Some tokens may appear locally unimportant while still exert-ing strong influence on other token representations through Transformer attention interactions (Chefer et al., 2021; Sundararajan et al., 2017). To cap-ture this effect, we estimate token importance by measuring how much the representations of other tokens change after removing a target token from the attention process. Tokens inducing larger repre-sentation variations are considered more important for contextual information propagation. For a fixed attention head, the attention output of token i is 
+
+ai =
+
+> M
+
+X
+
+> j=1
+
+αij vj , (18) where M is the number of patch tokens, αij is the attention weight from token i to token j, and vj is the value vector of token j.13 If token k is removed, the remaining attention weights are renormalized as 
+
+˜a(−k) 
+
+> i
+
+= X 
+
+> j̸=k
+
+αij 
+
+1 − αik + ε vj = ai − αik vk
+
+1 − αik + ε ,
+
+(19) where ε is a small constant for numerical stability. The resulting output change is approximated by 
+
+∆a(k) 
+
+> i
+
+= ˜ a(−k) 
+
+> i
+
+− ai ≈ αik 
+
+1 − αik + ε (ai − vk).
+
+(20) We estimate the influence of token k on token i as 
+
+ˆIk→i = αik 
+
+1 − αik + ε ∥ai − vk∥2. (21) To avoid re-running the Transformer for each removed token, we further use a one-pass proxy: 
+
+Ik→i = ¯αik 
+
+1 − ¯αik + ε · ∥ yi∥2 · ∥ ¯vk∥2, (22) where H is the number of attention heads, ¯αik 
+
+is the head-averaged attention weight, ¯vk =
+
+> 1
+> H
+
+PHh=1 vh,k , and yi is the current-layer hidden feature of token i obtained from the same forward pass. Finally, the attention-ablation importance score is computed as 
+
+sabl  
+
+> k
+
+= 1
+
+M − 1
+
+> M
+
+X
+
+> i=1
+> i̸=k
+
+Ik→i. (23) 
+
+B Distribution Consistency Metric 
+
+Existing pruning strategies are generally importance-oriented or coverage-oriented, yet both tend to become unstable under ultra-low token budget (Fayyaz et al., 2022). As the token budget decreases, retained tokens progressively deviate from the original feature distribution (Rao et al., 2021), leading to degraded multimodal reasoning (Ioffe and Szegedy, 2015). Motivated by this observation, we revisit ultra-low token pruning from the perspective of distribution consistency between retained and full token representations. A common way to measure distribution discrep-ancy is through divergence metrics such as KL divergence or Wasserstein distance (Dowson and Landau, 1982; Sun and Saenko, 2016). However, these methods typically require covariance inver-sion, eigendecomposition, or determinant compu-tation, leading to considerable computational over-head and numerical instability for runtime token pruning (Arsigny et al., 2006). Instead of esti-mating exact probability divergence, we adopt a lightweight distribution consistency approximation based on first- and second-order feature statistics: 
+
+D(Xk, X f ) = Tr(Σ k) + d Var( μk)Tr(Σ f ) + d Var( μf ) ,κ = |D (Xk, X f ) − 1|,
+
+(24) where Xf and Xk denote the full token and kept token representations, respectively. Here, Tr(Σ) denotes the trace of the covari-ance matrix and serves as a lightweight approxi-mation of second-order feature statistics, reflecting the overall feature dispersion (Sun et al., 2017; Li et al., 2018), while Var( μ) measures the variance of channel-wise mean activations and reflects shifts in channel-wise feature responses (Huang and Be-longie, 2017; Ulyanov et al., 2016; Adachi et al., 2023). Since Tr(Σ) accumulates variance across feature dimensions, multiplying Var( μ) by d bal-ances the scales of first- and second-order statistics. The ratio formulation provides a scale-normalized comparison between kept and full token representations. When the kept tokens preserve distribution consistency with the original tokens representation, D(Xk, X f ) approaches 1,yielding a smaller κ. Therefore, κ is not intended as a strict probability divergence metric, but rather as a lightweight proxy for distribution deviation under ultra-low token pruning. Although κ does not explicitly characterize representation geometry or fine-grained semantic structure, it provides an efficient empirical indica-tor of whether aggressive pruning introduces sub-stantial statistical distribution deviation during in-ference. As shown in Table 5, larger κ consistently correlates with more severe downstream accuracy degradation under ultra-low token budget. Moti-vated by this observation, we use κ as an adaptive trigger signal for TATCS, which is activated only when the estimated distribution deviation exceeds a predefined threshold, thereby dynamically mitigat-ing distribution shift in the retained token features. 
+
+C Visualization of Kept Tokens 
+
+Fig. 3 and Fig. 4 compare token selection under 64 token budget on LLaVA-1.5-7B. FlowCut focuses on salient local regions, while SCOPE favors spa-tial coverage. By maintaining feature distribution consistency, our method preserves both semantic and contextual information, resulting in a more representative token subset. 14 Figure 3: Qualitative visualization of selected visual tokens under a token budget of 64 on LLaVA-1.5-7B. 
+
+15 Figure 4: Qualitative visualization of selected visual tokens under a token budget of 64 on LLaVA-1.5-7B. 
+
+16
