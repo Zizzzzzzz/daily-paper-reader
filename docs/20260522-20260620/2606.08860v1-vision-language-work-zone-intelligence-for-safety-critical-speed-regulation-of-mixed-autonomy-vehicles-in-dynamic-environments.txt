@@ -1,0 +1,254 @@
+Title: Vision-Language Work Zone Intelligence for Safety-Critical Speed Regulation of Mixed-Autonomy Vehicles in Dynamic Environments
+
+URL Source: https://arxiv.org/pdf/2606.08860v1
+
+Published Time: Tue, 09 Jun 2026 01:31:22 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+# Vision-Language Work Zone Intelligence for Safety-Critical Speed Regulation of Mixed-Autonomy Vehicles in Dynamic Environments 
+
+Angel Martinez-Sanchez 
+
+UC Merced 
+
+Kianna Ng 
+
+UC Merced 
+
+Wesley Maia 
+
+UC Merced 
+
+Laura Fleig 
+
+Johns Hopkins 
+
+Maitrayee Keskar 
+
+UC San Diego 
+
+Erika Maquiling 
+
+UC Merced 
+
+Yash Tandon 
+
+UC San Diego 
+
+Parthib Roy 
+
+UC Merced 
+
+Mohan M. Trivedi 
+
+UC San Diego 
+
+Ross Greer 
+
+UC Merced 
+
+Abstract —Temporary work-zone speed limits are communi-cated through visually inconsistent signage and are often missing from digital maps, creating safety risks for human drivers and automated vehicle systems. We present a real-time, onboard perception pipeline that detects active work zones, recognizes associated temporary speed limits, and outputs a law-aware work-zone state and speed value suitable for driver alerts or downstream automated control. The system fuses object detections with semantic verification and temporally smoothed, hysteresis-based state transitions to reduce false activations and flicker in dynamic scenes, and runs fully on low-cost embedded hardware. Evaluated manually on a annotated subset of the ROADWork dataset (490 sequences), the system achieves inside-work-zone event-level recall of 96.5% and event-level precision of 68.7%. Speed-limit recognition evaluated on 35 minutes of in-house driving data attains 95.45% precision and 53.85% recall, with no incorrect speed classifications and a single false positive. These results demonstrate a practical, scalable approach for grounding work-zone speed awareness directly in onboard perception rather than maps or infrastructure. We release our source code for the proposed system pipeline on our GitHub repository: https://github.com/Mi3-Lab/workzone 
+
+Index Terms —work zone safety, speed limit detection, com-puter vision, ADAS, autonomous vehicles, perception systems 
+
+I. I NTRODUCTION 
+
+Active road construction zones introduce highly dynamic driving environments that challenge both human drivers and intelligent vehicle systems. Rapidly changing roadways, tem-porary barriers, construction workers, and variable speed limits require continuous adaptation to evolving conditions. These environments are particularly safety-critical because vehicle speed strongly influences crash severity. For example, a pedes-trian or roadway worker struck at 40 mph has only about a 20% chance of survival, compared to approximately 90% at 20 mph [1]. As a result, reliable awareness of temporary speed limits and work zone context is essential for both manual driving and automated vehicle operation. Temporary speed limits are commonly deployed in work zones to mitigate risk under dynamic roadway conditions. These limits are often communicated through portable, elec-tronic, or handheld displays that vary widely in appearance and are rarely documented into digital maps or navigation databases. This creates a mismatch between the physical driving environment and the internal representations used by 
+
+Fig. 1: High-level overview of the proposed work-zone and temporary speed-limit recognition system. A live camera stream is processed onboard to detect when the vehicle is inside an active work zone and infers the applicable temporary speed limit, which can be passed downstream to AD or ADAS systems (e.g., an audio cue or intervention control). advanced driver assistance systems and automated vehicles, resulting in incomplete situational awareness during safety-critical roadway transitions. Maintaining accurate, real-time awareness in such environments is challenging because rel-evant cues may change faster than conventional mapping or infrastructure-based updates can propagate. The safety consequences of these conditions are substantial. In the United States, approximately 101,000 crashes, 39,000 injuries, and 899 fatalities occurred in construction zones in 2023 [2], with speeding involved in roughly one-third of fatal incidents annually [3]. As mixed-autonomy environments become more prevalent, vehicle control increasingly relies on machine perception rather than direct human judgment, plac-ing greater demand on robust systems capable of recognizing dynamic roadway conditions directly from sensor input In this work, we present a vision-based approach system that can (i) recognize active work zones, (ii) detect associ-ated temporary speed limits directly from roadside signage, and (iii) generate real-time, law-aware outputs suitable for manual driving, mixed-autonomy supervision, and automated control as shown in Figure 1. Rather than relying on maps or 
+
+> arXiv:2606.08860v1 [cs.CV] 7 Jun 2026
+
+specialized infrastructure, the proposed system grounds speed awareness in direct visual observation using low-cost, off-the-shelf cameras and embedded computing already available in most vehicles. By grounding awareness in direct visual observation, we aim to reduce the mismatch between variable physical conditions and automated driving systems’ internal representations, offering a scalable pathway to improving safety in dynamic work zone environments. The primary contributions of this work are as follows: (1) 
+
+Onboard work-zone and temporary speed-limit percep-tion: We develop a real-time perception pipeline that jointly detects active work zones and recognizes associated temporary speed limits using low-cost embedded hardware suitable for in-vehicle deployment; (2) Temporally stable work-zone state estimation: We introduce a temporal inference framework that fuses object detections with semantic verification and hysteresis-based state transitions to reduce flicker and false activations in dynamic scenes; (3) Law-aware speed out-put interface: We propose a unified output representation that produces actionable speed-limit with work-zone status, enabling integration with manual driving assistance, mixed-autonomy supervision, and automated control; and (4) Open-source release: We release our system implementation (code, weights, configurations) to support reproducibility and accel-erate follow-on research. II. R ELATED WORK 
+
+A. Work Zone Behavior Across Levels of Vehicle Automation 
+
+Prior work suggests that failures to adhere to temporary speed limits in work zones arise from different mechanisms depending on the level of vehicle automation. In manual driving, speeding behavior is often attributed to behavioral factors such as risk perception, habituation, and inconsistent enforcement rather than failures of visual perception [4]. In partially automated vehicles, the challenge shifts toward human–automation interaction. Drivers using adaptive cruise control or lane-keeping assistance are more likely to exceed posted speed limits [5], particularly when automation main-tains a previously set speed and does not respond to changes in roadway context. Temporary speed limits are frequently absent from map-based speed data, and many assistance systems do not automatically adapt to temporary reductions, increas-ing reliance on timely driver intervention. At higher levels of automation, perception limitations become more critical. Automated driving systems depend on accurate models of roadway context, yet temporary work zone speed limits are often visually inconsistent, rapidly changing, and omitted from maps. Reports of real-world automated vehicle operation high-light cases in which temporary limits are missed or not acted upon [6]. In such cases, failures stem not from intentional noncompliance but from incomplete situational awareness. Advanced driver assistance system (ADAS) adoption has increased rapidly over the past decade [7]. As control authority shifts from the human driver to the vehicle, safety limitations increasingly arise from perception and system-integration con-straints rather than deliberate driver behavior. These trends motivate approaches that enable vehicles to perceive temporary speed limits directly from the physical environment. 
+
+B. Work Zone Detection 
+
+Early approaches to work zone detection focused on iden-tifying construction boundaries and roadway geometry using sensor fusion and structured environmental representations [8]. More recently, the problem is framed as a large-scale video understanding task using deep learning [9], supported by natu-ralistic driving datasets containing construction-related objects and scenes [10]–[13]. Despite progress in visual detection, most existing systems formulate work zone recognition as a frame-level perception problem, focusing on detecting con-struction objects or determining the presence of a work zone within a scene. Prior methods generally do not model the temporal interaction between a vehicle and the work zone environment, such as distinguishing between approaching, entering, traversing, and exiting phases. As a result, perception outputs alone are often insufficient to directly support down-stream vehicle behavior. In contrast, this work bridges this perception–behavior gap by modeling temporally consistent work zone awareness and leveraging it to inform law-aware driving decisions. This perspective enables visual perception outputs to be translated into actionable behavioral context, supporting safer and more compliant vehicle operation in dynamic construction environments. 
+
+C. Speed Limit Detection 
+
+Speed limit perception for permanent roadway signage has been extensively studied using both classical computer vision pipelines and deep learning–based object detectors for stan-dardized regulatory signs [14], [15]. These approaches have been incorporated into advanced driver assistance systems for speed awareness and regulation. However, work zones introduce sensing conditions that are not well addressed by methods developed for permanent regulatory signage. Tem-porary speed limits may be conveyed through digital speed limit (DSL) signs and temporary traffic control (TTC) message boards, which are often implemented using LED arrays. When capturing with a camera, LED flicker artifacts can arise from the interaction between LED pulse-width modulation (PWM), camera exposure, and sampling, producing temporal aliasing and spatial banding in captured frames [16]. These artifacts are amplified by rolling-shutter sensors, which captures the scene sequentially across image rows causing different scanlines that can sample different phases of the LED cycle. Over-all, TTC/DSL displays may appear with fragmented missing segments, truncated words, or inconsistent character visibility across frames, degrading the reliability relative to static printed signage. Recent work on DSL signs explores multi-frame aggre-gation and post-processing techniques to recover numeric values [17]. Although the methods described proved to be accurate, they are computationally expensive as they operate at approximately 0.5 Hz. To our knowledge, we are the first to visually extract posted temporary speed limits from TTC message boards, despite their frequent use in active work zones. III. D ESIGN APPROACH AND SYSTEM REQUIREMENTS 
+
+Methods to address unsafe speeds in construction zones include digital speed limit databases, infrastructure-based solu-tions such as smart signage, and policy or enforcement-based interventions. While effective in controlled settings, these approaches face practical limitations in temporary work zones where conditions change rapidly. Infrastructure-dependent so-lutions require coordination, maintenance, and investment that limit scalability and deployability across diverse roadway environments. These constraints motivate a vehicle-centric, perception-based approach that operates independently of maps or external infrastructure. The system must satisfy the following requirements: 1) Reliable, robust, and stable perception: Accurate and temporally stable detection of work zones and temporary speed limits. 2) Real-time embedded operation: Low-latency execu-tion on embedded hardware without reliance on cloud connectivity. 3) Flexibility across autonomy levels: Clear separation between perception, decision logic, and downstream actuation or driver advisories. 4) Law-aware behavior: Speed limits are applied only when visibly detected, with no inference in their ab-sence. 5) Safe and non-disruptive outputs: Predictable, minimal outputs that support driver or system awareness without distraction. To our knowledge, no prior work integrates work zone perception, temporary speed limit recognition, and law-aware decision logic within a unified real-time pipeline designed ex-plicitly for safety-critical deployment in dynamic construction environments. IV. S YSTEM OVERVIEW AND PROTOTYPE ARCHITECTURE 
+
+A. System Overview 
+
+We introduce a vision-based, real-time perception pipeline that recognizes active work zones and detects associated tem-porary speed limits directly from the environment. The system consists of three primary stages: (1) work zone detection using temporally aggregated visual cues, (2) temporary speed limit recognition from roadside signage, and (3) generation of struc-tured, law-aware outputs. Each stage is designed for real-time operation on embedded hardware while maintaining modular separation between perception, reasoning, and downstream interfaces. A detailed system diagram is presented in Figure 2 with its methods described in the following subsections. 
+
+B. Visual Perception for Work Zone Detection 
+
+The work zone detection module is formulated as a real-time spatio-temporal perception architecture processing a forward-facing monocular camera stream. The objective is to robustly               
+
+> Input Live Camera / Video Stream
+> Object Detection
+> •50 work zone classes
+> •Speed limit classes
+> •Hard-negative trained
+> •1280px @ 30 FPS (Jetson Nano)
+> Text Extraction and Speed Limit Detection
+> (Message Boards)
+> Language Verification
+> (Global & Per-Cue)
+> •Semantic Context
+> •Cue Validation
+> Scene Context Classifier
+> (Highway/Urban)
+> Multi-Modal Fusion
+> •Weighted EMA (Anti-flicker)
+> •Context & OCR Boost
+> State Machine
+> OUT →APPROACHING →INSIDE →EXITING
+
+# +  
+
+> System Output
+> •Auditory Cue for Manual Drivers
+> •Correct Speed Reduction for Autonomous Vehicles
+
+Fig. 2: System architecture of the proposed vision-based work zone recognition pipeline. YOLO-based object detection feeds parallel semantic verification (CLIP), OCR-based speed limit extraction, and scene context classification. These modalities are fused through a temporally smoothed weighted mech-anism, followed by a hysteresis-based state machine that produces stable, real-time work zone and speed awareness outputs. infer the probabilistic state of an active construction envi-ronment, mitigating the high intra-class variance and visual ambiguity inherent to dynamic work zones. 
+
+Object Detection: The foundational layer utilizes a YOLO-based detector [18] trained on the ROADWork dataset [10] (comprising over 5,000 work zone sequences and 50 target classes). For each frame at time t, discrete detections are semantically aggregated across k = 4 higher-order cue groups: 
+
+CYOLO (t) = 1
+
+|G|
+
+X
+
+> g∈G
+
+max  
+
+> i:ci∈g
+
+si (1) where si denotes the confidence of object i, and G partitions the detection classes into mutually exclusive semantic groups (e.g., regulatory signage, channelization devices, construction vehicles, and active personnel). To systematically attenuate false positive rates induced by visually analogous artifacts, hard-negative mining is applied, iteratively retraining the de-tector on high-confidence background misclassifications. 
+
+Semantic Scene Verification: To disambiguate complex scenes, the architecture employs Contrastive Language–Image Pretraining (CLIP) [19], [20] to evaluate the global semantic coherence of the frame against a target text embedding. To optimize computational load, this verification is dynamically gated, triggering exclusively when the localized detector confi-dence enters a probabilistic uncertainty boundary ( CYOLO (t) >τCLIP = 0 .45 ): 
+
+CCLIP (t) = cos( fvision (xt), f text (“active construction site” )) 
+
+(2) The integrated scene-level confidence is then computed via a piecewise fusion function:        
+
+> Cfused (t) =
+> (
+> CYOLO (t),if CYOLO (t)≤τCLIP
+> αC YOLO (t) + (1 −α)CCLIP (t),otherwise
+
+(3) where α = 0 .6 weights the contribution of localized primitives against global semantic context. 
+
+Temporal Smoothing and State Estimation: The fused confidence stream is subjected to an Exponential Moving Average (EMA) filter to attenuate high-frequency noise: 
+
+CEMA (t) = β · Cfused (t) + (1 − β) · CEMA (t − 1) (4) with a smoothing factor β = 0.3. The filtered signal is routed into a finite state machine enforcing asymmetric hys-teresis thresholds (τentry = 0.70 , τexit = 0.45 ) to gov-ern transitions across four traversal phases: OUTSIDE →
+
+APPROACHING → INSIDE → EXITING. These parameters were derived via a constrained grid-search optimization over a validation corpus of 406 videos, formulated to maximize the event-level F1 score subject to a strict upper bound on the false positive rate ( ≤ 5 events/hour). 
+
+Preliminary Results: Empirical evaluation demonstrates that this hybrid, temporally-smoothed architecture achieves an 84.6% reduction in false positive detections relative to a YOLO-only baseline, yielding an F1 score of 0.87 and an operational rate of 2.6 false positives per hour on the test distribution. As shown in Figure 3, the raw detector confidence exhibits high-frequency volatility, frequently crossing decision boundaries. In contrast, the fused and EMA-smoothed signal produces stable plateaus that align with semantically consistent roadway segments, thereby eliminating rapid threshold cross-ings that would otherwise induce erroneous state transitions. 
+
+C. Temporary Speed Limit Recognition 
+
+Temporary speed limits in work zones are conveyed through heterogeneous signage types that differ in appearance, relia-bility, and temporal behavior. This system explicitly supports three classes of common temporary speed limit signage: (1) standard static speed limit signs, (2) digital speed limit (DSL) signs that display numeric limits using LED panels, and (3) 
+
+Fig. 3: Temporal evolution of the work zone confidence score across a continuous drive, comparing raw YOLO object-detection outputs with the fused, EMA-smoothed signal uti-lized for state transitions. Dashed lines delineate the asym-metric hysteresis thresholds for state entry ( τentry = 0 .70 ) and exit ( τexit = 0 .45 ). The fused EMA score integrates semantic context, yielding conservative, stable values that effectively prevent state oscillation. temporary traffic control (TTC) message boards that may rotate between multiple messages. For standard temporary speed limit signs, we employ a trained detection and classification model using publicly avail-able traffic sign datasets, including Mapillary [11] and LISA traffic datasets [12], [13]. The training data is augmented with examples of DSL signs, as large-scale labeled datasets for DSL signage remain limited. Hard negative mining was also used during training with background images containing similar signs and banners to reduce false detections. To ensure accurate results, a tracking window was implemented in which the sign must be continuously tracked for a minimum of 15 frames, and the detected speed limit must maintain a consistency ratio of at least 80% in that tracking window. For TTC message boards, the system first gets the bounding box crop from the YOLO object detector then applies optical character recognition (OCR) within the detected region. OCR outputs are aggregated across multiple frames into a history buffer that identifies keywords such as “Speed Limit” or “MPH” along with the numeric digits. These safety checks enforce plausible and consistent speed limits before the results are passed on to the downstream decision logic. 
+
+D. Outputs and Human–Vehicle Interfaces 
+
+The system’s core outputs are the inferred work zone state and the perceived temporary speed limit, which may be inter-preted by either human drivers or advanced driver assistance systems (ADAS). Driver-facing advisories and speed guidance are optional downstream interfaces rather than mandatory control actions. For manual and partially automated vehicles [21], the system output can be presented as supervisory cues to support driver awareness through visual, auditory, or haptic feedback without enforcing automatic vehicle control. For higher levels of automation, perception outputs are exposed through a structured interface for integration with planning or control modules, where detected speed limits may inform speed setpoints or motion-planning logic. Outputs may also be shared through cooperative perception frame-works to enable shared situational awareness across vehicles via vehicle-to-everything (V2X) communication. Throughout all configurations, the system maintains a clear separation between perception, decision-making, and actuation, allow-ing system integrators to determine appropriate enforcement strategies based on application requirements. 
+
+E. Hardware and Deployment Platform 
+
+The perception pipeline is deployed on an NVIDIA Jet-son Nano paired with an Intel RealSense camera mounted inside the vehicle and runs fully onboard without cloud connectivity. In this configuration, the pipeline runs at ap-proximately 15 FPS. The TTC message-board speed limit extraction component requires marginal additional memory and is therefore evaluated on an NVIDIA Jetson AGX Orin, where the OCR stage runs at an average of 7 FPS during active text extraction. Outside of these brief extraction intervals, the pipeline continues at its standard real-time rate. Given that the system is a software-based solution, the method is not tied to this hardware. In practice, the system can integrate with existing vehicle cameras and onboard compute resources to support broad deployment and scalability across diverse vehicle platforms V. E VALUATION AND TESTING 
+
+Evaluation focuses on the system’s ability to (1) reliably detect active work zones, (2) produce temporally stable state transitions suitable for real-time use, and (3) recognize asso-ciated temporary speed limits from roadside signage. Because missed work-zone detections are especially costly in safety-critical settings, we emphasize event-level metrics that mea-sure whether a work zone is detected at all, alongside com-plementary analyses of frame-level state accuracy, transition timing error, and false-activation behavior. 
+
+A. Detection Performance 
+
+Let P denote the set of predicted work zone events and 
+
+G the set of ground-truth events. Each event is defined as a contiguous temporal interval corresponding to a specific system state (e.g., INSIDE ). A predicted event is considered a correct detection if it overlaps any ground-truth event. We count a predicted event p ∈ P as a true positive if it overlaps any ground-truth event: 
+
+TP P = |{ p ∈ P | ∃ g ∈ G such that p ∩ g̸ = ∅ }| . (5) Similarly, we count a ground-truth event g ∈ G as detected if it overlaps any prediction: 
+
+TP G = |{ g ∈ G | ∃ p ∈ P such that g ∩ p̸ = ∅ }| . (6) Then, 
+
+Precision = TP P
+
+|P| , Recall = TP G
+
+|G| . (7) These event-based formulations emphasize whether work zones are detected at all, rather than frame-level accuracy, TABLE I: State-transition matching performance under tem-poral tolerance windows. A predicted transition is counted as correct if its timestamp falls within ±k frames of the corresponding ground-truth transition.                  
+
+> Tolerance ±(frames) Precision Recall Accuracy
+> 00.0215 0.1427 0.0133 50.0512 0.1931 0.0429 15 0.1136 0.3056 0.1038 30 0.1918 0.4272 0.1815
+
+which is more appropriate for safety-critical applications where missed detections carry high cost. Evaluation was performed on a manually annotated subset of the ROADWork dataset consisting of 490 video sequences. The system achieves an INSIDE event recall of 96.5% and event precision of 68.7%, indicating that nearly all true work zone events are successfully detected while some false acti-vations remain. Frame-level accuracy across all four states is 64.5%, with a macro F1 score of 0.60. Per-state intersection-over-union (IoU) analysis shows strong separation between stable states ( OUTSIDE IoU 0.56, INSIDE IoU 0.47) but substantially lower performance for boundary states (AP-PROACHING IoU 0.11, EXITING IoU 0.09), indicating that temporal transitions remain the primary challenge. 
+
+B. Temporal Behavior 
+
+To characterize temporal alignment between predicted and ground-truth detections, we define the state entry timing offset for a given state s as 
+
+∆ts = tpred  
+
+> s
+
+− tgt  
+
+> s
+
+, (8) where tpred  
+
+> s
+
+and tgt  
+
+> s
+
+denote the predicted and ground-truth entry times, respectively. Positive values indicate delayed detection relative to ground truth, while negative values indicate early detection. Transition performance under varying tolerance windows is summarized in Table I. Across evaluated sequences, advisory activation timing ex-hibits a mean absolute error of 81 frames (2.7 s), with a median error of 39 frames (1.3 s), indicating that most detections occur within a short temporal window while a small number of large deviations increase the mean. Entry timing for the INSIDE 
+
+state shows a mean absolute error of 142 frames (4.7 s), reflecting variability in boundary localization. Because transition boundaries are inherently ambiguous and subject to annotation variability, transition detection was evaluated under temporal tolerance windows of ±{ 0, 5, 15 , 30 }
+
+frames. Transition recall and precision increase with tolerance as expected, reaching 0.43 recall and 0.19 precision at ±30 
+
+frames. This trend indicates that predicted transitions are generally localized near the correct temporal region even when exact frame alignment differs. The remaining precision gap suggests prediction fragmentation near state boundaries, consistent with the reduced IoU observed for APPROACHING 
+
+and EXITING states. TABLE II: Ablation study evaluating component contributions to event-level performance.                
+
+> Configuration Event F1 FP Rate (hr −1)Notes
+> YOLO only (baseline) 76.9% 12.3 High false positive rate + CLIP verification 85.6% 7.8 Major FP reduction + Hysteresis (0.7/0.45) 89.4% 5.1 Flicker suppression Full system (+ EMA) 91.2% 4.2 Production configuration
+
+C. Calibration and Parameter Selection 
+
+System parameters are calibrated using a validation dataset of 406 diverse work zone videos spanning highway con-struction, urban lane closures, and shoulder work scenarios. Calibration is formulated as a constrained optimization prob-lem: maximize event-level F1 score while constraining false positive rate to ≤5 events per hour. Detection stability is additionally quantified using a flicker rate metric, defined as state transitions per minute, and configurations with elevated flicker are penalized to improve usability. CLIP verification is selectively triggered when aggregated YOLO confidence exceeds 0.45, corresponding to an uncer-tainty region where object-level evidence suggests a work zone but scene-level context improves precision. Hysteresis thresholds are asymmetric (entry: 0.7, exit: 0.45) to suppress flicker and preserve state persistence through brief occlusions. 
+
+D. Ablation Study 
+
+Table II summarizes the contribution of major system components. Compared to a YOLO-only baseline, CLIP ver-ification and temporal hysteresis substantially reduce false activations, and the full system configuration achieves the best event-level performance under the false-positive constraint. 
+
+E. Speed Limit Recognition Performance 
+
+The speed limit recognition performance was evaluated using approximately 35 minutes of in-house driving data, encompassing a total of 39 posted 25 mph and 55 mph static signs within construction zones. As we prioritized reliable correct detections, a precision of 95.45% with only one false positive and zero incorrect speed classifications were achieved within our in-house dataset. Our tracking window method also resulted in a recall of 53.85% due to unstable predictions during poor visibility conditions such as nighttime rain or heavy fog. Despite the missed detections, the system successfully recognized at least one speed limit sign in all but one of the 10 evaluated driving clips within the first or second appearance of a posted speed limit sign. While the captured driving clips did not contain DSL signs, we did encounter TTC message boards. Across seven TTC message board instances, three were clearly captured and four exhibited degraded legibility (two blurry and two partial). When the camera captured a clear, complete message, the system achieved a 100% success rate in extracting the correct speed limit. However, the current pipeline could not reliably recover text from blurry or partially rendered messages, as illustrated in Figure 4. Image blurring primarily resulted from adverse weather such as rain and low-light conditions   
+
+> (a) Clear Capture (b) Blurry Capture (c) Partial Capture
+
+Fig. 4: Examples of TTC message-board captures under vary-ing visibility and display artifacts. compounded by the camera’s placement inside the cabin behind the windshield, which introduced glare and reflections. Furthermore, partial text captures occurred frequently due to asynchronous timing between the TTC board LED pulse-width modulation and the camera’s rolling shutter effect. To mitigate partial LED captures on TTC message boards, a lightweight multi-frame reconstruction method was imple-mented. For each detection, a sliding window of consecutive crops (e.g., N = 2 or N = 3 ) is maintained. Neighboring frames are aligned to a reference crop using Fourier-domain phase correlation and combined via a per-pixel median merge as shown in Figure 5. Although this computationally inexpen-sive approach produces a visually improved human-readable composite, the merged outputs did not consistently produce OCR readings with sufficient confidence for automated speed-limit extraction. In particular, consecutive frames often lacked the complementary LED strokes needed for full text recon-struction. Attempting to use temporally distant frames to fill these gaps also proved ineffective as continuous motion of the vehicle introduced significant perspective skew that our translation-only alignment could not resolve, resulting in fragmented OCR outputs. VI. L IMITATIONS , F UTURE DIRECTIONS , AND 
+
+CONCLUDING REMARKS 
+
+This work demonstrates the feasibility of perception-based recognition of work zones and temporary speed limits using forward-facing visual perception and embedded computing. Limitations which motivate future research include resolv-ing inherent ambiguity of work-zone boundaries and transi-tions, and degradation of transition timing under occlusion, clutter, and annotation variability. Also, temporary speed-limit signage remains difficult to confidently classify, especially while TTC message boards are sensitive to blur, glare, low-light conditions, and rolling-shutter/PWM artifacts that can yield partial text captures and reduce OCR confidence. These limitations can be overcome in future research, including expansion of training and evaluation data to better cover adverse weather, and nighttime conditions. Incorporation of stronger temporal reasoning may improve boundary localiza-tion and reduce fragmentation near state transitions. Additional Frame A 
+
+> Frame B
+> Fourier Domain (A)
+> Fourier Domain (B)
+> Merged Frame
+
+Fig. 5: Multi-frame reconstruction for partially captured TTC message boards. Consecutive crops are aligned via Fourier-domain phase correlation and combined using a per-pixel median merge to improve human readability. research directions include improved multi-frame reconstruc-tion and display-aware processing for LED message boards. Finally, cooperative perception mechanisms such as vehicle-to-everything (V2X) communication could enable shared work-zone awareness [22], [23] when signage is partially occluded or not directly visible. Overall, the proposed system illustrates a practical and scalable pathway for improving work-zone safety for intel-ligent transportation systems. By grounding speed awareness in direct visual perception rather than static digital representa-tions, the approach better aligns vehicle behavior with rapidly changing roadway conditions. Its low-cost, hardware-agnostic design supports deployment across manual, mixed-autonomy, and automated vehicles, offering a near-term opportunity to reduce speeding and increase driver alertness in dynamic construction environments. REFERENCES [1] L. Torres. (2024, Mar.) Speeding makes work zones dangerous for everyone. National Safety Council. [Online]. Available: https: //www.nsc.org/road/safety-topics/speeding/speeding-makes-work-zones -dangerous-for-everyone [2] National Highway Traffic Safety Administration. (2023) 2023 fatality analysis reporting system (fars) annual report file (arf). U.S. Department of Transportation. Accessed via workzonesafety.org. [Online]. Available: https://workzonesafety.org/work-zone-data/ [3] Federal Highway Administration. (2025, Aug.) Work zone facts and statistics. U.S. Department of Transportation. [Online]. Available: https://ops.fhwa.dot.gov/wz/resources/facts stats.htm [4] H. Summala and J. Hietam¨ aki, “Drivers’ immediate responses to traffic signs,” Ergonomics , vol. 27, no. 2, pp. 205–216, 1984. [5] S. S. Monfort, I. J. Reagan, J. B. Cicchino, W. Hu, P. Gershon, B. Mehler, and B. Reimer, “Speeding behavior while using adaptive cruise control and lane centering in free flow traffic,” Traffic Injury Prevention , vol. 23, no. 2, pp. 85–90, 2022. [6] M. Ansarinejad, K. Ansarinejad, P. Lu, and Y. Huang, “User experi-ence of navigating work zones with automated vehicles: Insights from youtube on challenges and strengths,” Smart Cities , vol. 8, no. 4, p. 120, 2025. [7] Partnership for Analytics Research in Traffic Safety (PARTS), “Market penetration of advanced driver assistance systems (adas),” MITRE, Tech. Rep., Sep. 2024, september 2024 Report. [Online]. Available: https://www.mitre.org/sites/default/files/2024-09/PR-24-2614-PARTS -Market-Penetration-Advanced-Driver-Assistance-Systems-0917.pdf [8] W. Shi and R. R. Rajkumar, “Work zone detection for autonomous vehicles,” in Proceedings of the IEEE International Intelligent Trans-portation Systems Conference (ITSC) . IEEE, Sep. 2021, pp. 1585– 1591. [9] F. Abodo, R. Rittmuller, B. Sumner, and A. Berthaume, “Detecting work zones in shrp 2 nds videos using deep learning-based computer vision,” in Proceedings of the IEEE International Conference on Machine Learning and Applications (ICMLA) . IEEE, Dec. 2018, pp. 679–686. [10] A. Ghosh, S. Zheng, R. Tamburo, K. Vuong, J. Alvarez-Padilla, H. Zhu, and S. G. Narasimhan, “Roadwork: A dataset and benchmark for learning to recognize, observe, analyze, and drive through work zones,” in Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) , 2025, pp. 6132–6142. [11] C. Ertler, J. Mislej, T. Ollmann, L. Porzi, G. Neuhold, and Y. Kuang, “The mapillary traffic sign dataset for detection and classification on a global scale,” in Proceedings of the European Conference on Computer Vision (ECCV) . Springer, Aug. 2020, pp. 68–84. [12] M. B. Jensen, M. P. Philipsen, A. Møgelmose, T. B. Moeslund, and M. M. Trivedi, “Vision for looking at traffic lights: Issues, survey, and perspectives,” IEEE Transactions on Intelligent Transportation Systems ,vol. 17, no. 7, pp. 1800–1815, 2016. [13] M. P. Philipsen, M. B. Jensen, A. Møgelmose, T. B. Moeslund, and M. M. Trivedi, “Traffic light detection: A learning algorithm and evalua-tions on a challenging dataset,” in Proceedings of the IEEE International Intelligent Transportation Systems Conference (ITSC) . IEEE, Sep. 2015, pp. 2341–2345. [14] C. G. Keller, C. Sprunk, C. Bahlmann, J. Giebel, and G. Baratoff, “Real-time recognition of U.S. speed signs,” in Proceedings of the IEEE Intelligent Vehicles Symposium . IEEE, 2008, pp. 518–523. [15] M. Chaman, A. El Maliki, H. Dahou, R. El Gouri, H. Laamari, and A. Hadjoudja, “Deep learning-based speed limit sign detection using YOLOv11 applied to speed regulation in electric vehicles for ADAS,” 
+
+Engineering, Technology & Applied Science Research , vol. 15, no. 4, pp. 25 354–25 362, Aug. 2025. [16] B. Deegan, “Led flicker: Root cause, impact and measurement for automotive imaging applications,” in Electronic Imaging: Autonomous Vehicles and Machines . Society for Imaging Science and Technology, Jan. 2018, pp. 146–1–146–6. [17] M. Zhu, A. Sidhu, and K. A. Redmill, “Enhancing digital speed limit detection in work zones: A camera-based approach with multi-frame processing,” in Proceedings of the IEEE International Conference on Intelligent Transportation Systems (ITSC) . IEEE, 2024, pp. 4013–4019. [18] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You only look once: Unified, real-time object detection,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR) .IEEE, 2016, pp. 779–788. [19] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in Proceedings of the International Conference on Machine Learning (ICML) . PMLR, 2021, pp. 8748–8763. [20] R. Greer and M. Trivedi, “Towards explainable, safe autonomous driving with language embeddings for novelty identification and active learning: Framework and experimental analysis with real-world data sets,” arXiv preprint arXiv:2402.07320 , 2024. [21] A. Rangesh, N. Deo, R. Greer, P. Gunaratne, and M. M. Trivedi, “Autonomous vehicles that alert humans to take-over controls: Modeling with real-world data,” in 2021 IEEE International Intelligent Transporta-tion Systems Conference (ITSC) . IEEE, 2021, pp. 231–236. [22] R. Greer, S. Desai, L. Rakla, A. Gopalkrishnan, A. Alofi, and M. Trivedi, “Pedestrian behavior maps for safety advisories: Champ framework and real-world data analysis,” in 2023 IEEE Intelligent Vehicles Symposium (IV) . IEEE, 2023, pp. 1–8. [23] F. Denk, P. Brunner, W. Huber, M. Margreiter, K. Bogenberger, and R. Kates, “Assessment of traffic safety interventions using virtual randomized controlled trials: potential of connected and automated driving including v2x for collision reduction at urban intersections,” in 
+
+2022 IEEE 25th International Conference on Intelligent Transportation Systems (ITSC) . IEEE, 2022, pp. 1183–1190.
