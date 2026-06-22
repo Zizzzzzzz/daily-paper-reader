@@ -1,0 +1,656 @@
+Title: Effective and Low-cost Lane-based Map Localization for Vehicle-Centric Route Generation
+
+URL Source: https://arxiv.org/pdf/2606.16101v1
+
+Published Time: Tue, 16 Jun 2026 01:58:35 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> 1
+
+# Effective and Low-cost Lane-based Map Localization for Vehicle-Centric Route Generation 
+
+Hong-Shiang Lin Jung-Hsin Chen Yu-Luen Tzeng Wei-Hao Chen Yi-Chen Lee Li-Jhe Chen Peng-Yuan Chen 
+
+National Taipei University 
+
+Abstract —Driver-centric route representation plays a vital role in intuitive driving guidance systems. This paper presents OLRA, a low-cost, map-localization-based route generation method that derives driver-view-aligned routes by matching a navigation route—composed of discrete road nodes on a map—with lane markings detected from onboard camera images. This matching process enhances vehicle localization accuracy and enables the generation of visually aligned driving routes. We further intro-duce route evaluation metrics and compare OLRA with Open-Pilot, a representative low-cost approach that directly generates routes from camera images, using a well-established autonomous driving dataset—NuScenes. Experimental results demonstrate that OLRA outperforms OpenPilot in scenarios involving non-linear road segments and in route estimation beyond 20 meters ahead of the vehicle, achieving a lower overall Euclidean error. This study aims to promote future research in low-cost, map-localization-based route prediction frameworks. 
+
+Index Terms —Driving route generation, lane detection, map localization, augmented reality, autonomous driving. 
+
+I. I NTRODUCTION 
+
+Despite advancements in navigation software, drivers often struggle to translate map-based guidance into their visual surroundings, particularly in complex traffic scenarios. Several driver assistance systems now use Augmented Reality (AR) for navigation, integrating multiple information sources to provide guidance from the driver’s perspective [1]. The carpet [2], a perspective-aware overlay from the ego lane to the destination, helps drivers perceive the road surface and key locations, especially at intersections. Carpets also fit the limited field of view of an AR Head-Up Display (HUD) ( 8◦ × 3◦ to 
+
+12 ◦ × 5◦) [3], which includes the road surface where Carpet is displayed. However, this intuitiveness raises the demand for highly accurate vehicle-centric route generation, a chal-lenge that remains largely undisclosed in both commercial solutions[2] and academic research. This paper proposes a method to address this gap. Vehicle-centric route generation can be done in two ways: 
+
+map-localization-based and direct generation (Figure 1). The first estimates the vehicle’s location on the map and converts map routes into vehicle-centric routes. The second skips map localization and directly generates routes from sensor inputs (e.g., camera images), using recorded waypoints as supervi-sion. Previous map localization methods expose two main issues we are concerned with. First, the relied-upon map data is 
+
+Corresponding author: Hong-Shiang Lin is with CSIE, NTPU, Taiwan, email: hongshianglin@gm.ntpu.edu.tw. E
+
+> N
+> Map
+> Localization
+> E
+> N
+> Route (V-BEV)
+> R
+> F
+> Map Localization
+> View Transform
+> Sensors (Not limited to cameras)
+
+(a) Map-localization-based approach. E 
+
+> N
+> Map
+> Route (V-BEV)
+> R
+> F
+> Direct Generation
+> Sensors (Not limited to cameras)
+
+(b) Direct approach. 
+
+(c) Example at a roundabout intersection. Left: V-BEV. Right: Camera view. 
+
+Fig. 1: (a – b) General workflows of map-localization-based and direct generation methods. (c) The map-localization-based approach ( OLRA ) produces a more stable route, closer to the ground truth, than the direct approach ( Openpilot ). Colors: OLRA green, Openpilot blue, ground truth red. difficult to obtain. Early studies depended on prebuilt accu-rate maps [4], [5], but these are prohibitively expensive to build, as they require high-precision GPS and LiDAR. Later work used open-source maps [6], [7], [8], but their geometry annotations (e.g., lane count, lane width, buildings) are not globally available, limiting real-world applicability. There is also research on satellite-to-ground view localization [9], [10], but satellite images are generally not freely accessible. Second, prior studies have mainly focused on map–image alignment for positioning, with limited attention to driving routes. Few have examined how map data represents driving routes, how these routes align with lanes, and how they appear from the vehicle’s perspective after transformation from the map view. These are the issues that this paper seeks to address. The direct generation methods are closely related to tra-jectory prediction research in autonomous driving. Although 
+
+trajectory and route differ — the former means future po-sitions, the latter means planned path — both share similar mathematical structures as coordinate sequences. Accordingly, supervised learning models for trajectory prediction can be adapted for route generation by converting ground truth trajectories into training routes. However, current state-of-the-art deep learning research has yet to show significant practical applicability. Over the past decade, these methods have generated high-quality trajectories [11], [12], [13], [14], [15], [16], but they pose major deployment and maintenance challenges. These models are resource-intensive, requiring 
+
+> arXiv:2606.16101v1 [cs.MM] 15 Jun 2026 2
+
+large parameter counts and costly inputs such as multi-view images, LiDAR, and high-definition maps. In contrast, industry solutions like OpenPilot [17] have proven feasible for most vehicles, showing that direct route generation can be achieved using only low-cost inputs such as a front-facing camera. With OpenPilot serving as a low-cost benchmark for direct generation methods, this paper aims to address the following questions:  
+
+> •
+
+Is it possible to develop a low-cost solution within map localization-based generation methods?  
+
+> •
+
+How does the performance of this low-cost solution compare to OpenPilot in terms of vehicle-centric driving route generation? 
+
+We consider this research valuable because map-localization-based generation offers greater interpretability than direct methods, aiding analysis in complex urban scenarios. we use navigation routes , consisting of waypoints from origin to destination. This minimal data provides broad global coverage and is available through commercial navigation ser-vices [18] or open-source platforms [19], [20]. In addition, we leverage mature deep learning lane detection [21], [22], [23], [24] to extend earlier methods [5], [6] that aligned map lanes with camera lanes. The new challenge is aligning camera lanes with navigation routes, which we call lane-to-route alignment .This heterogeneous task is hard because lane lines give only partial information, especially at intersections or occluded areas, making stable localization and accurate route generation difficult. Another difficulty is matching straight lane lines with curved paths at intersections, since current lane detection methods often struggle with non-straight exits. To address these challenges, we propose a novel lane-to-route alignment loss that integrates global alignment with local motion sensor compensation. Building on an earlier version described in our pending patent [25], the current formula-tion introduces sample-wise weighting. Route-direction-aware weighting is designed to handle mismatches between straight lane markings and curved navigation routes, while uniform weighting is included for comparison. This loss is efficiently minimized to optimize the vehicle’s pose in the map-centric bird’s-eye view (M-BEV). The resulting system, as shown in Figure 2 and termed OLRA (Optimized Lane-to-Route Alignment ), first detects lane lines from camera images, then jointly uses these lane lines, yaw rate, speed, GPS, and the navigation route to refine the vehicle’s pose. The driving route is finally generated by transforming the navigation route from M-BEV to the vehicle-centric BEV (V-BEV), achieving robust route estimation even in challenging scenarios. Existing map-localization methods rarely evaluate driving route quality or compare with direct-generation approaches. We propose a metric for route evaluation on the nuScenes 
+
+dataset [26] and benchmark two low-cost solutions, OLRA and OpenPilot, under the same setting. Overall, OLRA achieves lower mean Euclidean error and outperforms OpenPilot at mid-range distances (20–40 m), though it is slightly less accurate at short range (0–20 m). Importantly, OLRA notably reduces route direction errors at intersections, as shown in Figure 1. In summary, the main contributions of this paper are as follows: Image Lane detection  
+
+> Pose (M-BEV)
+> E
+> N
+> Yaw Rate & Speed Route Transform
+> E
+> N
+> Nav. Route & GPS (M-BEV)
+> X
+> Z
+> Y
+> Lanes (Camera)
+> argmin
+> L
+> Optimization
+> Driving Route (V-BEV)
+> R
+> F
+
+Fig. 2: The resulting system. Red points and lines indicate the navigation route; blue points and lines show camera-detected lane lines. The current vehicle pose is marked by a blue circle with an arrow in the M-BEV, while light blue circles denote previous poses in the V-BEV. Green points and lines represent the driving route based on optimized pose. The background map is for visualization only and does not provide lane or building details.  
+
+> •
+
+We propose OLRA, a low-cost map-localization method for generating vehicle-centric driving routes, reducing reliance on complex map data and increasing its applica-bility.  
+
+> •
+
+We introduce a metric to evaluate driving routes and com-pare OLRA with OpenPilot, highlighting differences be-tween localization-based and direct-generation methods. We also publicly release a tool that converts NuScenes data into algorithm inputs and ground truth, aligned with Open Street Map.  
+
+> •
+
+We show that OLRA serves as a strong baseline for low-cost solutions, outperforming OpenPilot overall and reducing route errors at intersections, a key challenge in real-world driving. To conclude, in contrast to prior work that starts from ideal inputs, we begin with simplified inputs to establish a stable baseline, allowing for incremental improvements in accuracy. Our approach also unifies map-based localization, route gen-eration, and trajectory prediction, providing an interpretable and coherent research foundation. II. R ELATED WORK 
+
+In this section, we introduce related research on map relative localization and trajectory prediction. In particular, methods for trajectory prediction can serve as references for the direct generation of driving routes. In addition, we review recent advancements in lane detection techniques. 
+
+A. Map Relative Localization 
+
+From the perspective of map-to-camera alignment, map-relative localization first estimates the vehicle’s pose on the map. In the second stage, the V-BEV is projected into the camera frame. Although this projection can be handled via standard calibration [30], achieving accurate localization re-mains an open research challenge. Early research employed Kalman filter-based optimization frameworks that incorporate lane-line-based map-to-camera 3HD Map Accurate Map Open Map Nav. Route Multi-Cam Single-Cam Lidar GPS Motion Sensor                              
+
+> (or 360 cam) (Consumer) (Consumer)
+> Map Localization
+> LaneLoc [5] ✓✓✓✓✓
+> EDM [27] ✓✓✓
+> Lane-level [6] ✓✓✓
+> OrienterNet [8] ✓✓✓
+> OLRA ✓✓✓✓
+> Direct
+> CNN-multimodal [13] ✓✓✓
+> MP3 [28] ✓
+> Transfuser [14] ✓✓
+> UniAD [16] ✓
+> OP-Deepdive [29] ✓
+
+TABLE I: Comparison of input data requirements for map localization-based and direct approaches for driving route generation, with both high-cost and low-cost research studies included. matching results [5], [4]. Schreiber et al. [5] modelled resid-uals between camera and map lane lines and proposed an online detection workflow using projected map lines. This positioning technique was adopted by the well-known Bertha Benz autonomous driving project [31]. Tao et al. [4] focused more on the lane line geometry model and evaluated lo-calization performance under different GPS error conditions. These studies heavily rely on prebuilt, high-precision maps for aligning online camera-detected lane lines. Another approach is to render open-source map data and match image features with the rendered map [27], [6], [7], [8]. In the pioneering work, Nedevschi et al. [27] defined an 
+
+extended digital map (EDM) encoding visual landmarks from OpenStreetMap [19] — lane markings, curbs, painted traffic signs, and stop lines — to detect camera lanes for localization near intersections. Later, Cao et al. [6] used HOG features to match projected lane-level maps with camera images. In the extended study, Flade et al. [7] combined lane detection with Canny edges for more robust map-to-camera matching. More recently, Sarlin et al. [8] introduced the first neural network to match planimetric maps with camera images in a learned BEV feature space, including buildings and other attributes beyond lanes. Although these approaches avoid the cost of high-precision prebuilt maps, they still rely on lane-level or building information, which are not consistently provided in the OpenStreetMap data, posing risks for stable localization in practical driving scenarios. Deep-learning-based methods have also been developed for cross-view geo-localization. For satellite-to-UAV alignment, Wang et al. [32] proposed the Local Pattern Network (LPN) 
+
+to capture contextual information and enhance discriminative cues. Tian et al. [33] addressed view differences by explicitly applying view transform before using a conditional GAN to synthesize satellite images for localization. In contrast, Xia et al. [34] introduced a feature alignment module to implic-itly align fine-grained features. Shen et al. [35] employed a ConvNeXt-based network with cross-dimension interactions to avoid the trade-off between small-region focus and destructive segmentation. For addressing the even larger view discrep-ancies between satellite and ground images, Wang et al. [9] proposed a decoupled hierarchical ( DeHi ) CNN-transformer architecture to capture local features, while Li et al. [10] used self-knowledge distillation to capture scene context and scale variations. Overall, these methods rely on satellite images, often unavailable, and give only raw visual data for limited ground areas without map-centric geometry, making direct vehicle localization difficult. Unlike previous works, we rely solely on the navigation routes, which are consistently available in public maps and commercial navigation software. With mature DNN-based lane detection, we adopt a lane-based approach without struggling with online lane detection, as in pioneering works [5], [4]. This also avoids the real-time visual cue extraction challenges of previous methods [27], [7], [6], [8], [9], [10]. We thus focus on the lane-to-route alignment problem. Building on our ongoing work [25], this paper refines the alignment loss to handle shape discrepancies near intersections, and introduces more robust losses for both the sensor consistency and temporal constraints. In contrast to prior lane-based approaches that combine map matching and sensor data via Kalman filters, our framework directly formulates lane-to-route and motion sensor losses, which are optimized by gradient descent, making the localization performance more objective-driven and directly tied to the designed cost functions. Finally, we provide a full evaluation of localization performance over complete driving routes, something prior studies did not. 
+
+B. Trajectory Prediction 
+
+Early deep-learning-based trajectory prediction primarily employed RNNs and CNNs. Kim et al. [11] used LSTMs to forecast future trajectories based on historical movements of surrounding vehicles and ego motion sensor data. Lee et al. [12] extended this approach with a CVAE that integrates CNNs and RNNs for multi-modal prediction. Cui et al. [13] first rasterized tracked objects and then used a CNN to encode these representations along with combined state inputs for long-term, multi-modal prediction. However, these methods typically depend on complex, preprocessed inputs such as HD maps [13] or detailed trajectory histories [11], [12], [13]. Recent studies have moved toward end-to-end models that predict trajectories directly from raw sensor data. Zeng et al. [36] introduced the first end-to-end planner with a CNN-based model that tracks surrounding objects and generates a bird’s-eye-view (BEV) cost volume. Building on the ro-bustness and interpretability of BEV semantics, Chitta et 4
+
+al. [37] proposed NEAT , a transformer-based model that learns a BEV attention map to jointly predict semantic maps and future trajectories. Zhang et al. [15] further advanced this direction with Beverse , unifying perception and prediction within a single BEV architecture. However, these end-to-end models adopt multi-task architectures and may thus suffer from negative transfer [16]. In contrast, some research focuses on predicting future motion without explicit perception modules [14], [38], [39]. Chitta et al. [14] and Prakash et al. [38] use multiple transformer encoders to capture global context and fuse Li-DAR–camera features, while Nayakanti et al. [39] propose a hierarchical fusion architecture for multi-modal integration. These methods improve flexibility by bypassing the perception stage but lack interpretability, making performance analysis in complex driving scenarios more difficult. Another popular end-to-end paradigm is the modular de-sign [40], [28], [41], [16], which follows a sequential pipeline of perception, prediction, and planning. Sadat et al. [40] introduced such a framework with interpretable semantic occupancy forecasting in the prediction stage. To remove the need for map inputs, Casas et al. [28] proposed MP3 ,a LiDAR-based, interpretable mapless driving system that performs online mapping and dynamic occupancy estimation. As a vision-based counterpart, Hu et al. [41] presented St-P3 , which transforms perspective-view to BEV features by learning spatial and temporal representations. Building on this line of work, Hu et al. [16] further coordinated perception and prediction to improve planning and introduced the unified model UniAD , a milestone in modular end-to-end design. More recently, Zheng et al. [42] proposed a generative end-to-end model— GenAD — which comprehensively models potential future interactions between the ego vehicle and surrounding traffic participants. In addition, vision-language models [43] have been explored to further enhance planning performance. Although the aforementioned deep-learning-based studies have made significant progress in trajectory prediction, their practical application still faces several challenges. These ap-proaches often need costly inputs, such as LiDAR [40], [38], [14], [36], [28], HD maps [13], or multi-view cameras [15], [41], [16], [42], [43]. LiDAR provides accurate but sparse depth and requires costly equipment, multi-view cameras need complex setups for depth estimation, and HD maps depend on multiple sensors, making them expensive and limited in coverage. Many state-of-the-art models [37], [14], [39], [28], [41], [16] are parameter-heavy and need strong computing power to run efficiently. The American startup ai.comma launched the openpilot system [17], where the SuperCombo model predicts trajec-tories from a single front camera and runs efficiently on edge devices. However, the official implementation lacks training code and full datasets. We adopt the re-implemented openpilot model by Chen et al. [29], referred to as OP-Deepdive , which achieves comparable performance. Unlike OP-Deepdive, which provides no interpretable intermediate outputs and may struggle in complex intersections, our pro-posed OLRA uses both map-centric and camera views to generate interpretable map-based localization for driving route prediction. Table I compares input requirements, showing the lightweight nature of OLRA and OpenPilot; although Su-perCombo supports motion sensors, we have not seen acorresponding implementation in OP-Deepdive so far. 
+
+C. Lane Detection 
+
+Early studies [44], [45] used handcrafted features for lane detection, but they struggle under variable real-world condi-tions. Deep learning-based approaches later became the main-stream for lane detection. Gansbeke et al. [46] proposed the first end-to-end model that learns image features to predict lane lines via a weighted least-squares formulation. Sev-eral lightweight models for robust real-time detection fol-lowed [47], [21], [48], [49]. Inspired by anchor-based object detection, Tabelini et al. [47] introduced LaneAtt , improving inference speed for real-time use. Jin et al. [48] later on proposed Eigenlanes to better represent curved and winding lanes in the Eigenlane space. Liu et al. [21] developed Cond-lanenet , a row-wise approach capturing complex lane shapes and dynamically recovering lane instances. Li et al. [49] presented PGA-Net , a global attention model improving curve-based methods to detect curved lines in cluttered scenes without post-processing. Wu et al. [50] proposed dense hybrid proposal modulation to improve true positives and reduce false predictions via diversity and quality constraints. Recently, Huang et al. [22] introduced Anchor3dlane++ ,using 3D lane anchors to balance BEV- and front-view-based methods. Zhao et al. [23] first leveraged layout and shape priors to recover lanes in low-textured regions. For video-based detection, He et al. [51] proposed STANet , trained with a streaming strategy and deformable temporal attention to use historical frames. Zhou et al. [24] introduced LaneTCA , using adjacent and accumulative attention to aggregate temporal context and boost performance. This paper focuses on lane-to-route alignment, not on devel-oping new lane detectors. For evaluating OLRA, we prioritized stability and low false alarm rates when choosing models from previous lightweight approaches. Anchor-based methods [47], [48] and row-wise methods [21] are generally more stable than curve-based methods [49], which are sensitive to small parameter changes. Anchor-based methods may achieve higher recall in sparse lane scenarios, but our task only requires partial lane recovery for route alignment, making row-wise methods preferable. Considering open-source availability and verifiability, we selected the classical Condlanenet model [21] for experiments. More advanced [50], [23] or video-based methods [51], [24] are beyond this paper’s scope. III. M ETHOD 
+
+a) Overview: Figure 3 illustrates the workflow. The optimization target is the vehicle pose in the map-centric BEV (M-BEV), jointly constrained by three losses: an alignment loss comparing the navigation route with detected lane lines in the vehicle-centric BEV (V-BEV), a sensor consistency loss 5Image  
+
+> Lane detection
+> Camera to V-BEV
+> X
+> Z
+> R
+> F
+> Y
+> Lanes (V-BEV)
+> R
+> F
+> Pose (M-BEV)
+> E
+> N
+> Previous Poses
+> E
+> N
+> Yaw Rate & Speed
+> M-BEV to V-BEV
+> R
+> F
+> E
+> N
+> Driving Route (V-BEV)
+> R
+> F
+> Alignment Loss
+> R
+> F
+> E
+> N
+> Nav. Route (M-BEV)
+> Sensing Consistency Loss
+> R
+> F
+> Temporal Smoothness Loss
+> R
+> F
+> X
+> Z
+> Y
+> Lanes (Camera) Clipped route (M-BEV)
+> E
+> N
+> E
+> N
+> GPS (M-BEV)
+> Initialization
+> E
+> N
+> Route Clipping
+> E
+> N
+
+Fig. 3: The workflow. The camera-detected lane lines are first transformed from the camera view into the V-BEV. The navigation route, originally represented in the M-BEV, is clipped and then converted into the V-BEV using the optimized pose. The transformed route and lane lines are subsequently compared through an alignment loss. To ensure stable pose estimation, previous poses are incorporated via a temporal smoothness loss. These poses, together with motion sensor data (yaw rate and speed), are also used to enforce motion consistency through a sensor consistency loss. Note: GPS (shown as a brown circle), along with the navigation route, is used to initialize the previous pose. leveraging motion sensor data for short-term accuracy, and a temporal smoothness loss enforcing stability across frames. To improve robustness, only a forward segment of the route is clipped for each frame and transformed into V-BEV using the current pose. GPS is used solely for initialization; thereafter, the system relies entirely on lane-to-route alignment for global pose optimization, avoiding GPS noise. 
+
+A. Loss Formulation 
+
+We define the input data and estimated variables for the pose optimization problem. At time t, the inputs are the captured image I, GPS position gt (east and north), vehicle speed 
+
+st, and yaw rate ωt. The clipped navigation route in M-BEV is denoted as RM , represented by a sequence of 2D coordinates. The estimated quantities include detected lane lines ˆLt and driving route RtV in V-BEV, where the vertical axis points forward and the horizontal axis points right. The current vehicle pose is ˆpt, and the set of previous poses in M-BEV is {ˆpt−k∆t}, with k ∈ [1 , N p].With the input data and estimated information defined, we formulate the minimization problem as: 
+
+W∗ = argmin 
+
+> W
+
+L(O, W). (1) Here, W = {ˆLt, ˆpt, {ˆpt−k∆t}, RtV } is the set of estimated information, while O = {I, RM , s t, ω t} is the set of input data. We now define the loss function E in Equation 1 as follows: 
+
+L(O, W) = wALA(ˆLt, RtV )+ wS LS (ˆ pt, ˆpt−∆t, s t, ω t)+ wT LT (ˆ pt, {ˆpt−k∆t})
+
+(2) Here, LA, LS , and LT denote the lane-to-route alignment loss, the sensor consistency loss, and the temporal smoothness loss, respectively, with corresponding weights wA, wS , and wT .
+
+a) Lane-to-Route Alignment Loss LA: Our preliminary lane-to-route alignment loss [25] corresponds to this align-ment: points are sampled along RtV and ˆLt at fixed intervals in the vehicle’s forward direction, and the error is computed from the x-coordinates of the sampled points. However, near intersections, if the route points toward a turn while the camera detects a straight lane, a mismatch occurs, which may cause the system to incorrectly rotate the vehicle’s heading. To address this issue, we further consider assigning weights to the sampled points. Let ˆLtC denote the centerline, and we can first define the lane-to-route alignment function LA as follows: 
+
+LA(ˆLt, RtV ) = X
+
+> yi
+
+WA,θ (ˆLtC , RtV )LA,x (Lt,i C,x , R t,i V,x ). (3) In Equation 3, the sampled points (yi, L t,i C,x ) and (yi, R t,i V,x ),lie on Γt 
+
+> L
+
+and Γt
+
+> R
+
+, respectively. Here, Γt 
+
+> L
+
+denotes the polyline formed by the lane centerline points ˆLtC , while Γt 
+
+> R
+
+denotes the polyline formed by the route points RtV . Additionally, 
+
+yi = i × d, where d is the sampling interval along the forward direction of the vehicle, NA denotes the default number of samples. In practice, however, the sampling positions yi are restricted to the overlapping range between the lane lines and the route. The loss LA,x measures the lateral difference between sampled points of the centerline and the route in V-BEV. It is defined as follows: 
+
+LA,x (Lt,i C,x , R t,i V,x ) = ρH (Lt,i C,x − Rt,i V,x ) (4) 6R
+
+> F
+
+Fig. 4: Lane-to-route alignment loss. The solid dark blue points and lines represent the original lane line, while the hollow dark blue points indicate sampled points along it at fixed intervals. The light blue points and lines show the processed lane after centerline extraction. Similarly, the solid dark red points and lines depict the navigation route transformed into the vehicle coordinate frame, with hollow orange points marking sampled points along the route. The loss computes the x-coordinate differences LA,x between sampled points of the centerline and the route, weighted by their directional discrepancies via 
+
+WA,θ .Here, Lt,i C,x and Rt,i V,x denote the x coordinates of points sampled at equal intervals along the y direction. The Huber loss function ρH reduces the influence of large differences, helping to stabilize the loss. Then, regarding the assignment of weights, we consider two mechanisms. The first is to maintain uniform weighting. In this case, the loss becomes the same as the previous version [25], and the weights are given by: 
+
+WA,θ (ˆLtC , RtV ) = 1
+
+P
+
+> yi
+
+1 (5) The second mechanism considers the previous pose ˆpt−∆t and assigns dynamic weights to reduce the influence of points with large directional differences, so that the pose adjustment is not misled. Under this mechanism, the weights become: 
+
+WA,θ (Lt,i C,θ , R t,i V,θ ) = wiA,h 
+
+P
+
+> yi
+
+wiA,h 
+
+(6) Here, wiA,h represents the direction difference between the route and lane at distance yi, and is formulated as an ex-ponential function: 
+
+wiA,h = e− (Lt,i C,θ −Rt,i V,θ )2 
+
+> θ2
+> ϵ
+
+(7) Here, Lt,i C,θ denotes the heading of the sample point (yi, L t,i C,x )
+
+obtained under the previous pose, while Rt,i V,θ denotes the heading of the sample point (yi, R t,i V,x ), and the parameter θϵ
+
+controls the tolerance for heading differences between the lane and the route. Figure 4 illustrates the lane-to-route alignment concept. The loss computes the x-coordinate differences between sampled points of the transformed route and the centerline of the ego lane, weighted by their directional discrepancies. 
+
+b) Sensor Consistency Loss LS : Although visual odom-etry (e.g., [52]) and SLAM (e.g., [53]) aim for accurate local motion, we take a simpler approach. Standard motion sensors like yaw rate and speed, combined with a basic kinematic model, provide effective short-term constraints [54]. This lightweight strategy avoids the complexity of full visual odometry or SLAM pipelines. Let ptS denote the pose predicted using the kinematic model, the sensor consistency loss measures the difference between this predicted pose ptS and the optimization pose 
+
+ˆpt. To interpret the difference in a vehicle-centric manner, we transform the difference into longitudinal, lateral, and heading components. Therefore, the loss is defined as follows: 
+
+LS (ˆ pt, ˆpt−∆t, s t, ω t) = LS (ˆ pt, ptS , ˆpt−∆tθ )= wVS,x LS,V,x (ˆ pt, ptS , ˆpt−∆tθ )+wVS,y LS,V,y (ˆ pt, ptS , ˆpt−∆tθ )+wS,θ LS,θ (ˆ pt, ptS , ˆpt−∆tθ )
+
+(8) Here, LS,V,x , LS,V,y , and LS,θ denote the lateral, longitudinal, and heading losses, with weights wVS,x , wVS,y , and wS,θ . The subscript of LS,V,x — (V, x ) — indicates the x-direction in the V-BEV (lateral), and similarly for LS,V,y (longitudinal). These positional distances are derived from the corresponding M-BEV distances as follows: 
+
+LS,V,x (ˆ pt, ptS , ˆpt−∆tθ )= aLS,M,x (ˆ ptx, p tS,x ) − bLS,M,y (ˆ pty , p tS,y )
+
+LS,V,y (ˆ pt, ptS , ˆpt−∆tθ )= aLS,M,x (ˆ ptx, p tS,x ) + bLS,M,y (ˆ pty , p tS,y )
+
+(9) Here, we define a = cos(ˆ pt−∆tθ ) and b = sin(ˆ pt−∆tθ ). The quantities LS,M,x and LS,M,y represent distances in the M-BEV. Their subscripts indicate directions: (M, x ) for LS,M,x 
+
+(east) and (M, y ) for LS,M,y (north). The positional distances are defined as: 
+
+LS,M,x (ˆ ptx, p tS,x ) = ρH (ˆ ptx − ptS,x ),
+
+LS,M,y (ˆ pty , p tS,y ) = ρH (ˆ pty − ptS,y ) (10) Here, ˆptx and ˆpt−∆tx represent the x components of ˆpt and 
+
+ˆpt−∆t, respectively. Similar to lane-to-route alignment loss, we control the influence of errors in each direction using the Huber Loss ρH , maintaining the stability of the loss. We adopt a typical constant velocity and constant angular velocity motion model to predict ptS . This is briefly described as follows: 
+
+ptS,θ = ˆ pt−∆tθ + ωt∆t. 
+
+If ωt = 0 (
+
+ptS,y = ˆ pt−∆ty + stcos (ˆ pt−∆tθ )∆ t, ptS,x = ˆ pt−∆tx + stsin (ˆ pt−∆tθ )∆ t. 
+
+Otherwise, (
+
+ptS,y = ˆ pt−∆ty + st 
+
+> ωt
+
+(sin (ptS,θ ) − sin (ˆ pt−∆tθ )) ,ptS,x = ˆ pt−∆tx − st 
+
+> ωt
+
+(cos (ptS,θ − cos (ˆ pt−∆tθ )) .
+
+(11) 7
+
+Finally, for the heading distance – which is independent of the coordinate system orientation – we use the sine of the heading difference to express its magnitude: 
+
+LS,θ = sθ sin(ˆ ptθ − ptS,θ ) (12) The parameter sθ controls the influence of the heading differ-ence. 
+
+c) Temporal Smooth Loss LT : Temporal inconsistencies in lane line detection and noise in motion sensor data can cause instability in localization, making data smoothing necessary. However, we avoid applying smoothing directly to the lane lines, as their varying lengths across frames can lead to shape distortion. While polynomial fitting can mitigate this length in-consistency, it often results in a loss of detailed lane geometry. Therefore, we opt to smooth only the poses, which not only stabilizes localization but also effectively compensates for the motion sensor noise. Instead of directly averaging the current and previous poses — which can introduce localization lag — we adopt aconstant-jerk motion model to enforce temporal smoothness. This model allows the vehicle’s position, velocity, and ac-celeration to evolve while maintaining a smooth trajectory. Similar to the sensor consistency loss, we decompose the pose errors into longitudinal, lateral, and heading components. The temporal smoothness loss, LT , is thus defined as: 
+
+LT (ˆ pt, {ˆpt−k∆t}) = wVT,x LT,V,x (ˆ pt, {ˆpt−k∆t})+ wVT,y LT,V,y (ˆ pt, {ˆpt−k∆t})+ wT,θ LT,θ (ˆ pt, {ˆpt−k∆t})
+
+(13) Here, we set Np = 3 , meaning the jerk is computed using the current pose and the three preceding frames. The terms LT,V,x ,
+
+LT,V,y , and LT,θ represent the jerk in the lateral, longitudinal, and heading directions, respectively, each weighted by wVT,x ,
+
+wVT,y , and wT,θ . We then transform the jerk values from the East-North frame into longitudinal and lateral components relative to the vehicle frame, using the heading of ˆpt−∆t
+
+(denoted as ˆpt−∆tθ) as the reference. The transformation is defined as follows: 
+
+LT,V,x (ˆ pt, {ˆpt−k∆t})= aLJ,M,x (ˆ ptx, {ˆpt−k∆tx }) − bLJ,M,y (ˆ pty , {ˆpt−k∆ty }),
+
+LT,V,y (ˆ pt, {ˆpt−k∆t})= aLJ,M,x (ˆ ptx, {ˆpt−k∆tx }) + bLJ,M,y (ˆ pty , {ˆpt−k∆ty })
+
+(14) This equation is in a similar manner to Equation 9, where 
+
+a = cos(ˆ pt−∆tθ ) and b = sin(ˆ pt−∆tθ ). The jerk is typically computed as follows: 
+
+LJ,M,x (ˆ ptx, {ˆpt−k∆tx }) = ρH (ˆ ptx −3ˆ pt−∆tx +3ˆ pt−2∆ tx − ˆpt−3∆ tx )
+
+(15) 
+
+LJ,M,x denotes the jerk in the x direction (East) under the East-North coordinate system. Similarly, by using the y com-ponents of each pose, we compute the jerk in the y direction (North), denoted as LJ,M,y .The jerk in the heading direction can be computed directly using Equation 15, without the need for a coordinate transfor-mation. Similar to the approach used in the sensor consistency loss, we convert the angular value into a length unit and apply a scaling factor to control its influence: 
+
+LT,θ = sθ sin( LJ,θ ) (16) Here, the parameter sθ determines the contribution of the heading jerk to the overall loss. 
+
+B. Inference 
+
+Although the loss above can be minimized via brute-force pose search, this approach is either too costly or not precise enough. To avoid this trade-off, we adopt gradient descent-based method to find a locally optimal solution. This method is more efficient, but relies heavily on a good initial guess. The next section outlines our initialization strategy and optimization process. 
+
+a) Initialization: Intuitively, aligning the vehicle’s GPS with the navigation route reduces lateral localization errors along the route direction [55], but it cannot resolve the heading when the vehicle deviates from the road direction, such as during lane changes, turns, or curves. Accurate heading initial-ization is crucial as it provides the starting point for integrating yaw rate and speed from motion sensors. To ensure robustness, localization is activated only when the ego lane line is first detected; once initialized, the system can maintain stable localization even without lane lines. Before activation, raw GPS data gt is continuously matched to the closest segment of the navigation route to obtain the clipped route RM . When ego lane lines are detected, gt is projected onto the route, and the projected point with the segment direction defines an intermediate pose, which is then refined by minimizing the lane-to-route alignment loss LA.
+
+b) Optimization: After initialization, the temporal smoothness loss LT and sensor consistency loss LS are incorporated into the total loss L for subsequent frames. The vehicle pose at each frame is optimized by minimizing L,keeping the previous pose, navigation route, and lane lines fixed while updating only the current pose via gradient descent. The starting pose is initialized using the sensor-predicted pose 
+
+ptS , and separate learning rates are applied to position and heading: (ηp,A , η p,S ) for position and (ηθ,A , η θ,S ) for heading. Higher rates (ηp,A , η θ,A ) are used when ego lanes are detected, reflecting greater confidence in adjusting the global pose, while lower rates (ηp,S , η θ,S ) keep the pose closer to ptS when lanes are absent, preventing abrupt orientation changes. The optimization runs for a fixed number of iterations NG but terminates early if L falls below the threshold ϵ. Detailed parameter settings are provided in Section IV. 
+
+c) Post Process: To ensure that the driving route starts from the ego vehicle, we translate the optimized route RtV
+
+derived from the current pose ˆpt such that it is aligned with the vehicle’s forward direction. Specifically, we first compute the intersection of RtV with the line y = 0 , denoted as (δx, 0) .Then, an x-direction displacement ∆x = −δx is applied to the entire route, so that the intersection point is shifted to the origin (0 , 0) .8
+
+IV. E XPERIMENT RESULTS 
+
+A. Dataset 
+
+Our experiments use the NuScenes dataset, which contains 1000 scenes: 700 for training, 150 for validation, and 150 for testing. The dataset provides samples ( ≈ 2 Hz, keyframes) and sweeps ( ≈ 10 Hz, denser temporal coverage); we adopt sweeps for all experiments. We focus on ego poses, representing high-precision vehicle positions from GPS refined with IMU corrections, synchronized with each video frame. These ego poses are used to synthesize ground-truth routes for evaluation, simulate perturbed sensor inputs for our method, and derive navigation routes from OpenStreetMap. Details of how these data are generated are described below. 
+
+a) Ground Truth Route Synthesis: By collecting ego poses from future frames, we obtain the vehicle’s future trajec-tory starting from the current time step. Although the trajectory length varies with vehicle speed, our goal is to predict the driving route, which reflects the intended direction of motion; therefore, the route ground truth should remain unaffected by speed. For each scene, we construct a polyline connecting consecutive ego poses and, from each frame, sample points along the polyline at fixed spatial intervals (2 m) until a fixed distance ahead (60 m), or the farthest reachable point if shorter. This produces a route of consistent length for every frame, invariant to vehicle speed. At this stage, the route is represented in M-BEV and is then transformed to V-BEV using the ego pose. 
+
+b) Sensor Data Simulation: The proposed system uses GPS, yaw rate, and speed sensors. GPS is a global sensor with inherent noise, while yaw rate and speed are local sensors that exhibit long-term drift. We simulate them based on ego poses as follows:  
+
+> •
+
+GPS simulation: The previous frame’s ego pose serves as the current GPS reading to model a 0.1 s delay (10 Hz). Random offsets in East and North directions from [−10 , 10] m simulate localization noise.  
+
+> •
+
+Yaw rate simulation: Yaw rate is derived from the relative rotation between consecutive quaternions around the z-axis, divided by the frame interval. A small constant bias (0.01 rad/s) simulates long-term drift.  
+
+> •
+
+Speed simulation: True speed comes from the translation difference between consecutive ego poses divided by the frame interval. A constant bias (0.1 m/s) is added when moving, while speed remains zero when stationary. Cases where road slope variations are not captured by yaw rate or speed can cause inconsistencies with the vehicle trajectory (Figure 5). These account for 4% (7 of 150) of the validation set and are excluded from evaluation. 
+
+c) Navigation Route Crawling: We simulate navigation routes by retrieving road nodes from OpenStreetMap [19]. For each NuScenes scene, the first and last ego poses define the start and end points. Since NuScenes uses local ENU coordinates while OSM uses global GPS coordinates, we approximate the conversion for each collection area (Boston Seaport, Singapore-Onenorth, Singapore-Hollandvillage, and Singapore-Queenstown) using a reference origin. After con-verting the start and end points to GPS, the OSRM toolkit [20] 
+
+Fig. 5: Examples of cases with varied road slopes. 
+
+Fig. 6: Examples of scenes where OpenStreetMap fails to provide navigation routes. These include areas such as parking lots, hotel entrances, and locations not typically covered by standard maps, as well as scenes starting at intersections where small coordinate conversion errors can cause the planned route to deviate from the actual drivable road. performs route planning, and the resulting GPS waypoints are converted back to ENU coordinates. Using this pipeline, we re-trieved navigation routes for 124 out of 150 validation scenes, achieving approximately 83% coverage. Figure 6 shows scenes where route planning failed. 
+
+B. Experimental Setup 
+
+Table II summarizes the parameter settings of OLRA. In the following, we provide details on the training of the lane detection model, CondLaneNet , and the Openpilot model, OP-DeepDive .
+
+a) Condlanenet: We initially attempted to train Cond-LaneNet on NuScenes data by projecting HD map lane annota-tions onto the images, but the model recovered almost no lanes on the validation set due to limited coverage, missing double yellow lines, and frequent misalignments (Figure 7). Instead, CondLaneNet trained on the CULane dataset still performs reasonably well on NuScenes images, except under adverse weather, at night, or on curved roads. Therefore, we adopt this model for our experiments and analyze how lane detection accuracy affects overall performance. Training settings are as follows: downscaling ratios for mask and heatmap are 4 and 16, images are resized to 800 × 320 with a cropping box of 
+
+[0 , 270 , 1640 , 590] , and the model is trained for 16 epochs. 
+
+C. Metrics 
+
+The reference paper [29] proposes four metrics for trajectory evaluation. Since our focus is route accuracy rather than 9
+
+Fig. 7: NuScene map lane line projection results. The projected lanes cover only a small portion of the actual lane areas in the images, especially near the camera. Some projections are also misaligned with the true lane positions. Based on the sensor data provided by NuScene, we did not find information that could correct these inconsistencies.                                       
+
+> Symbol Value Meaning
+> wA0.1 Weight of the alignment loss.
+> d2Sampling interval for alignment loss.
+> NA16 Number of sampling points for alignment loss.
+> θϵ5π
+> 180 Tolerance for heading difference in alignment.
+> sθ7Scale on heading difference for sensor consistency and temporal smoothness losses.
+> wS1Weight of the sensor consistency loss.
+> wVS,x 1Weight of the lateral component of sensor consistency loss.
+> wVS,y 1Weight of the longitudinal component of sensor consistency loss.
+> wS,θ 1Weight of the heading component of sensor consistency loss.
+> wT1Weight of the temporal smoothness loss.
+> wVT ,x 1Weight of the lateral component of temporal smoothness loss.
+> wVT ,y 1Weight of the longitudinal component of temporal smoothness loss.
+> wT ,θ 1Weight of the heading component of temporal smoothness loss.
+> (ηp,A , η p,S )(0.2, 0.001) Learning rates for position optimization.
+> (ηθ,A , η θ,S )(0.007, 0.0001) Learning rates for heading optimization.
+> NG40 Maximum number of pose update iterations.
+> ϵ0.3 Loss threshold for optimization.
+
+TABLE II: Parameter setting for OLRA. driving comfort, we retain only two: hit rate (corresponding to what the OpenPilot paper calls average precision) and Euclidean error. Both metrics require a definition of point correspondence between the predicted and ground-truth routes. In trajectory tasks, correspondence is usually based on times-tamps, but this does not apply to route tasks where indices are not tied to time. Instead, we define correspondence by traveled distance: two points correspond if they lie at the same distance along their routes. When the predicted route matches the ground truth in shape and position, corresponding points are close; if the routes differ, errors grow with distance. All routes are standardized to start from y = 0 in the V-
+
+Fig. 8: Illustration of the proposed point cor-respondence. The ground-truth route (red) and the predicted route (blue) are uniformly sam-pled at 2 m intervals, with gray lines indicating the correspondences between sample points. If the ground-truth route is longer than the predicted route, the additional ground-truth sample points are paired with the last point of the predicted route to impose a penalty. BEV coordinate system, corresponding to the vehicle’s front. Figure 8 illustrates this definition. We provide tools for simulating both the ground-truth and input data, as well as for evaluating driving routes; detailed information can be found in the technical reports [56], [57]. 
+
+D. OLRA V.S. OpenPilot a) OP-DeepDive Training: The OP-DeepDive model supports multi-modal outputs, enabling it to predict multiple possible driving trajectories simultaneously. Its weights are updated using the Multiple Trajectory Prediction (MTP) Loss, as introduced in the Comma.ai blog. The MTP Loss combines a classification loss, scaled by a weighting factor, with a regression loss. In our experiments, OP-DeepDive is trained on driving routes converted from NuScenes vehicle trajectories (see Section IV-A). The model is trained for 1,000 epochs with a classification loss weight of 1. During inference, the route with the highest confidence is selected as the final prediction. 
+
+b) Quantitative Comparison: After training the OP-DeepDive model, we compared our proposed method (using direction weighting for alignment) with OP-DeepDive on the NuScene-defined validation set. The evaluation metric is hit rate@x (higher is better), which measures whether the predicted driving route falls within a distance threshold from the ground-truth route. We consider three levels of strictness: strict (0.5 m), moderate (1.0 m), and lenient (2.0 m). Within the 0 – 40 m range, OLRA achieves hit rate@0.5 = 0.53, hit rate@1.0 = 0.70, and hit rate@2.0 = 0.84; in contrast, OP-DeepDive yields hit rate@0.5 = 0.64, hit rate@1.0 = 0.72, and hit rate@2.0 = 0.80. Although OP-DeepDive shows higher hit rates at the strict and moderate levels, a closer look at different distance intervals reveals that its advantage comes mainly from the near range. Beyond 10 m, OLRA’s performance gradually matches and even surpasses that of OP-DeepDive. Figure 9 illustrates these interval-wise differences. In addition to hit rate, we also evaluate Euclidean Error (lower is better). Across the 0 – 40 m range, OLRA achieves an average Euclidean Error of 1.06, compared to 1.89 for OP-DeepDive, indicating smaller overall deviations. Figure 9 further shows the results in the 20 – 40 m range, where OP-DeepDive’s error increases sharply, while OLRA remains relatively stable, demonstrating its robustness in long-range predictions. We attribute OP-DeepDive’s near-range advantage to the validation set, where most short-range routes are straight segments, favoring its design, whereas at longer distances the presence of intersections and more complex maneuvers 10 0-10 10-20 20-30 30-40  
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 pilot
+> olra_osm
+
+(a) Hit rate@0.5. 0-10 10-20 20-30 30-40   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 pilot
+> olra_osm
+
+(b) Hit rate@1.0. 0-10 10-20 20-30 30-40   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0 pilot
+> olra_osm
+
+(c) Hit rate@2.0. 0-10 10-20 20-30 30-40   
+
+> 0.2
+> 1.5
+> 2.7
+> 4.0
+> 5.2
+> 6.5 pilot
+> olra_osm
+
+(d) Euclidean error. 
+
+Fig. 9: Hit rate and Euclidean error comparison with Open-Pilot. (a–c) OLRA achieves higher hit rates than OpenPilot at longer distances (20–40 m). (d) In terms of Euclidean error, OLRA also shows significantly better performance in the far range. 
+
+OP-DeepDive (GPU) Condlanenet (GPU) OLRA (CPU) 4ms 6ms 9ms 
+
+TABLE III: Runtime Comparison provides scenarios where OLRA demonstrates its strength. This phenomenon will be further discussed in later examples. 
+
+c) Qualitative Comparison: Figure 10 shows examples where OLRA outperforms OP-DeepDive. The OP-DeepDive model often fails to predict non-straight routes, such as lane changes, curved roads, occlusions, and left or right turns at intersections. In these cases, OLRA leverages the inherent directionality of the route: by aligning the route with the lane structure, it can accurately indicate the intended driv-ing direction. In contrast, OP-DeepDive struggles when the lane orientation differs from the camera view, when multiple possible directions exist, or when occlusions occur. Moreover, OP-DeepDive frequently produces paths that are too short and fails to maintain consistent route lengths. Figure 11 illustrates scenarios where OP-DeepDive outper-forms OLRA. OLRA performs poorly when lane markings are missing for long stretches, lanes are unusually wide, or lanes have irregular shapes, causing drift or misaligned heading. In contrast, OP-DeepDive predicts routes starting from the vehicle’s front, making it less sensitive to inaccuracies in the lane centerline. Figure 12 presents scenarios where OLRA outperforms OP-DeepDive but still exhibits certain limitations. When the GPS initialization introduces a longitudinal error and the subsequent lane lines remain straight, this offset persists until the vehicle makes a turn and then returns to straight driving, at which point the error is gradually corrected. Moreover, when the vehicle steers within a straight lane, the resulting path variations are not captured by the navigation route. While such steering cases (Figure 12(c–d)) are generally unimportant for driving route guidance, they become more critical in the context of trajectory prediction. 
+
+d) Runtime Comparison: Table III compares the runtime of OLRA and OP-DeepDive on a machine with an Intel i9-14900 CPU and an RTX 4090 GPU. OP-DeepDive is very fast, averaging 4 ms, while OLRA takes about 15 ms, including CondLaneNet lane detection and pose optimization on the CPU. The longer runtime is due to the higher complexity of CondLaneNet and the additional iterations required for lane-route alignment loss convergence.                            
+
+> Hit rate @0.5 ↑Hit rate @1.0 ↑Hit rate @2.0 ↑Euclidean error ↓
+> OLRA w NuScene Route 0.58 0.74 0.86 0.94 OLRA 0.53 0.70 0.84 1.05 OLRA wo Direction 0.54 0.70 0.85 1.08 Sensor Only 0.10 0.21 0.39 4.73 Raw GPS 0.05 0.09 0.19 5.78
+
+TABLE IV: Hit rates and euclidean errors in the ablation study. 
+
+E. Ablation Study 
+
+We conducted an ablation study to analyze the contributions of different components in our method. First, we compare using the OSM-edited route versus the NuScenes ground-truth route as the reference, testing whether a more realistic reference helps generate routes closer to the true driving routes even when the input GPS is noisy. Next, we evaluate two types of alignment loss — dynamic direction weighting and uniform weighting — to assess the effect of weighting strategy on route quality. Finally, we remove the alignment loss entirely, relying only on yaw rate and speed, to quantify its overall impact. 
+
+a) Quantitative Comparison: Table IV summarizes the ablation study results. Generating driving routes solely from raw GPS yields a Euclidean error of approximately 5.78 m, consistent with the ±10 -meter random perturbations applied to the ground-truth GPS, and the hit rate is only 19% at the loose level. Incorporating sensor-based corrections reduces the error by about 1 m and significantly improves hit rates, but the error remains larger than a single lane width. Introducing lane and route alignment further boosts performance: hit rates exceed 50% at the strict level and 80% at the loose level, while the Euclidean error drops to around 1 m, less than half a typical lane width. The difference between dynamic direction weighting and uniform weighting is minor; dynamic weighting slightly lowers the Euclidean error but also slightly decreases hit rates. This is likely because there are few examples in the validation set that benefit from dynamic weighting, and the gradient of dynamic weighting is less stable, which may slow convergence. Finally, replacing the navigation route edited from OSM with a ground-truth NuScenes route brings only marginal improvement, suggesting that alignment discrepan-cies still affect route quality, though our route editing strategy partially mitigates this issue. Figure 13 further illustrates the distribution trends of Hit Rate and Euclidean Error across different distance ranges. Starting from the baseline using only raw GPS data, we ob-serve consistent performance improvements across all distance intervals as more constraints are gradually introduced. Notably, the performance curves of OLRA with and without direction weighting are almost identical. 
+
+b) Qualitative Comparison: Figure 14 illustrates sce-narios where the results from using either the OSM route or the NuScene route are nearly identical. In these cases– particularly when driving straight – the routes are inherently similar, leading to an optimized vehicle pose that remains close between the two. However, when encountering lane changes or intersections with greater depth, the OSM route and the NuScene route differ significantly. In such cases, these discrepancies lead to variations in localization, which in turn reduce the effectiveness of the driving route, as illustrated in Figure 15. 11 
+
+(a) Driving straight at night. (b) Straight as road bends right. (c) Straight as road bends left. (d) Approaching a road bends left. 
+
+(e) Straight through a cross. (f) Straight through right-bending cross. (g) Right turn at a T-junction. (h) Straight through left-bending cross. 
+
+(i) Straight at a Y-junction. (j) Left turn at a cross. (k) Occlusion ahead. (l) Lane switching. 
+
+Fig. 10: Examples where OLRA outperforms OP-DeepDive. Red: Ground Truth; Green: OLRA; Blue: OP-DeepDive. (a) OLRA maintains stable route length when driving straight at night, avoiding under-prediction. (b–d) OLRA better adapts to distant curves while driving straight. (e–j) OLRA correctly predicts the exit at intersections, while OP-DeepDive tends to predict straight. (k) OLRA handles lane changes even when camera view and lane orientation differ. (l) OLRA predicts turning direction despite occlusion. 
+
+(a) Overly wide ego lane (b) Right-side parking (c) Jagged lane marking 
+
+Fig. 11: Scenarios where OP-DeepDive outperforms OLRA. (a) An overly wide ego lane causes a mismatch between the lane centerline and the driving path. (b) The absence of a right edge line, often due to roadside parking, leads to lateral deviation. (c) A jagged lane marking introduces errors between the estimated centerline and the actual driving path. 
+
+(a) Longitudinal misalignment at right turning. 
+
+(b) Longitudinal misalignment at left turning. 
+
+(c) Lane change. (d) Steering around a vehicle. 
+
+Fig. 12: Limitations of OLRA. (a) Longitudinal mis-alignment of the predicted route. (b) Slightly curved routes appear exaggerated in the camera view. (c–d) Lane changes or evasive steering create inconsistent cross-lane routes. 0-10 10-20 20-30 30-40 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Hit rate
+> olra
+> olra_osm
+> olra_wo_dir
+> sensor
+> raw
+
+(a) Hit rate@0.5. 0-10 10-20 20-30 30-40  
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Hit rate
+> olra
+> olra_osm
+> olra_wo_dir
+> sensor
+> raw
+
+(b) Hit rate@1.0. 0-10 10-20 20-30 30-40  
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Hit rate  olra
+> olra_osm
+> olra_wo_dir
+> sensor
+> raw
+
+(c) Hit rate@2.0. 0-10 10-20 20-30 30-40  
+
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> Euclidean error (m)
+> olra
+> olra_osm
+> olra_wo_dir
+> sensor
+> raw
+
+(d) Euclidean error. 
+
+Fig. 13: Hit rate and Euclidean error comparison across different ranges in the ablation study. 
+
+(a) Straight driving. (b) Straight through an intersection. 
+
+(c) Straight driving at night. (d) Left turn. 
+
+Fig. 14: Scenarios where performance is similar when us-ing OSM-based route or NuScene-based route. Red: Ground Truth; Gray: Raw GPS result; Green: OLRA result; Light blue: OLRA result using NuScene-based Route. Top-right: M-BEV – localization results under different settings. Bottom-right: V-BEV – driving routes under different settings. 
+
+(a) Left lane change. (b) Right lane change. 
+
+(c) Left turn at intersection. (d) Right turn at intersection. 
+
+Fig. 15: Scenarios where performance degrades when using OSM-based routes. 12 
+
+(a) Driving straight. (b) On a road bending left. (c) Left turn. 
+
+Fig. 16: Scenarios where direction weighting and uniform weighting perform similarly. Light green: uniform weighting. 
+
+(a) Right turn at an intersection. (b) Left turn across an intersection. 
+
+Fig. 17: (a) Direction weighting outperforms uniform weight-ing. (b) Uniform weighting outperforms direction weighting. Figure 16 presents scenarios where direction weighting and uniform weighting yield nearly identical outcomes. In these cases, since there is no mismatch between curved routes and straight lane lines, both methods converge to similar vehicle poses. In contrast, Figure 17 highlights situations where the two methods diverge. In (a), direction weighting helps prevent misalignment and achieves better localization. However, in (b), when the route direction from the previous pose already deviates substantially from the lane line, direction weighting overly truncates the loss, leading to slower convergence and inferior results compared to uniform weighting. Figure 18 compares OLRA with the sensor-only baseline. As expected, vehicle poses estimated by sensor-only drift over long-term driving, often causing the route to point toward an incorrect fork or even the opposite lane. With lane-to-route alignment, the heading remains more stable and is corrected back to the ego lane. However, in Figure 18(f), OLRA performs worse: at the middle of the intersection, the route direction deviates significantly from the straight lane lines, which misleads the heading estimation. 
+
+F. Correlation Analysis with Lane Lines 
+
+Figure 19 illustrates the relationship between the proportion of frames in each validation scene where the ego-lane line is successfully detected and the distribution of OLRA Euclidean error. As expected, a lower lane detection rate leads to a 
+
+(a) Driving Straight. (b) Straight through. (c) Left-bending road. 
+
+(d) Straight at fork. (e) Left turn. (f) Right turn. 
+
+Fig. 18: (a–e) OLRA generally outperforms sensor-only. (f) OLRA performs worse. Yellow: results using sensor data solely. 0.0 0.2 0.4 0.6 0.8 1.0 
+
+> Ego-lane ratio
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> Mean Euclidean error (m)
+> cases
+> linear fit
+
+Fig. 19: Relationship be-tween OLRA Euclidean er-ror and lane detection rate. higher Euclidean error. This observation is consistent with the qualitative examples presented earlier, where the absence of lane line detections results in noticeable deviations in the generated driving route. V. C ONCLUSION 
+
+In this work, we propose OLRA, a low-cost map-localization-based driving route generation method. Compared to direct approaches such as Openpilot, OLRA demonstrates superior performance in non-straight driving scenarios, high-lighting its effectiveness in handling more complex driving maneuvers. While OLRA demonstrates promising results, several di-rections remain for future work. The first limitation is its reliance on lane detection results, as the model cannot be fine-tuned; we plan to enable self-supervised updates based on the navigation route via backpropagation with the proposed losses. Longitudinal localization refinement is also challenging and may be improved by predicting lane lines with intersection-range information for better route alignment. Beyond these challenges, OLRA could be extended by adding a lightweight localization model that takes both the navigation route and lane lines as inputs to improve stability and prediction. In addition, trajectory prediction based on the generated route could simplify the task for a small model, while incorporating additional context to capture fine-grained steering behaviors. Finally, to compare fairly, we plan to add motion sen-sors and navigation routes to OP-DeepDive and evaluate it against OLRA. Comma.ai claims to use OpenStreetMap for intersections [58], but which map data best aids route generation remains unclear, and we have not yet seen a public implementation. 
+
+A. Acknowledgments 
+
+This work was partially supported by the National Science Council (NSC), Taiwan, under Grant NSC 113-2222-E-305-001-REFERENCES [1] Admin, “How to use augmented reality in the latest 2025 mercedes-benz eqb,” 2025. [Online]. Available: https://www.mbscottsdale.com/blog/ how-to-use-route-guidance-with-augmented-reality/ [2] Phiar, “Ai-powered ar navigation for driving,” 2020. [Online]. Available: https://www.youtube.com/watch?v=0m-eA1vVIZ4 [3] ResearchInChina, “Automotive head-up display (hud) industry report,” 2023. [Online]. Available: http://www.researchinchina.com/ Htmls/Report/2023/72915.html [4] Z. Tao, P. Bonnifait, V. Fr´ emont, and J. Iba˜ nez-Guzman, “Mapping and localization using gps, lane markings and proprioceptive sensors,” in 2013 IEEE/RSJ International Conference on Intelligent Robots and Systems , 2013, pp. 406–412. 13 
+
+[5] M. Schreiber, C. Kn¨ oppel, and U. Franke, “Laneloc: Lane marking based localization using highly accurate maps,” in 2013 IEEE Intelligent Vehicles Symposium (IV) , 2013, pp. 449–454. [6] G. Cao, F. Damerow, B. Flade, M. Helmling, and J. Eggert, “Camera to map alignment for accurate low-cost lane-level scene interpretation,” in 
+
+2016 IEEE 19th International Conference on Intelligent Transportation Systems (ITSC) . IEEE, 2016, pp. 498–504. [7] B. Flade, M. Nieto, G. Velez, and J. Eggert, “Lane detection based camera to map alignment using open-source map data,” in 2018 21st International Conference on Intelligent Transportation Systems (ITSC) .IEEE, 2018, pp. 890–897. [8] P.-E. Sarlin, D. DeTone, T.-Y. Yang, A. Avetisyan, J. Straub, T. Mal-isiewicz, S. R. Bulo, R. Newcombe, P. Kontschieder, and V. Balntas, “Orienternet: Visual localization in 2d public maps with neural match-ing,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 21 632–21 642. [9] T. Wang, J. Li, and C. Sun, “Dehi: A decoupled hierarchical architecture for unaligned ground-to-aerial geo-localization,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 3, pp. 1927– 1940, 2023. [10] S. Li, M. Hu, X. Xiao, and Z. Tu, “Patch similarity self-knowledge dis-tillation for cross-view geo-localization,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 6, pp. 5091–5103, 2023. [11] B. Kim, C. M. Kang, J. Kim, S. H. Lee, C. C. Chung, and J. W. Choi, “Probabilistic vehicle trajectory prediction over occupancy grid map via recurrent neural network,” in 2017 IEEE 20Th international conference on intelligent transportation systems (ITSC) . IEEE, 2017, pp. 399–404. [12] N. Lee, W. Choi, P. Vernaza, C. B. Choy, P. H. Torr, and M. Chandraker, “Desire: Distant future prediction in dynamic scenes with interacting agents,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2017, pp. 336–345. [13] H. Cui, V. Radosavljevic, F.-C. Chou, T.-H. Lin, T. Nguyen, T.-K. Huang, J. Schneider, and N. Djuric, “Multimodal trajectory predictions for autonomous driving using deep convolutional networks,” in 2019 international conference on robotics and automation (icra) . IEEE, 2019, pp. 2090–2096. [14] K. Chitta, A. Prakash, B. Jaeger, Z. Yu, K. Renz, and A. Geiger, “Transfuser: Imitation with transformer-based sensor fusion for au-tonomous driving,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 11, pp. 12 878–12 895, 2022. [15] Y. Zhang, Z. Zhu, W. Zheng, J. Huang, G. Huang, J. Zhou, and J. Lu, “Beverse: Unified perception and prediction in birds-eye-view for vision-centric autonomous driving,” arXiv preprint arXiv:2205.09743 , 2022. [16] Y. Hu, J. Yang, L. Chen, K. Li, C. Sima, X. Zhu, S. Chai, S. Du, T. Lin, W. Wang, L. Lu, X. Jia, Q. Liu, J. Dai, Y. Qiao, and H. Li, “Planning-oriented autonomous driving,” in Proceedings of the IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition , 2023. [17] comma.ai, “openpilot,” https://github.com/commaai/openpilot. [18] TomTom, “Tomtom map,” https://www.tomtom.com/. [19] Fastly and OSMF, “Open street map,” https://www.openstreetmap.org/. [20] OSRM, “Open source route machine,” https://project-osrm.org/. [21] L. Liu, X. Chen, S. Zhu, and P. Tan, “Condlanenet: a top-to-down lane detection framework based on conditional convolution,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 3773–3782. [22] S. Huang, Z. Shen, Z. Huang, Y. Liao, J. Han, N. Wang, and S. Liu, “Anchor3dlane++: 3d lane detection via sample-adaptive sparse 3d anchor regression,” IEEE Transactions on Pattern Analysis and Machine Intelligence , 2024. [23] L. Zhao, W. Zheng, Y. Zhang, J. Zhou, and J. Lu, “Structlane: Leverag-ing structural relations for lane detection,” IEEE Transactions on Image Processing , vol. 33, pp. 3692–3706, 2024. [24] K. Zhou, L. Li, W. Zhou, Y. Wang, H. Feng, and H. Li, “Lanetca: Enhancing video lane detection with temporal context aggregation,” 
+
+IEEE Transactions on Circuits and Systems for Video Technology , 2025. [25] H.-S. Lin and P.-W. Shen, “Vehicle localization combining vehicle body signals, lane markings, and map navigation information,” Chinese patent application, 2025, patent pending, Application No. 114133270. [26] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Krishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuscenes: Amultimodal dataset for autonomous driving,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2020, pp. 11 621–11 631. [27] S. Nedevschi, V. Popescu, R. Danescu, T. Marita, and F. Oniga, “Accu-rate ego-vehicle global localization at intersections through alignment of visual data with digital map,” IEEE transactions on intelligent transportation systems , vol. 14, no. 2, pp. 673–687, 2012. [28] S. Casas, A. Sadat, and R. Urtasun, “Mp3: A unified model to map, perceive, predict and plan,” in 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) . IEEE Computer Society, 2021, pp. 14 398–14 407. [29] L. Chen, T. Tang, Z. Cai, Y. Li, P. Wu, H. Li, J. Shi, J. Yan, and Y. Qiao, “Level 2 autonomous driving on a single device: Diving into the devils of openpilot,” 2022. [30] Z. Zhang, “A flexible new technique for camera calibration,” IEEE Transactions on pattern analysis and machine intelligence , vol. 22, no. 11, pp. 1330–1334, 2002. [31] J. Ziegler, P. Bender, M. Schreiber, H. Lategahn, T. Strauss, C. Stiller, T. Dang, U. Franke, N. Appenrodt, C. G. Keller et al. , “Making bertha drive—an autonomous journey on a historic route,” IEEE Intelligent transportation systems magazine , vol. 6, no. 2, pp. 8–20, 2014. [32] T. Wang, Z. Zheng, C. Yan, J. Zhang, Y. Sun, B. Zheng, and Y. Yang, “Each part matters: Local patterns facilitate cross-view geo-localization,” 
+
+IEEE Transactions on Circuits and Systems for Video Technology ,vol. 32, no. 2, pp. 867–879, 2021. [33] X. Tian, J. Shao, D. Ouyang, and H. T. Shen, “Uav-satellite view syn-thesis for cross-view geo-localization,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 32, no. 7, pp. 4804–4815, 2021. [34] P. Xia, Y. Wan, Z. Zheng, Y. Zhang, and J. Deng, “Enhancing cross-view geo-localization with domain alignment and scene consistency,” IEEE Transactions on Circuits and Systems for Video Technology , 2024. [35] T. Shen, Y. Wei, L. Kang, S. Wan, and Y.-H. Yang, “Mccg: A convnext-based multiple-classifier method for cross-view geo-localization,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 3, pp. 1456–1468, 2023. [36] W. Zeng, W. Luo, S. Suo, A. Sadat, B. Yang, S. Casas, and R. Urtasun, “End-to-end interpretable neural motion planner,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2019, pp. 8660–8669. [37] K. Chitta, A. Prakash, and A. Geiger, “Neat: Neural attention fields for end-to-end autonomous driving,” in International Conference on Computer Vision (ICCV) , 2021. [38] A. Prakash, K. Chitta, and A. Geiger, “Multi-modal fusion transformer for end-to-end autonomous driving,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 7077– 7087. [39] N. Nayakanti, R. Al-Rfou, A. Zhou, K. Goel, K. S. Refaat, and B. Sapp, “Wayformer: Motion forecasting via simple & efficient at-tention networks,” in 2023 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2023, pp. 2980–2987. [40] A. Sadat, S. Casas, M. Ren, X. Wu, P. Dhawan, and R. Urtasun, “Perceive, predict, and plan: Safe motion planning through interpretable semantic representations,” in Computer Vision–ECCV 2020: 16th Euro-pean Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part XXIII 16 . Springer, 2020, pp. 414–430. [41] S. Hu, L. Chen, P. Wu, H. Li, J. Yan, and D. Tao, “St-p3: End-to-end vision-based autonomous driving via spatial-temporal feature learning,” in European Conference on Computer Vision . Springer, 2022, pp. 533– 549. [42] W. Zheng, R. Song, X. Guo, C. Zhang, and L. Chen, “Genad: Generative end-to-end autonomous driving,” in European Conference on Computer Vision . Springer, 2024, pp. 87–104. [43] Z. Guo, K. Gubernatorov, S. Asfaw, Z. Yagudin, and D. Tsetserukou, “Vdt-auto: End-to-end autonomous driving with vlm-guided diffusion transformers,” arXiv preprint arXiv:2502.20108 , 2025. [44] Y. U. Yim and S.-Y. Oh, “Three-feature based automatic lane detec-tion algorithm (tfalda) for autonomous driving,” IEEE Transactions on Intelligent Transportation Systems , vol. 4, no. 4, pp. 219–225, 2003. [45] C.-B. Wu, L.-H. Wang, and K.-C. Wang, “Ultra-low complexity block-based lane detection and departure warning system,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 29, no. 2, pp. 582– 593, 2018. [46] W. V. Gansbeke, B. D. Brabandere, D. Neven, M. Proesmans, and L. V. Gool, “End-to-end lane detection through differentiable least-squares fitting,” in 2019 IEEE/CVF International Conference on Computer Vision Workshop (ICCVW) , 2019, pp. 905–913. [47] L. Tabelini, R. Berriel, T. M. Paixao, C. Badue, A. F. De Souza, and T. Oliveira-Santos, “Keep your eyes on the lane: Real-time attention-guided lane detection,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , June 2021, pp. 294–302. [48] D. Jin, W. Park, S.-G. Jeong, H. Kwon, and C.-S. Kim, “Eigenlanes: Data-driven lane descriptors for structurally diverse lanes,” in Pro-14 
+
+ceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 17 163–17 171. [49] Q. Li, X. Yu, J. Chen, B.-G. He, W. Wang, D. B. Rawat, and Z. Lyu, “Pga-net: Polynomial global attention network with mean curvature loss for lane detection,” IEEE Transactions on Intelligent Transportation Systems , 2023. [50] Y. Wu, L. Zhao, J. Lu, and H. Yan, “Dense hybrid proposal modulation for lane detection,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 33, no. 11, pp. 6845–6859, 2023. [51] K. He, J. Xie, X. Dai, K. Chang, F. Chen, and Z. Wang, “Stadet: Streaming timing-aware video lane detection,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 9, pp. 8644– 8656, 2024. [52] F. Fu, J. Yang, J. Ma, and J. Zhang, “Self-supervised visual odometry based on scene appearance-structure incremental fusion,” IEEE Trans-actions on Intelligent Transportation Systems , 2025. [53] R. Mur-Artal and J. D. Tard´ os, “ORB-SLAM2: an open-source SLAM system for monocular, stereo and RGB-D cameras,” IEEE Transactions on Robotics , vol. 33, no. 5, pp. 1255–1262, 2017. [54] S. Lef` evre, D. Vasquez, and C. Laugier, “A survey on motion prediction and risk assessment for intelligent vehicles,” ROBOMECH journal ,vol. 1, pp. 1–14, 2014. [55] D. Andersson and J. Fjellstr¨ om, “Vehicle positioning with map matching using integration of a dead reckoning system and gps,” 2004. [56] W.-H. Chen, J. H. Chen, P.-Y. Chen, L.-C. Chen, Y. C. Lee, Y. L. Tzeng, and H.-S. Lin, “Nuscenes data alignment by sequence,” Technical Re-port, Technical Report, 2025, https://github.com/hongshianglin/nuscene seg. [57] J.-H. Chen, Y.-L. Tzeng, and H.-S. Lin, “Evaluation tool for driving route,” Technical Report, Technical Report, 2025, https://github.com/ hongshianglin/drive route eval. [58] comma.ai, “openpilot 0.94,” https://blog.comma.ai/094release/. 
+
+Hong-Shiang Lin received the B.S. and M.S. de-grees in Electrical Engineering and a Ph.D. degree in Computer Science from National Taiwan University, Taiwan, in 2009, 2011 and 2018, respectively. From 2015 to 2020, he was with Toppano, a startup company, leading the development of multimedia applications, with an emphasis on 3D vision tech-nologies. From 2020 to 2024, he was with Mobile Drive Co., Ltd., leading in 3D vision system de-velopment. He is currently an Assistant Professor in the Department of Computer Science, National Taipei University, Taiwan. His research interests include multiview geometry, autonomous driving, and augmented reality. 
+
+Jung-Hsin Chen received the B.S. degree in Com-puter Science from Feng Chia University, Taichung, Taiwan, in 2024. He is currently pursuing the M.S. degree in Computer Science from National Taipei University. 
+
+Yu-Luen Tzeng received the B.S. degree in Com-puter Science from Tam Kang University, Taipei, Taiwan, in 2024. He is currently pursuing the M.S. degree in Computer Science from National Taipei University. 
+
+Wei-Hao Chen was enrolled in the Computer Sci-ence program at National Taipei University. 
+
+Yi Chen Lee is currently pursuing the B.S. degree in Computer Science from National Taipei University. 
+
+Li Jhe Chen is currently pursuing the B.S. degree in Computer Science from National Taipei University. 
+
+Peng Yuan Chen is currently pursuing the B.S. degree in Computer Science from National Taipei University.
