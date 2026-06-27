@@ -1,0 +1,196 @@
+Title: GeoIMO: Geometry-Driven Independent Motion Classification for Event Cameras
+
+URL Source: https://arxiv.org/pdf/2606.24499v1
+
+Published Time: Wed, 24 Jun 2026 01:05:36 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# GeoIMO: Geometry-Driven Independent Motion Classification for Event Cameras 
+
+Anil Bayram Gogebakan 1, Filippo Marostica 1, Alessio Caviglia 1, Alessandro Savino 1, and Stefano Di Carlo 1
+
+Politecnico di Torino, Turin, Italy 
+
+{anil.gogebakan, filippo.marostica, alessio.caviglia, alessandro.savino, stefano.dicarlo}@polito.it 
+
+Abstract. Existing automotive event datasets rely on appearance-based annotations from frame pipelines, making them poorly suited for motion-aware event perception. We present a geometry-driven, annotation-free framework that classifies detected objects as static or independently mov-ing by exploiting ego-motion structure directly from the event stream. A Focus of Expansion model with yaw compensation estimates global back-ground motion, while objects are labeled as moving when local motion deviates from this prediction, as quantified by a scale-invariant residual. Temporal stabilization improves robustness across consecutive event win-dows. The method requires no learning, no manual motion labels, and works with any input bounding boxes. Experiments on MVSEC and the Prophesee 1 Megapixel Automotive Detection dataset demonstrate consistent performance across diverse driving scenarios, with yaw com-pensation improving results during turns and a simple translational local model offering a favorable accuracy-efficiency trade-off. 1
+
+Keywords: Event camera · Automotive perception · Independent mo-tion detection. 
+
+# 1 Introduction 
+
+Autonomous driving systems in complex, dynamic environments must reliably separate stationary scene elements, ego-motion, and Independently Moving Ob-jects (IMOs). This is essential for safety-critical tasks such as collision avoid-ance, trajectory prediction, and motion planning [12]. Traditional vision-based systems are limited by appearance-based object detection, which treats parked vehicles and moving traffic alike. In safety-critical settings, this motion-agnostic approach can cause overly conservative behavior or fail to prioritize dynamic threats. Overcoming this limitation requires perception systems that capture motion at high temporal resolution. Event cameras meet this need by replacing frame-based capture with asyn-chronous, pixel-level event generation [2, 5], offering microsecond temporal res-olution, inherent motion sensitivity, low latency, and robustness to motion blur  
+
+> 1
+
+The code is publicly available at https://github.com/smilies-polito/GeoIMO.  
+
+> arXiv:2606.24499v1 [cs.CV] 23 Jun 2026 2A. B. Gogebakan et al.
+
+and high dynamic range scenes. However, their adoption remains limited by the need for specialized algorithms and data representations, immature processing pipelines, and the scarcity of large-scale annotated datasets for event-based per-ception [1, 2]. A key obstacle is that existing automotive datasets lack bounding boxes reflecting object motion state: most annotations derive from RGB pipelines and treat static and moving objects alike [9, 13]. This appearance-based labeling creates a modality mismatch that limits the ability to distinguish IMOs from static scene elements, and makes such datasets unsuitable as ground truth for methods that exploit the motion sensitivity of event cameras. Existing approaches to motion understanding in event streams suffer from significant limitations. Supervised methods require costly per-object manual an-notation of motion state. Dense optical flow estimation is computationally expen-sive, sensitive to noise in sparse event data, and requires additional ego-motion compensation before object motion can be isolated [10]. Tracking-based meth-ods depend on temporal association and are fragile in the presence of occlusions, clutter, and abrupt motion changes. Critically, none of these approaches exploit the geometric structure of ego-motion already latent in the event stream in a lightweight, annotation-free manner. This work proposes a geometry-driven motion-based filtering framework that leverages parametric ego-motion models to classify detected objects as static or independently moving. The core insight is that vehicle ego-motion induces a glob-ally consistent, predictable motion pattern across the event stream. By estimat-ing this global pattern and comparing it with the local motion observed within detected object regions, objects that deviate from expected ego-motion can be identified as independently moving. The framework uses the Focus of Expan-sion (FOE) [6], a compact geometric representation of translational ego-motion derived from optical flow, to characterize background motion without requiring dense flow computation. Motion consistency of events within each bounding box is then assessed relative to the estimated FOE, enabling classification of IMOs without any learned components or manual motion annotation. Importantly, the framework operates on any set of bounding boxes, whether provided by an ex-isting dataset or generated on the fly by applying an off-the-shelf frame-based detector to co-recorded imagery, and produces motion-consistent labels suitable for training and evaluating event-based perception systems. This approach bridges the gap between frame-based annotations and event-based perception, enabling the construction of motion-consistent object represen-tations better aligned with the sensing characteristics of event cameras. Beyond dataset annotation, the proposed framework provides a foundation for down-stream tasks, including motion segmentation, moving-object detection, neuro-morphic perception, and temporally-aware tracking. GeoIMO: Geometry-Driven IMO Classification 3
+
+# 2 Background 
+
+2.1 Event Cameras, Event-Based Automotive Datasets, and the Annotation Gap 
+
+Event cameras are bio-inspired sensors that replace frame-based capture with asynchronous event generation [2, 5]. Each pixel emits an event (x, y, t, p ) when its log-brightness changes beyond a threshold, where (x, y ) is the pixel location, 
+
+t the microsecond timestamp, and p ∈ { +1 , −1} the polarity. This produces sparse, high-temporal-resolution data that naturally encodes motion: static scene elements generate no events, while moving edges produce dense activity. These properties make event cameras well-suited for motion-aware perception in dy-namic driving environments [1, 2]. Public datasets have been central to progress in event-based autonomous driving, with the two main object-level benchmarks being Prophesee 1Megapixel Automotive Detection [9] and MVSEC [13]. Prophesee provides RGB-derived bounding boxes transferred to the event domain via homography, while MVSEC offers synchronized event and grayscale data but no native bounding-box anno-tations. In both datasets, labels reflect appearance rather than motion state, so static objects may still be marked as foreground, creating a modality mismatch for methods that rely on the motion sensitivity of event cameras. 
+
+2.2 Motion Compensation and Contrast Maximization 
+
+A principled way to interpret event streams is motion compensation : events are warped using candidate motion parameters, and their alignment is evaluated to estimate the underlying motion. Here, the motion parameters describe the assumed image motion, for example, a horizontal and vertical velocity (vx, v y ),or a more general parametric motion model such as optical flow or ego-motion parameters. For a given motion field, each event at location (xi, y i) and time 
+
+ti is shifted to a reference time tref , and accumulated into an Image of Warped Events (IWE). If the motion parameters correctly describe the scene dynamics, events from the same physical edge align spatially and form sharp structures in the IWE; otherwise, the IWE becomes blurred. This idea is formalized through contrast maximization [11], which measures alignment quality by the spatial variance of the IWE. Motion is then estimated by maximizing this contrast over the candidate parameter space, without explicit supervision. Beyond ego-motion estimation, contrast maximization has also been used for motion segmentation, separating the event stream into independently moving components [10]. However, Stoffregen et al. [10] lack an explicit geo-metric ego-motion model, making it vulnerable to yaw-induced flow corruption during turns, susceptible to background cluster contamination in dense automo-tive scenes, and dependent on a fixed pre-specified number of objects, limita-tions that directly motivate the geometry-driven approach proposed here. The proposed framework builds on the same contrast maximization objective but applies it separately to ego-motion and object-level estimation under an explicit geometric parameterization, avoiding joint iterative clustering entirely. 4 A. B. Gogebakan et al. 
+
+2.3 Optical Flow, Ego-Motion, and the Focus of Expansion 
+
+Optical flow describes the apparent 2D pixel velocity induced by relative motion between the camera and the scene [4]. For event cameras, it can be estimated directly from event streams [14], linking raw event data to higher-level motion understanding. Under pure camera translation in a static scene, the optical flow field is radially symmetric: all vectors point away from a single image location, the FOE [6]. The FOE is the projection of the translation direction onto the im-age plane, and the flow magnitude increases with distance from it. Since driving is often dominated by forward motion, the FOE offers a compact and efficient representation of background ego-motion. Yaw rotation, caused by steering, adds an approximately uniform horizontal flow component that radial expansion alone cannot explain. As a result, the apparent FOE is shifted, and a pure translation model becomes biased during turns. Prior work therefore extends the FOE model with an explicit rotational term [3,8], enabling more accurate ego-motion estimation across a wider range of driving maneuvers. This combined parameterization forms the geometric basis of our method. 
+
+2.4 Object-Level Motion Reasoning in Event Streams 
+
+Despite progress in optical flow and ego-motion estimation, connecting pixel- or event-level motion cues to object-level representations remains an open prob-lem. The DOTIE framework shows that spiking neural networks can isolate independently moving objects directly from event streams [7], highlighting the potential of event-driven detection. However, its evaluation still relies on bound-ing boxes derived from frame-based annotations, inheriting the same modality mismatch. Crucially, none of these methods exploit the geometric structure of ego-motion already present in the event stream in a lightweight, annotation-free way. This gap motivates methods that explicitly connect ego-motion estimation with object-level motion classification in event-based perception. 
+
+# 3 Methodology 
+
+The proposed framework classifies detected objects as static or moving using event-based motion analysis. It assumes bounding boxes are already available and focuses only on estimating the motion state of each object. The input is an event stream E = {x, y, t, p } and a set of bounding boxes Bt for each temporal window ∆t , and the output is a binary motion label for each box. The pipeline consists of five stages (see Figure 1): (i) background event selec-tion, (ii) global ego-motion estimation via contrast maximization, (iii) local mo-tion estimation within each bounding box, (iv) temporal stabilization of global and local estimates, and (v) residual-based static/moving classification. GeoIMO: Geometry-Driven IMO Classification 5 
+
+> Fig. 1. Overview of the proposed pipeline.
+
+3.1 Global Ego-Motion Estimation 
+
+Background event selection. Reliable ego-motion estimation requires events orig-inating exclusively from static scene structures. Events located inside bounding boxes classified as non-static in previous windows are therefore excluded, as their motion patterns do not correspond to the global camera-induced motion and would otherwise bias the estimation. The remaining events are treated as background and used to estimate global ego-motion. In the first temporal win-dow, no prior classification is available; all bounding box events are therefore included in the background set. 
+
+Ego-motion model. Rather than estimating dense optical flow, we adopt a low-dimensional parametric model that captures the dominant effects of camera translation and rotation. Under pure forward translation, the optical flow field is radial and parameterized by the FOE (xf oe , y f oe ) [6] and an expansion coefficient 
+
+s, yielding image-plane velocities vx = s(x − xf oe ) and vy = s(y − yf oe ).In practice, vehicle turning introduces a yaw component that displaces the apparent FOE and cannot be captured by radial expansion alone. The model is therefore extended with a yaw parameter ωy [3, 8], giving the full parameter set 
+
+θ = ( xf oe , y f oe , s, ω y ). Defining centered coordinates ¯x = x − cx and ¯y = y − cy
+
+relative to the principal point (cx, c y ), the total velocity field becomes 
+
+vx = s(x − xf oe ) −
+
+
+
+f + ¯x2
+
+f
+
+
+
+ωy , vy = s(y − yf oe ) − ¯x¯yf ωy ,
+
+where f is the focal length. Given a candidate parameter set θ, each event at location (xi, y i) and time ti
+
+is warped toward a reference timestamp tref according to the estimated velocity field: 
+
+(x′
+
+> i
+
+, y ′
+
+> i
+
+) = ( xi, y i) +  vx(xi, y i), v y (xi, y i)(tref − ti).
+
+The warped events are accumulated into an IWE, whose sharpness reflects the quality of the motion estimate. Alignment quality is quantified by the spatial 6 A. B. Gogebakan et al. 
+
+variance of the IWE, following the contrast maximization framework of [11]. To prevent cancellation between opposite polarities, the contrast is computed separately for positive and negative events: 
+
+C(θ) = C+(θ) + C−(θ), C±(θ) = 1
+
+Np
+
+X
+
+> x,y
+
+ I±(x, y ; θ) − ¯I±(θ)2,
+
+where Np is the number of pixels and ¯I± the mean of the corresponding IWE. The optimal ego-motion parameters are obtained as θ∗ = arg max θ C(θ).
+
+3.2 Local Bounding-Box Motion Estimation 
+
+For each temporal window, events within each bounding box are extracted and used to estimate local object motion independently of the global ego-motion estimate. To avoid unreliable estimates from small or weakly activated regions, a box b is processed only if nb ≥ ⌊ 100 ρ⌋ and Ab ≥ ⌊ 150 ρ⌋, where nb is the number of events in the box, Ab its area, and ρ = WsHs/(346 · 260) scales the thresholds with the sensor resolution. Boxes failing either criterion are assigned the static label by default, since there is insufficient event evidence to reliably infer independent motion. Two motion models are considered: a radial model (xb
+
+> foe
+
+, y b
+
+> foe
+
+, s b), which cap-tures expansion or contraction patterns, and a uniform translational model 
+
+(vx, v y ), which approximates lateral image-plane motion. In both cases, parame-ters are estimated by maximizing contrast over events inside the bounding box. The estimated parameters are converted into a single observed velocity vobs =(vx(xb, y b), v y (xb, y b)) at the box center (xb, y b). For the translational model, this is directly the estimated (vx, v y ); for the radial model, it is obtained by evaluating the radial field at the box center. 
+
+3.3 Temporal Stabilization 
+
+Motion estimates from individual temporal windows can be unstable due to variations in event density and imperfect contrast-maximization convergence. To reduce this variability, both global and local estimates are temporally stabilized across consecutive windows. For ego-motion, the four parameters (xf oe , y f oe , s, ω y ) are temporally filtered using a lightweight Kalman-based formulation, applied independently to each component with different dynamics. The expansion coefficient s is allowed to change more quickly to follow variations in forward speed, while the FOE co-ordinates, especially the vertical one, are more strongly stabilized because they vary more slowly in typical driving. For each bounding box, the image-plane velocity vobs is stabilized in both Cartesian and polar form. Separating magnitude and direction improves robust-ness, since direction becomes unreliable when velocity is small and should not affect the magnitude estimate. Each window is weighted by its contrast score: GeoIMO: Geometry-Driven IMO Classification 7
+
+high-contrast estimates contribute more, while low-contrast, poorly aligned mea-surements are down-weighted. The FOE search bounds expand proportionally to the estimated yaw rate, maintaining robustness during turns. 
+
+3.4 Motion Consistency Criterion and Classification 
+
+Given the temporally stabilized estimates, each bounding box is classified by comparing the motion predicted by ego-motion with the locally observed motion. For a bounding box centered at (xb, y b), the estimated ego-motion field yields an expected velocity vego (xb, y b) for a nominally static point at that location. The discrepancy with respect to the observed velocity vobs is quantified by the scale-invariant residual 
+
+r = ∥vobs − vego ∥
+
+max( ∥vobs ∥, ∥vego ∥, ϵ ) ,
+
+where ϵ prevents numerical instability when both velocities are near zero. Normalization by the larger of the two magnitudes ensures that r is invariant to the overall motion scale, enabling a single threshold τ to operate consistently across different driving speeds and object distances. Each object is labeled static if r ≤ τ and moving if r > τ .
+
+# 4 Experiments and Results 
+
+4.1 Experimental Setup 
+
+Experiments are conducted on two widely used event-based automotive datasets: MVSEC [13] and the Prophesee dataset [9]. MVSEC provides synchronized event streams and grayscale images but does not include native bounding-box anno-tations. Therefore, object bounding boxes are obtained by applying a YOLOv3 detector on the grayscale frames. In contrast, the Prophesee dataset provides bounding box annotations directly. In this section, we first present results on MVSEC, followed by a more detailed analysis on a selected subset of the Proph-esee dataset. Since existing annotations do not distinguish between static and moving ob-jects, all bounding boxes are manually annotated as either static or moving .These labels serve as ground truth for evaluating motion classification perfor-mance. Manual annotation ensures motion-consistent labels aligned with the event data. The proposed method performs binary classification at the bounding-box level, assigning each object a static or moving label. Predicted and ground-truth boxes are matched based on spatial and temporal proximity to ensure consistent comparison over time. Evaluation is then performed only on matched pairs, isolating motion-classification performance from detection errors. Since each error simultaneously counts as a false positive for one class and a false neg-ative for the other, the total numbers of false positives and false negatives are equal, making micro-precision, micro-recall, and micro-F1 identical. For class-balanced evaluation, we therefore use per-class F1 and macro F1. 8 A. B. Gogebakan et al.                       
+
+> Table 1. Motion classification performance on the MVSEC outdoor_day2 sequence. Yaw BBox Model F1-score Moving F1 Static F1 Macro F1 False Translational 0.6865 0.2700 0.8004 0.5352 True Translational 0.7192 0.2911 0.8250 0.5580 False Radial 0.6955 0.2788 0.8070 0.5429 True Radial 0.7211 0.2910 0.8264 0.5587
+
+4.2 Motion Classification Results on MVSEC 
+
+We evaluate the proposed framework on the MVSEC dataset using the out-door_day2 sequence. Bounding boxes are generated by applying a YOLOv3 detector on the grayscale frames and subsequently annotated with motion la-bels. The resulting dataset is highly imbalanced, with approximately 88.5% of the bounding boxes corresponding to static objects and only 11.5% to mov-ing ones. This imbalance is an important factor when interpreting classification performance, particularly for the moving class. Table 1 reports motion classification performance under different motion modeling configurations. We compare the impact of incorporating yaw rotation into the ego-motion model and of different local motion models within bounding boxes. The results show a consistent gap between the moving and static classes. While the static class achieves high F1-scores (above 0.80 in all configurations), the moving class remains significantly lower (around 0.27–0.29). This is partly due to the strong class imbalance, which biases the model toward static pre-dictions. In addition, the outdoor_day2 sequence contains multiple hard turns, where accurate FOE estimation becomes challenging. Errors in global motion estimation during and shortly after these turns lead to incorrect motion com-pensation, which particularly affects the moving class. In terms of the motion model, enabling yaw consistently improves performance across both bounding box models. This is expected, as rotational motion becomes significant in turn-ing scenarios. Including the yaw parameter allows the model to better capture these dynamics, resulting in improved motion compensation and classification accuracy. Comparing the bounding box motion models, the radial formulation yields slightly higher performance than the translational one across all config-urations. However, the improvement is marginal, indicating that the additional modeling complexity does not translate into a substantial gain in classification accuracy. While the radial model is theoretically more expressive, the limited spatial extent of bounding boxes and the sparsity of event data restrict its prac-tical advantage. Overall, the best performance is achieved with the radial model and yaw enabled. Nevertheless, the small performance gap between radial and translational models suggests that simpler motion formulations remain compet-itive, particularly in terms of computational efficiency. GeoIMO: Geometry-Driven IMO Classification 9     
+
+> Fig. 2. Classification performance with and without yaw compensation across two driving scenarios from Prophesee dataset. Badges report the signed difference ∆=
+> yaw true −yaw false . Yaw compensation yields substantial gains in hard-turn sequences, while its effect is negligible under near-straight ego-motion.
+
+4.3 Motion Classification on Prophesee Subset 
+
+We further evaluate the proposed framework on a selected subset of the Prophe-see dataset. The subset includes multiple driving scenarios with varying motion characteristics, enabling a more detailed analysis of the impact of motion mod-eling choices. 
+
+Effect of Yaw in Ego-Motion Modeling We first analyze the impact of incorporating yaw rotation in the global motion model. Figure 2 reports classifi-cation performance with and without yaw across two driving scenarios, with all other parameters held fixed. The annotated badges show the signed difference 
+
+∆ = yaw true − yaw false for each metric, highlighting the contribution of yaw compensation directly on the figure. The results show that incorporating yaw significantly improves performance in scenarios involving strong camera rotations, such as hard turns. In contrast, for near-straight motion, including yaw does not provide measurable benefits and can slightly degrade performance. This indicates that the additional model complexity introduced by yaw is only beneficial when the underlying motion justifies it. 
+
+Effect of Bounding Box Motion Model We next analyze the impact of the local motion model used within bounding boxes. Table 2 compares the radial and translational models in terms of both classification performance and runtime. The radial model, while more expressive, does not consistently outperform the simpler translational model in terms of F1-score. In several sequences, the translational model achieves comparable or even better performance. At the same time, the computational cost of the radial model is significantly higher. 10 A. B. Gogebakan et al.                        
+
+> Table 2. Per-sequence difference between radial and translational bounding box mo-tion models (radial −translational).
+> Sequence ∆F1 ∆Time (s/prediction) Scene 1 0.025 0.30 Scene 2 -0.034 0.79 Scene 3 -0.014 0.79 Scene 4 -0.016 0.35
+> Table 3. Comparison between a global parameter configuration and per-sequence op-timized configurations.
+> Strategy F1-score Moving F1 Static F1 Macro F1
+> Global Best (Single Set) 0.651 0.393 0.749 0.571 Per-Video Best 0.701 0.435 0.792 0.614
+
+A likely explanation for this behavior is the limited spatial extent of bounding boxes. Since each bounding box contains a relatively small number of events, the additional degrees of freedom introduced by the radial model cannot be reliably estimated. Furthermore, local event distributions can be affected by sensor noise, event-rate variability, and sparse activity within small bounding boxes, which can further degrade the stability of more complex motion models. As a result, the radial model provides no reliable benefit in practice despite its higher theoretical expressiveness. These findings suggest that the translational model provides a better trade-off between accuracy and efficiency for object-level motion estimation. 
+
+Global vs. Scenario-Specific Parameter Selection Finally, we compare two parameter selection strategies: a single global configuration applied across all sequences, and a scenario-specific configuration optimized for each sequence. The results are summarized in Table 3. Using a single global configuration already yields strong performance across different scenarios, demonstrating the robustness of the proposed framework. However, further improvements can be achieved by adapting the model parame-ters to specific sequences. This indicates that different motion conditions benefit from different modeling assumptions, and suggests that scenario-aware or adap-tive parameter selection could further enhance performance. 
+
+Qualitative Analysis We provide qualitative examples that highlight the mis-match between frame-based detections and event-based motion cues, which mo-tivate our approach. Figure 3 shows a traffic scene before and after motion onset. While bounding boxes are present even when the scene is static, almost no events are generated inside them. Once motion begins, event activity rises sharply within the same regions. This shows that frame-based detectors capture object presence, whereas event data reflects scene dynamics, motivating motion-aware filtering of bounding boxes. Figure 4 presents a hard-turn example. As GeoIMO: Geometry-Driven IMO Classification 11   
+
+> Fig. 3. Event activity in bounding boxes before and after motion onset.
+> Fig. 4. Example of ego-motion during a hard turn, showing the corresponding shift of the FOE.
+
+the ego vehicle rotates left, the estimated FOE shifts toward the left side of the image, consistent with the geometric motion model. This helps explain the performance gains obtained by incorporating yaw. 
+
+# 5 Conclusion 
+
+This work presented a geometry-driven framework for classifying bounding boxes as static or moving from event-based motion cues. By combining parametric ego-motion estimation with contrast maximization, the method operates with-out supervision or explicit motion labels, addressing the mismatch between frame-based annotations and event-driven sensing. Experiments on MVSEC and Prophesee show consistent performance across diverse driving scenarios. Yaw modeling improves results during turns, while simple translational models offer a promising trade-off between accuracy and efficiency. A single global parameter setting already performs competitively, with scenario-specific tuning providing further gains. Overall, the approach bridges appearance-based annotations and motion-consistent event perception, offering a lightweight basis for motion seg-mentation, moving-object detection, and temporally aware perception. Future work will focus on greater robustness under rotational motion and tighter inte-gration with event-based detection and tracking. 12 A. B. Gogebakan et al. 
+
+# References 
+
+1. Chen, G., Cao, H., Conradt, J., Tang, H., Rohrbein, F., Knoll, A.: Event-Based Neuromorphic Vision for Autonomous Driving: A Paradigm Shift for Bio-Inspired Visual Sensing and Perception. IEEE Signal Processing Magazine 37 (4), 34–49 (Jul 2020). https://doi.org/10.1109/MSP.2020.2985815 2. Gallego, G., Delbrück, T., Orchard, G., Bartolozzi, C., Taba, B., Censi, A., Leutenegger, S., Davison, A.J., Conradt, J., Daniilidis, K., Scaramuzza, D.: Event-Based Vision: A Survey. IEEE Transactions on Pattern Analysis and Machine Intel-ligence 44 (1), 154–180 (Jan 2022). https://doi.org/10.1109/TPAMI.2020.3008413 3. Heeger, D.J., Jepson, A.D.: Subspace methods for recovering rigid motion I: Algo-rithm and implementation. International Journal of Computer Vision 7(2), 95–117 (Jan 1992). https://doi.org/10.1007/BF00128130 4. Horn, B.K.P., Schunck, B.G.: Determining optical flow. Artificial Intelligence 
+
+17 (1), 185–203 (Aug 1981). https://doi.org/10.1016/0004-3702(81)90024-2 5. Lichtsteiner, P., Posch, C., Delbruck, T.: A 128\times 128 120 dB 15 μs Latency Asynchronous Temporal Contrast Vision Sensor. IEEE Journal of Solid-State Cir-cuits 43 (2), 566–576 (Feb 2008). https://doi.org/10.1109/JSSC.2007.914337 6. Longuet-Higgins, H.C., Prazdny, K.: The interpretation of a moving retinal image. Proceedings of the Royal Society of London. B. Biological Sciences 208 (1173), 385–397 (Jul 1980). https://doi.org/10.1098/rspb.1980.0057 7. Nagaraj, M., Liyanagedera, C.M., Roy, K.: DOTIE - Detecting Objects through Temporal Isolation of Events using a Spiking Architecture. In: 2023 IEEE Inter-national Conference on Robotics and Automation (ICRA). pp. 4858–4864 (May 2023). https://doi.org/10.1109/ICRA48891.2023.10161164 8. Nagata, J., Sekikawa, Y., Hara, K., Aoki, Y.: FOE-based regularization for optical flow estimation from an in-vehicle event camera. In: International Workshop on Advanced Image Technology (IWAIT) 2019. vol. 11049, pp. 562–565. SPIE (Mar 2019). https://doi.org/10.1117/12.2521520 9. Perot, E., de Tournemire, P., Nitti, D., Masci, J., Sironi, A.: Learning to Detect Objects with a 1 Megapixel Event Camera. In: Advances in Neural Information Processing Systems. vol. 33, pp. 16639–16652. Curran Associates, Inc. (2020) 10. Stoffregen, T., Gallego, G., Drummond, T., Kleeman, L., Scaramuzza, D.: Event-based motion segmentation by motion compensation. In: Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) (October 2019) 11. Stoffregen, T., Kleeman, L.: Event cameras, contrast maximization and reward functions: An analysis. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (June 2019) 12. Yurtsever, E., Lambert, J., Carballo, A., Takeda, K.: A Survey of Autonomous Driving: Common Practices and Emerging Technologies. IEEE Access 8, 58443– 58469 (2020). https://doi.org/10.1109/ACCESS.2020.2983149 13. Zhu, A.Z., Thakur, D., Özaslan, T., Pfrommer, B., Kumar, V., Daniilidis, K.: The Multivehicle Stereo Event Camera Dataset: An Event Camera Dataset for 3D Perception. IEEE Robotics and Automation Letters 3(3), 2032–2039 (Jul 2018) 14. Zhu, A.Z., Yuan, L., Chaney, K., Daniilidis, K.: EV-FlowNet: Self-Supervised Optical Flow Estimation for Event-based Cameras (Feb 2018). https://doi.org/10.15607/RSS.2018.XIV.062
