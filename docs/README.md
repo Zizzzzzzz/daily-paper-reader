@@ -6,122 +6,85 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-27
-- 运行时间：2026-06-27 20:58:43 UTC
+- 最新运行日期：2026-06-28
+- 运行时间：2026-06-28 21:21:41 UTC
 - 运行状态：成功
-- 本次总论文数：34
-- 精读区：21
+- 本次总论文数：21
+- 精读区：8
 - 速读区：13
 
 ### 今日简报（AI）
-今日精读21篇、速读13篇，事件相机表示学习综述与DriveStack-VLA模型获满分推荐。最值得关注的两个方向：事件相机系统综述（10.0）和BEV视觉-语言-动作模型（10.0）。建议优先精读这两篇满分论文，再速读KV缓存优化与神经动作编码的相关工作。
-- 详情：[/202606/27/README](/202606/27/README)
+1) 今日精读2篇满分论文，涵盖事件相机表征学习与多模态机器人自监督感知，速读聚焦自动驾驶反射框架及长视频理解。  
+2) 强烈关注《事件相机表征学习综述》与《多模态机器人自监督学习》，两篇均为10/10满分，前者奠定事件数据处理方法论，后者为机器人通用感知提供新范式。  
+3) 建议优先精读这两篇满分论文，跟进事件相机在低光照/高速场景应用，同时探索自监督学习如何降低机器人对标注数据的依赖。
+- 详情：[/202606/28/README](/202606/28/README)
 
 ### 精读区论文标签
-1. [A Systematic Survey on Event Camera Representation Learning](/202606/27/2606.23078v1-a-systematic-survey-on-event-camera-representation-learning)  
+1. [A Systematic Survey on Event Camera Representation Learning](/202606/28/2606.23078v1-a-systematic-survey-on-event-camera-representation-learning)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：事件相机表示学习综述
-2. [DriveStack-VLA: Render-Teacher Alignment for BEV-Based DeepStack Vision-Language-Action Model](/202606/27/2606.24051v1-drivestack-vla-render-teacher-alignment-for-bev-based-deepstack-vision-language-action-model)  
-   标签：评分：10.0/10、query:evlm
-   evidence：基于BEV和渲染教师对齐的VLA驾驶模型
-3. [Spectral Evolution-Guided Token Pruning in Multimodal Large Language Models](/202606/27/2606.24165v1-spectral-evolution-guided-token-pruning-in-multimodal-large-language-models)  
-   标签：评分：10.0/10、query:evlm
-   evidence：基于谱演化的MLLM token剪枝
-4. [FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics](/202606/27/2606.26636v1-fracevent-event-camera-simulation-via-fractional-relaxation-pixel-dynamics)  
+   evidence：事件相机表示学习的最新综述
+2. [OctoSense: Self-Supervised Learning for Multimodal Robot Perception](/202606/28/2606.27317v1-octosense-self-supervised-learning-for-multimodal-robot-perception)  
    标签：评分：10.0/10、query:ev-cam
-   evidence：事件相机模拟用于基于事件的视觉
-5. [Learning What Not to Forget: Long-Horizon Agent Memory from a Few Kilobytes of Learning](/202606/27/2606.20954v1-learning-what-not-to-forget-long-horizon-agent-memory-from-a-few-kilobytes-of-learning)  
+   evidence：传感器平台包含事件相机，直接相关于神经形态视觉
+3. [PolicyTrim: Boosting Intrinsic Policy Efficiency of Vision-Language-Action Models](/202606/28/2606.22540v3-policytrim-boosting-intrinsic-policy-efficiency-of-vision-language-action-models)  
    标签：评分：9.0/10、query:evlm
-   evidence：学习型相关性驱逐用于长上下文代理记忆管理
-6. [Decoupling the Declarative from the Procedural in Vision-Language-Action Models](/202606/27/2606.21496v1-decoupling-the-declarative-from-the-procedural-in-vision-language-action-models)  
+   evidence：通过动作块优化提升VLA模型内在策略效率
+4. [UniFS: Unified Fast-to-Slow Hierarchical Architecture for Vision-Language-Action Models](/202606/28/2606.22794v1-unifs-unified-fast-to-slow-hierarchical-architecture-for-vision-language-action-models)  
    标签：评分：9.0/10、query:evlm
-   evidence：解耦VLA模型中的声明性和程序性知识
-7. [Following the Flow: Advection-Consistent Modeling for Event-based Small Object Detection](/202606/27/2606.22378v1-following-the-flow-advection-consistent-modeling-for-event-based-small-object-detection)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：基于事件相机的小目标检测
-8. [PolicyTrim: Boosting Intrinsic Policy Efficiency of Vision-Language-Action Models](/202606/27/2606.22540v1-policytrim-boosting-intrinsic-policy-efficiency-of-vision-language-action-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：VLA模型策略效率
-9. [OmniSpace: Efficient Geometry Awareness for Autonomous Vehicles MLLMs](/202606/27/2606.22617v1-omnispace-efficient-geometry-awareness-for-autonomous-vehicles-mllms)  
+   evidence：面向高效视觉-语言-动作模型的快-慢统一架构
+5. [Open-Vocabulary BEV Segmentation with 3D-Aware Geometric Constraints](/202606/28/2606.24353v1-open-vocabulary-bev-segmentation-with-3d-aware-geometric-constraints)  
    标签：评分：9.0/10、query:mm-trf
-   evidence：用于自动驾驶交通场景理解的几何感知多模态大模型
-10. [SpotAttention: Plug-In Block-Sparse Routing for Pretrained Long-Context Transformers](/202606/27/2606.22874v1-spotattention-plug-in-block-sparse-routing-for-pretrained-long-context-transformers)  
+   evidence：利用视觉语言模型进行开放词汇鸟瞰图分割，用于自动驾驶
+6. [G$^3$VLA: Geometric inductive bias for Vision-Language-Action Models](/202606/28/2606.24472v1-g3vla-geometric-inductive-bias-for-vision-language-action-models)  
    标签：评分：9.0/10、query:evlm
-   evidence：通过学习预算的稀疏注意力实现KV缓存压缩
-11. [RoPE-Aware Bit Allocation for KV-Cache Quantization](/202606/27/2606.24033v1-rope-aware-bit-allocation-for-kv-cache-quantization)  
-   标签：评分：9.0/10、query:evlm
-   evidence：基于RoPE感知位分配的KV缓存量化
-12. [Accelerating Multimodal Large Language Models with Prior-Corrected Token Reduction](/202606/27/2606.24156v1-accelerating-multimodal-large-language-models-with-prior-corrected-token-reduction)  
-   标签：评分：9.0/10、query:evlm
-   evidence：通过token缩减加速多模态大语言模型
-13. [M^2C-EvDet: Multi-Domain Multi-Order Cross-Modal Knowledge Distillation for Event-based Object Detection](/202606/27/2606.24248v1-m2c-evdet-multi-domain-multi-order-cross-modal-knowledge-distillation-for-event-based-object-detection)  
+   evidence：用于机器人操作的VLA模型引入几何归纳偏置
+7. [GeoIMO: Geometry-Driven Independent Motion Classification for Event Cameras](/202606/28/2606.24499v1-geoimo-geometry-driven-independent-motion-classification-for-event-cameras)  
    标签：评分：9.0/10、query:ev-cam
-   evidence：基于事件相机的目标检测与跨模态知识蒸馏
-14. [UniRED: Unified RGB-D Video Frame Interpolation with Event Guidance](/202606/27/2606.24282v1-unired-unified-rgb-d-video-frame-interpolation-with-event-guidance)  
+   evidence：基于几何的事件相机独立运动分类
+8. [FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics](/202606/28/2606.26636v1-fracevent-event-camera-simulation-via-fractional-relaxation-pixel-dynamics)  
    标签：评分：9.0/10、query:ev-cam
-   evidence：事件引导的RGB-D视频插帧
-15. [CompressKV: Semantic-Retrieval-Guided KV-Cache Compression for Resource-Efficient Long-Context LLM Inference](/202606/27/2606.24467v1-compresskv-semantic-retrieval-guided-kv-cache-compression-for-resource-efficient-long-context-llm-inference)  
-   标签：评分：9.0/10、query:evlm
-   evidence：长上下文LLM的KV缓存压缩
-16. [GeoIMO: Geometry-Driven Independent Motion Classification for Event Cameras](/202606/27/2606.24499v1-geoimo-geometry-driven-independent-motion-classification-for-event-cameras)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：基于几何驱动的事件相机独立运动分类
-17. [UniDrive: A Unified Vision-Language and Grounding Framework for Interpretable Risk Understanding in Autonomous Driving](/202606/27/2606.24759v1-unidrive-a-unified-vision-language-and-grounding-framework-for-interpretable-risk-understanding-in-autonomous-driving)  
-   标签：评分：9.0/10、query:mm-trf
-   evidence：基于多模态大模型的交通场景理解
-18. [Toward Low-Latency Vision-Language Models with Doubly-Correct Predictions in Egocentric Visual Understanding](/202606/27/2606.25160v1-toward-low-latency-vision-language-models-with-doubly-correct-predictions-in-egocentric-visual-understanding)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向实时人机协作的低延迟VLM权重剪枝
-19. [Active Adversarial Perturbation-driven Associative Memory Retrieval for RGB-Event Visual Object Tracking](/202606/27/2606.26455v1-active-adversarial-perturbation-driven-associative-memory-retrieval-for-rgb-event-visual-object-tracking)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：RGB-事件融合的视觉目标跟踪，使用事件相机
-20. [Event-based Gaze Control System for Accurate Real-time Spin Estimation in Professional Ball Games](/202606/27/2606.26780v1-event-based-gaze-control-system-for-accurate-real-time-spin-estimation-in-professional-ball-games)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：事件相机用于实时球类跟踪和旋转估计
-21. [OctoSense: Self-Supervised Learning for Multimodal Robot Perception](/202606/27/2606.27317v1-octosense-self-supervised-learning-for-multimodal-robot-perception)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：明确将事件相机作为多模态传感器套件的一部分
+   evidence：面向事件视觉的事件相机模拟方法
 
 ### 速读区论文标签
-1. [Recency/Frequency Adaptive KV Caching for Large Language Model Serving](/202606/27/2606.21238v1-recencyfrequency-adaptive-kv-caching-for-large-language-model-serving)  
+1. [Intend, Reflect, Refine: An Adaptive Multimodal Reflection Framework for Autonomous Driving](/202606/28/2606.22913v1-intend-reflect-refine-an-adaptive-multimodal-reflection-framework-for-autonomous-driving)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：面向自动驾驶的自适应多模态反射框架
+2. [Three-Step Hierarchical Transformer for Multi-Pedestrian Trajectory Prediction](/202606/28/2606.23058v1-three-step-hierarchical-transformer-for-multi-pedestrian-trajectory-prediction)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：基于多模态大模型的交通场景理解
+3. [Towards Fast and Effective Long Video Understanding of Multimodal Large Language Models via Adaptive Quasi-Gaussian Sampling](/202606/28/2606.24187v2-towards-fast-and-effective-long-video-understanding-of-multimodal-large-language-models-via-adaptive-quasi-gaussian-sampling)  
    标签：评分：8.0/10、query:evlm
-   evidence：KV缓存压缩与长上下文管理
-2. [NAC: Neural Action Codec for Vision-Language-Action Models](/202606/27/2606.21372v1-nac-neural-action-codec-for-vision-language-action-models)  
+   evidence：自适应帧采样提升多模态大模型长视频推理效率
+4. [Latent Visual States for Efficient Multimodal Reasoning](/202606/28/2606.24233v1-latent-visual-states-for-efficient-multimodal-reasoning)  
    标签：评分：8.0/10、query:evlm
-   evidence：神经动作编解码器用于高效VLA模型动作标记化
-3. [ASCII Art Turns LLMs into VLA Controllers](/202606/27/2606.21470v1-ascii-art-turns-llms-into-vla-controllers)  
+   evidence：通过潜在视觉状态实现高效多模态推理
+5. [P-MTP: Efficient Document Parsing via Multi-Token Prediction with Progressive Depth Scaling](/202606/28/2606.24447v1-p-mtp-efficient-document-parsing-via-multi-token-prediction-with-progressive-depth-scaling)  
    标签：评分：8.0/10、query:evlm
-   evidence：通过ASCII渲染将纯文本LLM转化为VLA控制器，高效
-4. [UniviewVLA: A Unified Multiview Vision-Language-Action Model with World Modeling](/202606/27/2606.21501v1-univiewvla-a-unified-multiview-vision-language-action-model-with-world-modeling)  
-   标签：评分：8.0/10、query:evlm
-   evidence：面向机器人的统一视觉-语言-动作模型，结合世界建模
-5. [Compressing Observation History into Agent Memory: Distilling Transformers into Recurrent Transformers](/202606/27/2606.21562v1-compressing-observation-history-into-agent-memory-distilling-transformers-into-recurrent-transformers)  
-   标签：评分：8.0/10、query:evlm
-   evidence：将观测历史压缩为循环Transformer的固定大小记忆以处理长序列
-6. [ScalePredictor: Instance-aware Scale Learning for Accurate Quantization of Vision Transformers](/202606/27/2606.21947v1-scalepredictor-instance-aware-scale-learning-for-accurate-quantization-of-vision-transformers)  
-   标签：评分：8.0/10、query:evlm
-   evidence：提出动态量化方法以实现高效视觉Transformer推理
-7. [Deeper is Not Always Better: Mitigating the Alignment Tax via Confident Layer Decoding](/202606/27/2606.21906v1-deeper-is-not-always-better-mitigating-the-alignment-tax-via-confident-layer-decoding)  
-   标签：评分：7.0/10、query:evlm
-   evidence：用于高效LLM推理的免训练解码策略
-8. [Look Before You Zoom: Adaptive Routing for the Resolution-Context Trade-off in Visual RAG](/202606/27/2606.21968v1-look-before-you-zoom-adaptive-routing-for-the-resolution-context-trade-off-in-visual-rag)  
-   标签：评分：7.0/10、query:evlm
-   evidence：自适应路由优化分辨率-上下文权衡提升VLM效率
-9. [Compression and Retrieval: Implicit Memory Retrieval for Video World Models](/202606/27/2606.23105v1-compression-and-retrieval-implicit-memory-retrieval-for-video-world-models)  
-   标签：评分：7.0/10、query:evlm
-   evidence：注意力驱动的隐式记忆检索压缩长视频上下文
-10. [Progressive Pixel-Neighborhood Deformable Cross-Attention for Multispectral Object Detection](/202606/27/2606.24092v1-progressive-pixel-neighborhood-deformable-cross-attention-for-multispectral-object-detection)  
+   evidence：多token预测加速VLM推理
+6. [From Driving Videos to Simulatable Scenarios](/202606/28/2606.21993v1-from-driving-videos-to-simulatable-scenarios)  
    标签：评分：7.0/10、query:mm-trf
-   evidence：解决交通场景中的多光谱目标检测问题
-11. [Semi-Supervised Vision-Language-Action Model](/202606/27/2606.21493v1-semi-supervised-vision-language-action-model)  
+   evidence：利用视觉语言模型和大语言模型从驾驶视频生成可模拟场景，用于交通场景理解
+7. [FlowDec: Temporal Conditional Flow Decorruptor for Robust Continuous Vision-Language Navigation](/202606/28/2606.22424v1-flowdec-temporal-conditional-flow-decorruptor-for-robust-continuous-vision-language-navigation)  
+   标签：评分：7.0/10、query:evlm
+   evidence：面向鲁棒视觉语言导航的图像恢复方法
+8. [BEV-Denoise: Learning Intrinsic Noise for Accurate Bird's-Eye-View Semantic Segmentation](/202606/28/2606.22931v1-bev-denoise-learning-intrinsic-noise-for-accurate-birds-eye-view-semantic-segmentation)  
+   标签：评分：7.0/10、query:mm-trf
+   evidence：用于交通场景理解的鸟瞰图语义分割
+9. [FlowTrain: Flow-Based Decoupled Training for Industrial-Grade Vision-Language Models](/202606/28/2606.23087v1-flowtrain-flow-based-decoupled-training-for-industrial-grade-vision-language-models)  
+   标签：评分：7.0/10、query:evlm
+   evidence：多模态大语言模型效率优化
+10. [Structured Hyperedge Adaptation for Parameter-Efficient Fine-Tuning of Vision Transformers](/202606/28/2606.22383v1-structured-hyperedge-adaptation-for-parameter-efficient-fine-tuning-of-vision-transformers)  
    标签：评分：6.0/10、query:evlm
-   evidence：半监督VLA模型，减少标注依赖，提高效率
-12. [Black-Box Continual Learning for Vision-Language Models](/202606/27/2606.22999v1-black-box-continual-learning-for-vision-language-models)  
+   evidence：利用超边适应进行视觉Transformer的参数高效微调
+11. [Beyond Bayer: Task-Optimal Sensor Co-Design for Robust Autonomous-Driving Segmentation](/202606/28/2606.24096v1-beyond-bayer-task-optimal-sensor-co-design-for-robust-autonomous-driving-segmentation)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：综合交通场景理解与感知
+12. [USS: Unified Spatial-Semantic Prompts for Embodied Visual Tracking with Latent Dynamics Learning](/202606/28/2606.25880v1-uss-unified-spatial-semantic-prompts-for-embodied-visual-tracking-with-latent-dynamics-learning)  
    标签：评分：6.0/10、query:evlm
-   evidence：面向VLM的高效持续学习
-13. [Graph it first! Enabling Reasoning on Long-form Egocentric Videos through Scene Graphs](/202606/27/2606.25842v1-graph-it-first-enabling-reasoning-on-long-form-egocentric-videos-through-scene-graphs)  
+   evidence：用于具身视觉跟踪的统一空间语义提示
+13. [Learning Robot Visual Navigation in Crowds via Intention-Aware Scene Representations](/202606/28/2606.26047v1-learning-robot-visual-navigation-in-crowds-via-intention-aware-scene-representations)  
    标签：评分：6.0/10、query:evlm
-   evidence：使用场景图压缩长视频推理中的token使用量
+   evidence：面向机器人的意图感知场景表示视觉人群导航
 
 
 <div class="dpr-home-promo-card">
