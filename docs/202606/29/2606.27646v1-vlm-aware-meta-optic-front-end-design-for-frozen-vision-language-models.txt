@@ -1,0 +1,393 @@
+Title: VLM-Aware Meta-Optic Front-End Design for Frozen Vision-Language Models
+
+URL Source: https://arxiv.org/pdf/2606.27646v1
+
+Published Time: Mon, 29 Jun 2026 00:20:56 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# VLM-Aware Meta-Optic Front-End Design for Frozen Vision-Language Models 
+
+Chanik Kang 1,2, Raphaël Pestourie 2,∗, and Haejun Chung 1,3,∗ 
+
+> 1
+
+Department of Artificial Intelligence, Hanyang University, Seoul, 04763, Korea  
+
+> 2
+
+School of Computational Science and Engineering, Georgia Institute of Technology, Atlanta, GA, 30332, USA 
+
+rpestourie3@gatech.edu  
+
+> 3
+
+Department of Electronic Engineering, Hanyang University, Seoul, 04763, Korea 
+
+haejun@hanyang.ac.kr 
+
+> *
+
+Corresponding authors 
+
+Abstract. Conventional machine-vision pipelines typically rely on high-quality optics that produce clean, human-interpretable images, and op-tical design has therefore been driven by image-level criteria such as resolution, aberration correction, and pixel fidelity. However, such optics are often impractical for size-, cost-, or form-factor-constrained appli-cations, where compact meta-optics offer an attractive alternative but operate under strict physical efficiency limits. We propose CODA, a co-design framework that optimizes a continuous-density meta-optic front-end for frozen-model recognition using differentiable image formation and adjoint-gradient updates of Maxwell-based simulations. CODA di-rectly optimizes the cross-entropy loss of a fixed zero-shot CLIP classifier without learned reconstruction, image signal processing, or image-fidelity auxiliary objectives. In a two-dimensional simulated imaging benchmark on ImageNet-100, CODA improves CLIP ViT-L/14 zero-shot accuracy from 53.75 ± 3.57% with a focal-concentration baseline to 65.41 ± 3.99%. The optimized optics further transfer without re-optimization across CLIP, SigLIP, and DINOv2 on ImageNet-100, CIFAR-100, and Food-101. These results demonstrate that, under constrained meta-optic imaging, downstream recognition can be improved by aligning optical design with frozen vision-model objectives rather than conventional image-formation criteria. 
+
+Keywords: Computational Photography · Physics-based Vision and Shape from X · Vision-language models · Meta-optics · Optics–AI co-design ·
+
+Electromagnetic inverse design 
+
+# 1 Introduction 
+
+Large-scale vision–language models (VLMs) are increasingly used as general-purpose visual consumers for open-vocabulary classification, retrieval, and other perception tasks [15, 32, 44]. When clean, conventionally rendered images are available, they are the natural input interface for these models: their visual     
+
+> arXiv:2606.27646v1 [cs.CV] 26 Jun 2026 2Kang et al.
+> Fig. 1: Schematic overview of a conventional imaging-classification pipeline and CODA (co-design of meta-optic front-ends with differentiable adjoints). CODA keeps the VLM fixed and optimizes only the meta-optic density ρfor recognition. The classification loss is differentiated through the frozen VLM and image-formation model to the point-spread-function (PSF) interface, and an adjoint Maxwell solve yields
+> ∂L/∂ρ .
+
+encoders are primarily trained and evaluated on this image domain. We therefore do not frame optical co-design as a way to outperform a high-quality clean-image interface. Instead, we study the constrained case: when the optical front-end must be compact or multifunctional, can it be optimized to produce sensor measurements that are more useful to a frozen VLM? Conventional imaging is not always the most practical hardware interface. In applications where thickness, weight, aperture sharing, manufacturability, or multifunctional wavefront control dominates the system budget, meta-optic front-ends can offer substantial advantages. Their planar subwavelength struc-tures can replace bulky multi-element lens stacks while enabling compact angle-, wavelength-, or polarization-dependent responses. The challenge is that these advantages often come with constrained image formation. In high-numerical-aperture [3, 6], wide-field-of-view [22, 24, 42], and ultra-compact meta-optic set-tings [4, 11, 13, 34, 40], the sensor measurement may be shaped by aberration, diffraction, multiplexing, or other departures from clean image formation [8, 18, 35,38,45]. Such optical inputs are still often evaluated using human-interpretable criteria such as resolution, contrast, and reconstruction fidelity [36, 39, 46]. This creates a mismatch for foundation-model inference. Image-fidelity met-rics such as peak signal-to-noise ratio (PSNR) and structural similarity index measure (SSIM) reward visually faithful reconstructions [41], while focusing ob-jectives reward compact point-spread functions. A frozen VLM, however, maps VLM-Aware Meta-Optic Front-End Design 3
+
+its input into a learned representation space and may not rank constrained op-tical measurements by the same criteria. Thus, in a constrained optical regime, the front-end preferred by conventional image-formation metrics need not be the front-end preferred by downstream recognition. Prior end-to-end computational imaging systems have shown that optical front-ends can be optimized for downstream computational objectives [2, 20, 21, 33, 38, 39, 46]. In many such systems, however, the optics are optimized to-gether with a reconstruction network, image-processing module, or task-specific neural backend. This makes the source of any gain ambiguous: it may come from the optical front-end, from a backend adapted to optical artifacts, or from both. Foundation-model deployment presents a different setting: the downstream model is already trained and is often used as a fixed visual consumer. Accord-ingly, we ask whether changing only the optical front-end can better serve a frozen VLM. We propose CODA (co-design of meta-optic front-ends with differentiable adjoints), a framework for optimizing a constrained meta-optic front-end with a frozen VLM objective. Here, “front-end” refers to the meta-optic imaging element and its differentiable sensor-image formation model, not a complete camera sys-tem including the image sensor, mechanical package, or image signal processor. CODA optimizes only the continuous density of a planar meta-optic while keep-ing the VLM and class text embeddings fixed. For each wavelength–angle con-dition, a Maxwell-equation simulation produces a one-dimensional point-spread function (PSF), which is used to synthesize sensor images through a differen-tiable line-scan image-formation model. The frozen VLM consumes these sensor images, and its classification loss is differentiated back to the PSF interface and then converted into an adjoint-gradient update of the meta-optic density. No learned deconvolution, reconstruction network, or image signal processing mod-ule is inserted between the optic and the frozen model. We make the following empirical and methodological contributions. First, we formulate frozen-VLM optical front-end optimization as a single-objective problem driven by downstream classification loss, without image-fidelity aux-iliary losses. Second, we connect frozen-encoder automatic differentiation to adjoint-gradient updates of a Maxwell-based meta-optic simulation through a PSF backward interface. Third, within the same simulated meta-optic design domain and image-formation model, we show that switching from a model-agnostic focal-concentration objective to the frozen-VLM objective improves CLIP ImageNet-100 accuracy by +11 .66 percentage points. Finally, we show that the same optimized optics, without optical re-optimization, outperform the focal-concentration baseline across CLIP [32], SigLIP [44], and DINOv2 [29] eval-uations on ImageNet-100 [9, 37], CIFAR-100 [17], and Food-101 [1]. We do not claim that CODA surpasses clean-image inputs or improves every optical design problem; rather, our results show that VLM-aware optical optimization can im-prove recognition when the front-end is constrained and the downstream visual model is frozen. 4 Kang et al. 
+
+# 2 Positioning relative to prior work        
+
+> Fig. 2: Representative optics-adaptation formulations for optics–AI co-design. Green/orange arrows denote forward/backward passes, and light/dark blocks indicate trainable/frozen components. Unlike sequential, joint, and bilevel formula-tions, CODA freezes the visual foundation model and back-propagates its classification loss only to the meta-optic density.
+
+Our setting differs from three adjacent lines of work. First, meta-optics in-verse design uses gradient-based electromagnetic inverse design, often imple-mented with adjoint simulations, to optimize large geometric or material degrees of freedom [12, 14, 23, 25, 27]. These methods typically optimize optical figures of merit such as focusing efficiency, achromaticity, Strehl ratio, or image fidelity. We instead optimize a task loss measured after a frozen VLM consumes the sensor output. Second, end-to-end computational imaging jointly optimizes optical elements and downstream networks [2, 16, 20, 21, 36, 38, 39]. These systems demonstrate the value of task-aware optics, but because the perception model is trained or adapted together with the optics, they do not isolate whether a fixed foundation model can be served better by changing the optical front-end alone. We freeze the downstream model throughout. Third, optical computing and photonic–electronic vision systems use diffrac-tive or metasurface elements as passive computational front-ends for compute offload or edge inference, often with a task-specific digital backend trained around the optical front-end [7,19,31,43]. Recent large-scale metasurface vision systems instantiate a fixed-optics/backend-training direction: the metasurface is reused as an optical feature extractor, while the digital backend is trained on its cap-tured features [31]. CODA inverts this division of labor: the foundation visual VLM-Aware Meta-Optic Front-End Design 5
+
+encoder is frozen, and only the meta-optic density is optimized, isolating whether the optical front-end alone can adapt to a fixed visual consumer. 
+
+# 3 Method 
+
+CODA has three components: a frozen-VLM optical objective (Sec. 3.1), a Maxwell-to-sensor forward model (Sec. 3.2), and a PSF-interface backward pass that connects frozen-encoder automatic differentiation to an adjoint Maxwell solve (Sec. 3.3). 
+
+3.1 Optimization problem 
+
+Let ρ ∈ [0 , 1] N denote the design density on a discretized planar meta-optic. We linearly interpolate relative permittivity, 
+
+ε(ρi) = εmin + ρi(εmax − εmin ), (1) with εmin = 1 and εmax = 5 .76 . We optimize this continuous grayscale density directly. Given a frozen VLM fϕ, labeled clean images D = {(Ij , y j )}, and wavelength– angle conditions C = {(λk, θ k)}Kk=1 , let PSF C (ρ) = {PSF( ρ; λk, θ k)}Kk=1 denote the corresponding optical responses. CODA optimizes only ρ:
+
+ρ⋆ = arg min 
+
+> ρ∈[0 ,1] N
+
+E(I,y )∼D LCE (fϕ(A(I; PSF C (ρ))) , y ) , (2) Here LCE is the classification loss, and A is the differentiable image-formation operator that maps a clean image to the sensor tensor consumed by the frozen model. No learned deconvolution, reconstruction network, or image signal pro-cessing module is inserted between the optical front-end and fϕ.
+
+3.2 Forward model: Maxwell to sensor 
+
+For each wavelength–angle condition (λk, θ k), we compute the two-dimensional TE-polarized electromagnetic response of the meta-optic. We write the target steady-state response as the time-harmonic Maxwell problem for the complex phasor field Ek:
+
+∇ × μ−10 ∇ × Ek − ω2
+
+> k
+
+ε0ε(ρ)Ek = −iω kJλk ,θ k , (3) where ωk = 2 πc 0/λ k and Jλk ,θ k denotes the incident source associated with wavelength λk and incidence angle θk. Although Eq. (3) is written in the fre-quency domain, the numerical simulation is performed in the time domain. In practice, we use the open-source finite-difference time-domain (FDTD) pack-age Meep [30] and extract the complex steady-state field component at ωk; this extracted phasor is denoted by Ek below. 6 Kang et al.  
+
+> Fig. 3: Simulation and line-scan image formation. (a) A 2D meta-optic sim-ulation uses incident plane-wave illumination, an optimizable meta-optic design re-gion, and a sensor line where the point-spread function (PSF) is measured. (b) Nine wavelength–angle conditions from three wavelengths and three incidence angles. (c) The resulting one-dimensional PSFs are applied row-wise to clean images to generate simulated sensor images.
+
+To interface these one-dimensional PSFs with two-dimensional VLM inputs, we use a line-scan approximation, analogous to push-broom acquisition (Fig. 3(c)) [10, 28]. A 2D cross-section extruded along the invariant axis represents a cylin-drical, one-dimensionally focusing meta-optic; Eq. (4) implements this approx-imation by applying the PSF only along the focused horizontal coordinate v,treating scan lines at fixed u as optically independent. Each wavelength maps to a color channel and each incidence angle maps to a horizontal image zone. For channel c ∈ { R, G, B } and zone z ∈ { left , mid , right },let k(c, z ) index the associated wavelength–angle condition. After resampling each PSF onto the image grid, using the same symbol for brevity, the sensor tensor is 
+
+Isensor [c, u, v ] = X
+
+> v′
+
+Iclean [c, u, v ′]PSF k(c,z (v)) (v − v′; ρ), (4) where u and v denote vertical and horizontal image coordinates, respectively, and 
+
+z(v) maps columns to zones. This approximation keeps the optics–VLM coupling differentiable while avoiding full three-dimensional FDTD over the image field. For computational simplicity, all wavelength–angle conditions are evaluated on the same sensor-line location and represented by PSFs centered on a common readout coordinate. This assumption reduces simulation complexity and isolates VLM-Aware Meta-Optic Front-End Design 7
+
+the effect of frozen-VLM-aware optical optimization from sensor-geometry con-siderations. 
+
+3.3 Frozen VLM loss and adjoint-gradient update 
+
+For CLIP and SigLIP, class text embeddings are pre-computed and held fixed. Given a simulated sensor image Isensor , the frozen image encoder produces an embedding zimg , and class probabilities are computed from cosine-similarity log-its with temperature τ :
+
+pm = exp( z⊤
+
+> img
+
+ztxt  
+
+> m
+
+/τ )
+
+P 
+
+> m′
+
+exp( z⊤
+
+> img
+
+ztxt  
+
+> m′
+
+/τ ) . (5) The classification loss is LCE = − log py ; below, L denotes its mini-batch average. The VLM weights and text embeddings are frozen, and only the optical density 
+
+ρ is updated. Because the FDTD solver is outside the automatic-differentiation graph, we split the gradient at the PSF interface: 
+
+∂L
+
+∂ρ i
+
+=
+
+> K
+
+X
+
+> k=1
+
+X
+
+> x
+
+∂L
+
+∂PSF k(x)
+
+∂PSF k(x)
+
+∂ρ i
+
+. (6) The first factor is obtained by reverse-mode automatic differentiation through the frozen VLM and the differentiable image-formation operator. The second is computed with an adjoint Maxwell solve [5,26]. For PSF k(x) = |Ek(x, y f )|2, the adjoint source at the sensor-line monitor is 
+
+sk(x) = ∂L
+
+∂PSF k(x) 2Ek(x, y f ), (7) where 2Ek is the local vector–Jacobian product of the intensity operation un-der our complex-field convention. Solving the adjoint Maxwell problem gives an adjoint field Eadj  
+
+> k
+
+, yielding 
+
+∂L
+
+∂ρ i
+
+= Re 
+
+> K
+
+X
+
+> k=1
+
+ω2
+
+> k
+
+ε0∆ε 
+
+Z
+
+> Ωi
+
+Ek(r; ρ) · Eadj  
+
+> k
+
+(r; ρ) dr , (8) where ∆ε = εmax − εmin and Ωi is the region of the i-th design pixel. Each update therefore requires K forward and K adjoint FDTD simulations, independent of the number of design pixels. With K = 9 wavelength–angle con-ditions, 18 FDTD calls produce gradients for all N = 13 ,400 density variables; a finite-difference estimate would require K(N +1) ≈ 1.2×10 5 forward simulations per update. 8 Kang et al. 
+
+Fig. 4: Sensor-space gradients induced by the frozen visual classifier. For two ImageNet-100 validation images, the heatmaps show the magnitude of the cross-entropy gradient with respect to the simulated sensor image, |∂LCE /∂I sensor |. These structured gradients are back-propagated through the line-scan image-formation model to produce the point-spread-function gradients used as adjoint sources for the optical update. 
+
+Algorithm 1 CODA meta-optic optimization with a frozen visual classifier. 
+
+Require: frozen classifier fϕ(·; T ) with fixed class text embeddings T ; labeled dataset 
+
+D; differentiable image-formation operator A, including fixed PSF resampling to the image grid; wavelength–angle conditions C = {(λk , θ k )}Kk=1 ; number of itera-tions Niter ; learning rate η; clip norm gmax 
+
+Ensure: optimized density ρ (meta-optic front-end design) 1: Initialize density ρ ∈ [0 , 1] N randomly (VLM-cold) or from a Focus-opt checkpoint (VLM-warm) 2: Initialize Adam optimizer state for ρ; keep ϕ and T fixed 3: for n = 1 , . . . , N iter do 
+
+4: Sample mini-batch B = {(Ij , y j )} ⊂ D 
+
+5: for k = 1 , . . . , K do 
+
+6: Ek ← FDTD( ρ, λ k , θ k )
+
+7: Pk ≡ PSF k ← | Ek (·, y f ; ρ)|2
+
+8: end for 
+
+9: Isensor ,j ← A  Ij ; {Pk }Kk=1 
+
+ for all (Ij , y j ) ∈ B 
+
+10: L ← |B| −1 P   
+
+> (Ij,y j)∈B
+
+LCE (fϕ(Isensor ,j ; T ), y j )
+
+11: Compute {αk }Kk=1 , where αk ≡ ∂L/∂P k , by reverse-mode automatic differenti-ation through fϕ and A, treating {Pk }Kk=1 as PSF-interface variables 12: for k = 1 , . . . , K do 
+
+13: sk (x) ← 2 αk (x) Ek (x, y f ; ρ)
+
+14: Eadj  
+
+> k
+
+← FDTD adj (ρ, λ k , θ k , s k )
+
+15: end for 
+
+16: Assemble g ← ∇ ρL from {Ek , E adj  
+
+> k
+
+}Kk=1 using Eq. (8) 17: g ← clipnorm( g, g max )
+
+18: ρ ← clip [0 ,1] (AdamStep( ρ, g, η )) 
+
+19: end for 
+
+20: return ρVLM-Aware Meta-Optic Front-End Design 9
+
+3.4 Designs compared 
+
+All optical designs are evaluated under the same 5 μm × 600 nm design envelope, FDTD grid, wavelength–angle conditions, and downstream image-formation code. The learned designs use the same density parameterization and optimizer fam-ily. We compare four primary designs: Fresnel, an analytical reference; Focus-opt, a model-agnostic focal-concentration baseline optimized for 200 iterations; VLM-cold, CODA from random initialization for 100 iterations; VLM-warm, 100 CODA iterations initialized from the same-seed Focus-opt iteration-100 check-point. The Focus-opt baseline uses no labels, text prompts, or encoder gradients. It optimizes the same density variables with a focal-concentration objective, 
+
+Lfocus (ρ) = − 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+P 
+
+> x∈Wk
+
+PSF k(x; ρ)
+
+P 
+
+> x
+
+PSF k(x; ρ) (9) where Wk is the target focal window for the k-th wavelength–angle condition. This baseline represents a model-agnostic optical prior: more energy concen-trated near the target focus is expected to yield a better sensor measurement. Its downstream accuracies are evaluated only after optical optimization by pass-ing the resulting sensor tensors through frozen encoders. VLM-cold and VLM-warm differ only in initialization; both use the CODA gradient path of Eq. (6). VLM-warm gives a budget-matched comparison to 200-iteration Focus-opt: from the same-seed Focus-opt iteration-100 checkpoint, we switch the objective from focal concentration to frozen-VLM cross-entropy for another 100 iterations (Fig. 6). Focus-opt, VLM-cold, and VLM-warm each use three seeds. All downstream encoders remain frozen; for DINOv2, which has no text branch, we fit a clean-image linear probe once and keep it fixed across optical designs. 
+
+# 4 Results 
+
+4.1 Main ImageNet-100 result 
+
+We optimize the structure of a meta-optic front-end on the ImageNet-100 [37] training split using CLIP ViT-L/14 [32] as the frozen optimization-time con-sumer, and report all main accuracies on the held-out ImageNet-100 validation split (5,000 images). Clean images, evaluated without a simulated optical front-end, reach 88.26% zero-shot accuracy and serve as the no-optic reference for this pipeline. This clean-image result is not the target to beat; it marks the advantage of the visual domain on which the frozen model is normally trained and evaluated. The relevant comparison is therefore among constrained optical front-ends with the same simulated design envelope and image-formation model. Table 1 summarizes the designs. As expected, none of the simulated optical designs reaches the clean-image reference. Within the constrained setting, the analytical Fresnel baseline is severely 10 Kang et al.                                  
+
+> Table 1: ImageNet-100 validation accuracy with frozen CLIP ViT-L/14. All optical designs use the same simulated design domain and image-formation model; optimized designs report mean ±standard deviation over three seeds. Concentration is the mean local sensor-line energy fraction within a 0.5 μm target window, averaged over the nine wavelength–angle conditions. The symbol pp denotes percentage points.
+> Input / design Concentration ↑Accuracy (%) ↑
+> Clean images –88.26 Fresnel zone plate 0.114 8.10 Focus-opt 0.432 ±0.021 53 .75 ±3.57
+> VLM-cold 0.216 ±0.012 47 .87 ±1.76
+> VLM-warm (ours) 0.425 ±0.013 65 .41 ±3.99
+> ∆VLM-warm vs. Focus-opt +11 .66 pp
+
+degraded, showing that a closed-form lens is inadequate in this small-aperture, multi-wavelength configuration. Focus-opt improves accuracy to 53 .75 ± 3.57 %, confirming that the model-agnostic focusing baseline is already strong. Direct VLM optimization from random initialization does not improve on Focus-opt: VLM-cold reaches 47 .87 ± 1.76 % suggesting that cold-start VLM gradients alone are insufficient to find a useful optical basin. In contrast, VLM-warm reaches 
+
+65 .41 ±3.99 %, improving over Focus-opt by +11 .66 percentage points. The worst VLM-warm seed (61.44%) exceeds the best Focus-opt seed (57.84%), so the warm-start advantage is seed-consistent rather than a single favorable run. The comparison is also robust to checkpoint selection. The matched-budget comparison uses Focus-opt at iteration 200 because VLM-warm also uses 200 total iterations. However, the best Focus-opt validation checkpoint occurs earlier, at iteration 50, with 58 .95 ± 3.07 % accuracy. VLM-warm still exceeds this best Focus-opt checkpoint by +6 .46 percentage points. The +17 .54 percentage-point gap between VLM-warm and VLM-cold indi-cates that initialization is central to CODA optimization. The two variants share the same optical model, image-formation pipeline, frozen encoder, loss function, and optimizer family; they differ only in the initial density ρ. VLM-cold also lands in a basin with substantially worse local focusing: its local peak positions span −0.20 to +0 .71 μm across the nine wavelength–angle conditions, an order of magnitude wider than either Focus-opt or VLM-warm in their corresponding local sensor-line coordinates. This pattern suggests a difficult VLM cross-entropy landscape over the meta-optic density space. From random initialization, the VLM objective can drive the design toward an asymmetric local optimum with poor focusing and lower downstream accuracy. Focal-concentration optimization instead moves ρ into a region where the wavelength–angle conditions are jointly well focused, acting as a scaffold for subsequent VLM optimization. Figure 6 shows this under the same compute budget: from the same iteration-100 density, continuing Focus-opt VLM-Aware Meta-Optic Front-End Design 11  
+
+> Fig. 5: (a) Representative optical designs and fields for the Table 1 comparison. (b) Qualitative sensor images and CLIP ViT-L/14 zero-shot predictions on ImageNet-100 validation examples. Columns compare the clean image with sensor images from the Fresnel zone plate, Focus-opt, VLM-cold, and VLM-warm designs. Labels show the top-1 prediction and confidence; GT denotes the ground-truth class. The examples are illustrative, and quantitative claims use the full validation set.
+
+reaches 53 .75 % by iteration 200, whereas switching to the frozen-VLM objective reaches 65 .41 % over the same 100 additional iterations. 
+
+4.2 Local PSF metrics do not predict recognition gain 
+
+The VLM-warm gain is not predicted by the local PSF metrics that motivate the Focus-opt baseline. Concentration, full width at half maximum (FWHM), local peak position, and peak intensity all tie or favor Focus-opt, yet VLM-warm improves downstream zero-shot accuracy by +11 .66 percentage points. Thus, in this constrained optical regime, the metrics that would select Focus-opt under a conventional focusing objective do not select the more accurate front-end for the frozen VLM. 12 Kang et al. 
+
+Fig. 6: Optimization trajectories on ImageNet-100 with frozen CLIP ViT-L/14. At iteration 100, VLM-warm forks from the Focus-opt trajectory and switches to the frozen-CLIP classification objective, while Focus-opt continues focal-concentration optimization with the same budget. VLM-cold uses the frozen-CLIP objective from random initialization. Shaded bands show ±1 standard deviation over three seeds. 
+
+Table 2: Local PSF metrics versus downstream accuracy. Compact-focus metrics tie or favor Focus-opt, whereas CLIP zero-shot accuracy favors VLM-warm. Arrows indicate the conventional preferred direction; ∆ denotes VLM-warm − Focus-opt. 
+
+Metric Focus-opt VLM-warm ∆
+
+Concentration ↑ 0.432 ± 0.021 0.425 ± 0.013 −0.007 
+
+Median FWHM ( μm) ↓ 0.16 0.16 0
+
+Max local |xpeak | (μm) ↓ 0.03 0.04 +0 .01 
+
+Peak intensity (a.u.) ↑ 355 ± 138 229 ± 101 −126 
+
+2nd moment ( μm2) 1.23 ± 0.39 1.47 ± 0.37 +0 .24 
+
+Zero-shot accuracy (%) ↑ 53 .75 ± 3.57 65 .41 ± 3.99 +11 .66 
+
+The main optical difference is PSF spatial extent. VLM-warm has a 20% 
+
+larger intensity-weighted second moment than Focus-opt, trading lower peak in-tensity for a broader base. Broader PSFs alone are not sufficient: Fresnel and VLM-cold are also broad or unstable yet perform poorly. We therefore inter-pret the larger second moment as a correlate of CODA optimization, not as a standalone optical-design rule. VLM-Aware Meta-Optic Front-End Design 13 
+
+A second line of evidence comes from the frozen encoder embedding space. A 5-fold cross-validated linear probe fit directly on CLIP image embeddings from the same 5,000 validation images reaches 73 .49 ± 3.65% for VLM-warm versus 
+
+63 .45 ± 2.57% for Focus-opt; silhouette and inter-/intra-class distance measures move consistently. Because the probe uses only image embeddings, not CLIP text prompts, the gain is not merely prompt alignment. 
+
+4.3 Transfer without optical re-optimization 
+
+We next reuse the same ImageNet-100/CLIP optical designs without optical re-optimization. CLIP and SigLIP are evaluated in the standard zero-shot manner using dataset-specific text prompts. DINOv2 has no text encoder, so for each dataset we fit one linear probe on clean-image DINOv2 training features and then keep that probe fixed across optical designs. Table 3 reports the transfer matrix. 
+
+Table 3: Transfer without optical re-optimization across datasets and frozen encoders. The optical designs from the ImageNet-100/CLIP setting are reused unchanged for all entries. CLIP and SigLIP use zero-shot prompts; DINOv2 uses a frozen encoder with a linear probe fit once on clean-image training features. Entries report top-1 accuracy; learned optics show mean ± standard deviation over three seeds, while the Fresnel zone plate is analytical. ∆ rows show VLM-warm minus Focus-opt in percentage points. 
+
+Dataset Design CLIP (%) SigLIP (%) DINOv2 (%) 
+
+ImageNet-100 Fresnel 8.10 1.98 5.68 VLM-cold 47 .87 ± 1.76 32 .65 ± 3.49 72 .52 ± 3.77 
+
+Focus-opt 53 .75 ± 3.57 38 .10 ± 3.73 77 .37 ± 2.01 
+
+VLM-warm 65 .41 ± 3.99 52 .07 ± 5.42 84 .98 ± 1.04 
+
+∆ (pp) +11 .66 +13 .97 +7.61 
+
+CIFAR-100 Fresnel 8.07 5.67 4.85 VLM-cold 31 .19 ± 1.80 22 .92 ± 2.01 49 .91 ± 1.32 
+
+Focus-opt 34 .45 ± 4.36 26 .33 ± 3.85 52 .44 ± 4.08 
+
+VLM-warm 51 .01 ± 5.61 41 .03 ± 5.21 73 .24 ± 4.73 
+
+∆ (pp) +16 .56 +14 .70 +20 .80 
+
+Food-101 Fresnel 2.16 2.26 1.52 VLM-cold 41 .21 ± 1.75 24 .96 ± 1.53 47 .09 ± 0.85 
+
+Focus-opt 47 .35 ± 6.50 27 .42 ± 6.61 49 .46 ± 8.18 
+
+VLM-warm 65 .31 ± 7.55 45 .93 ± 9.10 70 .26 ± 5.14 
+
+∆ (pp) +17 .96 +18 .51 +20 .80 
+
+VLM-warm outperforms Focus-opt in all nine dataset–encoder pairs, with margins from +7 .61 to +20 .80 percentage points. We treat this all-cell win 14 Kang et al. 
+
+pattern as a consistency check rather than nine independent hypothesis tests, because entries share optical seeds, simulation settings, and related evaluation pipelines. The cold-start ablation reverses the pattern: Focus-opt exceeds VLM-cold in all nine cells by +2 .37 to +6 .14 percentage points, confirming that the focusing scaffold matters beyond the ImageNet-100/CLIP optimization cell. 
+
+4.4 Limitations 
+
+Our claims are made in a controlled simulation regime. We use two-dimensional FDTD and line-scan image formation to keep frozen-VLM backpropagation tractable at batch size 16 (peak 42 GB GPU memory). For computational sim-plicity, all wavelength–angle conditions are evaluated on the same sensor-line location and represented by PSFs centered on a common readout coordinate. Thus, we do not model field-dependent sensor geometry, full two-dimensional wide-FOV image formation, or a complete camera package. The three wave-lengths, 450, 550, and 650 nm, are mapped to RGB channels rather than used to model broadband color, so achromatic or broadband meta-optic design is outside our scope. Our evaluation protocol also fixes several choices. DINOv2 is evaluated with a clean-image linear probe because it has no text branch, and the probe is fit once and kept fixed across optical designs. Finally, CODA is not meant to outperform clean-image inputs, improve every optical design problem, or replace focusing objectives when faithful image formation is feasible. Our narrower claim is that, for a constrained simulated meta-optic front-end feeding a frozen visual model, VLM-loss-driven adjoint optimization can improve recognition relative to a focal-concentration objective. 
+
+# 5 Conclusion 
+
+We presented CODA, a meta-optic front-end co-design framework that con-nects a frozen foundation VLM loss to adjoint-gradient updates of the optical density. The clean-image reference remains the strongest input in our experi-ments, as expected for a VLM trained on conventionally formed natural images. CODA should therefore be read as a constrained meta-optic front-end result rather than a claim against clean imaging. In our controlled two-dimensional line-scan setting, CODA improves ImageNet-100 CLIP accuracy by +11 .66 per-centage points over Focus-opt under the same simulated design envelope, and the same optimized optics outperform Focus-opt on all nine evaluated encoder– dataset combinations without optical re-optimization. Focal-plane metrics tie or favor Focus-opt, while downstream accuracy and CLIP embedding separa-bility favor VLM-warm. We interpret the warm-start result as evidence that focal-concentration optimization can be a useful scaffold, but that once a con-strained optical front-end must feed a frozen VLM, the VLM loss can provide a more effective objective for recognition-oriented optical optimization than focal concentration alone. VLM-Aware Meta-Optic Front-End Design 15 
+
+# Ethical responsibilities and AI disclosure 
+
+This work is a simulation-only study using public datasets and pretrained vision models as explicit components of the research methodology. It collects no new data, involves no human subjects, and deploys no physical sensing system. The manuscript, analyses, experimental data, results, references, and scientific claims were created and manually validated by the authors. No generative AI tool was used to generate, alter, or fabricate experimental data, quantitative results, references, or scientific claims. GPT Image was used only to render non-data graphical elements in the author-designed conceptual illustration in Fig. 1. 
+
+# References 
+
+1. Bossard, L., Guillaumin, M., Van Gool, L.: Food-101–mining discriminative com-ponents with random forests. In: European conference on computer vision. pp. 446–461. Springer (2014) 2. Chang, J., Sitzmann, V., Dun, X., Heidrich, W., Wetzstein, G.: Hybrid optical-electronic convolutional neural networks with optimized diffractive optics for image classification. Scientific reports 8(1), 12324 (2018) 3. Chen, J., Huang, S.X., Chan, K.F., Wu, G.B., Chan, C.H.: 3d-printed aberration-free terahertz metalens for ultra-broadband achromatic super-resolution wide-angle imaging with high numerical aperture. Nature Communications 16 (1), 363 (2025) 4. Chi, C., Hou, Q., Zhao, G., Song, Q., Xu, S., Piao, Y., Qin, M., Hu, Y., Chen, C., Cai, W., Chen, Y., Yuan, X., Duan, H.: Ultracompact wide-fov near-infrared camera with a wafer-level manufactured meta-aspheric lens. Light: Advanced Man-ufacturing 7, 1–12 (2026). https://doi.org/10.37188/lam.2026.045 
+
+5. Christiansen, R.E., Sigmund, O.: Inverse design in photonics by topology opti-mization: tutorial. Journal of the Optical Society of America B 38 (2), 496–509 (2021) 6. Chung, H., Miller, O.D.: High-na achromatic metalenses by inverse design. Optics express 28 (5), 6945–6965 (2020) 7. Colburn, S., Chu, Y., Shilzerman, E., Majumdar, A.: Optical frontend for a con-volutional neural network. Applied optics 58 (12), 3179–3186 (2019) 8. Colburn, S., Zhan, A., Majumdar, A.: Metasurface optics for full-color computa-tional imaging. Science advances 4(2), eaar2114 (2018) 9. Deng, J., Dong, W., Socher, R., Li, L.J., Li, K., Fei-Fei, L.: ImageNet: A large-scale hierarchical image database. In: 2009 IEEE conference on computer vision and pattern recognition. pp. 248–255. Ieee (2009) 10. Faraji-Dana, M., Arbabi, E., Kwon, H., Kamali, S.M., Arbabi, A., Bartholomew, J.G., Faraon, A.: Hyperspectral imager with folded metasurface optics. Acs Pho-tonics 6(8), 2161–2167 (2019) 11. Fu, W., Zhao, D., Li, Z., Liu, S., Tian, C., Huang, K.: Ultracompact meta-imagers for arbitrary all-optical convolution. Light: Science & Applications 11 (1), 62 (2022) 12. Hammond, A.M., Oskooi, A., Chen, M., Lin, Z., Johnson, S.G., Ralph, S.E.: High-performance hybrid time/frequency-domain topology optimization for large-scale photonics inverse design. Optics Express 30 (3), 4467–4491 (2022) 13. Hao, C., Wu, Y., Yuan, Z., Zhou, Z.W., Wang, Y., Li, M., Feng, C., Wang, K., Zhang, Z., Chen, J.: Compact meta-camera for intelligent wide-angle and low-light imaging. Laser & Photonics Reviews 20 (5), e00803 (2026) 16 Kang et al. 14. Hughes, T.W., Minkov, M., Williamson, I.A., Fan, S.: Adjoint method and inverse design for nonlinear nanophotonic devices. ACS Photonics 5(12), 4781–4787 (2018) 15. Jia, C., Yang, Y., Xia, Y., Chen, Y.T., Parekh, Z., Pham, H., Le, Q., Sung, Y.H., Li, Z., Duerig, T.: Scaling up visual and vision-language representation learning with noisy text supervision. In: International conference on machine learning. pp. 4904–4916. PMLR (2021) 16. Kienesberger, L., Kuang, Z., Liu, Y., Miller, O.D.: End-to-end meta-imagers: Information-theoretic objectives and generalized focusing optima. arXiv preprint arXiv:2606.16724 (2026) 17. Krizhevsky, A., Hinton, G., et al.: Learning multiple layers of features from tiny images (2009) 18. Liang, H., Martins, A., Borges, B.H.V., Zhou, J., Martins, E.R., Li, J., Krauss, T.F.: High performance metalenses: numerical aperture, aberrations, chromaticity, and trade-offs. Optica 6(12), 1461–1470 (2019) 19. Lin, X., Rivenson, Y., Yardimci, N.T., Veli, M., Luo, Y., Jarrahi, M., Ozcan, A.: All-optical machine learning using diffractive deep neural networks. Science 
+
+361 (6406), 1004–1008 (2018) 20. Lin, Z., Pestourie, R., Roques-Carmes, C., Li, Z., Capasso, F., Soljačić, M., John-son, S.G.: End-to-end metasurface inverse design for single-shot multi-channel imaging. Optics express 30 (16), 28358–28370 (2022) 21. Lin, Z., Roques-Carmes, C., Pestourie, R., Soljačić, M., Majumdar, A., John-son, S.G.: End-to-end nanophotonic inverse design for imaging and polarimetry. Nanophotonics 10 (3), 1177–1187 (2021) 22. Liu, Y., Li, W.D., Xin, K.Y., Chen, Z.M., Chen, Z.Y., Chen, R., Chen, X.D., Zhao, F.L., Zheng, W.S., Dong, J.W.: Ultra-wide fov meta-camera with transformer-neural-network color imaging methodology. Advanced Photonics 6(5), 056001– 056001 (2024) 23. Ma, W., Pestourie, R., Lin, Z., Johnson, S.G.: Inverse design for robust inference in integrated computational spectrometry. Nanophotonics 15 (7), e70054 (2026) 24. Martins, A., Li, K., Li, J., Liang, H., Conteduca, D., Borges, B.H.V., Krauss, T.F., Martins, E.R.: On metalenses with arbitrarily wide field of view. Acs Photonics 
+
+7(8), 2073–2079 (2020) 25. Meem, M., Majumder, A., Banerji, S., Garcia, J.C., Kigner, O.B., Hon, P.W., Sensale-Rodriguez, B., Menon, R.: Imaging from the visible to the longwave in-frared wavelengths via an inverse-designed flat lens. Optics Express 29 (13), 20715– 20723 (2021) 26. Miller, O.: Photonic Design: From Fundamental Solar Cell Physics to Computa-tional Inverse Design. Ph.D. thesis, EECS Department, University of California, Berkeley (May 2012), http://www2.eecs.berkeley.edu/Pubs/TechRpts/2012/ EECS-2012-115.html 
+
+27. Molesky, S., Lin, Z., Piggott, A.Y., Jin, W., Vucković, J., Rodriguez, A.W.: Inverse design in nanophotonics. Nature photonics 12 (11), 659–670 (2018) 28. Mouroulis, P., Green, R.O., Chrien, T.G.: Design of pushbroom imaging spec-trometers for optimum recovery of spectroscopic and spatial information. Applied Optics 39 (13), 2210–2220 (2000) 29. Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M., Khalidov, V., Fernandez, P., Haziza, D., Massa, F., El-Nouby, A., Assran, M., Ballas, N., Galuba, W., Howes, R., Huang, P.Y., Li, S.W., Misra, I., Rabbat, M., Sharma, V., Synnaeve, G., Xu, H., Jegou, H., Mairal, J., Labatut, P., Joulin, A., Bojanowski, P.: Dinov2: Learning robust visual features without supervision (2024), https://arxiv.org/ abs/2304.07193 VLM-Aware Meta-Optic Front-End Design 17 30. Oskooi, A.F., Roundy, D., Ibanescu, M., Bermel, P., Joannopoulos, J.D., Johnson, S.G.: Meep: A flexible free-software package for electromagnetic simulations by the fdtd method. Computer Physics Communications 181 (3), 687–702 (2010) 31. Peng, J., Luo, M., Han, Y., Wu, S., Li, H., Shastri, B.J., Shu, C., Dou, Q., Chai, Y., Huang, C.: Optical metasurfaces for general vision processing on the edge. Nature 
+
+654 , 917–925 (2026). https://doi.org/10.1038/s41586-026-10635-z 
+
+32. Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., Sutskever, I.: Learning transferable visual models from natural language supervision. In: Meila, M., Zhang, T. (eds.) Proceedings of the 38th International Conference on Machine Learning. Proceed-ings of Machine Learning Research, vol. 139, pp. 8748–8763. PMLR (18–24 Jul 2021), https://proceedings.mlr.press/v139/radford21a.html 
+
+33. Rodionov, S., Burguete-Lopez, A., Makarenko, M., Wang, Q., Getman, F., Frat-alocchi, A.: Moclip: A foundation model for large-scale nanophotonic inverse de-sign. arXiv preprint arXiv:2511.18980 (2025) 34. Seo, J., Jo, J., Kim, J., Kang, J., Kang, C., Moon, S.W., Lee, E., Hong, J., Rho, J., Chung, H.: Deep-learning-driven end-to-end metalens imaging. Advanced Pho-tonics 6(6), 066002 (2024) 35. Shen, Z., Zhao, F., Jin, C., Wang, S., Cao, L., Yang, Y.: Monocular metasurface camera for passive single-shot 4d imaging. Nature Communications 14 (1), 1035 (2023) 36. Sitzmann, V., Diamond, S., Peng, Y., Dun, X., Boyd, S., Heidrich, W., Heide, F., Wetzstein, G.: End-to-end optimization of optics and image processing for achro-matic extended depth of field and super-resolution imaging. ACM Transactions on Graphics (TOG) 37 (4), 1–13 (2018) 37. Tian, Y., Krishnan, D., Isola, P.: Contrastive representation distillation. arXiv preprint arXiv:1910.10699 (2019) 38. Tseng, E., Colburn, S., Whitehead, J., Huang, L., Baek, S.H., Majumdar, A., Heide, F.: Neural nano-optics for high-quality thin lens imaging. Nature communications 
+
+12 (1), 6493 (2021) 39. Tseng, E., Mosleh, A., Mannan, F., St-Arnaud, K., Sharma, A., Peng, Y., Braun, A., Nowrouzezahrai, D., Lalonde, J.F., Heide, F.: Differentiable compound optics and processing pipeline optimization for end-to-end camera design. ACM Trans-actions on Graphics (TOG) 40 (2), 1–19 (2021) 40. Wang, J., Yu, R., Ye, X., Sun, J., Li, J., Huang, C., Xiao, X., Ji, J., Shen, W., Tie, Z., Chen, C., Zhu, S., Li, T.: Quantitative phase imaging with a compact meta-microscope. npj Nanophotonics 1(1), 4 (Apr 2024). https://doi.org/10. 1038/s44310-024-00007-8 , https://doi.org/10.1038/s44310-024-00007-8 
+
+41. Wang, Z., Bovik, A.C., Sheikh, H.R., Simoncelli, E.P.: Image quality assessment: from error visibility to structural similarity. IEEE transactions on image processing 
+
+13 (4), 600–612 (2004) 42. Wirth-Singh, A., Fröch, J.E., Yang, F., Martin, L., Zheng, H., Zhang, H., Tanguy, Q.T., Zhou, Z., Huang, L., John, D.D., et al.: Wide field of view large aperture meta-doublet eyepiece. Light: Science & Applications 14 (1), 17 (2025) 43. Wirth-Singh, A., Xiang, J., Choi, M., Fröch, J.E., Huang, L., Colburn, S., Shlizer-man, E., Majumdar, A.: Compressed meta-optical encoder for image classification. Advanced Photonics Nexus 4(2), 026009–026009 (2025) 44. Zhai, X., Mustafa, B., Kolesnikov, A., Beyer, L.: Sigmoid loss for language im-age pre-training. In: Proceedings of the IEEE/CVF international conference on computer vision. pp. 11975–11986 (2023) 18 Kang et al. 45. Zhang, Q., Lin, P., Wang, C., Zhang, Y., Yu, Z., Liu, X., Lu, Y., Xu, T., Zheng, Z.: Neural-optic co-designed polarization-multiplexed metalens for compact com-putational spectral imaging. Laser & Photonics Reviews 18 (8), 2400187 (2024) 46. Zhou, C., Nayar, S.K.: Computational cameras: convergence of optics and process-ing. IEEE Transactions on Image Processing 20 (12), 3322–3340 (2011)
