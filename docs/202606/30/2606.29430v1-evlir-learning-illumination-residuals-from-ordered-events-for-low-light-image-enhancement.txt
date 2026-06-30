@@ -1,0 +1,473 @@
+Title: EvLIR: Learning Illumination Residuals from Ordered Events for Low-Light Image Enhancement
+
+URL Source: https://arxiv.org/pdf/2606.29430v1
+
+Published Time: Tue, 30 Jun 2026 01:28:59 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# EvLIR: Learning Illumination Residuals from Ordered Events for Low-Light Image Enhancement 
+
+## Haoxian Zhou 1* Chuanzhi Xu 1* Langyi Chen 1 Pengfei Ye 2
+
+## Haodong Chen 1 Qiang Qu 1 Ali Anaissi 1 Weidong Cai 11The University of Sydney 2Massachusetts Institute of Technology 15          
+
+> 20
+> 25
+> 30
+> SDE -in
+> SDE -out
+> SDSD -in
+> SDSD -out
+> 15
+> 20
+> 25
+> 30
+> SDE -in
+> SDE -out
+> SDSD -in
+> SDSD -out
+> PSN R*
+> 0.60
+> 0.70
+> 0.80
+> 0.95
+> 0.90
+> SDE -in
+> SDE -out
+> SDSD -in
+> SDSD -out
+> SSIM
+> Ours E2VID+ SNR -Net Uformer LLFIow -L-SKF
+> Retinexformer ELIE eSL -Net Liu et aI. EvLight
+> PSNR
+
+# EvLIR             
+
+> Input Low -light
+> RGB Image
+> Temporal
+> Illumination
+> Correction
+> Temporal Event
+> Residual Module
+> (TERM )Illumination
+> Residual 𝚫 L
+> Input Event
+> Stream
+> Corrected
+> Illumination 𝐿
+> Enhanced
+> Image
+> Image -Event fusion
+> Restoration network
+> EvLight Ground Truth
+> Enhancement  Comparison
+> eSL -Net SNR -Net Retinexformer Low -light Image Event Stream
+> Baselines
+
+EvLIR
+
+> Inputs
+
+Figure 1. Temporal-residual enhancement in EvLIR. A low-light frame provides an unreliable snapshot, while ordered event bins expose short-window brightness-change trends. The Temporal Event Residual Module (TERM) summarizes these temporal cues and predicts a bounded illumination correction for low-light restoration. 
+
+## Abstract 
+
+Low-light image enhancement is severely ill-posed when the input frame contains missing structure, saturated noise, and weak local contrast. Event cameras provide asynchronous brightness-change observations with high temporal resolu-tion, but prior works often treat voxel channels as an un-ordered or static feature stack before fusion, rather than ex-plicitly modeling their within-window temporal evolution, weakening the temporal evidence that makes events use-ful. We propose EvLIR, a temporal-residual enhancement framework that learns illumination residuals from ordered events for low-light image enhancement. Given a low-light frame and its aligned event voxel, EvLIR preserves the or-
+
+> *
+
+Corresponding authors: Chuanzhi Xu: chuanzhi.xu@sydney.edu.au, Haoxian Zhou: hzho0442@uni.sydney.edu.au 
+
+dered temporal bins of the event stream and introduces a Temporal Event Residual Module (TERM) to encode short-window event dynamics with a lightweight ConvGRU. The resulting temporal state is converted into a bounded illumi-nation correction, which provides spatially adaptive pho-tometric guidance for Retinex-style illumination estimation and subsequent reliability-aware image-event restoration. On SDE and SDSD indoor/outdoor benchmarks, EvLIR achieves the best result on eleven of twelve dataset-metric pairs, with average scores of 25.63 dB PSNR, 28.30 dB PSNR*, and 0.827 SSIM across the four benchmarks. 
+
+## 1. Introduction 
+
+Low-light image enhancement (LLIE) aims to recover vis-ible, clean, and contrast-rich images from severely under-exposed observations. In extreme low light, however, a sin-
+
+> arXiv:2606.29430v1 [cs.CV] 28 Jun 2026
+
+gle frame may not contain enough reliable structure: dark regions are dominated by shot noise, local contrast col-lapses, and aggressive brightening easily amplifies artifacts [46]. Recent LLIE methods leverage event cameras to pro-vide complementary cues for low-light image enhancement. Event cameras are bio-inspired sensors that respond asynchronously to brightness changes. They output sparse events with timestamp, spatial location, and polarity, in-stead of dense frames at a fixed rate [7, 8]. Compared with conventional cameras, event cameras provide microsecond-level temporal resolution, low latency, high dynamic range, and reduced motion blur. These advantages have enabled their use in various vision tasks, such as visual odome-try [49], super-resolution [39], pose estimation [48], and 3D reconstruction [37, 38]. In particular, their high dynamic range and sensitivity to brightness changes make them well suited for challenging illumination scenarios. Some meth-ods have explored using events to guide low-light image en-hancement [16–18, 45]. For LLIE, the temporal sequence of events can pro-vide useful information. Events occurring within a short time window are more likely to reflect consistent brightness changes or structural cues, while isolated events may be less reliable and can be caused by sensor noise or transient mo-tion [9, 10]. Based on this observation, we hypothesize that a low-light enhancer should consider not only the spatial presence of events, but also their short-term temporal con-sistency when estimating illumination. In this paper, we propose Event-based Illumination Residual Learning (EvLIR) , a temporal-residual enhance-ment framework for event-guided low-light image enhance-ment. Instead of treating event voxels as static multi-channel inputs, EvLIR models their short-window tempo-ral evolution and uses it to guide illumination estimation, as summarized in Fig. 1. Specifically, a 32-channel event voxel is divided into K ordered groups, where each group is encoded by a lightweight convolutional projector. A Con-vGRU is then used to aggregate the ordered event features and capture intra-window temporal dependencies. The re-sulting hidden state is processed by the Temporal Event Residual Module (TERM) to produce a bounded illumina-tion correction, which transforms asynchronous event dy-namics into spatially adaptive photometric guidance before image-event feature fusion. The bounded residual design is important for event-guided LLIE, since event signals can be sparse, noisy, and highly dependent on scene content. By injecting event-derived temporal corrections into the illumination path, EvLIR couples short-term brightness-change trends with image-event restoration and provides spatially adap-tive photometric guidance. Our contributions are summarized as follows. • We introduce short-window temporal event modeling for event-guided low-light image enhancement. Instead of treating an event voxel as a static multi-channel map, we preserve its ordered temporal bins and use them to capture brightness-change trends for illumination estimation. • We design a Temporal Event Residual Module (TERM) that converts ordered event bins into a bounded illumi-nation correction. The module transforms asynchronous event dynamics into spatially adaptive photometric guid-ance, enabling the enhancer to refine low-light illumina-tion according to short-term brightness-change trends. • We present a unified temporal-residual enhancement framework that couples ordered event modeling, illu-mination correction, and reliability-aware image-event restoration. Experiments on SDE and SDSD datasets demonstrate strong and consistent performance. 
+
+## 2. Related Work 
+
+2.1. Frame-Based Low-Light Image Enhancement 
+
+Low-light image enhancement aims to improve the bright-ness, contrast, and detail visibility of images captured un-der insufficient illumination. Traditional frame-based meth-ods usually rely on hand-crafted priors, such as histogram equalization [1, 2, 6] and Retinex theory [11, 20, 25, 40, 47]. However, these methods depend on strong assumptions about image formation and often struggle in complex real-world scenes. Learning-based methods substantially improve LLIE performance under realistic and complex illumination con-ditions. Early CNN-based approaches, including LL-Net [22], RetinexNet [34], and KinD [46], study low-light restoration from the perspectives of end-to-end en-hancement, Retinex decomposition, and layer-wise im-age restoration. Transformer-based methods, such as LL-Former [31] and Retinexformer [5], further exploit long-range dependency modeling to improve detail reconstruc-tion and global consistency. More recently, Bai et al. pro-posed DRWKV [3], an RWKV-based LLIE model that im-proves edge continuity with relatively low computational cost. Most supervised deep LLIE models rely on paired low-light and normal-light images, which are difficult to collect at scale in real scenes. To address this problem, un-paired or no-reference methods such as EnlightenGAN [15] have been proposed. More recent generative models, such as Diff-Retinex [44], further improve perceptual quality and detail recovery using diffusion priors. However, these mod-els often introduce higher model complexity and inference cost. Despite their progress, frame-based methods remain constrained by the imaging physics of RGB sensors. Un-der extremely low illumination, a large amount of visual information may already be lost during acquisition. Short exposure produces severe noise, while long exposure can in-troduce motion blur. Once scene structures and textures are lost during image capture, image enhancement alone can hardly recover them reliably. 
+
+2.2. Event-Guided Low-Light Image Enhancement 
+
+Event cameras provide high dynamic range, high temporal resolution, and reduced motion blur, making them useful for low-light perception. Early event-based methods related to low-light imaging mainly focus on reconstructing images or videos from events alone, such as [24, 26]. These methods show the potential of events as an alternative visual signal, but they do not fully exploit the complementary relation-ship between a low-light RGB frame and its aligned event stream. Recent works explore the joint use of low-light RGB images and events for LLIE, where events provide com-plementary high-contrast structural cues under poor illu-mination. Early studies mainly use events to compensate for missing structures in low-light frames. For example, Zhang et al. [45] formulate low-light event-to-image recon-struction as an unsupervised domain adaptation problem, while Jin et al. [17] reconstruct event gradients and fuse them with low-light image features through a dual-branch GAN. Subsequent methods further improve cross-modal fu-sion and illumination modeling. Jiang et al. [16] combine event streams and under-exposed frames with residual fu-sion, multi-scale Transformer encoding, and multi-level re-construction losses. Wu et al. [36] propose an unsupervised event-assisted enhancement method by matching simulated event maps with real events. More recent methods incorpo-rate Retinex-style illumination estimation and controllable enhancement. Sun et al. [27] and Guo et al. [12] use event information to guide illumination estimation and Retinex decomposition, while Lu et al. [23] introduce brightness prompts for controllable low-light enhancement. Liang et al. [18] propose EvLight and construct SDE, a large-scale real-world event-image dataset with spatio-temporal alignment. SDE establishes a representative benchmark for event-guided LLIE and enables systematic evaluation under indoor and outdoor low-light scenes. Although these methods demonstrate the value of events for LLIE, most of them still treat events mainly as structural edges, illumination priors, or static voxel features. The tem-poral order inside the event window is usually compressed before fusion, which makes it harder to distinguish stable brightness changes from noisy event responses. In con-trast, EvLIR explicitly preserves short-window event order by splitting the event voxel into temporal bins and encoding them with the Temporal Event Residual Module (TERM). This design uses the intrinsic temporal resolution of events to produce event-derived illumination corrections for more reliable low-light restoration. 
+
+## 3. Method 
+
+3.1. Base Illumination Estimation 
+
+Given a low-light RGB image Il ∈ R3×H×W and an aligned event voxel E ∈ RC×H×W , EvLIR aims to recover a normal-light image ˆI. We formulate the enhancement pro-cess through Retinex-style illumination estimation. An il-lumination network first estimates a base illumination map 
+
+L0 ∈ R1×H×W from the low-light observation and its illu-mination priors: 
+
+L0, F l = I(Il, P i), (1) where Pi denotes the sampled illumination priors and Fl is the illumination feature. The base illumination map pro-vides the initial photometric estimate for low-light correc-tion. Instead of using this estimate directly, EvLIR refines it with temporal information from ordered events. The overall architecture is shown in Fig. 2. 
+
+3.2. Ordered Event Representation 
+
+The event voxel contains C channels produced by temporal discretization. Directly treating these channels as a static feature map can obscure the short-window order of bright-ness changes. To preserve this temporal structure, we divide the event voxel into K ordered bins: 
+
+E = [ E1, E 2, . . . , E K ], Ek ∈ R CK ×H×W . (2) Each Ek represents one ordered time segment in the event window. This representation allows the network to dis-tinguish consistent brightness-change trends from isolated event responses and provides the input sequence for the temporal residual estimation. 
+
+3.3. Temporal Event Residual Module 
+
+The Temporal Event Residual Module (TERM) converts the ordered event bins into a temporal feature for illumination correction. For each event bin, TERM first applies a 3 × 3
+
+convolution followed by LeakyReLU: 
+
+Xk = ϕ(Ek), (3) where ϕ denotes the convolutional projector. The projected sequence is then encoded by a ConvGRU. For the k-th bin, the recurrent update is represented as: 
+
+Zk = σ(Wz ∗ [Xk, H k−1]) , (4) 
+
+Rk = σ(Wr ∗ [Xk, H k−1]) , (5) 
+
+˜Hk = tanh( Wh ∗ [Xk, R k ⊙ Hk−1]) , (6) 
+
+Hk = (1 − Zk) ⊙ Hk−1 + Zk ⊙ ˜Hk, (7) where Hk is the hidden state, Zk and Rk are the update and reset gates, ∗ denotes convolution, and all ConvGRU gates 在此处键⼊公式。 
+
+(a) Temporal Event Residual Module (TERM) 
+
+(b) Temporal Illumination Correction 
+
+(c) Overall Architecture of EvLIR            
+
+> Aligned Event Voxel 𝑬
+> 32 -channel voxel
+> H×W
+> 1
+> •
+> •
+> •
+> 32 time
+> Ordered Event Representation
+> split into 𝐾 ordered bins
+> 𝐾 = 8
+> 𝐸 !𝐸 "𝐸 #𝐸 $
+
+⋯      
+
+> each bin: C/K ×H×W
+> Shared
+> Projection
+> Conv 3 ×3
+> +
+> LeakyReLU
+> 𝑋 !=𝜙 (𝐸 !)
+> ConvGRU
+> (temporal encoder)
+
+⋯                       
+
+> Process {𝑋₁ ,𝑋₂ ,…,𝑋 ₖ}
+> Temporal
+> State 𝐻 !
+> Illumination
+> Residual 𝚫 L
+> Δ𝐿 =𝑠 ⋅tanh 𝜓 𝐻 !
+> Input Low -light
+> RGB Image 𝑰 𝒍 Base Illumination 𝐿 #
+> Illumination
+> Residual Δ𝐿
+> Combine with residual weight 𝜶
+
+𝑳 = 𝑳 𝟎 + 𝜶 𝚫 𝑳              
+
+> 𝛼 :Temporal Residual Weight
+> Corrected
+> Illumination 𝑳
+> Input Event Stream
+> Retinex Light -up
+> Event Feature Extractor 𝒇 𝒆
+> Concat +
+> 1×1
+> Align 𝒇 𝒂
+> SNR map 𝑺
+> Enhanced Image
+
+…             
+
+> Input Low -light
+> RGB Image 𝑰 𝒍
+> Residual Head
+> Conv + LReLU + Conv
+> Illumination priors 𝑷 𝒊
+> Illumination network
+> Restoration Network
+> (Restoration Backbone)
+> Image Feature 𝑭 𝒊 Aligned Image -event
+> Feature 𝑭 𝒊𝒆
+
+Temporal 
+
+Illumination 
+
+Correction   
+
+> Event Feature 𝑭 𝒆
+> Guide
+
+TERM       
+
+> Illumination Residual Δ𝐿 Corrected Illumination 𝑳
+
+Figure 2. Architecture of EvLIR. Ordered event bins are processed by the Temporal Event Residual Module to predict a bounded illumination correction. The corrected illumination drives Retinex light-up, and reliability-aware image-event restoration produces the final image. 
+
+use 3 × 3 convolutions. The temporal state Hk after the last ordered bin summarizes the short-term event dynamics inside the window. This sequential design is important because ordered event bins should not be reduced to a static channel stack too early. A direct concatenation of all bins can mix tem-poral and spatial evidence, but it does not explicitly model how brightness changes evolve from early to late bins. Sim-ilarly, averaging the per-bin features preserves the existence of multiple bins but removes their temporal transition, mak-ing persistent changes and isolated event responses harder to separate. In TERM, the ConvGRU processes the bins in order and updates the hidden state through reset and up-date gates. Consistent brightness-change patterns can be reinforced across consecutive bins, while sparse or tran-sient responses can be down-weighted when they are not supported by the temporal context. The resulting state pre-dicts a spatially adaptive illumination correction, allowing different regions to receive residual adjustments based on local event dynamics. The pseudo-code of TERM is given in Algorithm 1. 
+
+Algorithm 1 Temporal Event Residual Module in EvLIR 
+
+Input: event voxel E, base illumination L0, bin num-ber K
+
+Output: corrected illumination L
+
+1: Split E into ordered bins [E1, E 2, . . . , E K ]
+
+2: Initialize temporal state H0 ← 0
+
+3: for k = 1 , . . . , K do 
+
+4: Project current bin: Xk ← ϕ(Ek)
+
+5: Form recurrent input: Uk ← [Xk, H k−1]
+
+6: Update gate: Zk ← σ(Wz ∗ Uk)
+
+7: Reset gate: Rk ← σ(Wr ∗ Uk)
+
+8: Candidate input: Vk ← [Xk, R k ⊙ Hk−1]
+
+9: Candidate state: ˜Hk ← tanh( Wh ∗ Vk)
+
+10: Hk ← (1 − Zk) ⊙ Hk−1 + Zk ⊙ ˜Hk
+
+11: end for 
+
+12: Predict residual: ∆L ← s · tanh( ψ(Hk)) 
+
+13: Refine illumination: L ← L0 + α∆L
+
+14: return LTable 1. Quantitative comparison on SDE and SDSD benchmarks. The best and second-best results in each metric are shown in bold and underlined, respectively.                                                                                                                                                   
+
+> Input Method SDE-in SDE-out SDSD-in SDSD-out PSNR PSNR* SSIM PSNR PSNR* SSIM PSNR PSNR* SSIM PSNR PSNR* SSIM Event only E2VID+ [26] 15.19 15.92 0.5891 15.01 16.02 0.5765 13.48 13.67 0.6494 16.58 17.27 0.6036 Image only SNR-Net [42] 20.05 21.89 0.6302 22.18 22.93 0.6611 24.74 25.30 0.8301 24.82 26.44 0.7401 Image only Uformer [33] 21.09 22.75 0.7524 22.32 23.57 0.7469 24.03 25.59 0.8999 24.08 25.89 0.8184 Image only LLFlow-L-SKF [35] 20.92 22.22 0.6610 21.68 23.41 0.6467 23.39 24.13 0.8180 20.39 24.73 0.6338 Image only Retinexformer [5] 21.30 23.78 0.6920 22.92 23.71 0.6834 25.90 25.97 0.8515 26.08 28.48 0.8150 Image+Event ELIE [16] 19.98 21.40 0.6178 20.69 23.12 0.6533 27.46 28.30 0.8793 23.29 28.26 0.7423 Image+Event eSL-Net [28] 21.25 23.19 0.7277 22.42 24.39 0.7187 24.99 25.72 0.8786 24.49 26.36 0.8031 Image+Event Liu et al. [21] 21.79 23.88 0.7051 22.35 23.89 0.6895 27.58 28.43 0.8879 23.51 27.63 0.7263 Image+Event EvLight [18] 21.98 24.41 0.7527 21.49 25.08 0.7159 29.47 30.77 0.9341 24.39 30.67 0.8123 Image+Event EvLIR (ours) 22.50 25.00 0.7699 22.72 25.78 0.7540 31.18 31.53 0.9346 26.10 30.89 0.8498
+
+3.4. Temporal Illumination Correction 
+
+TERM converts the temporal state Hk into a bounded illu-mination residual. The residual head ψ consists of a 3 × 3
+
+convolution, LeakyReLU, and a final 3 × 3 convolution: 
+
+∆L = s · tanh( ψ(Hk)) , (8) where Hk denotes the state after the last ordered bin has been processed, and s controls the residual scale. The cor-rected illumination map is then computed as: 
+
+L = L0 + α∆L, (9) where α controls the contribution of the temporal resid-ual. The bounded residual transforms asynchronous event dynamics into spatially adaptive photometric guidance, en-abling the enhancer to refine low-light illumination accord-ing to short-term brightness-change trends. The corrected illumination is used for Retinex light-up: 
+
+Im = Il ⊙ L + Il. (10) 
+
+3.5. Reliability-Aware Image-Event Restoration 
+
+After temporal illumination correction, EvLIR extracts im-age and event features for restoration. The image branch encodes the light-up image Im, while the event branch en-codes the original event voxel: 
+
+Fi = fi(Im), Fe = fe(E). (11) The two feature maps are concatenated and aligned by a 
+
+1 × 1 convolution: 
+
+Fie = fa([ Fi, F e]) . (12) An SNR map provides a spatial reliability prior for image-event restoration [18]. High-SNR regions indicate more re-liable image evidence, whereas low-SNR regions encour-age stronger use of event features. The restoration network takes the aligned image-event feature Fie , the light-up im-age Im, image feature Fi, event feature Fe, and SNR map as inputs to predict the final normal-light image: 
+
+ˆI = R(Fie , I m, F i, F e, S ). (13) In this way, EvLIR jointly organizes ordered event dynam-ics, illumination correction, and spatially adaptive modality selection within a temporal-residual enhancement frame-work. 
+
+## 4. Experiments and Results 
+
+4.1. Experimental Setup 
+
+Datasets. We evaluate on four event-guided LLIE bench-marks: SDE-in, SDE-out, SDSD-in, and SDSD-out. The SDE [18] dataset contains 91 paired image-event sequences, including 43 indoor and 48 outdoor sequences, with 76 sequences for training and 15 for testing. All data are captured at a resolution of 346 × 260 .The SDSD [29] benchmark contains paired low-light and normal-light videos from dynamic indoor and outdoor scenes at an original resolution of 1920 × 1080 . Follow-ing the dynamic-subset protocol, 125 sequences are used for training, and 25 sequences are used for testing. The videos are resized to 346 × 260 .
+
+Benchmarks and Metrics. We compare EvLIR with rep-resentatively leading and reproducible baselines, includ-ing event-only, image-only, and image-event enhancement methods. E2VID+ uses only the event stream, while SNR-Net, Uformer, LLFlow-L-SKF, and Retinexformer take only the low-light RGB image as input. ELIE, eSL-Net, Liu et al., EvLight, and EvLIR use both the low-light image and the aligned event representation. These leading meth-ods provide a meaningful comparison across different in-put modalities and are sufficient to evaluate the effective-ness of EvLIR on the SDE and SDSD datasets. We re-port Peak Signal-to-Noise Ratio (PSNR) [14], PSNR* [18], Input Event eSL-Net SNR-Net Retinexformer EvLight Ours GT        
+
+> Figure 3. Qualitative comparison on SDE-in.
+> Input Event eSL-Net SNR-Net Retinexformer EvLight Ours GT
+> Figure 4. Qualitative comparison on SDE-out.
+
+and the Structural Similarity Index Measure (SSIM) [32] as image restoration metrics. More experimental details, comparison-scope discussion, and additional results are provided in section A of the supplementary material. 
+
+Implementation Details. All images are evaluated at 
+
+260 × 346 resolution. For EvLIR, the event voxel has 32 channels and is split into K = 8 ordered temporal bins by default. The temporal hidden dimension is 16, with α = 0 .1
+
+and residual scale s = 0 .1. We train the models with Adam using an initial learning rate of 1.5 × 10 −4 and a cosine learning-rate schedule for 80 epochs. Training and evalu-ation are conducted on a single NVIDIA RTX 5090 GPU. During training, the GPU memory usage is approximately 60%. The training time is about 8 hours on SDE-in, 7.5 hours on SDE-out, 8.5 hours on SDSD-in, and 10 hours on SDSD-out. 
+
+4.2. Quantitative Comparison 
+
+Table 1 shows that EvLIR achieves the best result on eleven of the twelve dataset-metric pairs. On SDE-in, EvLIR reaches 22.50 dB PSNR, 25.00 dB PSNR*, and 0.7699 SSIM, improving the best competing results by 0.52 dB, 0.59 dB, and 0.0172, respectively. On SDE-out, EvLIR ob-tains the highest PSNR* and SSIM, with gains of 0.70 dB and 0.0071 over the best competing scores. On SDSD-in, EvLIR ranks first on all three metrics, including a 1.71 dB PSNR improvement over the best competing result, indicat-ing that the temporal cue remains useful when events are generated synthetically. On SDSD-out, it achieves 26.10 dB PSNR, 30.89 dB PSNR*, and 0.8498 SSIM, surpassing the previous best results by 0.02 dB, 0.22 dB, and 0.0314. Across the four datasets, EvLIR obtains average scores of 25.63 dB PSNR, 28.30 dB PSNR*, and 0.8271 SSIM. The only exception is SDE-out PSNR, where Retinex-former obtains 22.92 dB while EvLIR obtains 22.72 dB; however, EvLIR still achieves the best SDE-out PSNR* Input Event eSL-Net SNR-Net Retinexformer EvLight Ours GT        
+
+> Figure 5. Qualitative comparison on SDSD-in.
+> Input Event eSL-Net SNR-Net Retinexformer EvLight Ours GT
+> Figure 6. Qualitative comparison on SDSD-out.
+
+and SSIM, suggesting stronger exposure-normalized fi-delity and structural similarity. 
+
+4.3. Qualitative Comparison 
+
+Figures 3–6 show qualitative comparisons on randomly se-lected test samples from each dataset. Compared with image-only and event-guided baselines, EvLIR restores clearer structural boundaries and preserves more fine de-tails in low-light regions. The results also contain fewer visible noise artifacts and more natural contrast, especially around edges and textured areas. In addition, the recov-ered illumination is closer to the ground truth, avoiding both under-enhancement in dark regions and over-enhancement in bright regions. These visual comparisons indicate that our method helps produce cleaner, sharper, and more faith-ful results. To further examine the applicability, we collect real-world low-light data. Additional visualizations are pro-vided in section D of the supplementary material. 
+
+4.4. Ablation Study 
+
+We conduct two ablation studies on SDE-in to examine the temporal aggregation strategy and temporal granularity in TERM. All variants retain the same illumination-residual head and restoration network; only the aggregation of event evidence is changed. Order-Free Accumulation collapses the 32-channel event voxel before feature projection and residual prediction. Bin-Wise Mean independently projects each temporal bin and then applies order-invariant average pooling. Ordered ConvGRU corresponds to the complete TERM and processes the projected bins sequentially. As shown in Table 2, extracting features from individ-ual temporal bins before aggregation improves PSNR from 21.99 dB to 22.27 dB, PSNR* from 24.58 dB to 24.85 dB, and SSIM from 0.7534 to 0.7650. Replacing order-invariant mean pooling with Ordered ConvGRU further im-proves the three metrics to 22.50 dB, 25.00 dB, and 0.7699, respectively. Relative to order-free aggregation, the com-plete design yields gains of 0.51 dB PSNR, 0.42 dB PSNR*, Table 2. Ablation of temporal aggregation in TERM on SDE-in. All variants use the same residual head and restoration network.                                        
+
+> Variant PSNR PSNR* SSIM Order-Free Accumulation 21.99 24.58 0.7534 Bin-Wise Mean 22.27 24.85 0.7650 Ordered ConvGRU (TERM) 22.50 25.00 0.7699
+> Table 3. Parameter ablation of the number of temporal bins Kin TERM on SDE-in and SDE-out.
+> KSDE-in SDE-out PSNR PSNR* SSIM PSNR PSNR* SSIM 422.41 24.58 0.7639 21.94 25.59 0.7335 822.50 25.00 0.7699 22.72 25.78 0.7537
+> 16 22.15 24.79 0.7625 22.33 25.35 0.7331
+
+and 0.0165 SSIM. These controlled comparisons indicate that bin-level feature extraction is more effective than early event accumulation and that sequence-aware aggregation provides additional benefits over order-invariant pooling. We also study the number of temporal bins K in TERM. Table 3 compares K = 4 , K = 8 , and K = 16 on SDE-in and SDE-out under the same model configuration. Asmaller K provides denser events per bin but coarser tem-poral resolution, while a larger K improves temporal gran-ularity but makes each recurrent input sparser and more noise-sensitive. The best results are consistently obtained with K = 8 on all six dataset-metric pairs. Compared with 
+
+K = 4 and K = 16 , K = 8 improves PSNR by 0.09 dB and 0.35 dB on SDE-in, and by 0.78 dB and 0.39 dB on SDE-out, respectively. These results indicate that K = 8 
+
+provides a better balance between temporal resolution and per-bin event density. Additional details are provided in Section C of the supplementary material. 
+
+4.5. Residual Visualization 
+
+Fig. 7 provides a direct view of how TERM modifies the il-lumination path. The low-light inputs contain weak contrast and poorly visible structures, while the base illumination maps capture only the coarse exposure distribution. The learned residuals are spatially non-uniform and concentrate around event-supported edges, texture boundaries, and local brightness transitions. After adding the residual to the base illumination, the corrected maps preserve the coarse light-ing layout while sharpening local photometric details. The resulting outputs recover clearer scene structures and more balanced illumination. This behavior is consistent with the ablation results: bin-level feature extraction is more effec-tive than early event accumulation, and Ordered ConvGRU further improves restoration by using event dynamics to produce localized illumination corrections.        
+
+> Input Base L0Residual ∆LCorrected LOutput
+> Figure 7. Visualization of learned illumination residuals on three SDE-in samples. From left to right: low-light input, base illumi-nation, residual heatmap predicted from ordered events, corrected illumination, and enhanced output.
+
+4.6. Analysis 
+
+The results support the hypothesis that event temporal order provides useful evidence for illumination correction. The largest PSNR improvements appear on the SDSD splits, where temporally coherent synthetic events can provide clean photometric trends. The SDE improvements are smaller but consistent, which is expected for real event data containing sensor noise, imperfect synchronization, and scene-dependent event sparsity. The controlled aggregation study further separates the effects of temporal partitioning and recurrent modeling. Order-free accumulation performs worst, bin-wise mean pooling benefits from bin-level fea-tures, and Ordered ConvGRU achieves the strongest results. 
+
+## 5. Conclusion 
+
+We propose EvLIR, a temporal-residual enhancement framework for event-guided low-light image enhancement. Instead of treating the event voxel as a static multi-channel map, EvLIR preserves ordered temporal bins and uses the Temporal Event Residual Module (TERM) to con-vert short-term event dynamics into a bounded illumina-tion correction. This design couples ordered event dy-namics with Retinex-style illumination refinement and pro-vides spatially adaptive photometric guidance according to brightness-change trends. Experiments on SDE and SDSD indoor/outdoor benchmarks show strong overall per-formance against image-only and image-event methods, with the best result on eleven of twelve dataset-metric pairs. The ablation results further demonstrate that bin-level event features and sequence-aware aggregation both contribute to the effectiveness of the illumination correction. Future work will further explore the generality and robustness of the pro-posed framework under more diverse low-light conditions. References 
+
+[1] Mohammad Abdullah-Al-Wadud, Md Hasanul Kabir, M Ali Akber Dewan, and Oksam Chae. A dynamic his-togram equalization for image contrast enhancement. IEEE transactions on consumer electronics , 53(2):593–600, 2007. 2[2] Tarik Arici, Salih Dikbas, and Yucel Altunbasak. A his-togram modification framework and its application for image contrast enhancement. IEEE Transactions on image process-ing , 18(9):1921–1935, 2009. 2 [3] Xuecheng Bai, Yuxiang Wang, Boyu Hu, Qinyuan Jie, Chuanzhi Xu, Kechen Li, Hongru Xiao, and Vera Chung. Drwkv: Focusing on object edges for low-light image en-hancement. In Proceedings of the IEEE/CVF Winter Confer-ence on Applications of Computer Vision , pages 1554–1564, 2026. 2 [4] Wenjie Cai, Qingguo Meng, Zhenyu Wang, Xingbo Dong, and Zhe Jin. Evrwkv: A continuous interactive rwkv frame-work for effective event-guided low-light image enhance-ment. IEEE Transactions on Circuits and Systems for Video Technology , 2026. 11 [5] Yuanhao Cai, Hao Bian, Jing Lin, Haoqian Wang, Radu Tim-ofte, and Yulun Zhang. Retinexformer: One-stage retinex-based transformer for low-light image enhancement. In Pro-ceedings of the IEEE/CVF international conference on com-puter vision , pages 12504–12513, 2023. 2, 5 [6] Turgay Celik and Tardi Tjahjadi. Contextual and variational contrast enhancement. IEEE Transactions on Image Process-ing , 20(12):3431–3441, 2011. 2 [7] Langyi Chen, Chuanzhi Xu, Haoxian Zhou, Pengfei Ye, Ziyu Luo, Haodong Chen, Qiang Qu, Xiaoming Chen, and Weidong Cai. Fracevent: Event-camera simulation via fractional-relaxation pixel dynamics, 2026. 2 [8] Guillermo Gallego, Tobi Delbr¨ uck, Garrick Orchard, Chiara Bartolozzi, Brian Taba, Andrea Censi, Stefan Leutenegger, Andrew J Davison, J¨ org Conradt, Kostas Daniilidis, et al. Event-based vision: A survey. IEEE transactions on pattern analysis and machine intelligence , 44(1):154–180, 2020. 2 [9] Daniel Gehrig and Davide Scaramuzza. Low-latency auto-motive vision with event cameras. Nature , 629(8014):1034– 1040, 2024. 2 [10] Shasha Guo and Tobi Delbruck. Low cost and latency event camera background activity denoising. IEEE Transactions on Pattern Analysis and Machine Intelligence , 45(1):785– 795, 2022. 2 [11] Xiaojie Guo, Yu Li, and Haibin Ling. Lime: Low-light im-age enhancement via illumination map estimation. IEEE Transactions on image processing , 26(2):982–993, 2016. 2 [12] Xuejian Guo, Zhiqiang Tian, Yuehang Wang, Siqi Li, Yu Jiang, Shaoyi Du, and Yue Gao. Eretinex: Event camera meets retinex theory for low-light image enhancement. In 
+
+2025 IEEE International Conference on Robotics and Au-tomation (ICRA) , pages 3759–3765. IEEE, 2025. 3 [13] Yuhuang Hu, Shih-Chii Liu, and Tobi Delbruck. v2e: From video frames to realistic dvs events. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 1312–1321, 2021. 11 [14] Quan Huynh-Thu and Mohammed Ghanbari. Scope of va-lidity of psnr in image/video quality assessment. Electronics letters , 44(13):800–801, 2008. 5 [15] Yifan Jiang, Xinyu Gong, Ding Liu, Yu Cheng, Chen Fang, Xiaohui Shen, Jianchao Yang, Pan Zhou, and Zhangyang Wang. Enlightengan: Deep light enhancement without paired supervision. IEEE transactions on image processing ,30:2340–2349, 2021. 2 [16] Yu Jiang, Yuehang Wang, Siqi Li, Yongji Zhang, Minghao Zhao, and Yue Gao. Event-based low-illumination image enhancement. IEEE Transactions on Multimedia , 26:1920– 1931, 2023. 2, 3, 5 [17] Haiyan Jin, Qiaobin Wang, Haonan Su, and Zhaolin Xiao. Event-guided low light image enhancement via a dual branch gan. Journal of Visual Communication and Image Represen-tation , 95:103887, 2023. 3 [18] Guoqiang Liang, Kanghao Chen, Hangyu Li, Yunfan Lu, and Lin Wang. Towards robust event-guided low-light image enhancement: a large-scale real-world event-image dataset and novel approach. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 23–33, 2024. 2, 3, 5 [19] Guoqiang Liang, Kanghao Chen, Hangyu Li, Yunfan Lu, and Lin Wang. Towards robust event-guided low-light image enhancement: a large-scale real-world event-image dataset and novel approach. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 23–33, 2024. 11 [20] Chunxiao Liu, Zelong Wang, Philip Birch, and Xun Wang. Efficient retinex-based framework for low-light image en-hancement without additional networks. IEEE Transactions on Circuits and Systems for Video Technology , 35(5):4896– 4909, 2024. 2 [21] Lin Liu, Junfeng An, Jianzhuang Liu, Shanxin Yuan, Xi-angyu Chen, Wengang Zhou, Houqiang Li, Yan Feng Wang, and Qi Tian. Low-light video enhancement with synthetic event guidance. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 1692–1700, 2023. 5 [22] Kin Gwn Lore, Adedotun Akintayo, and Soumik Sarkar. Ll-net: A deep autoencoder approach to natural low-light image enhancement. Pattern Recognition , 61:650–662, 2017. 2 [23] Yunfan Lu, Xiaogang Xu, Hao Lu, Yanlin Qian, Pengteng Li, Huizai Yao, Bin Yang, Junyi Li, Qianyi Cai, Weiyu Guo, et al. See: See everything every time–adaptive brightness adjustment for broad light range images via events. arXiv preprint arXiv:2502.21120 , 2025. 3 [24] Liyuan Pan, Cedric Scheerlinck, Xin Yu, Richard Hartley, Miaomiao Liu, and Yuchao Dai. Bringing a blurry frame alive at high frame-rate with an event camera. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 6820–6829, 2019. 3 [25] Hu Qiang, Yuzhong Zhong, Yiwei Liao, Xingxing You, Yuqi Zhu, and Songyi Dian. Gwretinex-net: Gray world retinex network for low-light image enhancement. IEEE Transac-tions on Circuits and Systems for Video Technology , 2025. 2[26] Timo Stoffregen, Cedric Scheerlinck, Davide Scaramuzza, Tom Drummond, Nick Barnes, Lindsay Kleeman, and Robert Mahony. Reducing the sim-to-real gap for event cam-eras. In European Conference on Computer Vision , pages 534–549. Springer, 2020. 3, 5 [27] Lei Sun, Yuhan Bao, Jiajun Zhai, Jingyun Liang, Yu-lun Zhang, Kaiwei Wang, Danda Pani Paudel, and Luc Van Gool. Low-light image enhancement using event-based illumination estimation. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 6667– 6677, 2025. 3 [28] Bishan Wang, Jingwei He, Lei Yu, Gui-Song Xia, and Wen Yang. Event enhanced high-quality image recovery. In 
+
+European Conference on Computer Vision , pages 155–171. Springer, 2020. 5 [29] Ruixing Wang, Xiaogang Xu, Chi-Wing Fu, Jiangbo Lu, Bei Yu, and Jiaya Jia. Seeing dynamic scene in the dark: Ahigh-quality video dataset with mechatronic alignment. In 
+
+Proceedings of the IEEE/CVF international conference on computer vision , pages 9700–9709, 2021. 5 [30] Ruixing Wang, Xiaogang Xu, Chi-Wing Fu, Jiangbo Lu, Bei Yu, and Jiaya Jia. Seeing dynamic scene in the dark: Ahigh-quality video dataset with mechatronic alignment. In 
+
+Proceedings of the IEEE/CVF international conference on computer vision , pages 9700–9709, 2021. 11 [31] Tao Wang, Kaihao Zhang, Tianrun Shen, Wenhan Luo, Bjorn Stenger, and Tong Lu. Ultra-high-definition low-light image enhancement: A benchmark and transformer-based method. In Proceedings of the AAAI conference on artificial intelli-gence , pages 2654–2662, 2023. 2 [32] Zhou Wang, Alan C Bovik, Hamid R Sheikh, and Eero P Si-moncelli. Image quality assessment: from error visibility to structural similarity. IEEE transactions on image processing ,13(4):600–612, 2004. 6 [33] Zhendong Wang, Xiaodong Cun, Jianmin Bao, Wengang Zhou, Jianzhuang Liu, and Houqiang Li. Uformer: A general u-shaped transformer for image restoration. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 17683–17693, 2022. 5 [34] Chen Wei, Wenjing Wang, Wenhan Yang, and Jiaying Liu. Deep retinex decomposition for low-light enhancement. 
+
+arXiv preprint arXiv:1808.04560 , 2018. 2 [35] Yuhui Wu, Chen Pan, Guoqing Wang, Yang Yang, Jiwei Wei, Chongyi Li, and Heng Tao Shen. Learning semantic-aware knowledge guidance for low-light image enhancement. In 
+
+Proceedings of the IEEE/CVF conference on computer vi-sion and pattern recognition , pages 1662–1671, 2023. 5 [36] Zehao Wu, Yuanqing Xia, Rui Hu, and Runze Gao. Event-gan: An unsupervised low-light grayscale image enhance-ment method based on event camera. IEEE Sensors Journal ,2025. 3 [37] Chuanzhi Xu, Langyi Chen, Haodong Chen, Vera Chung, and Vincent Qu. Towards end-to-end neuromorphic voxel-based 3d object reconstruction without physical priors. In 
+
+2025 IEEE International Conference on Multimedia and Expo (ICME) , pages 1–6, 2025. 2 [38] Chuanzhi Xu, Haoxian Zhou, Langyi Chen, Haodong Chen, Zeke Zexi Hu, Zhicheng Lu, Ying Zhou, Vera Chung, Qiang Qu, and Weidong Cai. A survey of 3d reconstruction with event cameras. Computational Visual Media , (99):1–37, 2026. 2 [39] Chuanzhi Xu, Haoxian Zhou, Langyi Chen, Yuk Ying Chung, and Qiang Qu. Ultralight polarity-split neuromor-phic snn for event-stream super-resolution. In Proceedings of the AAAI Conference on Artificial Intelligence , pages 11196– 11204, 2026. 2 [40] Jun Xu, Yingkun Hou, Dongwei Ren, Li Liu, Fan Zhu, Mengyang Yu, Haoqian Wang, and Ling Shao. Star: A struc-ture and texture aware retinex model. IEEE Transactions on Image Processing , 29:5022–5037, 2020. 2 [41] Senyan Xu, Zhijing Sun, Kean Liu, Xin Lu, Ruixuan Jiang, Xueyang Fu, and Zheng-Jun Zha. Event-illumination collab-orative low-light image enhancement with a high-resolution real-world dataset. In Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , pages 22270–22280, 2026. 11 [42] Xiaogang Xu, Ruixing Wang, Chi-Wing Fu, and Jiaya Jia. Snr-aware low-light image enhancement. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 17714–17724, 2022. 5 [43] Zishu Yao, Xiang-Xiang Su, Shengning Zhou, Guang-Yong Chen, Guodong Fan, and Xing Chen. Bievlight: Bi-level learning of task-aware event refinement for low-light image enhancement. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 41541– 41550, 2026. 11 [44] Xunpeng Yi, Han Xu, Hao Zhang, Linfeng Tang, and Ji-ayi Ma. Diff-retinex: Rethinking low-light image enhance-ment with a generative diffusion model. In Proceedings of the IEEE/CVF international conference on computer vision ,pages 12302–12311, 2023. 2 [45] Song Zhang, Yu Zhang, Zhe Jiang, Dongqing Zou, Jimmy Ren, and Bin Zhou. Learning to see in the dark with events. In European Conference on Computer Vision , pages 666– 682. Springer, 2020. 2, 3 [46] Yonghua Zhang, Jiawan Zhang, and Xiaojie Guo. Kindling the darkness: A practical low-light image enhancer. In Pro-ceedings of the 27th ACM international conference on mul-timedia , pages 1632–1640, 2019. 2 [47] Zunjin Zhao, Bangshu Xiong, Lei Wang, Qiaofeng Ou, Lei Yu, and Fa Kuang. Retinexdip: A unified deep framework for low-light image enhancement. IEEE Transactions on Cir-cuits and Systems for Video Technology , 32(3):1076–1088, 2021. 2 [48] Haoxian Zhou, Chuanzhi Xu, Langyi Chen, Pengfei Ye, Haodong Chen, Yuk Ying Chung, and Qiang Qu. Exploiting spatiotemporal properties for efficient event-driven human pose estimation. arXiv preprint arXiv:2512.06306 , 2025. 2 [49] Yi Zhou, Guillermo Gallego, and Shaojie Shen. Event-based stereo visual odometry. IEEE Transactions on Robotics , 37 (5):1433–1450, 2021. 2 Technical Appendices and Supplementary Material 
+
+## A. Additional Experimental Details 
+
+Dataset protocol. The experiments use the indoor and outdoor subsets of SDE [19] and SDSD [30]. SDE contains 91 spatially and temporally aligned image-event sequences, of which 76 are used for training and 15 for testing. The indoor and outdoor sequences are processed separately. For SDSD, we follow the dynamic-scene split with 125 training sequences and 25 testing sequences. The original SDSD videos are resized to the DAVIS spatial resolution before event-image processing. The events for SDSD are gener-ated with v2e [13], while SDE provides real events captured by an event camera. All spatial transformations are applied jointly to the low-light image, normal-light target, and event representation. The diagnostic visualizations in this supple-ment use matched 256 × 256 crops. 
+
+Event voxel construction. Each event is represented by timestamp, position, and polarity, (ti, x i, y i, p i), where pi ∈{− 1, +1 }. For an event window with C = 32 channels, the temporal channel index is 
+
+ci = clip 
+
+ ti − tmin 
+
+tmax − tmin 
+
+C
+
+
+
+, 0, C − 1
+
+
+
+. (14) The voxel value at (ci, y i, x i) accumulates pi. The resulting tensor is divided into K = 8 contiguous groups, with four voxel channels in each group. This grouping preserves the early-to-late order of the event window before ConvGRU encoding. 
+
+Frame-event alignment. For a frame with timestamp τj ,the event window is selected from the neighboring frame interval, 
+
+Ej = {ei | τj−1 ≤ ti ≤ τj+1 }, (15) with the first and last frames using the available sequence boundary. The same center crop is applied to the low-light frame, target frame when available, and event coor-dinates. This alignment keeps the event representation spa-tially matched to the image crop while preserving temporal evidence around the queried frame. 
+
+Optimization and objective. The model is optimized for 80 epochs with Adam using an initial learning rate of 
+
+1.5×10 −4, zero weight decay, and cosine annealing. Train-ing uses mixed precision, a fixed random seed of 2333, and the best checkpoint selected by validation loss. The batch size is 4 for SDE and 8 for SDSD. The temporal hidden di-mension is 16, and the illumination update uses α = 0 .1 and residual bound s = 0 .1. The training objective combines a Charbonnier reconstruction term and LPIPS perceptual su-pervision: 
+
+L = Lchar + λperc LLPIPS . (16) The perceptual-loss weight is 0.5 for SDE, 0.2 for SDSD-in, and 1.0 for SDSD-out, following the corresponding training configurations. The same objective and restoration com-ponents are retained across the temporal aggregation and bin-number ablations, so the reported differences isolate the tested temporal design. 
+
+Metric definition. PSNR and SSIM are computed on normalized RGB outputs. PSNR* follows the exposure-normalized protocol used by SDE. For prediction ˆI and tar-get I, the prediction is first rescaled by the ratio of their global means, 
+
+ˆI∗ = clip ˆI mean( I)mean( ˆI) , 0, 1
+
+!
+
+, (17) and PSNR is then computed between ˆI∗ and I. PSNR* therefore reduces the effect of a global exposure offset while retaining spatial and color reconstruction errors. 
+
+Comparison scope. EvRWKV [4], BiEvLight [43], and EIC-LIE [41] are not included because their official code has not been open-sourced at the time of writing. 1
+
+## B. Event Representation Diagnostics 
+
+Temporal-bin density. Figure 8 visualizes the same cropped event window under K = 4 , K = 8 , and K = 16 
+
+temporal partitioning. The diagnostic is not a benchmark result, but it clarifies the trade-off behind the numerical ab-lation in the main paper. Coarser partitioning merges short-lived brightness changes, while overly fine partitioning pro-duces sparse recurrent inputs in some bins. 
+
+Static accumulation versus ordered bins. The accumu-lated two-channel representation preserves event location and polarity but discards when each response occurs inside the window. The bottom row of Fig. 9 exposes changes in event support from early to late bins. These changes are rel-evant in low light because persistent responses across neigh-boring bins provide different evidence from isolated back-ground activity. The ConvGRU processes the groups in this   
+
+> 1EvRWKV: https://arxiv.org/abs/2507.03184 ; BiEv-Light: https://github.com/iijjlk/BiEvlight ; EIC-LIE:
+> https://github.com/QUEAHREN/EIC-LIE .Table 4. Implementation summary for EvLIR.
+
+Item Setting Input resolution Matched 256 × 256 crops for training, ablation, and diagnostic visualization. Event voxel 32 ordered channels built from frame-aligned event windows. Temporal grouping Default K = 8 bins, with four voxel channels per recurrent step. Temporal hidden state 16 channels in the ordered ConvGRU cue encoder. Illumination update Image-derived base illumination plus bounded event residual with α = 0 .1 and 
+
+s = 0 .1.Training Adam, 80 epochs, initial learning rate 1.5 × 10 −4, cosine annealing, seed 2333. Loss Charbonnier reconstruction with LPIPS perceptual supervision.     
+
+> Figure 8. Frame-event alignment and temporal bin density for a real low-light capture. The event window is attached to the target frame and then divided into equal-duration bins. This diagnostic illustrates why a small Kcoarsens temporal evidence, whereas a large Kreduces the event density available at each recurrent step.
+
+order and updates its state recurrently instead of treating all 32 channels as an unordered stack. 
+
+Polarity interpretation. Positive and negative events in-dicate opposite directions of logarithmic brightness change; neither polarity is an absolute illumination measurement. Consequently, EvLIR does not use the event count as a brightness map. The ordered events are encoded as a cor-rection signal for an image-derived base illumination map. This formulation preserves the complementary role of the RGB frame, which supplies scene appearance and global illumination context, while events provide short-window photometric dynamics. 
+
+Sparsity across time. The distribution of event responses is visibly non-uniform across the eight bins. Increasing 
+
+K improves temporal resolution but reduces the number of events available at each recurrent step. This observation is consistent with the parameter ablation in the main paper: 
+
+K = 8 performs better than both the coarser K = 4 and the sparser K = 16 settings on SDE-in and SDE-out. 
+
+Visualization procedure. The panels are generated di-rectly from the loaded event tuples. Timestamps are nor-malized within the frame-aligned window and divided into equal-duration bins. For display, polarity counts are log-arithmically compressed and mapped to red or blue; no learned filtering is applied. 
+
+## C. Temporal Residual and Restoration Path 
+
+Localized correction. Figure 10 shows a spatially non-uniform residual whose high-frequency component re-sponds around event-supported boundaries. For this case, Figure 9. Event diagnostics for an SDE-in sample: raw asynchronous events, positive/negative accumulation, and the eight ordered bins used by TERM. Red and blue denote positive and negative events. 
+
+the correlation between event activity and |∆L−blur(∆ L)|
+
+is 0.5312, and the residual-detail magnitude in the top 10% event-active pixels is 3.54 times that in low-activity regions. These are sample-level diagnostics, but they support the in-terpretation that ordered events influence local illumination correction. 
+
+Bounded update. The temporal state is mapped through a 
+
+tanh head and added to the image-derived base illumination with a small scale. Figure 11 shows that the corrected map retains the coarse layout while introducing local changes around structures with temporal evidence. The bound lim-its noisy event influence and prevents replacement of the image-derived estimate. 
+
+Reliability-aware restoration. Figure 12 visualizes the intermediate light-up image and SNR prior. The temporal residual adjusts photometric estimation using ordered dy-namics, whereas the SNR prior controls spatial modality reliability during final restoration. 
+
+## D. Additional Fine-Detail and Real Low-Light Results 
+
+Visual observations. On SDE, EvLIR better preserves thin bright boundaries, dark vertical edges, repeated line structures, and reflective highlights. The SDSD-in crops emphasize weak transitions on smooth surfaces. On SDSD-out, both methods recover the dominant structure, while EvLIR more closely matches the reference contrast. 
+
+Real low-light captures. Figure 14 and Fig. 15 provide additional qualitative results on real low-light DAVIS cap-tures collected outside the SDE and SDSD benchmark splits. Each row uses the middle frame of one captured se-Figure 10. From ordered event bins to illumination-residual diagnostics. The first two rows show the eight event groups in temporal order, while the last row compares the low-light input, event activity, signed residual ∆L, and the high-frequency component of the learned residual. 
+
+Figure 11. Base illumination, temporal residual, corrected illumination, and ConvGRU feature energy for the same sample. Figure 12. Low-light input, Retinex light-up image, and the SNR reliability map used during restoration.        
+
+> Detail A Detail B Dataset EvLight EvLIR GT EvLight EvLIR GT SDE-in
+> SDE-out
+> SDSD-in
+> SDSD-out
+
+Figure 13. Fine-detail comparisons on all four benchmarks. Each dataset contains two regions cropped from the same sample. Relative to EvLight, EvLIR more closely follows the reference structures in thin boundaries, repeated textures, and low-contrast surfaces. 
+
+quence. The low-light frame and events are center-cropped to 256 × 256 to match the inference preprocessing used for the SDE-in checkpoint, and the event map accumulates the corresponding cropped event window with positive and neg-ative polarities shown in red and blue. These samples do not have normal-light reference images, so they are used only for visual inspection rather than quantitative evaluation. 
+
+Observed behavior on real captures. The SDE-in model increases scene visibility on these real low-light frames while retaining the main spatial layout of the input. The event maps highlight motion-supported structures such as cloth boundaries, cables, reflective edges, and object con-tours, which are difficult to distinguish from the low-light frame alone. Because the captures lack aligned normal-light references, this section is intended to document quali-tative behavior under real sensor input rather than to replace benchmark evaluation. 
+
+Boundary conditions. The real-capture panels also indi-cate conditions where event guidance should be interpreted carefully. When motion is weak, the event map becomes sparse and the restoration relies mostly on the image branch. When a reflective edge or a moving object dominates the Figure 14. Real low-light captures with event activity and SDE-in outputs, part 1. The columns show the low-light input crop, cropped event activity, and the enhanced output produced by the SDE-in model. 
+
+event window, the event map can concentrate on a small re-gion rather than covering the whole scene. In these cases, the enhanced outputs may still contain mild color shifts or texture artifacts in low-contrast regions. These observations motivate future extensions that estimate event confidence more explicitly instead of treating all event-supported struc-tures as equally reliable. Figure 15. Real low-light captures with event activity and SDE-in outputs, part 2. The examples complement Fig. 14 with additional captured sequences. 
+
+Scope and limitations. The diagnostic figures clarify how the temporal branch behaves, but they do not imply that event activity is always reliable. Background activity, sparse responses, and image-event synchronization errors can produce misleading local cues. The bounded residual limits their effect, although additional confidence modeling could further improve robustness. The SDSD results also rely on simulated events and should not be interpreted as a substitute for evaluation on diverse real event sensors.

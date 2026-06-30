@@ -1,0 +1,1156 @@
+Title: Risk-Aware Selective Multimodal Driver Monitoring with Driver-State World Modeling
+
+URL Source: https://arxiv.org/pdf/2606.26922v1
+
+Published Time: Fri, 26 Jun 2026 01:06:59 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+# Risk-Aware Selective Multimodal Driver Monitoring with Driver-State World Modeling 
+
+Daosheng Qiu 1 , Haozhuang Chi 2⋆ , Hao Su 3 , Shu Long 1 , Xinyue Miao 1 ,Yongle Dong 1 , and Wei Zhang 1B⋆⋆  
+
+> 1
+
+Hubei University, Wuhan, China  
+
+> 2
+
+Nanyang Technological University, Singapore  
+
+> 3
+
+Osaka University, Osaka, Japan 
+
+zhang_wei@hubu.edu.cn 
+
+Abstract. Continuous driver monitoring in automated vehicles requires low-latency inference while avoiding unsafe decisions under uncertain driver states. Large vision-language models provide broad multimodal priors, but their latency and limited reliability in this setting make them unsuitable as always-on in-cabin monitors. We propose a cost-aware se-lective inference framework for deployable multimodal driver monitoring. The core system is a lightweight RGB-physiological student that combines in-cabin visual observations with window-level HR/EDA signals, and a learned gate that decides when to accept the fast prediction or abstain for safety intervention. Additional controls show that the learned scores contain sample-level information beyond scenario priors, while exact phys-iological synchronization remains a limitation. To incorporate predictive evidence, we further study a compact driver-state world modeling module that rolls out latent driver-state features and estimates future fast-model errors and counterfactual system-level action costs. On scenario-induced driver-demand recognition, the RGB-physiological student improves over RGB-only and physiology-only baselines, reaching 0.7440 Macro-F1 and 0.9099 balanced accuracy with 11.39M parameters and 3.08ms inference latency. Cost-aware selective inference reduces unsafe false negatives from 17.37% under always-fast inference to approximately 5% across seeds, while maintaining deployment-level latency. While driver-state world modeling offers valuable predictive signals, worst-group evaluations high-light persistent operating-point calibration drift. Ultimately, reliable edge driver monitoring requires advancing not only perception backbones, but also risk-aware selective control and group-robust calibration. 
+
+Keywords: Driver Monitoring · Autonomous Driving · Multimodal Learning · Human-Centered AI · Selective Prediction · Reliable Machine Learning · Efficient Inference  
+
+> ⋆
+
+Project Lead.  
+
+> ⋆⋆
+
+Corresponding author.  
+
+> arXiv:2606.26922v1 [cs.RO] 25 Jun 2026 2D. Qiu et al.
+
+1 Introduction 
+
+Human-centered driver monitoring is a prerequisite for safe automated driving, especially during shared-control and control-transition scenarios. A monitoring system must operate continuously, respond with low latency, and avoid unsafe decisions when the driver’s state is ambiguous. This requirement is particularly important for demand-related driver states, which are often only partially ob-servable from in-cabin visual cues. A driver may experience elevated demand without exhibiting a distinctive facial expression, posture, or hand movement, while window-level physiological signals such as heart rate and electrodermal activity can provide complementary evidence related to the driver’s state. These requirements create a tension between multimodal understanding and deployability. Recent vision-language models (VLMs) provide broad visual-semantic priors and offer a flexible interface for multimodal reasoning. However, our empirical study shows that large VLMs are not well suited as always-on in-cabin monitoring models. Their latency is orders of magnitude higher than that of compact task-specific networks, and their reliability as direct predictors or distillation teachers is limited under the driver-demand recognition protocol considered in this work. This motivates a different design principle: the continuous monitoring path should be handled by a lightweight multimodal student, while heavier predictive or verification modules should be invoked only selectively when they provide useful risk-related evidence. We propose a cost-aware selective inference framework for deployable mul-timodal driver monitoring. The core perception model is a lightweight RGB-physiological student that fuses short in-cabin visual observations with heart-rate and electrodermal activity signals. Instead of forcing the model to produce a decision for every input, we introduce a learned selective gate that evaluates prediction confidence, uncertainty, modality disagreement, physiological signal quality, and deployment cost. The gate decides whether to accept the fast pre-diction or abstain for safety intervention. This formulation separates perception accuracy from decision risk: in safety-critical monitoring, reducing unsafe false negatives can be more important than maximizing coverage on every sample. To incorporate predictive evidence, we further study a compact driver-state world modeling module. Unlike scene-level world models for autonomous driving that generate or predict future external environments, our formulation operates in a latent driver-state space. It performs action-conditioned closed-loop rollouts to estimate future fast-model errors and counterfactual system costs. The module is designed to support selective monitoring rather than to replace the fast student. Our experiments show that driver-state world modeling provides useful future-risk and action-cost signals, but worst-group evaluations also reveal a persistent limitation: operating points selected on validation data may drift under heavy-tailed group shifts. This observation highlights group-robust calibration as a central challenge for predictive safety monitoring. We evaluate the proposed framework on scenario-induced driver-demand recognition with RGB and physiological measurements. The RGB-physiological student improves over RGB-only and physiology-only baselines, reaching 0.7440 Risk-Aware Selective Multimodal Driver Monitoring 3
+
+Macro-F1 and 0.9099 balanced accuracy with 11.39M parameters and 3.08 ms inference latency. Cost-aware selective inference reduces unsafe false negatives from 17.37% under always-fast inference to approximately 5% across seeds while preserving deployment-level latency. We further analyze VLM teachers, knowledge distillation, physiological reliability, driver-state world modeling, and worst-group robustness. The results suggest that reliable edge driver monitoring requires not only stronger perception models, but also selective risk control and calibration under group shift. Our contributions are summarized as follows: 
+
+– We introduce a deployable RGB-physiological driver monitoring framework and show, through scenario-prior probes, error-recovery analysis, and physi-ological intervention controls, that the learned scores contain sample-level evidence beyond RGB-only monitoring and scenario lookup. 
+
+– We formulate multimodal driver monitoring as a cost-aware selective inference problem, enabling the system to trade off coverage, latency, abstention, and unsafe false negatives. 
+
+– We study a compact action-conditioned driver-state world modeling mod-ule that performs latent rollouts to estimate future fast-model errors and counterfactual system costs for selective monitoring. 
+
+– We provide a systematic empirical analysis of VLM teachers, knowledge distillation, physiological reliability, deployment latency, and worst-group calibration, showing both the promise and limitations of predictive selective monitoring in safety-critical in-cabin sensing. 
+
+2 Related Work 
+
+2.1 Multimodal Driver Monitoring 
+
+Driver monitoring is central to safe assisted and automated driving, particularly in shared-control and takeover scenarios. Early systems commonly relied on visual indicators such as eye closure, gaze direction, head pose, facial or body motion, and other behavioral cues, while recent benchmarks have pushed the field toward deep in-cabin activity understanding. Drive&Act [25] provides a large-scale multi-view dataset with RGB, infrared, depth, and pose modalities, together with hierarchical annotations for driver behavior recognition. DMD [28] further broadens visual driver monitoring with large-scale RGB, depth, and infrared recordings for attention, alertness, and distraction analysis. Vision-only monitoring remains limited when the target state is not directly observable. Demand-related states, stress, workload, and reduced readiness may occur without a distinctive visual manifestation. Physiological measurements pro-vide complementary evidence in such cases. Prior work has shown that autonomic signals, including heart activity and electrodermal activity, are informative for stress, workload, and drowsiness-related driver-state estimation [15, 18, 26, 31, 32]. The manD 1.0 dataset [8] enables synchronized multimodal driver modeling with visual, physiological, gaze, motion, and vehicle-related measurements in assisted 4 D. Qiu et al. 
+
+driving automation. Our work follows this multimodal direction, but focuses on a deployable RGB-physiological student and explicitly studies reliability, short-cut behavior, and selective decision-making for scenario-induced driver-demand recognition. 
+
+2.2 Vision-Language Models and Deployable Students 
+
+Vision-language models have established powerful general-purpose interfaces for visual-semantic understanding. CLIP [29] demonstrated scalable language-supervised visual pretraining, while Flamingo [1], BLIP-2 [21], InstructBLIP [7], LLaVA [22], and Qwen2-VL [33] advanced multimodal reasoning through large language models, instruction tuning, and unified image-video interfaces. Recent VLM-based driver-monitoring work [5] has explored visual instruction models for multitask driver understanding. Despite these advantages, large VLMs are not naturally suited for continuous driver monitoring. Their autoregressive decoding and large parameter counts impose substantial latency, and their reliability as task-specific predictors or dis-tillation teachers is not guaranteed in safety-critical in-cabin settings. Knowledge distillation offers one route to transfer information from large models to compact networks [16], and recent work such as VL2Lite [19] studies task-specific distil-lation from VLMs to lightweight classifiers. In contrast, our empirical findings show that a slow VLM teacher is not consistently stronger than a supervised RGB-physiological student under our driver-demand protocol. This motivates a student-first design: the always-on path is a compact multimodal model, while the VLM branch is treated as a probe or optional verification component rather than as the continuous monitoring engine. 
+
+2.3 Selective Prediction and Risk-Aware Inference 
+
+Selective prediction allows a model to abstain when its prediction is unreliable. The classical reject-option formulation studies the trade-off between recognition error and rejection [6]. Modern deep selective classification extends this idea to neural networks by optimizing coverage and risk jointly [9]. SelectiveNet [10] integrates a selection function into the model, while Deep Gambler [23] formulates abstention through a portfolio-inspired objective. Related learning-to-defer methods study when a model should hand off decisions to an external expert [24, 27]. More recent risk-control work extends this line by calibrating model behavior under user-specified loss functions [2]. Safety-critical driver monitoring requires a more asymmetric view of risk. In this setting, a false negative on a high-demand or high-risk driver state can be more costly than abstaining and triggering a safety intervention. Moreover, the decision must account not only for classification confidence, but also for latency, modality reliability, and deployment cost. Real-world deployment further raises group-shift concerns: models can perform well on average while failing on atypical groups or shifted test distributions [20, 30]. Our framework therefore formulates multimodal driver monitoring as cost-aware selective inference. The learned Risk-Aware Selective Multimodal Driver Monitoring 5
+
+gate evaluates confidence, entropy, margin, modality disagreement, physiological signal quality, and deployment cost to decide whether to accept the fast student prediction or abstain. We extend this view to deployment-aware monitoring with asymmetric unsafe-FN costs. 
+
+2.4 Predictive State Modeling and World Models 
+
+World models learn predictive representations of how states evolve over time and how actions influence future outcomes. Early work introduced world models as compact dynamics models for reinforcement learning agents [11]. PlaNet [12] and Dreamer-style agents [13] learn latent dynamics for planning or policy learning through predicted future trajectories, while TD-MPC2 [14] performs model-predictive control in a learned latent space. In visual representation learning, V-JEPA [3] shows that predicting future or missing representations in latent space can yield strong video representations without pixel reconstruction. In autonomous driving, generative world models such as DriveDreamer [34] and GAIA-1 [17] focus on modeling future external driving scenes. Recent efforts such as Driver-WM [4] have begun to shift this paradigm inward, proposing traffic-conditioned latent world models specifically designed for rolling out in-cabin driver dynamics. Our setting is different. We do not generate future road scenes or model the external traffic world. Instead, we study compact driver-state world modeling for in-cabin monitoring. The model operates on latent RGB-physiological features and estimates future fast-model errors and counterfactual system costs under candidate actions. Its purpose is to provide predictive evidence for cost-aware selective inference rather than to replace the fast student. This distinction is important: driver-state world modeling is used here as a risk-forecasting and decision-support component for selective monitoring, and our experiments further show that calibration drift under worst-group shifts remains a central challenge. 
+
+3 Methodology 
+
+We propose a deployable multimodal driver monitoring framework that separates low-latency perception from risk-aware decision making. The system contains a fast RGB-physiological student, a cost-aware selective gate, and a compact driver-state world modeling module. The student performs continuous monitoring from RGB and physiological signals. The gate decides whether to accept the fast prediction, abstain for safety intervention, or invoke an optional slow branch. The world model supplies predictive evidence by estimating future fast-model errors and counterfactual system-level action outcomes. 
+
+3.1 Problem Formulation and System Overview 
+
+Let xt = ( Vt, Pt) denote the multimodal observation at time window t, where 
+
+Vt is a short in-cabin RGB clip and Pt is the synchronized physiological window 6 D. Qiu et al. Fast-trust Score                     
+
+> Physio QC
+> Entropy
+> Multimodal Inputs
+> Frame 1 Frame 2 Frame 3 Frame 4
+> Fast RGB-Physiological Student Cost-Aware Selective Gate
+> Driver-State World Modeling Module
+> Optional Slow Branch / VLM Verifier
+> ConcatFusion
+> Classification Head Risk Head
+> RGB Frame Sequence 𝑽𝑽 t
+> Physiology Window 𝑷𝑷 t
+> Pred label Confidence Margin Uncertainty
+> Fast Prediction Row(Real-time Output)
+> RGB Branch
+> Physio Branch
+> Fusion + Heads
+> Temporal Aggregation
+> Fast Stats
+> WM Evidence
+> Selection Features
+> Scaler + Logistic Reg.
+> Accept Fast
+> Abstain/ warn
+> Slow-assisted
+> Prediction-feature history 𝑼𝑼 t
+> World Model World Model Heads Optional Planning
+> Prediction Confidence
+> 1
+> 0
+> -1
+> -2
+> -3
+> HR
+> EDA
+> 032 64 96 127
+> Window Index
+> Normalized Value
+> t-K+1
+> t-2
+> t
+> Future Risk
+> Future Fast Error
+> Counterfactual Action Cost
+> t-1
+> t+1
+> t+2
+> t+3
+
+⋯
+
+> t+H
+> Predicted Future States Latent Dynamics Rollout
+> Candidate Actions
+> Min-cost Choice
+> 2D CNN
+> 1D Conv
+> Temporal Pooling
+> RGB Feature
+> Physio Feature
+> T
+> optional auxiliary cues
+> Decision Policy
+
+⋯
+
+> Shape: [B,2,L]
+> Class Logits
+> Risk Logits
+> Uncertainty
+> Modality Disagree
+
+Fig. 1: Overview of the proposed framework. The system continuously processes RGB frames and window-level HR/EDA signals through a lightweight fast student. Instead of forcing a mandatory classification, a learned cost-aware gate evaluates instantaneous reliability and predictive evidence from a compact driver-state world modeling module. The gate then decides whether to accept_fast , abstain_warn ,
+
+slow_replace , or slow_verify . The slow branch is optional and used only for selective replacement or verification. 
+
+containing heart-rate and electrodermal activity signals. The target label is yt ∈ Y 
+
+with Y = {low , high }, where high is treated as the safety-critical positive state. Unlike a conventional classifier that always outputs a label, our system also predicts a monitoring action 
+
+A = {accept_fast , abstain_warn , slow_replace , slow_verify }. (1) Here, accept_fast uses the fast-student prediction, abstain_warn suppresses the class output and triggers conservative intervention, slow_replace uses the optional slow-branch prediction, and slow_verify accepts only when the fast and slow predictions agree. The complete system outputs ( ˆyt, a t) = Π(Vt, Pt)
+
+with at ∈ A . The objective is therefore not only to maximize recognition accuracy, but also to reduce unsafe false negatives under coverage and latency constraints. 
+
+3.2 Fast RGB-Physiological Student 
+
+The fast student is a lightweight multimodal classifier for continuous deployment. Given a clip Vt = {It, 1, . . . , It,T }, the RGB branch extracts frame-level features 
+
+rt,i = frgb (It,i ) and aggregates them as rt = gtemp (rt, 1, . . . , rt,T ), where gtemp 
+
+can be mean pooling, a recurrent unit, a temporal convolution, or a lightweight attention module. The physiological branch encodes the HR/EDA window Pt ∈
+
+RC×L, C = 2 , as pt = fphy (Pt). The fused representation is 
+
+ht = ffuse ([ rt; pt]) , st = Wcht + bc, qt = softmax( st), (2) Risk-Aware Selective Multimodal Driver Monitoring 7
+
+where st are logits and qt is the predicted distribution. The fast prediction is 
+
+ˆy ft = arg max y∈Y qt(y). The student is trained with the supervised classification loss 
+
+Lcls = − X
+
+> t
+
+log qt(yt). (3) The hidden representation ht, logits st, probabilities qt, and uncertainty statistics are reused by the selective gate and the driver-state world model. 
+
+3.3 Cost-Aware Selective Inference 
+
+The selective gate estimates whether the fast prediction should be trusted. For each sample, we construct a reliability vector 
+
+ϕt = [ ct, e t, m t, d t, q phy  
+
+> t
+
+, ηt], (4) where ct = max y qt(y) is confidence, et is predictive entropy, mt is the logit margin between the top two classes, dt is disagreement between RGB-only and RGB-physiological predictions, qphy  
+
+> t
+
+summarizes physiological signal quality, and 
+
+ηt contains optional predictive features from the driver-state world model. The learned gate is a reliability estimator ρt = gω (ϕt), where ρt is the estimated probability that the fast decision is correct. A calibrated policy chooses at =
+
+πω (ϕt); in its threshold form, 
+
+at =
+
+(
+
+accept_fast , ρt ≥ τ, 
+
+fallback , ρt < τ,  (5) where fallback is instantiated as abstain_warn , slow_replace , or slow_verify .The fallback mode, reliability threshold, and optional slow-confidence floor are selected on calibration data and fixed during testing. For an action a ∈ A , let ˜yt(a) be the final label produced by the action; if the action abstains, ˜yt(a) = ∅. We use the action utility 
+
+U (a; ˆ y ft , y t) = Rcor 1[˜ yt(a) = yt] − Cufn 1[˜ yt(a)̸ = ∅, y t = high , ˜yt(a)̸ = yt]
+
+− Cerr 1[˜ yt(a)̸ = ∅, ˜yt(a)̸ = yt, y t̸ = high ]
+
+− Cabs 1[˜ yt(a) = ∅] − Clat ℓ(a),
+
+(6) where Rcor rewards accepted correct predictions, Cufn penalizes unsafe false negatives, Cerr penalizes other accepted errors, Cabs penalizes abstention, and 
+
+ℓ(a) is the latency of action a. The unsafe-false-negative penalty is larger than the ordinary error penalty. The gate is trained and calibrated in two stages. First, gω is trained to predict fast-decision correctness with cost-sensitive sample weights. Second, candidate thresholds and fallback modes are evaluated on a held-out calibration subset, and the operating point is selected by maximizing empirical utility: 
+
+(τ ⋆, b ⋆) = arg max 
+
+> τ,b
+
+1
+
+|D cal |
+
+X
+
+> t∈D cal
+
+U (πτ,b ω (ϕt); ˆ y ft , y t), (7) 8 D. Qiu et al. 
+
+where b denotes the fallback mode. At inference time, 
+
+ˆyt =
+
+
+
+ˆy ft , at = accept_fast ,
+
+ˆy st , at = slow_replace ,
+
+ˆy ft , at = slow_verify and ˆy st = ˆ y ft ,
+
+∅, otherwise ,
+
+(8) where ˆy st is the optional slow-branch prediction. Abstention is interpreted as safety intervention rather than a normal classification decision. We therefore report coverage, unsafe false-negative rate, positive abstention, unhandled positives, slow-call rate, and effective latency in addition to standard classification metrics. 
+
+3.4 Driver-State World Modeling 
+
+The driver-state world model provides predictive evidence for the gate. Unlike scene-level autonomous-driving world models that generate future external en-vironments, our module operates on compact latent driver-state features. It estimates short-horizon monitoring risk and counterfactual system-level costs rather than replacing the fast student. The design factorizes driver-state dynamics from system-action outcomes: the monitoring action is not assumed to causally change the driver’s physiological state within the short decision window. We therefore model natural driver-state evolution with an action-free latent rollout and system-action consequences with a separate action-conditioned branch. For each window, we define 
+
+ut = [ ht; st; ct; et; mt; dt; qphy  
+
+> t
+
+], (9) where the terms denote the fast-student hidden representation, logits, confi-dence, entropy, margin, modality disagreement, and physiological quality. In implementation, ut may also include reference-branch statistics and additional physiological-quality statistics used by the gate. Given the feature history 
+
+Ut = {ut−K+1 , . . . , ut}, the encoder produces the latent state zt = Eθ (Ut).
+
+Action-free driver-state rollout. Starting from ˆzt = zt, the model performs closed-loop latent rollout by predicting a compact future feature and feeding it back into the next transition: 
+
+ˆut+k = Gθ (ˆ zt+k), ˆft+k = Fθ (ˆ ut+k), ˆzt+k+1 = ˆ zt+k + Tθ (ˆ zt+k, ˆft+k).
+
+(10) This feedback rollout predicts future high-demand probability ˆrt+k = Rθ ( ˆzt+k)
+
+and future fast-model error ˆet+k = Eerr  
+
+> θ
+
+( ˆzt+k). We also use aggregate horizon predictions 
+
+ˆr+ 
+
+> t
+
+= max  
+
+> 1≤k≤H
+
+ˆrt+k, ˆe+ 
+
+> t
+
+= max  
+
+> 1≤k≤H
+
+ˆet+k. (11) No raw RGB frames or physiological waveforms are reconstructed. Risk-Aware Selective Multimodal Driver Monitoring 9
+
+Action-conditioned system-outcome estimation. For each candidate action a ∈ A ,an action embedding a is used by a separate outcome branch: 
+
+˜zat = zt, ˜zat+k+1 = ˜ zat+k + T aθ (˜ zat+k, ˜f at+k, a). (12) This branch predicts system-level consequences of taking action a under the current driver-state trajectory; it does not imply that the action changes the driver’s natural state. The rollout states are temporally pooled as 
+
+¯zat = Pool(˜ zat+1 , . . . , ˜zat+H ), (13) and action-level outputs are 
+
+ˆct(a) = Cθ (¯ zat ), ˆot(a) = Oθ (¯ zat ), ˆbt(a) = Bθ (¯ zat ), (14) where ˆct(a) is the predicted counterfactual action cost, ˆot(a) estimates unsafe-outcome probability, and ˆbt(a) estimates abstention probability. These are action-level summaries over the rollout horizon. 
+
+Training objective and gate features. Let rt+k and et+k denote future high-demand and future fast-error targets, and define r+ 
+
+> t
+
+= max 1≤k≤H rt+k and 
+
+e+ 
+
+> t
+
+= max 1≤k≤H et+k. The world model is trained with 
+
+Lwm =λr+ BCE(ˆ r+ 
+
+> t
+
+, r + 
+
+> t
+
+) + λe+ BCE(ˆ e+ 
+
+> t
+
+, e + 
+
+> t
+
+) + λr1 BCE(ˆ rt+1 , r t+1 )+
+
+> H
+
+X
+
+> k=1
+
+h
+
+λr BCE(ˆ rt+k, r t+k) + λeBCE(ˆ et+k, e t+k) + λu∥ˆut+k − ut+k∥22
+
+i
+
++ λcℓc(ˆ ct, ct) + λoBCE(ˆ ot, ot) + λbBCE( ˆbt, bt),
+
+(15) where ˆct, ˆot, and ˆbt collect predicted costs, unsafe-outcome probabilities, and abstention probabilities for all actions. The targets ct, ot, and bt are obtained by offline counterfactual evaluation using the ground-truth label, fast prediction, optional slow prediction, and action-specific latency or intervention costs. The feature consistency term aligns predicted compact driver-state features with future observed compact features. At inference time, the world model augments the gate with 
+
+ηt = Ψ (ˆ r+ 
+
+> t
+
+, ˆe+ 
+
+> t
+
+, ˆrt+1: t+H , ˆet+1: t+H , ˆct, ˆot, ˆbt), (16) where Ψ (·) summarizes aggregate risk, selected rollout-step probabilities, coun-terfactual action costs, unsafe-action probabilities, and model-preferred action summaries. The selective gate uses ηt together with instantaneous confidence and modality-reliability signals to choose the final system action. 
+
+4 Experiments 
+
+We evaluate the proposed framework on scenario-induced driver-demand monitor-ing with RGB and physiological signals. The experiments address four questions: 10 D. Qiu et al. 
+
+whether physiological signals improve the fast student, whether selective inference reduces unsafe accepted errors, whether the system remains deployable under latency constraints, and whether driver-state world modeling provides useful predictive evidence under group shift. 
+
+4.1 Experimental Setup Task and inputs. The main evaluation is conducted on manD. Each sample contains an in-cabin RGB clip and a window-level physiological segment with HR and EDA signals. The target label is low or high , where high is treated as the safety-critical positive state. The system output is not limited to a class label: the selective policy either accepts the fast prediction, abstains for intervention, or optionally invokes a slow branch. 
+
+Metrics. For classification, we report Macro-F1 and balanced accuracy (BAcc). For selective monitoring, we report coverage, unsafe false-negative rate, positive abstention, unhandled positive rate, slow-call rate, and effective latency. An unsafe false negative is an accepted prediction where a true high sample is output as low . Positive abstention counts true high samples rejected for intervention, and unhandled positive rate is the sum of unsafe false negatives and positive abstentions. Gate thresholds, fallback modes, and operating points are selected on calibration data and fixed for test evaluation. 
+
+4.2 Multimodal Student and Reliability Checks 
+
+Table 1(a) summarizes the modality ablation and reliability controls. The physiology-only model is weak, while the RGB-only student reaches 0.6608 Macro-F1 and 0.7463 BAcc. Fusing RGB with HR/EDA improves performance to 0.7440 Macro-F1 and 0.9099 BAcc, establishing the RGB-physiological student as the strongest always-on perception model. Shuffling physiological windows substantially de-grades performance, indicating that the physiological branch is not a vacuous input. However, shifted physiology remains competitive, and the scenario-only baseline is strong. We therefore interpret the task as scenario-induced driver-demand monitoring rather than clinical stress or workload diagnosis. We also evaluate architecture choices, physiological normalization, and VLM-to-student distillation. These results are provided in the supplementary material. In brief, ResNet18+GRU gives the best BAcc among tested temporal modules, MobileNetV3-small gives the best Macro-F1, per-window z-score is the most stable physiological normalization, and neither raw nor reliability-filtered KD consistently improves over the supervised RGB-physiological student. 
+
+Beyond scenario priors. Because scenario priors are strong in manD, we further test whether the learned scores contain information beyond scenario identity. A scenario-only probe obtains 0.7372 Macro-F1 and 0.9089 BAcc, while adding model scores improves performance to 0.7803 Macro-F1 and 0.9239 BAcc. This indicates that the predictions are not reducible to scenario lookup. We also find that the RGB-physiological student recovers 382 of 803 RGB-only errors Risk-Aware Selective Multimodal Driver Monitoring 11 
+
+Table 1: Core results on manD. (a) Modality and reliability controls; † denotes a diagnostic probe, not a deployable monitoring policy. (b) Selective monitoring and deployment. Gate results are mean ± std across seeds.                                                        
+
+> (a) Modality and reliability (b) Selective monitoring
+> Setting Macro-F1 ↑BAcc ↑Metric Fast Slow Gate (Ours)
+> Perception baselines Standard classification metrics
+> Majority (High) 0.4710 0.5000 Coverage ↑1.0000 1.0000 0.8438 ±0.0379
+> Physio-only 0.3607 0.5450 Slow-call ↓0.0000 1.0000 0.0101 ±0.0175
+> RGB-only 0.6608 0.7463 Macro-F1 ↑0.7440 0.4506 0.8421 ±0.0214
+> RGB+physio (Ours) 0.7440 0.9099 BAcc ↑0.9099 0.4442 0.9463 ±0.0353
+> Reliability controls Safety-critical & deployment
+> Shuffled physio 0.5987 0.8029 Unsafe FN ↓0.1737 0.2104 0.0527 ±0.0081
+> Shifted physio 0.7432 0.8569 Pos. abstain 0.0000 0.0000 0.1272 ±0.0335
+> Scenario-only 0.7372 0.9089 Unhandled ↓0.1737 0.2104 0.1799 ±0.0254
+> Scenario+score probe †0.7803 0.9239 Latency ↓3.08 ms 8615.98 ms 90.18 ms
+
+(47.6%) and 228 of 646 RGB-only unsafe false negatives (35.3%), showing that physiological-window evidence is especially useful on visually ambiguous or unsafe RGB failures. A stricter test-time physiology intervention study in the supplement shows that the current model is not strongly sensitive to exact physiological synchronization; we therefore interpret HR/EDA as window-level contextual evidence rather than strictly time-locked physiological dynamics. 
+
+4.3 Cost-Aware Selective Inference and Deployment 
+
+Table 1(b) reports the core selective-inference and deployment results. Always-fast inference accepts every sample and produces an unsafe false-negative rate of 0.1737. The learned cost-aware gate reduces this to 0.0527 ± 0.0081 across seeds while improving Macro-F1 and BAcc. The learned policy primarily selects fast abstention rather than frequent slow escalation, which is consistent with the large latency gap between the fast student and the slow VLM. The fast student contains 11.39M parameters and runs in 3.08 ms, while the slow VLM requires 8615.98 ms per sample and is unsuitable as a continuous monitor. The selective confusion matrix and coverage-risk curves are shown in Fig. 2 and Fig. 5. These visualizations make explicit how cost-aware selection transfers part of the high-risk region from accepted false negatives to abstention or safety intervention. 
+
+Matched-coverage comparison. At the learned gate’s coverage of 0.8439, random abstention yields an unsafe false-negative rate of 0.1467, and confidence, entropy, or margin thresholding yields 0.1027. The learned gate obtains 0.0528 at the same coverage. Thus, the reduction in unsafe accepted errors is not explained by lower coverage alone; the learned gate identifies a more informative rejection region. We additionally report low-risk abstention and warning precision in the supplement, ensuring that abstention is evaluated as an intervention burden rather than treated as a free correct prediction. 12 D. Qiu et al. Always-fast      
+
+> True Low
+> True High
+> Accept Low Accept High Abstain Accept Low Accept High Abstain
+
+463  3 0 288  131  47 
+
+658  3130  0 273  3370  145         
+
+> Accepted Accepted Conservative
+> abstain
+> Unsafe FN Accepted Positive
+> Abstain
+> Accepted Accepted Conservative
+> abstain
+> Unsafe FN Accepted Positive
+> Abstain
+> Cost-aware Learned Gate
+
+Fig. 2: Selective confusion matrix. Comparison between always-fast inference and the learned cost-aware gate. By explicitly optimizing for asymmetric risk, the learned gate successfully redistributes safety-critical errors (Unsafe FNs, red) into conservative or positive abstentions (orange), while simultaneously increasing the number of correctly accepted high-demand states. 
+
+Table 2: Driver-state world modeling. The world-model gate with horizon H = 5 
+
+provides useful predictive evidence, but does not dominate all safety metrics.                                                   
+
+> Method Fast-Err AUC ↑Cost MSE ↓Pairwise ↑Coverage ↑Macro-F1 ↑BAcc ↑Unsafe FN ↓Unhand. Pos. ↓
+> Instantaneous baseline
+> Current-evidence gate –––0.9549 0.7656 0.8062 0.0721 0.1103
+> Predictive extensions (Ours)
+> World-model gate ( H= 5 )0.9486 2.2440 0.6611 0.9339 0.8014 0.8219 0.0510 0.1140
+> Risk-calib. WM gate ( H= 5 )0.9486 2.2440 0.6611 0.9342 0.8018 0.8220 0.0507 0.1135 Factorized WM (latent) –––0.8766 0.8340 0.8954 0.0515 0.1595 Factorized WM (no latent) –––0.8260 0.8538 0.9634 0.0536 0.2043
+
+4.4 Driver-State World Modeling 
+
+Table 2 summarizes the driver-state world-model results. The action-feedback model provides non-trivial predictive evidence: future fast-error AUC increases from 0.8818 at H = 1 to 0.9486 at H = 5 , and counterfactual action-cost diagnostics improve after action-feedback modeling; detailed horizon-specific cost results are provided in the supplement. When integrated into the gate, the world-model gate with H = 5 reduces accepted-risk in grouped evaluation, lowering unsafe false negatives from 0.0721 to 0.0507 and improving utility. However, it slightly increases unhandled positives. Factorized variants shift the trade-off further: the latent variant is more safety-oriented but abstains more, while the no-latent variant improves classification quality but increases unhandled positives. Thus, driver-state world modeling is a useful predictive extension, but not a uniformly dominant controller. The world-model rollout visualization is shown in Fig. 4. It illustrates how future fast-error estimates and counterfactual action costs are converted into predictive features for the gate. 
+
+4.5 Calibration Drift and Worst-Group Robustness 
+
+We further evaluate operating-point stability under participant-scenario shift. In the strict worst-group evaluation, the current-evidence gate obtains lower weighted unsafe FN and unhandled-positive rates than the horizon-5 world-model gate, while the world-model gate gives slightly higher utility. Validation-selected Risk-Aware Selective Multimodal Driver Monitoring 13 RGB 
+
+> Case A
+
+Inputs 
+
+0
+
+-1 
+
+-2 
+
+0 32  64  96  127 
+
+Frame 1  Frame 2  Frame 3  Frame 4 
+
+> Normalized Value  Physiological Window
+
+1
+
+0
+
+-1 
+
+-2 
+
+0
+
+1
+
+-3  32  64  96  127 
+
+> Window index
+> Window index
+> Normalized Value
+
+0 32  64  96  127 
+
+> Window index
+
+4
+
+2
+
+0
+
+> Normalized Value
+> Case B Case C
+
+HR 
+
+EDA 
+
+HR 
+
+EDA 
+
+HR 
+
+EDA 
+
+> Physio-only
+> RGB-only
+> RGB + Physio
+
+0.0  0.2  0.4  0.6  0.8  1.0 
+
+> Physio-only
+> RGB-only
+> RGB + Physio
+
+0.0  0.2  0.4  0.6  0.8  1.0 
+
+Predicted Class Probabilities  P(Low) 
+
+> P(High)
+> Pred: Low(0.506)
+> Pred: High(1.000)
+> Pred: High(0.998)
+> P(Low)
+> P(High)
+> Pred: High(0.610)
+> Pred: Low(0.573)
+> Pred: High(0.992)
+> Physio-only
+> RGB-only
+> RGB + Physio
+
+0.0  0.2  0.4  0.6  0.8  1.0 
+
+> P(Low)
+> P(High)
+> Pred: Low(0.764)
+> Pred: Low(0.995)
+> Pred: Low(0.990)
+
+Predicted Class Probabilities 
+
+Predicted Class Probabilities 
+
+> Probability
+> Probability
+> Probability
+
+Outputs 
+
+> RGB
+> Physiological Window
+> Physiological Window
+> RGB
+
+GT : High 
+
+Final Pred : High 
+
+Case: RGB-only Sufficient 
+
+GT : High 
+
+Final Pred : High 
+
+Case : RGB + Physio Recovers 
+
+GT : High 
+
+Final Pred : Low 
+
+Case : RGB + Physio Still Fails 
+
+> Shape: [B,2,L]
+> Shape: [B,2,L]
+> Shape: [B,2,L]
+
+Fig. 3: Qualitative comparison of modality contributions. Case Ashows visual cues are sufficient. Case B demonstrates the necessity of mul-timodal fusion: when visual features are ambiguous (head down), physio-logical dynamics (EDA/HR drop) suc-cessfully recover the true High demand state. Case C shows a failure case where both modalities fail to capture the state change. RGB 
+
+> Case A
+
+Inputs 
+
+1
+
+-0 
+
+-1 
+
+0 32  64  96  127 
+
+> Normalized Value  Physiological Window
+
+1
+
+0
+
+-1 
+
+0
+
+2
+
+-2  32  64  96  127 
+
+> Window index
+> Window index
+> Normalized Value
+
+0 32  64  96  127 
+
+> Window index
+
+2
+
+0
+
+-2 
+
+> Normalized Value
+> Case B Case C
+
+HR 
+
+EDA 
+
+HR 
+
+EDA 
+
+HR 
+
+EDA 
+
+Outputs 
+
+Slow Out 
+
+Not Used 
+
+WM-predicted Fast-error Rollout  WM Counterfactual Action Costs 
+
+Frame 1  Frame 2  Frame 3  Frame 4 
+
+> Physiological Window
+> RGB
+> Physiological Window
+> RGB
+
+Final Decision 
+
+Label High 
+
+GT High 
+
+t+1 
+
+Error 0.01 
+
+Pred High 
+
+GT High 
+
+t+2 
+
+Error 0.01 
+
+Pred High 
+
+GT High 
+
+t+3 
+
+Error 0.01 
+
+Pred High 
+
+GT High 
+
+Fast Out 
+
+Label High 
+
+Conf 0.998 
+
+> Accept
+> Cost -0.93
+
+Abstain 
+
+Cost 0.21 
+
+> Replace
+> Cost 0.85
+> Verify
+> Cost 0.09
+
+WM-predicted Fast-error Rollout  WM Counterfactual Action Costs 
+
+Final Decision 
+
+Label High 
+
+GT High 
+
+t+1 
+
+Error 0.97 
+
+Pred Low 
+
+GT High 
+
+t+2 
+
+Error 0.97 
+
+Pred Low 
+
+GT High 
+
+t+3 
+
+Error 0.97 
+
+Pred Low 
+
+GT High 
+
+Fast Out 
+
+Label Low 
+
+Conf 0.987 
+
+> Accept
+> Cost -0.38
+
+Abstain 
+
+Cost 0.14 
+
+> Replace
+> Cost 1.26
+> Verify
+> Cost 0.78
+
+Slow Out 
+
+Label High 
+
+Conf 0.991 
+
+WM-predicted Fast-error Rollout  WM Counterfactual Action Costs 
+
+Final Decision 
+
+Label Warn/No 
+
+Label 
+
+GT High 
+
+t+1 
+
+Error 0.98 
+
+Pred Low 
+
+GT High 
+
+t+2 
+
+Error 0.98 
+
+Pred Low 
+
+GT High 
+
+t+3 
+
+Error 0.98 
+
+Pred Low 
+
+GT High 
+
+Fast Out 
+
+Label Low 
+
+Conf 0.992 
+
+> Accept
+> Cost 0.22
+
+Abstain 
+
+Cost 0.20 
+
+> Replace
+> Cost 1.22
+> Verify
+> Cost 0.80
+
+Slow Out 
+
+Label High 
+
+Conf 0.881 
+
+> Slow-assisted Correction
+> Slow<WM Rejection
+
+WM Future Fast-Error 
+
+Risk: 0.008 
+
+WM Future Fast-Error 
+
+Risk: 0.972 
+
+WM Future Fast-Error 
+
+Risk: 0.980 
+
+> Shape: [B,2,L]
+> Shape: [B,2,L]
+> Shape: [B,2,L]
+
+Fig. 4: Driver-state world model roll-out and action-cost estimation. The world model provides predictive evidence by sim-ulating future per-step risks and counterfac-tual system-level action costs. In Case B and C, although the instantaneous fast output is incorrect ( Low ), the world model anticipates high future risk and estimates that Abstain or 
+
+Replace yields the lowest cost, thereby guiding the gate toward a safer intervention. 
+
+fixed-risk operating points also drift on test groups, indicating that predictive evidence alone does not solve group-dependent calibration. The hardest groups are 
+
+P10::Anger , P16::Sadness , and P9::Fear . Detailed worst-group and fixed-risk results are provided in the supplement. Together with the matched-coverage comparison in Sec. 4.3, these results suggest that the learned gate captures useful risk structure on average, but maintaining a fixed operating point under participant-scenario shift remains unresolved. 
+
+4.6 Qualitative Analysis 
+
+We provide qualitative visualizations to illustrate system behavior. Fig. 3 com-pares RGB-only and RGB-physiological predictions using input waveforms and prediction distributions. Fig. 2 shows how selective inference separates accepted 
+
+low , accepted high , and abstained samples. Fig. 4 visualizes driver-state roll-out predictions and counterfactual action costs. Finally, Fig. 5 summarizes the overarching deployment characteristics, illustrating both the optimal coverage-risk Pareto frontier and the persistent calibration drift observed on difficult participant-scenario groups. 
+
+Supplementary results. The supplementary material includes VLM distillation, student architecture and normalization ablations, per-seed learned-gate results, 14 D. Qiu et al. Fast-Student Confidence Reliability on Hardest Groups                  
+
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.0 0.5 0.6 0.7 0.8 0.9 1.0
+> Fast Confidence
+> Empirical Accuracy
+> 0.2
+> Overall(n=4254,ECE=0.113)
+> P10 Anger(n=190,ECE=0.784)
+> P16 Sadness(n=203,ECE=0.656)
+> P9 Fear(n=141,ECE=0.957)
+> Perfect Calibration
+> Low-Latency Deployment Pareto Frontier
+> 0.175
+> 0.075
+> 0.050
+> 0.000
+> 0.0 0.2 0.4 1.00
+> Coverage
+> Unsafe FN Rate
+> 0.025
+> Current Gate
+> WM-H5 Gate
+> Always-fast(3.08ms)
+> 0.6 0.8
+> Effective latency budget <= 500 ms
+> Each point = one test-set operating point
+> 0.13 0.986
+> High-coverage Zoom
+> Near-full-coverage operating points
+> 0.100
+> 0.125
+> 0.150
+> 0.988 0.990 0.992 0.994 0.996 0.998 1.000
+> 0.14
+> 0.15
+> 0.16
+> 0.17
+> 0.175
+> 0.075
+> 0.050
+> 0.000 Always-fast
+> Unsafe FN Rate
+> 0.025
+> 0.100
+> 0.125
+> 0.150
+> 0.200
+> Random Abstain
+> Uncertainty Threshold
+> Learned Gate
+> Matched Coverage = 0.844
+> 0.1737
+> 0.1467
+> 0.1027
+> 0.0528
+> Matched-Coverage Unsafe False Negatives
+
+Fig. 5: Calibration, deployment frontier, and matched-coverage safety be-havior. Left: The fast student is reasonably calibrated overall, but reliability degrades markedly on the hardest participant-scenario groups, revealing calibration drift under heavy-tailed group shift. Middle: Coverage–risk Pareto frontiers under deployment latency constraints. The predictive driver-state gate improves the trade-off in part of the high-coverage regime, while always-fast inference defines the latency floor. Right: 
+
+Unsafe false-negative rate at matched coverage. The learned gate outperforms random abstention and uncertainty-threshold baselines at the same operating coverage, showing that its safety gain is not explained by lower coverage alone. 
+
+rule-based gate operating points, early and factorized world-model variants, cali-bration follow-ups, leave-one-scenario-out stress analysis, and synthetic transition forecasting. 
+
+5 Conclusion 
+
+We presented a deployable multimodal driver monitoring framework that shifts in-cabin driver-state recognition from always-accept classification to cost-aware selective inference. The system combines an always-on RGB-physiological student with a learned gate that accepts reliable fast predictions and abstains under high risk. Our results show that window-level physiological signals help recover visually ambiguous RGB errors and unsafe false negatives, while selective inference further reduces unsafe accepted errors against matched-coverage baselines without sacrificing deployment-level latency. Scenario-prior and intervention analyses also show that exact physiological synchronization remains a limitation, pointing to the need for more robust multimodal alignment. Our study further clarifies the role of heavier predictive components. Slow VLMs and direct VLM-to-student distillation do not consistently improve the supervised fast student, and should not be assumed to be reliable always-on monitors. Driver-state world modeling provides useful future-risk and action-cost signals, but remains sensitive to operating-point calibration drift under worst-group shifts. These findings suggest that reliable edge driver monitoring requires not only stronger perception backbones, but also risk-aware selection, abstention-aware evaluation, and group-robust calibration. Risk-Aware Selective Multimodal Driver Monitoring 15 
+
+Acknowledgements 
+
+This work was supported by the National Natural Science Foundation of China (Grant No. 62273135), the Hubei Provincial Key Research and Development Program (No. 2025BAB061), the Hubei Provincial Major Science and Technology Program (No. 2025BEA001), and the Wuhan Natural Science Foundation Focused Program (No. 2026040101030022). 
+
+References 
+
+1. Alayrac, J.B., Donahue, J., Luc, P., Miech, A., Barr, I., Hasson, Y., Lenc, K., Mensch, A., Millicah, K., Reynolds, M., Ring, R., Rutherford, E., Cabi, S., Han, T., Gong, Z., Samangooei, S., Monteiro, M., Menick, J., Borgeaud, S., Brock, A., Nematzadeh, A., Sharifzadeh, S., Binkowski, M., Barreira, R., Vinyals, O., Zisserman, A., Simonyan, K.: Flamingo: a visual language model for few-shot learning. In: Proceedings of the 36th International Conference on Neural Information Processing Systems. NIPS ’22, Curran Associates Inc., Red Hook, NY, USA (2022) 2. Angelopoulos, A.N., Bates, S., Fisch, A., Lei, L., Schuster, T.: Conformal risk control. In: The Twelfth International Conference on Learning Representations (2024), https://openreview.net/forum?id=33XGfHLtZg 
+
+3. Bardes, A., Garrido, Q., Ponce, J., Chen, X., Rabbat, M., LeCun, Y., Assran, M., Ballas, N.: Revisiting Feature Prediction for Learning Visual Representations from Video. arXiv e-prints arXiv:2404.08471 (Feb 2024). https://doi.org/10.48550/ arXiv.2404.08471 
+
+4. Chi, H., Qiu, D., Su, H., Liu, H., Li, Z., Zhang, H., Lv, C.: Driver-wm: A driver-centric traffic-conditioned latent world model for in-cabin dynamics rollout (2026), 
+
+https://arxiv.org/abs/2605.05092 
+
+5. Chi, H., Yang, H., Yang, L., Lv, C.: Vlm-dm: Visual language models for multitask domain adaptation in driver monitoring. In: 2025 IEEE Intelligent Vehicles Sym-posium (IV). pp. 1280–1285 (2025). https://doi.org/10.1109/IV64158.2025. 11097620 
+
+6. Chow, C.: On optimum recognition error and reject tradeoff. IEEE Transactions on Information Theory 16 (1), 41–46 (1970). https://doi.org/10.1109/TIT.1970. 1054406 
+
+7. Dai, W., Li, J., Li, D., Tiong, A.M.H., Zhao, J., Wang, W., Li, B., Fung, P., Hoi, S.: Instructblip: towards general-purpose vision-language models with instruction tuning. In: Proceedings of the 37th International Conference on Neural Information Processing Systems. NIPS ’23, Curran Associates Inc., Red Hook, NY, USA (2023) 8. Dargahi Nobari, K., Bertram, T.: A multimodal driver monitoring benchmark dataset for driver modeling in assisted driving automation. Scientific Data 11 (1), 327 (Mar 2024). https://doi.org/10.1038/s41597-024-03137-y , https://doi. org/10.1038/s41597-024-03137-y 
+
+9. Geifman, Y., El-Yaniv, R.: Selective classification for deep neural networks. In: Guyon, I., Luxburg, U.V., Bengio, S., Wallach, H., Fergus, R., Vishwanathan, S., Garnett, R. (eds.) Advances in Neural Information Processing Systems. vol. 30. Curran Associates, Inc. (2017), https://proceedings.neurips.cc/paper_files/ paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf 16 D. Qiu et al. 10. Geifman, Y., El-Yaniv, R.: SelectiveNet: A deep neural network with an integrated reject option. In: Chaudhuri, K., Salakhutdinov, R. (eds.) Proceedings of the 36th International Conference on Machine Learning. Proceedings of Machine Learning Research, vol. 97, pp. 2151–2159. PMLR (09–15 Jun 2019), https://proceedings. mlr.press/v97/geifman19a.html 
+
+11. Ha, D., Schmidhuber, J.: World Models. arXiv e-prints arXiv:1803.10122 (Mar 2018). https://doi.org/10.48550/arXiv.1803.10122 
+
+12. Hafner, D., Lillicrap, T., Fischer, I., Villegas, R., Ha, D., Lee, H., Davidson, J.: Learning latent dynamics for planning from pixels. In: International Conference on Machine Learning. pp. 2555–2565 (2019) 13. Hafner, D., Pasukonis, J., Ba, J., Lillicrap, T.: Mastering Diverse Domains through World Models. arXiv e-prints arXiv:2301.04104 (Jan 2023). https://doi.org/10. 48550/arXiv.2301.04104 
+
+14. Hansen, N., Su, H., Wang, X.: Td-mpc2: Scalable, robust world models for continuous control. In: Kim, B., Yue, Y., Chaudhuri, S., Fragkiadaki, K., Khan, M., Sun, Y. (eds.) International Conference on Learning Representations. vol. 2024, pp. 47376– 47405 (2024), https://proceedings.iclr.cc/paper_files/paper/2024/file/ cf73d57b6dcda32b293df7c2d5341f49-Paper-Conference.pdf 
+
+15. Healey, J., Picard, R.: Detecting stress during real-world driving tasks using phys-iological sensors. IEEE Transactions on Intelligent Transportation Systems 6(2), 156–166 (2005). https://doi.org/10.1109/TITS.2005.848368 
+
+16. Hinton, G., Vinyals, O., Dean, J.: Distilling the Knowledge in a Neural Network. arXiv e-prints arXiv:1503.02531 (Mar 2015). https://doi.org/10.48550/arXiv. 1503.02531 
+
+17. Hu, A., Russell, L., Yeo, H., Murez, Z., Fedoseev, G., Kendall, A., Shotton, J., Corrado, G.: Gaia-1: A generative world model for autonomous driving (2023), 
+
+https://arxiv.org/abs/2309.17080 
+
+18. Huang, J., Huang, X., Peng, Y., Hu, L.: Driver state recognition with physiological signals: Based on deep feature fusion and feature selection techniques. Biomedical Signal Processing and Control 93 , 106204 (2024). https://doi.org/https://doi. org/10.1016/j.bspc.2024.106204 , https://www.sciencedirect.com/science/ article/pii/S1746809424002623 
+
+19. Jang, J., Ma, C., Lee, B.: Vl2lite: Task-specific knowledge distillation from large vision-language models to lightweight networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 30073–30083 (June 2025) 20. Koh, P.W., Sagawa, S., Marklund, H., Xie, S.M., Zhang, M., Balsubramani, A., Hu, W., Yasunaga, M., Phillips, R.L., Gao, I., Lee, T., David, E., Stavness, I., Guo, W., Earnshaw, B.A., Haque, I.S., Beery, S., Leskovec, J., Kundaje, A.B., Pierson, E., Levine, S., Finn, C., Liang, P.: Wilds: A benchmark of in-the-wild distribution shifts. In: International Conference on Machine Learning (2020), https: //api.semanticscholar.org/CorpusID:229156320 
+
+21. Li, J., Li, D., Savarese, S., Hoi, S.: BLIP-2: Bootstrapping language-image pre-training with frozen image encoders and large language models. In: Krause, A., Brunskill, E., Cho, K., Engelhardt, B., Sabato, S., Scarlett, J. (eds.) Proceedings of the 40th International Conference on Machine Learning. Proceedings of Machine Learning Research, vol. 202, pp. 19730–19742. PMLR (23–29 Jul 2023), https: //proceedings.mlr.press/v202/li23q.html 
+
+22. Liu, H., Li, C., Wu, Q., Lee, Y.J.: Visual instruction tuning. In: Oh, A., Naumann, T., Globerson, A., Saenko, K., Hardt, M., Levine, S. (eds.) Advances in Neural Risk-Aware Selective Multimodal Driver Monitoring 17 Information Processing Systems. vol. 36, pp. 34892–34916. Curran Associates, Inc. (2023), https://proceedings.neurips.cc/paper_files/paper/2023/file/ 6dcf277ea32ce3288914faf369fe6de0-Paper-Conference.pdf 
+
+23. Liu, Z., Wang, Z., Liang, P.P., Salakhutdinov, R.R., Morency, L.P., Ueda, M.: Deep gamblers: Learning to abstain with portfolio theory. In: Wallach, H., Larochelle, H., Beygelzimer, A., d 'Alché-Buc, F., Fox, E., Garnett, R. (eds.) Ad-vances in Neural Information Processing Systems. vol. 32. Curran Associates, Inc. (2019), https://proceedings.neurips.cc/paper_files/paper/2019/file/ 0c4b1eeb45c90b52bfb9d07943d855ab-Paper.pdf 
+
+24. Madras, D., Pitassi, T., Zemel, R.: Predict responsibly: Improving fairness and accuracy by learning to defer. In: Bengio, S., Wallach, H., Larochelle, H., Grauman, K., Cesa-Bianchi, N., Garnett, R. (eds.) Advances in Neural Information Processing Systems. vol. 31. Curran Associates, Inc. (2018), https://proceedings.neurips. cc/paper_files/paper/2018/file/09d37c08f7b129e96277388757530c72-Paper. pdf 
+
+25. Martin, M., Roitberg, A., Haurilet, M., Horne, M., Reiß, S., Voit, M., Stiefelhagen, R.: Drive&act: A multi-modal dataset for fine-grained driver behavior recognition in autonomous vehicles. In: 2019 IEEE/CVF International Conference on Computer Vision (ICCV). pp. 2801–2810 (2019). https://doi.org/10.1109/ICCV.2019. 00289 
+
+26. Meteier, Q., Capallera, M., Ruffieux, S., Angelini, L., Abou Khaled, O., Mugellini, E., Widmer, M., Sonderegger, A.: Classification of drivers’ workload using phys-iological signals in conditional automation. Frontiers in Psychology Volume 12 - 2021 (2021). https://doi.org/10.3389/fpsyg.2021.596038 , https: //www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021. 596038 
+
+27. Mozannar, H., Sontag, D.: Consistent estimators for learning to defer to an expert. In: III, H.D., Singh, A. (eds.) Proceedings of the 37th International Conference on Machine Learning. Proceedings of Machine Learning Research, vol. 119, pp. 7076–7087. PMLR (13–18 Jul 2020), https://proceedings.mlr.press/v119/ mozannar20b.html 
+
+28. Ortega, J.D., Kose, N., Cañas, P., Chao, M.A., Unnervik, A., Nieto, M., Otaegui, O., Salgado, L.: Dmd: A large-scale multi-modal driver monitoring dataset for attention and alertness analysis. In: Computer Vision – ECCV 2020 Workshops: Glasgow, UK, August 23–28, 2020, Proceedings, Part IV. p. 387–405. Springer-Verlag, Berlin, Heidelberg (2020). https://doi.org/10.1007/978-3-030-66823-5_23 , https: //doi.org/10.1007/978-3-030-66823-5_23 
+
+29. Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., Sutskever, I.: Learning transferable visual models from natural language supervision. In: Meila, M., Zhang, T. (eds.) Proceedings of the 38th International Conference on Machine Learning. Proceedings of Machine Learning Research, vol. 139, pp. 8748–8763. PMLR (18–24 Jul 2021), 
+
+https://proceedings.mlr.press/v139/radford21a.html 
+
+30. Sagawa*, S., Koh*, P.W., Hashimoto, T.B., Liang, P.: Distributionally robust neural networks. In: International Conference on Learning Representations (2020), 
+
+https://openreview.net/forum?id=ryxGuJrFvS 
+
+31. Sahayadhas, A., Sundaraj, K., Murugappan, M.: Detecting driver drowsiness based on sensors: A review. Sensors 12 (12), 16937–16953 (2012). https://doi.org/10. 3390/s121216937 , https://www.mdpi.com/1424-8220/12/12/16937 18 D. Qiu et al. 32. Sriranga, A.K., Lu, Q., Birrell, S.: A systematic review of in-vehicle physiological indices and sensor technology for driver mental workload monitoring. Sensors 
+
+23 (4) (2023). https://doi.org/10.3390/s23042214 , https://www.mdpi.com/ 1424-8220/23/4/2214 
+
+33. Wang, P., Bai, S., Tan, S., Wang, S., Fan, Z., Bai, J., Chen, K., Liu, X., Wang, J., Ge, W., Fan, Y., Dang, K., Du, M., Ren, X., Men, R., Liu, D., Zhou, C., Zhou, J., Lin, J.: Qwen2-VL: Enhancing Vision-Language Model’s Perception of the World at Any Resolution. arXiv e-prints arXiv:2409.12191 (Sep 2024). 
+
+https://doi.org/10.48550/arXiv.2409.12191 
+
+34. Wang, X., Zhu, Z., Huang, G., Chen, X., Zhu, J., Lu, J.: Drivedreamer: Towards real-world-drive world models for autonomous driving. In: Leonardis, A., Ricci, E., Roth, S., Russakovsky, O., Sattler, T., Varol, G. (eds.) Computer Vision – ECCV 2024. pp. 55–72. Springer Nature Switzerland, Cham (2025) Risk-Aware Selective Multimodal Driver Monitoring 19 
+
+A Additional Discussion 
+
+This section clarifies several design choices that are central to interpreting the proposed framework. 
+
+Q1: Why formulate driver monitoring as selective inference rather than simply maximizing classification accuracy? 
+
+Continuous driver monitoring is not only a recognition problem. In a deployed vehicle, the system must also decide whether its own prediction is reliable enough to act on. This distinction matters because the error costs are asymmetric. Accepting a wrong low prediction for a true high driver state is more safety-critical than abstaining and triggering a conservative intervention. A standard classifier is forced to assign a label to every input, even when the visual and physiological evidence is ambiguous. Selective inference gives the monitor an explicit reject option: it can accept the fast prediction when the evidence is reliable, and abstain when the risk of an unsafe accepted error is too high. The objective is therefore not only to improve average recognition metrics, but to control the operating behavior of the system under uncertainty. 
+
+Q2: Why focus on scenario-induced driver demand instead of visible actions such as phone usage or eating? 
+
+Visible secondary activities are important, but they do not cover all safety-relevant driver states. A driver may look visually normal while experiencing elevated demand due to the driving scenario, automation state, or internal physiological response. Such demand-related states are only partially observable from RGB frames. This motivates the use of window-level physiological signals, which can provide complementary contextual evidence when visual cues are ambiguous. We therefore study scenario-induced driver-demand monitoring rather than general action recognition. This choice is not meant to replace visible behavior monitoring; it targets a different failure mode, where the driver state may be visually ambiguous but physiologically informative. 
+
+Q3: How should the strong scenario-only baseline be interpreted? 
+
+The scenario-only baseline confirms that the constructed demand labels contain scenario-level structure. We therefore do not interpret the task as clinical stress diagnosis or as a direct measurement of cognitive workload. At the same time, physiological signals are not redundant. The RGB-physiological student improves over RGB-only and physiology-only baselines, and shuffled physiological windows degrade performance. These results indicate that HR/EDA provide useful window-level state information, although part of the signal is correlated with scenario structure. This is why we describe the task as scenario-induced demand monitoring and include shuffled, shifted, and scenario-only controls rather than claiming pure physiological causality. 
+
+Q4: Why not rely on a large VLM as the continuous monitor? 
+
+Large VLMs provide broad semantic priors, but they are poorly matched to continuous edge monitoring. Their autoregressive decoding and large parameter 20 D. Qiu et al. 
+
+counts lead to inference latency that is incompatible with always-on in-cabin monitoring. More importantly, in our experiments the slow VLM branch is not consistently stronger than the supervised RGB-physiological student, either as a direct predictor or as a distillation teacher. We therefore treat the VLM as an optional probe or rare verification branch, not as the main deployed monitor. The common path must remain lightweight and reliable; uncertainty is handled by selective decision-making rather than by continuously running a large model. 
+
+Q5: What is meant by driver-state world modeling in this work? 
+
+Our driver-state world modeling module is not a scene-level autonomous-driving world model. It does not generate future road images, traffic scenes, occupancy maps, or driver videos. Instead, it operates on compact in-cabin moni-toring features extracted from the fast student, including latent representations, logits, uncertainty statistics, modality disagreement, and physiological quality. The module rolls out these driver-state features over a short horizon and estimates future fast-model errors and counterfactual system-level action costs. Its role is to provide predictive evidence to the selective gate, not to replace the fast student or to serve as a standalone simulator. 
+
+Q6: Why factorize driver-state dynamics from action-conditioned outcomes? 
+
+The monitoring action is not assumed to causally change the driver’s physi-ological state within the short decision window. For example, accepting a fast prediction or abstaining for intervention does not provide observed evidence that the driver’s HR/EDA dynamics would immediately change in the offline data. Modeling the action as directly controlling driver-state evolution would there-fore introduce an unsupported causal assumption. We instead use a factorized formulation: an action-free rollout models the natural evolution of driver-state features, while a separate action-conditioned branch estimates the system-level consequences of candidate actions, such as counterfactual action cost, unsafe out-come probability, and abstention outcome probability. This matches the available supervision and keeps the model’s causal interpretation conservative. 
+
+Q7: Why is world modeling treated as an extension rather than the main controller? 
+
+The world model provides useful predictive signals. It improves future fast-error prediction and can reduce accepted risk at some operating points. However, it does not uniformly dominate the current-evidence gate under worst-group evaluation. In particular, reductions in unsafe accepted false negatives can be accompanied by higher abstention or unhandled-positive rates, and operating points selected on validation data may drift under participant-scenario shifts. We therefore use driver-state world modeling as a predictive extension for selective inference rather than as an independent controller. This interpretation reflects the empirical evidence: predictive state modeling is valuable, but robust calibration remains necessary before such signals can safely govern decisions on their own. 
+
+Q8: Why evaluate the full system primarily on manD? Risk-Aware Selective Multimodal Driver Monitoring 21 
+
+The full framework requires synchronized in-cabin RGB, continuous physio-logical signals, and driver-state labels. Many public driver monitoring datasets provide visual behavior labels, but do not include aligned HR/EDA streams for the same monitoring windows. Evaluating those datasets would require removing the physiological branch and changing the safety objective, which would no longer test the full system studied in this work. We therefore evaluate the complete RGB-physiological selective monitoring pipeline on manD, and use multiple in-ternal reliability checks—including shuffled and shifted physiology, scenario-only baselines, worst-group evaluation, and calibration analyses—to probe shortcut behavior and robustness. Broader validation on future datasets with synchronized visual and physiological driver-state labels remains an important direction. 
+
+B Supplementary Material 
+
+This supplementary material provides additional implementation details and ablation results omitted from the main paper due to space constraints. We include VLM distillation results, student architecture and normalization ablations, per-seed selective-gate results, rule-based operating points, additional world-model variants, calibration follow-ups, and stress-test analyses. 
+
+B.1 Additional Protocol Details Task. The primary task is scenario-induced driver-demand monitoring on manD. Each sample contains an RGB clip and a synchronized HR/EDA physiological window. The semantic label is low or high , where high is treated as the safety-critical positive state. 
+
+Selective monitoring actions. The system action space is 
+
+A = {accept_fast , abstain_warn , slow_replace , slow_verify }.
+
+The always-on path is the RGB-physiological fast student. The slow branch is used only as an optional verification or replacement path. For selective evaluation, unsafe false negatives, positive abstention, unhandled positives, coverage, slow-call rate, and effective latency are computed using the definitions in the main paper. 
+
+Calibration. Gate thresholds, fallback modes, and slow-confidence floors are selected on calibration data and fixed for test evaluation. World-model checkpoints are selected by validation gate utility rather than by standalone prediction quality. 
+
+B.2 VLM-to-Student Distillation 
+
+Table 3 reports the VLM-to-student distillation ablation. Raw KD gives a marginal Macro-F1 gain over CE-only training but substantially reduces BAcc. Reliability-filtered KD is also weaker than the supervised RGB-physiological student. This supports the main-paper conclusion that the VLM teacher is not a consistently stronger training signal in this protocol. 22 D. Qiu et al.                                 
+
+> Table 3: VLM-to-student distillation ablation. Training strategy Macro-F1 BAcc CE-only RGB+physio 0.7440 0.9099
+> Raw KD 0.7461 0.7768 Reliability-filtered KD 0.6828 0.8309
+> Table 4: Student architecture and physiological normalization ablations. Group Variant Macro-F1 BAcc Main student RGB+physio 0.7440 0.9099 Backbone / temporal ResNet18 + pretrained + mean 0.7352 0.9071 Backbone / temporal MobileNetV3-small + pretrained + mean 0.7774 0.8960 Backbone / temporal ResNet18 + pretrained + GRU 0.7674 0.9221
+> Backbone / temporal ResNet18 + pretrained + attention 0.6407 0.8508 Backbone / temporal ResNet18 + pretrained + TCN 0.6901 0.8822 Physio normalization Per-window z-score 0.7440 0.9099
+> Physio normalization Global z-score 0.7651 0.8677 Physio normalization Raw statistics 0.6058 0.6659
+
+B.3 Student Architecture and Physiological Normalization 
+
+Table 4 reports the student architecture and physiological normalization ablations. Pretrained visual encoders consistently improve the always-on student. Among the tested temporal modules, ResNet18 with GRU aggregation gives the highest BAcc, while MobileNetV3-small gives the highest Macro-F1. For physiological preprocessing, per-window z-score normalization remains the most stable setting overall. 
+
+B.4 Learned Gate Across Seeds 
+
+Table 5 reports per-seed results for the learned cost-aware gate. Most seeds select a fast-abstain operating mode rather than frequent slow escalation, which is consistent with the large latency gap between the fast student and the slow branch. 
+
+B.5 Rule-Based Selective Operating Points 
+
+Table 6 provides representative rule-based selective operating points. These rules demonstrate the expected risk-coverage-latency trade-off, but they are less stable and less compact than the learned cost-aware gate reported in the main paper. Risk-Aware Selective Multimodal Driver Monitoring 23 
+
+Table 5: Learned cost-aware gate across seeds. Seed Coverage Slow-call Macro-F1 BAcc Unsafe FN Pos. abstain Unhandled pos. Latency A 0.8439 0.0000 0.8498 0.9644 0.0528 0.1259 0.1787 3.08 ms 23 0.8373 0.0000 0.8509 0.9650 0.0512 0.1317 0.1829 3.08 ms 37 0.7936 0.0000 0.8616 0.9705 0.0420 0.1729 0.2149 3.08 ms 51 0.9003 0.0404 0.8059 0.8853 0.0647 0.0784 0.1431 351.45 ms Mean ± std 0.8438 ±0.0379 0 .0101 ±0.0175 0 .8421 ±0.0214 0 .9463 ±0.0353 0 .0527 ±0.0081 0 .1272 ±0.0335 0 .1799 ±0.0254 90.18 ms 
+
+Table 6: Representative rule-based selective operating points. Policy Coverage Unsafe FN Effective latency Always-fast 1.0000 0.1737 3.08 ms Confidence-margin 0.8902 0.0636 1451.23 ms Confidence-margin strict 0.7494 0.0449 961.09 ms Entropy 0.6946 0.0314 1108.94 ms Physio-quality confidence gate 0.8839 0.0623 1505.92 ms Strict physio-quality confidence gate 0.8467 0.0444 1880.62 ms Best physio-aware gate 0.8310 0.0335 2046.70 ms 
+
+B.6 Early Driver-State World-Model Variants 
+
+Table 7 reports early driver-state world-model variants. The GRU and rollout variants provide strong future high-demand prediction, while the MLP and rollout variants show competitive fast-error prediction. These variants confirm that predictive state modeling is not empty, but they do not uniformly improve selective-gate performance. 
+
+B.7 Action-Feedback World-Model Horizon Ablation 
+
+Table 8 reports horizon-level prediction and counterfactual action evaluation for the action-feedback world model. The best future fast-error prediction is obtained at horizon H = 5 , whereas the lowest action-cost MSE occurs at H = 3 . This motivates reporting predictive-risk and action-cost diagnostics separately. 
+
+B.8 Factorized World Models and MPC-Style Gates 
+
+The round-2 world-model experiments evaluate factorized driver dynamics, latent consistency ablations, and policy-library MPC gates. Table 9 summarizes the factorized variants already discussed in the main paper. The latent factorized model is more conservative, while the no-latent variant improves classification metrics but produces a larger unhandled-positive burden. The policy-library MPC gates are weaker than the learned cost-aware gate in the evaluated setting. Across six seed/system combinations, MPC-style gates obtain coverage in the range 0.8590–0.9006, unsafe false-negative rates in the range 0.1195–0.1414, and unhandled positive rates in the range 0.2356–0.2711. 24 D. Qiu et al. 
+
+Table 7: Early driver-state world-model variants. Variant Future high F1/AUC Fast-error F1/AUC Coverage Macro-F1 BAcc Unsafe FN Current learned gate – – 0.8439 0.8498 0.9644 0.0528 GRU state forecaster 0.8974 / 0.9628 0.6703 / 0.9261 0.8639 0.8232 0.9562 0.0692 Current-feature MLP 0.8947 / 0.9523 0.5852 / 0.9036 0.8357 0.8581 0.9665 0.0486        
+
+> Latent rollout forecaster 0.9028 / 0.9476 0.6257 / 0.8958 0.8507 0.8452 0.9618 0.0581
+
+Table 8: Action-feedback world-model horizon ablation. Horizon Future high F1 Future high AUC Fast-error F1 Fast-error AUC Cost MSE Pairwise                      
+
+> H= 1 0.8952 0.9544 0.5645 0.8818 2.2481 0.6665
+> H= 3 0.8980 0.9549 0.6510 0.9255 2.2440 0.6611
+> H= 5 0.8972 0.9521 0.7114 0.9486 2.4428 0.6627
+
+These results suggest that explicit policy-library planning is not yet competitive with the learned selective gate. 
+
+B.9 Calibration Follow-Ups 
+
+Table 10 reports the scenario-stratified calibration follow-up. Naive scenario-specific thresholding does not solve operating-point drift and can degrade the test trade-off. The best reported world-model setting remains the global risk-calibrated horizon-5 gate. 
+
+B.10 Leave-One-Scenario-Out Stress Analysis 
+
+The leave-one-scenario-out stress test gives 0.4339 weighted Macro-F1, 0.7504 weighted BAcc, and 0.7908 weighted accuracy. Because several held-out scenarios contain single-class test labels, this evaluation should be interpreted as shortcut and stress analysis rather than as a standard generalization benchmark. The most difficult participant-scenario groups are P10::Anger , P16::Sadness , and 
+
+P9::Fear .
+
+B.11 Synthetic Transition and Early-Warning Stress Test 
+
+The original manD split does not support a stable real lead-time claim because most high-demand onsets occur near sequence starts. We therefore construct a synthetic low-to-high transition stress test. With the default best-F1 threshold, all evaluated world-model variants degenerate into near-always-warning behavior, producing test false-alarm rates close to 1.0. Under a validation false-alarm-rate constraint, the GRU forecaster performs best at the evaluated operating point, reaching test F1 of 0.6122, test false-alarm rate of 0.7600, and event recall of 1.0000. The MLP forecaster overfits the threshold and returns to a test false-alarm rate of 1.0000, while the rollout forecaster is more conservative, with test F1 Risk-Aware Selective Multimodal Driver Monitoring 25 
+
+Table 9: Factorized driver-state world-model variants. Variant Coverage Macro-F1 BAcc Unsafe FN Unhandled pos. World-model gate ( H = 5 ) 0.9339 0.8014 0.8219 0.0510 0.1140           
+
+> Factorized world model (latent) 0.8766 0.8340 0.8954 0.0515 0.1595 Factorized world model (no latent) 0.8260 0.8538 0.9634 0.0536 0.2043
+
+Table 10: Scenario-stratified calibration follow-up. Method Coverage Macro-F1 BAcc Unsafe FN / Unhandled pos. Current gate, risk-calibrated 0.9549 0.7648 0.8050 0.0721 / 0.1103 Current gate, scenario-calibrated 0.9462 0.7445 0.7824 0.0755 / 0.1212 World-model gate ( H = 5 ), risk-calibrated 0.9342 0.8018 0.8220 0.0507 / 0.1135      
+
+> World-model gate ( H= 5 ), scenario-calibrated 0.9382 0.7750 0.8091 0.0657 / 0.1238
+
+of 0.4390, false-alarm rate of 0.6800, and event recall of 0.6000. These results indicate that transition forecasting contains useful signal, but the operating point remains calibration-sensitive; we therefore do not treat early warning as a main result. 
+
+B.12 Scenario Residual and Error Recovery 
+
+We further analyze whether the learned scores contain information beyond scenario priors. A scenario-only probe obtains 0.7372 Macro-F1 and 0.9089 BAcc. Adding model scores improves the probe to 0.7803 Macro-F1 and 0.9239 BAcc, suggesting that the learned predictions are not reducible to scenario lookup. We also measure how often the RGB-physiological student corrects RGB-only errors. Among 803 RGB-only errors, 382 are recovered by the RGB-physiological student. Among 646 RGB-only unsafe false negatives, 228 are recovered. 
+
+B.13 Matched-Coverage Gate Baselines 
+
+To verify that the learned gate is not merely reducing risk by rejecting more samples, we compare policies at the learned gate’s coverage of 0.8439. Random abstention and confidence-based thresholding reduce unsafe false negatives less effectively than the learned gate. 
+
+B.14 Test-Time Physiological Intervention 
+
+We evaluate the same strong RGB-physiological checkpoint while replacing the physiological input only at test time. The results show that the model should not be interpreted as relying on exact time-synchronized physiological dynamics. These results suggest that the current model uses window-level physiological or contextual information, but should not be interpreted as depending on exact temporal physiological synchronization. 26 D. Qiu et al. 
+
+Table 11: Scenario residual and RGB-error recovery analysis. Analysis Result 1 Result 2 Scenario-only probe Macro-F1 0.7372 BAcc 0.9089 Scenario+score probe Macro-F1 0.7803 BAcc 0.9239 RGB-only errors 803 total 382 recovered (47.6%) RGB-only unsafe FNs 646 total 228 recovered (35.3%) 
+
+Table 12: Matched-coverage unsafe false-negative comparison. All baselines are evalu-ated at the learned gate’s coverage. Policy Coverage Unsafe FN Always-fast 1.0000 0.1737 Random abstention 0.8439 0.1467 Confidence/entropy/margin threshold 0.8439 0.1027 Learned gate 0.8439 0.0528 
+
+B.15 Abstention Burden 
+
+Our main evaluation reports positive abstention and unhandled positives to avoid treating abstention as a free correct prediction. Positive abstention counts true 
+
+high samples rejected for intervention, while unhandled positives combine unsafe false negatives and positive abstentions. Future evaluations should further separate low-risk false interventions and warning precision when richer intervention logs are available. Risk-Aware Selective Multimodal Driver Monitoring 27 
+
+Table 13: Test-time physiological intervention using the same strong RGB-physiological checkpoint. Test-time physio Macro-F1 BAcc Unsafe FN True synchronized 0.7674 0.9221 0.1515 Shuffled 0.7668 0.9218 0.1521 Shifted4 0.7902 0.9324 0.1309 Shifted16 0.7933 0.9337 0.1283 Shifted64 0.7635 0.9202 0.1552 Zero / missing 0.8409 0.9388 0.0837 Table 14: Worst-group and operating-point analysis. The world-model gate improves utility in some settings but remains calibration-sensitive under group shift. 
+
+Method Coverage ↑ Unsafe FN ↓ Unhandled Pos. ↓ Utility ↑
+
+Worst-group weighted performance 
+
+Current-evidence gate – 0.0705 0.1139 0.3960 
+
+World-model gate ( H = 5 , Ours) – 0.0731 0.1246 0.4035 
+
+Matched seed-group pairs (World-model better or equal) 
+
+WM ≥ Current 57/72 61/72 60/72 56/72 
+
+Validation-selected fixed-risk operating point 
+
+Current-evidence gate 0.9158 0.0436 0.1225 –World-model gate ( H = 1 ) 0.9156 0.0417 0.1241 –World-model gate ( H = 3 ) 0.9170 0.0531 0.1317 –
+
+World-model gate ( H = 5 , Ours) 0.8933 0.0359 0.1428 –
+
+Upper bound reference 
+
+Fixed-risk Oracle 0.9922 0.0000 0.0082 –

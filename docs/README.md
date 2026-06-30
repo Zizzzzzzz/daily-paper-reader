@@ -6,77 +6,86 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-29
-- 运行时间：2026-06-29 22:14:17 UTC
+- 最新运行日期：2026-06-30
+- 运行时间：2026-06-30 22:23:50 UTC
 - 运行状态：成功
-- 本次总论文数：19
-- 精读区：8
-- 速读区：11
+- 本次总论文数：22
+- 精读区：9
+- 速读区：13
 
 ### 今日简报（AI）
-今日推荐19篇论文，精读聚焦VLA模型策略压缩与高效缓存管理。最值得看《PolicyTrim》提升VLA策略效率与《Forget Without Compromise》流式KV缓存逐出方法。建议关注VLA模型部署优化，尝试结合策略修剪与缓存管理提升效率。
-- 详情：[/202606/29/README](/202606/29/README)
+今日精读22篇论文，重点聚焦事件相机模拟与RGB-事件融合检测两大方向。最值得关注的是《FracEvent》提出的分数阶松弛像素动力学事件模拟方法（10分）和《CMTFormer》层次化Transformer融合架构（10分）。建议普通读者优先从事件相机的低延迟特性与多模态视觉理解结合点切入，后续可关注大语言模型在交通场景生成与视觉冗余抑制上的应用。
+- 详情：[/202606/30/README](/202606/30/README)
 
 ### 精读区论文标签
-1. [PolicyTrim: Boosting Intrinsic Policy Efficiency of Vision-Language-Action Models](/202606/29/2606.22540v2-policytrim-boosting-intrinsic-policy-efficiency-of-vision-language-action-models)  
+1. [FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics](/202606/30/2606.26636v1-fracevent-event-camera-simulation-via-fractional-relaxation-pixel-dynamics)  
+   标签：评分：10.0/10、query:ev-cam
+   evidence：基于分数松弛像素动力学的事件相机模拟
+2. [CMTFormer: Marrying Transformer with Hierarchical Information Interaction for RGB-Event Object Detection](/202606/30/2606.29136v1-cmtformer-marrying-transformer-with-hierarchical-information-interaction-for-rgb-event-object-detection)  
+   标签：评分：10.0/10、query:ev-cam
+   evidence：利用跨模态Transformer进行RGB-事件目标检测
+3. [X-Mind: Efficient Visual Chain-of-Thought via Predictive World Model for End-to-End Driving](/202606/30/2606.28758v1-x-mind-efficient-visual-chain-of-thought-via-predictive-world-model-for-end-to-end-driving)  
    标签：评分：9.0/10、query:evlm
-   evidence：通过动作块优化减少推理调用次数，提升VLA模型内在策略效率
-2. [Forget Without Compromise: Nexus Sampling for Streaming KV-Cache Eviction Under Fixed Budgets](/202606/29/2606.23961v1-forget-without-compromise-nexus-sampling-for-streaming-kv-cache-eviction-under-fixed-budgets)  
+   evidence：具有预测世界模型的高效VLA端到端驾驶模型
+4. [HARD-KV: Head-Adaptive Regularization for Decoding-time KV Compression](/202606/30/2606.28831v1-hard-kv-head-adaptive-regularization-for-decoding-time-kv-compression)  
    标签：评分：9.0/10、query:evlm
-   evidence：固定预算下的流式KV缓存驱逐方法
-3. [DeLux: Cross-Modal Local Artifact Restoration in Video Using Neuromorphic Data](/202606/29/2606.27576v1-delux-cross-modal-local-artifact-restoration-in-video-using-neuromorphic-data)  
+   evidence：长上下文大语言模型的KV缓存压缩
+5. [EVLA: An Electro-Aware Multimodal Assistant for Physically-Grounded Driving Reasoning and Control](/202606/30/2606.28938v1-evla-an-electro-aware-multimodal-assistant-for-physically-grounded-driving-reasoning-and-control)  
+   标签：评分：9.0/10、query:mm-trf
+   evidence：面向物理接地驾驶推理与控制的电子感知多模态助手
+6. [Fast Enough to Act: Spatio-Temporal Visual Token Merging for Low-Latency Robotic VLMs and VLAs](/202606/30/2606.29350v1-fast-enough-to-act-spatio-temporal-visual-token-merging-for-low-latency-robotic-vlms-and-vlas)  
+   标签：评分：9.0/10、query:evlm
+   evidence：面向机器人视觉语言模型和视觉语言动作模型的令牌合并低延迟方法
+7. [Event-VLA: Action-Conditioned Event Fusion for Robust Vision-Language-Action Model](/202606/30/2606.29384v1-event-vla-action-conditioned-event-fusion-for-robust-vision-language-action-model)  
+   标签：评分：9.0/10、query:evlm
+   evidence：事件增强的视觉-语言-动作模型，用于光照变化下的鲁棒机器人操作
+8. [EvLIR: Learning Illumination Residuals from Ordered Events for Low-Light Image Enhancement](/202606/30/2606.29430v1-evlir-learning-illumination-residuals-from-ordered-events-for-low-light-image-enhancement)  
    标签：评分：9.0/10、query:ev-cam
-   evidence：利用神经形态事件流作为结构先验进行跨模态视频修复
-4. [MVPruner: Dynamic Token Pruning for Accelerating Multi-view Vision-Language Models in Autonomous Driving](/202606/29/2606.27660v1-mvpruner-dynamic-token-pruning-for-accelerating-multi-view-vision-language-models-in-autonomous-driving)  
-   标签：评分：9.0/10、query:evlm
-   evidence：提出自适应令牌剪枝方法用于自动驾驶多视图VLM
-5. [MultiHashFormer: Hash-based Generative Language Models](/202606/29/2606.28057v1-multihashformer-hash-based-generative-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：基于哈希的语言模型令牌压缩
-6. [Learning Action Priors for Cross-embodiment Robot Manipulation](/202606/29/2606.26095v1-learning-action-priors-for-cross-embodiment-robot-manipulation)  
-   标签：评分：8.0/10、query:evlm
-   evidence：跨本体机器人操作的VLA动作先验学习
-7. [FracEvent: Event-Camera Simulation via Fractional-Relaxation Pixel Dynamics](/202606/29/2606.26636v1-fracevent-event-camera-simulation-via-fractional-relaxation-pixel-dynamics)  
-   标签：评分：8.0/10、query:ev-cam
-   evidence：面向事件视觉的事件相机仿真
-8. [LA4VLA: Learning to Act without Seeing via Language-Action Pretraining](/202606/29/2606.27295v1-la4vla-learning-to-act-without-seeing-via-language-action-pretraining)  
-   标签：评分：8.0/10、query:evlm
-   evidence：语言动作预训练用于高效VLA
+   evidence：事件相机低光增强利用有序事件
+9. [From Accuracy to Visual Dependence: Auditing and Filtering Modality Collapse in Traffic VideoQA](/202606/30/2606.30220v1-from-accuracy-to-visual-dependence-auditing-and-filtering-modality-collapse-in-traffic-videoqa)  
+   标签：评分：9.0/10、query:mm-trf
+   evidence：使用视觉语言模型审计交通视频问答中的模态坍塌
 
 ### 速读区论文标签
-1. [A Generative Model for Closed-Loop Microsimulation of Signalized Intersections](/202606/29/2606.23588v1-a-generative-model-for-closed-loop-microsimulation-of-signalized-intersections)  
+1. [TrafficAlign: Aligning Large Language Models for Traffic Scenario Generation](/202606/30/2606.29097v1-trafficalign-aligning-large-language-models-for-traffic-scenario-generation)  
    标签：评分：8.0/10、query:mm-trf
-   evidence：信号交叉口微观仿真用于交通场景理解
-2. [SpikeVLA: Vision-Language-Action Models with Spiking Neural Networks](/202606/29/2606.27807v1-spikevla-vision-language-action-models-with-spiking-neural-networks)  
+   evidence：利用LLM生成交通场景，与交通场景理解需求相关
+2. [Latent Noise Mask for Reducing Visual Redundancy in Multimodal Large Language Models](/202606/30/2606.30168v1-latent-noise-mask-for-reducing-visual-redundancy-in-multimodal-large-language-models)  
    标签：评分：8.0/10、query:evlm
-   evidence：脉冲VLA用于节能具身导航
-3. [LocalNav: Distilling Frontier VLMs and Embodied RL for On-Device Object Goal Navigation](/202606/29/2606.27871v1-localnav-distilling-frontier-vlms-and-embodied-rl-for-on-device-object-goal-navigation)  
+   evidence：多模态大模型的视觉token剪枝
+3. [VisReflect: Latent Visual Reflection for Fine-Grained Perception in Long Visual Context](/202606/30/2606.30288v1-visreflect-latent-visual-reflection-for-fine-grained-perception-in-long-visual-context)  
    标签：评分：8.0/10、query:evlm
-   evidence：将大型VLM蒸馏为轻量级4B模型用于边缘部署
-4. [Edges Before Embeddings: A Confidence-Aware Blur Gate for Vision-Language Pipelines](/202606/29/2606.25838v1-edges-before-embeddings-a-confidence-aware-blur-gate-for-vision-language-pipelines)  
+   evidence：视觉令牌缩减以提升大型视觉语言模型效率
+4. [An Embedded Real-Time License Plate Recognition System for Complex Traffic Scenes](/202606/30/2606.27772v1-an-embedded-real-time-license-plate-recognition-system-for-complex-traffic-scenes)  
+   标签：评分：7.0/10、query:mm-trf
+   evidence：复杂交通场景中的实时车牌识别
+5. [SUMO: Segment and Track Any Motion with Nonlinear State Space Models](/202606/30/2606.29861v1-sumo-segment-and-track-any-motion-with-nonlinear-state-space-models)  
+   标签：评分：7.0/10、query:ev-cam
+   evidence：基于非线性动力学的目标跟踪与分割框架
+6. [SA-VLA: State-aware tokenizer for improving Vision-Language-Action Models' performance](/202606/30/2606.30113v1-sa-vla-state-aware-tokenizer-for-improving-vision-language-action-models-performance)  
    标签：评分：7.0/10、query:evlm
-   evidence：用于视觉语言管道的置信度感知模糊门控，通过过滤低质量输入提升效率，与多模态模型效率优化相关
-5. [GeMoE: Gating Entropy is All You Need for Uncertainty-aware Adaptive Routing in MoE-based Large Vision-Language Models](/202606/29/2606.26287v1-gemoe-gating-entropy-is-all-you-need-for-uncertainty-aware-adaptive-routing-in-moe-based-large-vision-language-models)  
-   标签：评分：7.0/10、query:evlm
-   evidence：基于MoE的大视觉语言模型中不确定性感知的自适应路由以提高效率
-6. [HybridCodec: Modeling Discrete and Continuous Representations for Efficient Speech Language Models](/202606/29/2606.27627v1-hybridcodec-modeling-discrete-and-continuous-representations-for-efficient-speech-language-models)  
-   标签：评分：7.0/10、query:evlm
-   evidence：结合离散令牌与连续残差实现高效语音语言模型，与令牌压缩相关
-7. [VLM-Aware Meta-Optic Front-End Design for Frozen Vision-Language Models](/202606/29/2606.27646v1-vlm-aware-meta-optic-front-end-design-for-frozen-vision-language-models)  
-   标签：评分：7.0/10、query:evlm
-   evidence：针对冻结视觉语言模型的元光学前端协同设计
-8. [End-to-End Dynamic Sparsity for Resource-Adaptive LLM Inference](/202606/29/2606.27743v1-end-to-end-dynamic-sparsity-for-resource-adaptive-llm-inference)  
-   标签：评分：7.0/10、query:evlm
-   evidence：端到端动态稀疏实现资源自适应LLM推理，方法可迁移至高效多模态LLM推理
-9. [Event-Adaptive Motion Planning with Distilled Vision-Language Model in Safety-Critical Situations](/202606/29/2606.25629v1-event-adaptive-motion-planning-with-distilled-vision-language-model-in-safety-critical-situations)  
+   evidence：面向VLA模型的状态感知动作分词器
+7. [SAGE-Nav: Leveraging LLM Planning and Alignment Fusion for Hierarchical Scene Graph-Guided Navigation](/202606/30/2606.25497v1-sage-nav-leveraging-llm-planning-and-alignment-fusion-for-hierarchical-scene-graph-guided-navigation)  
    标签：评分：6.0/10、query:evlm
-   evidence：基于蒸馏VLM的高效事件自适应机器人导航
-10. [ViQ: Text-Aligned Visual Quantized Representations at Any Resolution](/202606/29/2606.27313v1-viq-text-aligned-visual-quantized-representations-at-any-resolution)  
+   evidence：大模型规划用于具身导航，与VLA模型效率相关
+8. [Risk-Aware Selective Multimodal Driver Monitoring with Driver-State World Modeling](/202606/30/2606.26922v1-risk-aware-selective-multimodal-driver-monitoring-with-driver-state-world-modeling)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：使用RGB和生理信号进行多模态驾驶员监控，属于交通场景理解
+9. [hia-gat: A Heterogeneous Interaction-Aware Graph Attention Network For Frame-Level Traffic Conflict Risk Prediction On Freeways](/202606/30/2606.27577v1-hia-gat-a-heterogeneous-interaction-aware-graph-attention-network-for-frame-level-traffic-conflict-risk-prediction-on-freeways)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：基于图注意力的高速公路交通冲突风险预测
+10. [HKVLM: Faithful Reasoning Grounding by Binding Language Queries to a Frozen Detector](/202606/30/2606.28862v1-hkvlm-faithful-reasoning-grounding-by-binding-language-queries-to-a-frozen-detector)  
    标签：评分：6.0/10、query:evlm
-   evidence：高效的视觉量化表示用于视觉语言模型
-11. [Bifocal Diffusion Language Models: Asymmetric Bidirectional Context for Parallel Generation](/202606/29/2606.27732v1-bifocal-diffusion-language-models-asymmetric-bidirectional-context-for-parallel-generation)  
+   evidence：通过解耦定位与语言路径实现VLM的忠实推理定位
+11. [Efficient Spatio-Temporal Grounding with Multimodal Large Models via Second-Level Tracking and RL Verification](/202606/30/2606.29023v1-efficient-spatio-temporal-grounding-with-multimodal-large-models-via-second-level-tracking-and-rl-verification)  
    标签：评分：6.0/10、query:evlm
-   evidence：通过非对称双向注意力解决扩散语言模型中的KV缓存困境
+   evidence：利用第二级跟踪降低序列长度的高效时空定位管线
+12. [TAP-VLA: Tactile Annotation Prompting for Vision Language Action Models](/202606/30/2606.29089v1-tap-vla-tactile-annotation-prompting-for-vision-language-action-models)  
+   标签：评分：6.0/10、query:evlm
+   evidence：提出针对VLA模型的触觉注释提示
+13. [Dynamic Parsing and Updating Natural Language Specification using VLMs for Robust Vision-Language Tracking](/202606/30/2606.29357v1-dynamic-parsing-and-updating-natural-language-specification-using-vlms-for-robust-vision-language-tracking)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：面向自动驾驶的视觉语言跟踪与动态描述更新
 
 
 <div class="dpr-home-promo-card">
