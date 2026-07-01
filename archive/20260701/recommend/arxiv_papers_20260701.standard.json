@@ -1,0 +1,713 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-01T21:50:30.839430+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 5,
+    "deep_cap": 8,
+    "deep_selected": 5,
+    "quick_candidates": 11,
+    "quick_skim_target": 13,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2606.24282v1",
+      "source": "arxiv",
+      "title": "UniRED: Unified RGB-D Video Frame Interpolation with Event Guidance",
+      "abstract": "High frame-rate RGB-D videos are crucial for a variety of downstream tasks, including motion analysis, dynamic scene understanding, and 3D reconstruction. However, due to hardware and sensing constraints, practical RGB-D cameras are typically limited to low frame rates, making it difficult to capture rapid scene dynamics. Existing video interpolation methods have achieved strong performance on RGB data, but they are not readily applicable to RGB-D scenarios, where they often yield blurry boundaries, visible artifacts, and degraded geometric consistency. Furthermore, motion estimation from only two boundary frames is inherently under-constrained in complex dynamic scenes. Event cameras, by contrast, provide asynchronous measurements with ultra-high temporal resolution, offering dense motion cues. In this paper, we propose a unified multimodal framework for RGB-D video interpolation that jointly exploits RGB appearance, depth geometry, and event-based temporal cues. Specifically, it first extracts and fuses RGB, depth and event cues, then estimates bidirectional flow with motion basis refinement for RGB and Z-axial refinement for depth, and finally synthesizes the target RGB-D frame via bidirectional warping and soft blending. In addition, we construct a new RGB-D-Event dataset to alleviate the scarcity of tri-modal training data. Extensive experiments on a public benchmark and the proposed dataset demonstrate that our method achieves superior photometric fidelity for RGB interpolation and stronger geometric accuracy for depth interpolation than existing approaches.",
+      "authors": [
+        "Yinuo Zhang",
+        "Guangshun Wei",
+        "Yuanfeng Zhou",
+        "Yiran Shen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T08:03:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.24282v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "event cameras used for video interpolation",
+      "llm_evidence_cn": "使用事件相机进行视频插帧",
+      "llm_evidence": "使用事件相机进行视频插帧",
+      "canonical_evidence": "使用事件相机进行视频插帧",
+      "llm_tldr_en": "UniRED proposes a unified RGB-D video frame interpolation method guided by event cameras, achieving high frame-rate results with reduced artifacts.",
+      "llm_tldr_cn": "该论文提出UniRED方法，利用事件相机的高时间分辨率引导RGB-D视频帧插值，解决了低帧率RGB-D相机无法捕捉快速动态的问题。通过融合事件流和深度信息，该方法在运动边界和几何一致性上优于传统方法，适用于动态场景理解和三维重建。",
+      "llm_tldr": "该论文提出UniRED方法，利用事件相机的高时间分辨率引导RGB-D视频帧插值，解决了低帧率RGB-D相机无法捕捉快速动态的问题。通过融合事件流和深度信息，该方法在运动边界和几何一致性上优于传统方法，适用于动态场景理解和三维重建。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event data",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31225v1",
+      "source": "arxiv",
+      "title": "A First Exploration of Neuromorphic OT-CFM for Multi-Speaker VSR",
+      "abstract": "Visual Speech Recognition (VSR) tasks in complex multi-speaker scenarios are severely hindered by rapid head motions, occlusions, and subtle lip articulations. Traditional RGB-based methods struggle here due to low rates and motion blur of frames. To overcome these, we propose LipsFlow, a neuromorphic-inspired VSR framework that converts RGB videos into high-temporal-resolution event streams. For multi-speaker, we employ ByteTrack tracking and TalkNet active speaker detection to temporally segment scenes into single-speaker clips, enabling focused per-speaker analysis. By explicitly capturing microsecond-level articulatory dynamics via learnable event-based representations, LipsFlow achieves inherent robustness against visual degradation. To efficiently model these dense event-based features and adapt to speaker-specific articulatory patterns, we introduce Optimal Transport Conditional Flow Matching (OT-CFM). It enforces deterministic, straight-line trajectory generation in a semantic latent space, slashing inference latency to just two Ordinary Differential Equation (ODE) steps. Furthermore, we design a Dual-Level Semantic Supervision mechanism combining token-level BERT weight tying and sentence-level priors to resolve homophene ambiguities. Validated on competitive benchmarks, LipsFlow achieves a state-of-the-art WER of 22.3\\% at 240 ms latency, establishing a highly robust and efficient paradigm for event-based VSR.",
+      "authors": [
+        "Lin Chen",
+        "Jingping Fang",
+        "Hairui Liu",
+        "Chenyang Xu",
+        "Xiaorui Li",
+        "Weidong Cai",
+        "Xiaoming Chen"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM"
+      ],
+      "published": "2026-06-30T07:05:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.31225v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "neuromorphic-inspired framework converting RGB to event streams for VSR",
+      "llm_evidence_cn": "受神经形态启发的框架，将RGB视频转换为事件流用于视觉语音识别",
+      "llm_evidence": "受神经形态启发的框架，将RGB视频转换为事件流用于视觉语音识别",
+      "canonical_evidence": "受神经形态启发的框架，将RGB视频转换为事件流用于视觉语音识别",
+      "llm_tldr_en": "Proposes LipsFlow, a neuromorphic VSR framework that converts RGB videos to event streams, leveraging high-temporal-resolution event data for robustness in multi-speaker scenarios.",
+      "llm_tldr_cn": "传统RGB视觉语音识别在复杂多说话人场景中受限于运动模糊和低帧率。本文提出LipsFlow，一种受神经形态启发的VSR框架，将RGB视频转换为高时间分辨率的事件流，捕获微秒级别的发音动态。通过ByteTrack跟踪和TalkNet说话人检测分割单说话人片段，实验证明该方法在运动模糊和遮挡下具有鲁棒性，拓展了事件相机在语音识别中的应用。",
+      "llm_tldr": "传统RGB视觉语音识别在复杂多说话人场景中受限于运动模糊和低帧率。本文提出LipsFlow，一种受神经形态启发的VSR框架，将RGB视频转换为高时间分辨率的事件流，捕获微秒级别的发音动态。通过ByteTrack跟踪和TalkNet说话人检测分割单说话人片段，实验证明该方法在运动模糊和遮挡下具有鲁棒性，拓展了事件相机在语音识别中的应用。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "neuromorphic vision sensor",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31383v1",
+      "source": "arxiv",
+      "title": "MS-Resampler: Multi-Scope Visual Resampling for Efficient Multimodal LLMs",
+      "abstract": "Multimodal large language models (MLLMs) typically employ resampling-based projectors to transform dense visual features into a compact token sequence for language modeling. Most existing resamplers adopt a single, fixed aggregation scope via global cross-attention, which can blur fine-grained local evidence and limit the ability to capture both local details and global context within a fixed token budget. In this work, we propose MS-Resampler, a multi-scope visual resampling framework for MLLMs. MS-Resampler instantiates multiple scope-specific resamplers by injecting explicit spatial scope priors into the resampling attention, enabling each branch to aggregate visual information at a particular granularity from local to global. The outputs of these scope-specific resamplers are then adaptively fused to produce the final visual representations for language modeling. Extensive experiments on ten public multimodal benchmarks show that MS-Resampler consistently improves visual understanding and multimodal reasoning over conventional single-scope resamplers, while introducing only minimal computational overhead.",
+      "authors": [
+        "Zhongyang Li",
+        "Yaqian Li",
+        "Faming Fang",
+        "Rinyoichi Takezoe",
+        "Zi-Hao Bo",
+        "Cheng Qian",
+        "Mo Guang",
+        "Guixu Zhang",
+        "Kaiwen Long"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T09:11:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.31383v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "multi-scope visual resampling for efficient MLLMs",
+      "llm_evidence_cn": "用于高效多模态大模型的多范围视觉重采样",
+      "llm_evidence": "用于高效多模态大模型的多范围视觉重采样",
+      "canonical_evidence": "用于高效多模态大模型的多范围视觉重采样",
+      "llm_tldr_en": "Proposes MS-Resampler with multiple scope-specific resamplers to capture local and global visual information efficiently.",
+      "llm_tldr_cn": "现有重采样投影器采用单一固定聚合范围，易模糊局部细节。本文提出多范围重采样框架MS-Resampler，通过注入空间范围先验生成多分支重采样器，分别捕获取局部到全局的不同粒度信息，在固定token预算下显著提升多模态大模型的视觉理解能力，兼顾效率与效果。",
+      "llm_tldr": "现有重采样投影器采用单一固定聚合范围，易模糊局部细节。本文提出多范围重采样框架MS-Resampler，通过注入空间范围先验生成多分支重采样器，分别捕获取局部到全局的不同粒度信息，在固定token预算下显著提升多模态大模型的视觉理解能力，兼顾效率与效果。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31903v1",
+      "source": "arxiv",
+      "title": "Attend, Transform, or Silence: Operator-Level Visual Skipping for Efficient Multimodal LLM Inference",
+      "abstract": "Multimodal large language models (MLLMs) increasingly process long visual-token sequences, increasing the overall inference computation. Existing acceleration methods usually remove visual tokens or skip visual-token updates in entire layers, but these coarse strategies may discard fine-grained evidence or suppress useful operators together with redundant ones. In this paper, we study visual-token computation from an answer-observable perspective and find that late visual-token updates can remain large while having little effect on answer-token representations. Motivated by this answer-silent redundancy, we decompose each Transformer layer into attention and FFN operators and show that useful visual computation is often operator-dominant and layer-dependent. We propose an operator-level visual-token skipping framework that preserves the full visual-token sequence while selectively bypassing redundant attention, FFN, or both. Experiments across three MLLM architectures and 10 VQA benchmarks show that our method achieves strong efficiency-accuracy trade-offs, reducing \\textbf{33.7\\%} TFLOPs on Qwen3-VL while retaining \\textbf{99.5\\%} of the vanilla model performance.",
+      "authors": [
+        "Zhaoyang Luo",
+        "Runmin Dong",
+        "Miao Yang",
+        "Fan Wei",
+        "Yushan Lai",
+        "Bin Luo",
+        "Haohuan Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T16:08:29+00:00",
+      "link": "https://arxiv.org/pdf/2606.31903v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "operator-level visual skipping for efficient MLLM inference",
+      "llm_evidence_cn": "用于高效多模态大模型推理的算子级视觉跳跃",
+      "llm_evidence": "用于高效多模态大模型推理的算子级视觉跳跃",
+      "canonical_evidence": "用于高效多模态大模型推理的算子级视觉跳跃",
+      "llm_tldr_en": "Proposes operator-level visual skipping to accelerate MLLM inference by identifying answer-silent redundancy in attention and FFN operators.",
+      "llm_tldr_cn": "针对多模态大模型处理长视觉token序列计算量大的问题，本文从答案可观测性角度发现晚期视觉token更新对答案表征影响甚微，提出将Transformer层分解为注意力与前馈算子并选择性跳过冗余视觉算子，在不损失精度的前提下显著加速推理，为高效多模态模型推理提供了细粒度优化方案。",
+      "llm_tldr": "针对多模态大模型处理长视觉token序列计算量大的问题，本文从答案可观测性角度发现晚期视觉token更新对答案表征影响甚微，提出将Transformer层分解为注意力与前馈算子并选择性跳过冗余视觉算子，在不损失精度的前提下显著加速推理，为高效多模态模型推理提供了细粒度优化方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31982v1",
+      "source": "arxiv",
+      "title": "ERA: Entropy-Guided Visual Token Pruning with Rectified Attention for Efficient MLLMs",
+      "abstract": "Multimodal Large Language Models (MLLMs) incur prohibitive inference costs due to long visual token sequences. Training-free visual token reduction provides an efficient solution. However, existing methods distort attention distributions, giving rise to a phenomenon we term Attention Logit Collapse. To address this issue, we propose ERA, an Entropy-guided visual token pruning framework with Rectified Attention for efficient MLLMs. Specifically, ERA comprises three crucial components: Dual-view Entropy Pruning (DEP), Bias-aware Token Recycling (BTR), and Logit-preserving Attention Rectification (LAR). First, DEP identifies representative anchor tokens by jointly modeling visual diversity and head-wise saliency. BTR then recycles pruned tokens into their corresponding anchors while estimating a cluster-level logit bias. Building upon this, LAR injects the estimated bias into attention logits, effectively rectifying the collapse induced by token reduction. Together, these components preserve visual evidence even under aggressive compression, enabling robust performance across single-image, multi-image, and video settings on a wide range of MLLMs. Beyond delivering practical acceleration, ERA establishes logit-preserving visual token pruning as a principled framework for efficient MLLMs, unifying theoretical foundation, algorithmic design, and practical deployment. The code is at https://github.com/924973292/ERA.",
+      "authors": [
+        "Yuhao Wang",
+        "Mu Qiao",
+        "Haiwen Diao",
+        "Yunzhi Zhuge",
+        "Pingping Zhang",
+        "Xindong Zhang",
+        "Lei Zhang",
+        "Huchuan Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T17:20:29+00:00",
+      "link": "https://arxiv.org/pdf/2606.31982v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token pruning for efficient MLLMs",
+      "llm_evidence_cn": "针对高效多模态大模型的视觉令牌剪枝",
+      "llm_evidence": "针对高效多模态大模型的视觉令牌剪枝",
+      "canonical_evidence": "针对高效多模态大模型的视觉令牌剪枝",
+      "llm_tldr_en": "Proposes ERA, an entropy-guided visual token pruning framework with rectified attention to reduce MLLM inference costs while preserving attention fidelity.",
+      "llm_tldr_cn": "多模态大模型因长视觉令牌序列导致推理成本高昂，现有无训练令牌剪枝方法会扭曲注意力分布，引发注意力对数坍塌问题。本文提出ERA框架，包含双视角熵剪枝（DEP）、有偏令牌回收（BTR）和保对数注意力修正（LAR）三个组件，旨在保持注意力分布真实性的同时高效压缩视觉令牌。实验表明，ERA在多个MLLM基准上显著降低推理开销，并保持或提升任务性能。该工作为多模态大模型的训练免费令牌压缩提供了新思路。",
+      "llm_tldr": "多模态大模型因长视觉令牌序列导致推理成本高昂，现有无训练令牌剪枝方法会扭曲注意力分布，引发注意力对数坍塌问题。本文提出ERA框架，包含双视角熵剪枝（DEP）、有偏令牌回收（BTR）和保对数注意力修正（LAR）三个组件，旨在保持注意力分布真实性的同时高效压缩视觉令牌。实验表明，ERA在多个MLLM基准上显著降低推理开销，并保持或提升任务性能。该工作为多模态大模型的训练免费令牌压缩提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.29464v1",
+      "source": "arxiv",
+      "title": "Rank-Aware Hyperbolic Alignment for Vision-Language Dataset Distillation",
+      "abstract": "Vision-language dataset distillation (VLDD) compresses a large image-text paired dataset into a small set of synthetic pairs that can efficiently train contrastive vision-language models under strict data and compute budgets. Most existing methods match expert trajectories or cross-modal statistics, yet still enforce full-dimensional alignment in a Euclidean embedding space. This is often overly restrictive due to rank-deficient image--text correlation, with shared semantics concentrated in a low-dimensional range and remaining variation spread across a weakly correlated residual subspace. LoRS relaxes alignment at the similarity level by low-rank factorization, but does not explicitly control dominant alignment capacity and structure in the representation space. We thus propose a rank-aware hyperbolic alignment (RAHA) that combines hierarchical geometry with explicit alignment-capacity control. RAHA lifts multimodal representations to hyperbolic space and optimizes distilled pairs with asymmetric objectives that enforce geodesic alignment in the shared range while regularizing the residual subspace to preserve modality-private diversity and improve transfer robustness. Experiments on benchmarks show that RAHA demonstrates competitive cross-modal retrieval and improved transfer indicators under fixed budgets.",
+      "authors": [
+        "Jongoh Jeong",
+        "Sun-Kyung Lee",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T15:41:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.29464v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "dataset distillation for efficient vision-language model training",
+      "llm_evidence_cn": "数据集蒸馏用于高效视觉语言模型训练",
+      "llm_evidence": "数据集蒸馏用于高效视觉语言模型训练",
+      "canonical_evidence": "数据集蒸馏用于高效视觉语言模型训练",
+      "llm_tldr_en": "Rank-Aware Hyperbolic Alignment compresses vision-language datasets via hyperbolic geometry, enabling efficient training under strict compute budgets.",
+      "llm_tldr_cn": "视觉语言数据集蒸馏面临全维度对齐过于严格的问题。本文提出秩感知双曲对齐方法，利用双曲空间更好地建模低秩跨模态相关性，生成精简的合成图像-文本对。实验表明，该方法在多种蒸馏设置下优于现有方法，显著降低训练所需数据量和计算资源。该技术为高效多模态模型开发提供实用工具。",
+      "llm_tldr": "视觉语言数据集蒸馏面临全维度对齐过于严格的问题。本文提出秩感知双曲对齐方法，利用双曲空间更好地建模低秩跨模态相关性，生成精简的合成图像-文本对。实验表明，该方法在多种蒸馏设置下优于现有方法，显著降低训练所需数据量和计算资源。该技术为高效多模态模型开发提供实用工具。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.27313v2",
+      "source": "arxiv",
+      "title": "ViQ: Text-Aligned Visual Quantized Representations at Any Resolution",
+      "abstract": "A unified representation for text and vision is a natural pursuit, as it enables simpler multimodal modeling and more efficient training. However, representing images as discrete signals in the same way as text inevitably introduces severe information loss. Existing work struggles to balance low-level details and high-level semantics in discrete representations: reconstruction-oriented representations often lack semantic information, whereas semantically stronger features typically suffer from severe loss of detail. We present ViQ, a Visual Quantized Representations framework, which is designed to balance semantics and details in discrete representations while supporting inputs at native resolutions, thereby enabling it to serve as a unified and general discrete representation for arbitrary visual inputs. Our approach structures quantization learning into two stages: text-aligned pre-training and feature discretization. With text-aligned pre-training, we enhance the visual encoder semantic-rich supervision from the pretrained language model and enable it to process native-resolution visual inputs. During discretization, we propose a proximal representation learning strategy to progressively compact the feature space, along with a position-aware head-wise quantization mechanism that enables flexible processing of arbitrary resolutions. Extensive experiments on multimodal tasks demonstrate that ViQ achieves competitive performance compared to state-of-the-art multimodal vision encoders with continuous and high-dimensional visual features, while maintaining high precision in low-level reconstruction. We also show that multimodal training with visual quantized representations largely improves efficiency, yielding up to 20\\%-70\\% acceleration with different base LLMs and training recipes.",
+      "authors": [
+        "Xumin Yu",
+        "Zuyan Liu",
+        "Zhenyu Yang",
+        "Yuhao Dong",
+        "Shengsheng Qian",
+        "Jiwen Lu",
+        "Han Hu",
+        "Yongming Rao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T17:29:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.27313v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "visual quantized representations balancing semantics and details for efficient multimodal modeling",
+      "llm_evidence_cn": "平衡语义和细节的视觉量化表示，用于高效多模态建模",
+      "llm_evidence": "平衡语义和细节的视觉量化表示，用于高效多模态建模",
+      "canonical_evidence": "平衡语义和细节的视觉量化表示，用于高效多模态建模",
+      "llm_tldr_en": "ViQ proposes a visual quantization framework that balances semantics and details, supporting native resolutions to serve as a unified representation for multimodal models.",
+      "llm_tldr_cn": "该论文提出ViQ框架，通过视觉量化表示在离散信号中平衡低层细节和高层语义，支持任意分辨率输入，旨在作为文本和视觉的统一表示。该方法可提升多模态模型的效率和泛化能力。",
+      "llm_tldr": "该论文提出ViQ框架，通过视觉量化表示在离散信号中平衡低层细节和高层语义，支持任意分辨率输入，旨在作为文本和视觉的统一表示。该方法可提升多模态模型的效率和泛化能力。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.30185v1",
+      "source": "arxiv",
+      "title": "Dynamo: Dynamic Skill-Tool Evolution for Vision-Language Agents",
+      "abstract": "Improving vision-language models (VLMs) on visual reasoning typically requires retraining or hand-designed prompts and tools. We present Dynamo, a training-free framework that adapts a frozen VLM without any weight updates. On a small labeled training subset, the agent inspects its own correct and incorrect attempts and evolves two complementary capabilities: reusable reasoning skills for cognitive bottlenecks, and executable visual tools for perceptual ones. Each generated tool is paired with a skill that specifies when to invoke it, and both capability types accumulate in a persistent library. Across four visual reasoning benchmarks and five VLM backbones, Dynamo improves direct inference on all 20 model--benchmark settings (avg. +5.6 acc). When the tool set is given in advance, the framework learns when to call each tool, and per-step tool choice improves on every tested backbone. Against task-specific RL (VTool-R1, DeepEyes), Dynamo closes 65--99% of the RL gap at a fraction of the compute, and combines additively with RL when available.",
+      "authors": [
+        "Yutao Sun",
+        "Yanting Miao",
+        "Hao-Xuan Ma",
+        "Mengyu Zhou",
+        "Mingshuai Chen",
+        "Tiancheng Zhao",
+        "Dexin Wang",
+        "Lei Lv",
+        "Li Xu",
+        "Xiaoxi Jiang",
+        "Guanjun Jiang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-06-29T11:59:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.30185v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "training-free VLM adaptation for efficiency",
+      "llm_evidence_cn": "无需训练的视觉语言模型高效适配",
+      "llm_evidence": "无需训练的视觉语言模型高效适配",
+      "canonical_evidence": "无需训练的视觉语言模型高效适配",
+      "llm_tldr_en": "Dynamo adapts frozen VLMs without retraining by evolving reusable skills and visual tools, improving accuracy on 20 VLM-benchmark settings.",
+      "llm_tldr_cn": "现有的视觉语言模型（VLM）在视觉推理上的改进通常需要重新训练或人工设计提示和工具。本文提出Dynamo，一个无需训练即可适配冻结VLM的框架。在小规模标注子集上，智能体从自身成功和失败尝试中学习，进化出可重用的推理技能和可执行的视觉工具，并放入持久库中。在四个视觉推理基准和五个VLM骨干上，Dynamo在所有20个模型-基准设置上提升了直接推理性能（平均+5.6准确率），展示了高效架构和推理优化的可能性。",
+      "llm_tldr": "现有的视觉语言模型（VLM）在视觉推理上的改进通常需要重新训练或人工设计提示和工具。本文提出Dynamo，一个无需训练即可适配冻结VLM的框架。在小规模标注子集上，智能体从自身成功和失败尝试中学习，进化出可重用的推理技能和可执行的视觉工具，并放入持久库中。在四个视觉推理基准和五个VLM骨干上，Dynamo在所有20个模型-基准设置上提升了直接推理性能（平均+5.6准确率），展示了高效架构和推理优化的可能性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29579v1",
+      "source": "arxiv",
+      "title": "ScAle: Attention Head Scaling as a Minimal Adapter for Spatial Reasoning in Vision Language Models",
+      "abstract": "Spatial reasoning remains a persistent challenge for many vision language models (VLMs), and improving it typically requires fine-tuning with substantial additional parameters. Our preliminary analysis reveals that rescaling activations in selected transformer layers-without modifying pretrained weights-can significantly influence downstream performance. Motivated by this observation, we propose ScAle, an ultra-lightweight adaptation method that learns a small set of scalar coefficients to modulate last-token attention and MLP activations in a fully frozen backbone. We evaluate our method on the synthetic spatial reasoning benchmark SpatialEval and on real-world VQA datasets (COCOQA and VGQA) across multiple model families. Our method, ScAle, achieves up to 134.1% relative accuracy gains using only 1K trainable parameters without requiring millions of trainable parameters as in standard PEFT methods such as LoRA. Despite its extreme compactness, our approach recovers a substantial fraction of standard PEFT performance while preserving strong non-spatial VQA accuracy. These results demonstrate that bounded activation reweighting provides a simple, architecture-agnostic, and highly parameter-efficient alternative for adapting pretrained VLMs.",
+      "authors": [
+        "Rahul Chowdhury",
+        "Timothy A Rupprecht",
+        "Xuan Shen",
+        "Pu Zhao",
+        "Yanzhi Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG",
+        "cs.MM"
+      ],
+      "published": "2026-06-28T19:48:39+00:00",
+      "link": "https://arxiv.org/pdf/2606.29579v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "ultra-lightweight adaptation for spatial reasoning in vision language models via attention head scaling",
+      "llm_evidence_cn": "通过注意力头缩放实现视觉语言模型中空间推理的超轻量适配",
+      "llm_evidence": "通过注意力头缩放实现视觉语言模型中空间推理的超轻量适配",
+      "canonical_evidence": "通过注意力头缩放实现视觉语言模型中空间推理的超轻量适配",
+      "llm_tldr_en": "Proposes ScAle, a minimal adapter that learns scalar coefficients to modulate attention and MLP activations for VLM spatial reasoning without finetuning backbone.",
+      "llm_tldr_cn": "本文提出ScAle，一种超轻量适配方法，通过学习少量标量系数调节冻结VLMs最后一层注意力与MLP激活，无需微调即可提升空间推理能力。实验表明，该方法在SpatialEval和VQA数据集上有效提高了空间推理准确率，且引入参数量极少，为高效VLM架构提供了新思路。",
+      "llm_tldr": "本文提出ScAle，一种超轻量适配方法，通过学习少量标量系数调节冻结VLMs最后一层注意力与MLP激活，无需微调即可提升空间推理能力。实验表明，该方法在SpatialEval和VQA数据集上有效提高了空间推理准确率，且引入参数量极少，为高效VLM架构提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.30754v1",
+      "source": "arxiv",
+      "title": "Streaming Gaussian Encoding for 4D Panoptic Occupancy Tracking",
+      "abstract": "Camera-based 4D panoptic occupancy tracking (4D-POT) is a promising paradigm for holistic scene understanding from multi-view imagery, enabling joint reasoning about geometry, semantics, and object identities across time. Recent mask-based pipelines achieve strong performance by propagating instance queries across frames. However, their underlying volumetric representations are typically recomputed at each timestep, limiting geometric temporal consistency, particularly under occlusion and for static scene elements. To address this limitation, we propose a streaming Gaussian encoder that maintains a persistent volumetric scene representation for 4D-POT. Our method models the scene as a fixed-size set of latent Gaussian queries that are propagated via ego-motion compensation and refreshed under a confidence-guided budget constraint. Crucially, we shape Gaussian opacities through depth-based supervision to serve as proxy for visibility, enabling confidence to accumulate as a temporally aggregated measure of persistent scene support. Together with a warmup-based multi-frame training strategy, this yields representation-level temporal coherence beyond decoder-only tracking. Extensive experiments on Occ3D-extended nuScenes and Waymo establish a new state-of-the-art for camera-based 4D-POT, improving tracking consistency with negligible computational overhead while remaining fully compatible with existing mask-based pipelines. We provide code and models at https://sge.cs.uni-freiburg.de.",
+      "authors": [
+        "Maximilian Luz",
+        "Thomas Nürnberg",
+        "Yakov Miron",
+        "Abhinav Valada"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-06-29T18:00:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.30754v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "4D panoptic occupancy tracking for holistic scene understanding",
+      "llm_evidence_cn": "用于整体场景理解的4D全景占用跟踪",
+      "llm_evidence": "用于整体场景理解的4D全景占用跟踪",
+      "canonical_evidence": "用于整体场景理解的4D全景占用跟踪",
+      "llm_tldr_en": "Streaming Gaussian Encoding proposes a persistent volumetric representation using Gaussian queries for 4D panoptic occupancy tracking, improving geometric temporal consistency.",
+      "llm_tldr_cn": "基于相机的4D全景占用跟踪面临几何时间一致性问题，尤其在遮挡下。本文提出流式高斯编码器，通过固定大小的潜高斯查询集维护持久场景表示，并随自运动传播。该方法提升了跨帧建模能力，在多个数据集上达到最优性能，为动态场景理解提供鲁棒方案。",
+      "llm_tldr": "基于相机的4D全景占用跟踪面临几何时间一致性问题，尤其在遮挡下。本文提出流式高斯编码器，通过固定大小的潜高斯查询集维护持久场景表示，并随自运动传播。该方法提升了跨帧建模能力，在多个数据集上达到最优性能，为动态场景理解提供鲁棒方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31144v1",
+      "source": "arxiv",
+      "title": "A Modular Vision-Language-Action Robotics Framework for Indoor Environments",
+      "abstract": "This paper presents an integrated system for the CMU Vision-Language-Action (VLA) Challenge, designed to enable an autonomous agent to perform complex tasks based on natural language instructions. Our framework employs a modular architecture that orchestrates environment mapping, question processing, and navigation. The system operates in two parallel streams: a perception pipeline that constructs a semantic voxel map from real-time camera feeds using OwlViT embeddings, and a language pipeline that classifies user commands with a Vision-Language Model. The mapping is time-constrained; the system proceeds with a partial map if a 500-second exploration limit is reached. The classified query is then grounded in the geometric and semantic context of the map to generate a detailed prompt for the VLM. This yields an actionable output, demonstrating a capable solution for bridging the gap between human language and robotic action.",
+      "authors": [
+        "Anindya Jana",
+        "Snehasis Banerjee",
+        "Arup Sadhu",
+        "Ranjan Dasgupta"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T05:17:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.31144v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "modular VLA framework for robotics",
+      "llm_evidence_cn": "模块化机器人VLA框架",
+      "llm_evidence": "模块化机器人VLA框架",
+      "canonical_evidence": "模块化机器人VLA框架",
+      "llm_tldr_en": "A modular VLA system for the CMU VLA Challenge, integrating mapping, question processing, and navigation using VLMs.",
+      "llm_tldr_cn": "该论文提出面向室内环境的模块化视觉-语言-动作框架，并行运行感知管道（语义体素地图）和语言管道（VLM指令分类），并在时间约束下完成导航任务。为机器人VLA提供了一种可部署的系统架构。",
+      "llm_tldr": "该论文提出面向室内环境的模块化视觉-语言-动作框架，并行运行感知管道（语义体素地图）和语言管道（VLM指令分类），并在时间约束下完成导航任务。为机器人VLA提供了一种可部署的系统架构。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.31096v1",
+      "source": "arxiv",
+      "title": "Horizon3D: Sparse Radar-Camera Fusion for Long-Range 3D Perception in Autonomous Driving",
+      "abstract": "Long-range 3D object detection is critical for safe autonomous driving at highway speeds, yet existing radar-camera fusion methods remain limited at extended ranges. BEV-based methods capture scene-level context but incur rapidly growing computation and often lose fine-grained object detail, while query-based methods are efficient but provide limited scene-level context. Temporal fusion further requires both multi-frame accumulation for sparse distant observations and object-level motion modeling for fast-moving objects. We propose Horizon3D, a sparse radar-camera fusion framework for long-range 3D object detection that combines Gaussian primitives with sparse BEV features. Horizon3D initializes Gaussian primitives at radar- and camera-estimated object keypoints using Keypoint-Guided Gaussian Initialization, refines them through Object-Centric Sparse Fusion, and splats them onto the BEV plane to fuse object-level detail with sparse radar BEV context. It further introduces Dual-Path Temporal Fusion, which aggregates temporal cues through a BEV path for scene-level accumulation and a Gaussian path for object-level motion propagation. Experiments on TruckScenes show that Horizon3D achieves state-of-the-art radar-camera 3D detection performance. On the validation set, it outperforms the previous best method by +3.0 NDS and +1.6 mAP while maintaining competitive inference speed.",
+      "authors": [
+        "Geonho Bang",
+        "Geunju Baek",
+        "Dongyoung Lee",
+        "Wonjun Jeong",
+        "Jun Won Choi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T03:36:00+00:00",
+      "link": "https://arxiv.org/pdf/2606.31096v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Long-range 3D perception for autonomous driving",
+      "llm_evidence_cn": "自动驾驶远距离3D感知",
+      "llm_evidence": "自动驾驶远距离3D感知",
+      "canonical_evidence": "自动驾驶远距离3D感知",
+      "llm_tldr_en": "Horizon3D proposes a sparse radar-camera fusion framework for long-range 3D object detection, combining Gaussian primitives with sparse BEV features to improve performance at extended ranges.",
+      "llm_tldr_cn": "高速自动驾驶需要远距离3D检测，现有雷达-相机融合方法在远距离性能有限。本文提出Horizon3D，一种稀疏雷达-相机融合框架，结合高斯原语与稀疏BEV特征，实现高效远距离3D目标检测。实验证明，在长距离场景下该方法显著优于现有融合方法，为安全驾驶提供关键感知能力。",
+      "llm_tldr": "高速自动驾驶需要远距离3D检测，现有雷达-相机融合方法在远距离性能有限。本文提出Horizon3D，一种稀疏雷达-相机融合框架，结合高斯原语与稀疏BEV特征，实现高效远距离3D目标检测。实验证明，在长距离场景下该方法显著优于现有融合方法，为安全驾驶提供关键感知能力。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31603v1",
+      "source": "arxiv",
+      "title": "Preserve the Hard, Regenerate the Rest: Uncertainty-Guided Synthetic Training Data Augmentation with Diffusion Models",
+      "abstract": "Semantic segmentation models struggle with data sparsity and rare or visually diverse regions, e.g., dense regions or small objects in aerial or autonomous mobility data. While synthetic augmentation is an appealing solution, directly generating new labeled data risks misalignment of labels and generated pixels. Existing solutions to this problem often rely on external models, or employ coarse heuristics such as indiscriminately augmenting all foreground objects or entire backgrounds, which wastes capacity on uninformative pixels. To address this, we propose an uncertainty-guided synthetic context augmentation strategy that strictly preserves label validity and efficiently maximizes pixel informativeness per synthetic sample - no external guardrails required. Using a baseline segmenter's predictive entropy, we identify uncertain semantic regions and inpaint only the complementary visual context. When fine-tuning the segmenter on this synthetic data, we compute the loss only over the original pixels, excluding inpainted regions. This focuses learning on the unmodified, uncertain regions while presenting them in novel contexts. We demonstrate substantial mIoU gains on Cityscapes, UAVID, and BDD100K with the largest gains on rare and difficult classes such as buses, trains, or (from the aerial perspective) cars. Our results demonstrate that uncertainty-guided context augmentation is a highly effective lever to improve segmentation performance on complex datasets, with code provided at https://github.com/XITASO/Preserve-the-Hard-Regenerate-the-Rest.",
+      "authors": [
+        "Nikolai Röhrich",
+        "Julian Gleißner",
+        "Ahmed H. A. Ibrahim",
+        "Silvan Mertes",
+        "Tobias Huber"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-06-30T12:51:49+00:00",
+      "link": "https://arxiv.org/pdf/2606.31603v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Data augmentation for semantic segmentation in autonomous mobility",
+      "llm_evidence_cn": "自主移动中语义分割的数据增强",
+      "llm_evidence": "自主移动中语义分割的数据增强",
+      "canonical_evidence": "自主移动中语义分割的数据增强",
+      "llm_tldr_en": "Preserve the Hard proposes uncertainty-guided synthetic augmentation with diffusion models to improve segmentation on rare regions, preserving label validity.",
+      "llm_tldr_cn": "语义分割模型在稀疏区域表现差，现有增强方法可能错标签。本文提出不确定性引导的合成上下文增强策略，严格保留标签有效性，并最大化像素信息量。在航空和自主移动数据上，该方法有效提升密集区域和小物体分割性能。",
+      "llm_tldr": "语义分割模型在稀疏区域表现差，现有增强方法可能错标签。本文提出不确定性引导的合成上下文增强策略，严格保留标签有效性，并最大化像素信息量。在航空和自主移动数据上，该方法有效提升密集区域和小物体分割性能。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.31177v1",
+      "source": "arxiv",
+      "title": "GaussianMap: Learning Gaussian Representation for Multi-Sensor Online HD Map Construction",
+      "abstract": "Autonomous driving systems benefit from high-definition (HD) maps that provide critical information about road infrastructure. The online construction of HD maps offers a scalable approach to generate local vectorized maps from onboard sensor observations. Existing methods commonly adopt bird's-eye-view (BEV) features as the intermediate scene representation, encoding the surrounding space with fixed-resolution dense grids. However, map elements are spatially sparse yet require fine-grained geometric localization, making uniformly allocated BEV representations redundant and less effective for vectorized map prediction. In this work, we propose GaussianMap, an online HD map construction framework that learns an adaptive Gaussian representation of the surrounding scene. This representation consists of a set of Gaussian primitives on the BEV plane, each encoding a flexible local region with geometric properties and a feature vector, allowing the model to allocate representational capacity to map-relevant regions. To generate such a representation from sensor observations, we introduce a feed-forward Gaussian encoder that progressively refines these primitives through Gaussian interaction modeling and multi-sensor feature aggregation. The refined Gaussian representation is then splatted into a BEV feature map and decoded into vectorized map predictions. Extensive experiments on nuScenes and Argoverse 2 datasets demonstrate that GaussianMap achieves state-of-the-art performance in both camera-only and camera-LiDAR fusion settings. Our code will be made publicly available.",
+      "authors": [
+        "Hongyu Lyu",
+        "Julie Stephany Berrio Perez",
+        "Mao Shan",
+        "Stewart Worrall"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T06:08:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.31177v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "autonomous driving HD map construction with adaptive Gaussian representation",
+      "llm_evidence_cn": "自动驾驶高清地图构建，自适应高斯表示",
+      "llm_evidence": "自动驾驶高清地图构建，自适应高斯表示",
+      "canonical_evidence": "自动驾驶高清地图构建，自适应高斯表示",
+      "llm_tldr_en": "Proposes GaussianMap for online HD map construction using adaptive Gaussian representation, improving geometric localization and reducing redundancy of fixed-grid BEV.",
+      "llm_tldr_cn": "本文提出GaussianMap，一种在线高清地图构建框架。它通过学习自适应高斯表示代替传统固定分辨率BEV网格，解决了地图元素稀疏但需精细定位的矛盾。实验表明，该方法在多个数据集上提升了向量化地图预测的精度和效率，为自动驾驶场景理解提供了更紧凑的场景表示。",
+      "llm_tldr": "本文提出GaussianMap，一种在线高清地图构建框架。它通过学习自适应高斯表示代替传统固定分辨率BEV网格，解决了地图元素稀疏但需精细定位的矛盾。实验表明，该方法在多个数据集上提升了向量化地图预测的精度和效率，为自动驾驶场景理解提供了更紧凑的场景表示。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31814v1",
+      "source": "arxiv",
+      "title": "Generative Lane Topology Reasoning via Autoregressive Model with Geometry Prior",
+      "abstract": "Lane topology reasoning aims to construct a lane graph from onboard sensor observations. Existing methods follow a detection and association paradigm that treats each lane instance independently, leading to geometric inconsistency at connected endpoints and incomplete graphs due to visual occlusions. To address these issues, we propose TopoGPT, a generative framework that learns the geometry prior from typical lane graph structures through autoregressive sequence modeling. Specifically, we construct a large-scale map dataset comprising 3.3M scenes. For each lane graph, a lane tokenizer serializes it into discrete tokens, while a scene context encoder converts it into a rasterized image and extracts global features as scene tokens. We pre-train an autoregressive lane sequence transformer via scene-conditioned next-token prediction, endowing the model with the geometry prior over lane graph structures. Building upon this prior, a perception adapter aligns BEV features from multi-view images with the pre-trained scene condition, transferring the learned geometry prior to sensor-based lane graph prediction. On the OpenLane-V2 benchmark, TopoGPT outperforms existing methods by an average of +6.4 on lane-level and +11.6 on point-level metrics, and produces geometrically consistent and structurally complete lane graphs.",
+      "authors": [
+        "Jiahui Fu",
+        "Zehao Huang",
+        "Han Li",
+        "Naiyan Wang",
+        "Si Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T15:27:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.31814v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "generative lane topology reasoning from onboard sensors",
+      "llm_evidence_cn": "基于车载传感器的生成式车道拓扑推理",
+      "llm_evidence": "基于车载传感器的生成式车道拓扑推理",
+      "canonical_evidence": "基于车载传感器的生成式车道拓扑推理",
+      "llm_tldr_en": "Proposes TopoGPT, a generative autoregressive model with geometry prior for lane topology reasoning, improving consistency and completeness.",
+      "llm_tldr_cn": "本文提出TopoGPT，一种生成式车道拓扑推理框架。它通过自回归序列建模学习车道图的结构先验，利用车道分词器和场景上下文编码器将输入转换为离散令牌。在大规模数据集上预训练后，其生成的拓扑图在连接一致性和完整性上显著优于检测-关联范式，为自动驾驶地图构建提供了新思路。",
+      "llm_tldr": "本文提出TopoGPT，一种生成式车道拓扑推理框架。它通过自回归序列建模学习车道图的结构先验，利用车道分词器和场景上下文编码器将输入转换为离散令牌。在大规模数据集上预训练后，其生成的拓扑图在连接一致性和完整性上显著优于检测-关联范式，为自动驾驶地图构建提供了新思路。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31895v1",
+      "source": "arxiv",
+      "title": "RESOLVE: A Multi-Resolution and Multi-Modal Dataset for Roadside Cooperative Perception",
+      "abstract": "LiDAR has increasingly been integrated into traffic cameras to expand coverage and mitigate occlusion in roadside cooperative perception. However, how unimodal and camera-LiDAR fusion architectures behave under variations in LiDAR point sparsity induced by sensor configurations and scene-dependent sensing conditions remains underexplored. We introduce RESOLVE, a large-scale real-world benchmark dataset featuring multi-resolution roadside LiDAR and synchronized camera-LiDAR sensing for systematic evaluation of unimodal and fusion-based architectures in roadside 3D detection and tracking. RESOLVE contains over 100k images and 26k point cloud frames with 220k manually annotated bounding boxes, captured at a real-world urban intersection across diverse lighting and weather conditions and spanning 10 classes of traffic participants. In particular, RESOLVE enables controlled evaluation across three LiDAR resolution levels while keeping all other sensing and environmental factors fixed. This allows fair cross-architecture comparisons under point cloud distribution shifts resulting from resolution variations, sensing distance, and training-inference resolution mismatches. Results from extensive benchmark experiments reveal insights into how multimodal fusion can compensate for LiDAR point sparsity, offering clues for designing cost-efficient roadside multimodal perception. The dataset and benchmark codes are available at https://github.com/ASU-Suo-Lab/RESOLVE.",
+      "authors": [
+        "Shaozu Ding",
+        "Linan Song",
+        "Marco De Vincenzi",
+        "Dajiang Suo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T16:04:33+00:00",
+      "link": "https://arxiv.org/pdf/2606.31895v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multi-resolution roadside dataset for cooperative perception",
+      "llm_evidence_cn": "多分辨率路边合作感知数据集",
+      "llm_evidence": "多分辨率路边合作感知数据集",
+      "canonical_evidence": "多分辨率路边合作感知数据集",
+      "llm_tldr_en": "Introduces RESOLVE, a large-scale real-world multi-resolution roadside LiDAR and camera dataset for cooperative perception in traffic scenes.",
+      "llm_tldr_cn": "路边合作感知中LiDAR与相机融合受点云稀疏性影响，现有研究缺乏系统评估。本文构建RESOLVE数据集，包含多分辨率LiDAR和同步相机数据，超过10万图像和2.6万点云帧，22万手工标注框，覆盖真实城市路口。该数据集支持对单模态和融合架构在3D检测与追踪中的评估。实验揭示了点云稀疏性对融合性能的影响，为交通场景理解提供了重要基准。",
+      "llm_tldr": "路边合作感知中LiDAR与相机融合受点云稀疏性影响，现有研究缺乏系统评估。本文构建RESOLVE数据集，包含多分辨率LiDAR和同步相机数据，超过10万图像和2.6万点云帧，22万手工标注框，覆盖真实城市路口。该数据集支持对单模态和融合架构在3D检测与追踪中的评估。实验揭示了点云稀疏性对融合性能的影响，为交通场景理解提供了重要基准。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

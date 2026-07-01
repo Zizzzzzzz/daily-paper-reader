@@ -1,0 +1,449 @@
+Title: GaussianMap: Learning Gaussian Representation for Multi-Sensor Online HD Map Construction
+
+URL Source: https://arxiv.org/pdf/2606.31177v1
+
+Published Time: Wed, 01 Jul 2026 00:35:59 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# GaussianMap: Learning Gaussian Representation for Multi-Sensor Online HD Map Construction 
+
+Hongyu Lyu 1, Julie Stephany Berrio Perez 2, Mao Shan 1, Stewart Worrall 1
+
+Abstract — Autonomous driving systems benefit from high-definition (HD) maps that provide critical information about road infrastructure. The online construction of HD maps offers a scalable approach to generate local vectorized maps from onboard sensor observations. Existing methods commonly adopt bird’s-eye-view (BEV) features as the intermediate scene representation, encoding the surrounding space with fixed-resolution dense grids. However, map elements are spatially sparse yet require fine-grained geometric localization, mak-ing uniformly allocated BEV representations redundant and less effective for vectorized map prediction. In this work, we propose GaussianMap, an online HD map construction framework that learns an adaptive Gaussian representation of the surrounding scene. This representation consists of a set of Gaussian primitives on the BEV plane, each encoding a flexible local region with geometric properties and a feature vector, allowing the model to allocate representational capacity to map-relevant regions. To generate such a representation from sensor observations, we introduce a feed-forward Gaussian encoder that progressively refines these primitives through Gaussian interaction modeling and multi-sensor feature aggregation. The refined Gaussian representation is then splatted into a BEV feature map and decoded into vectorized map predictions. Extensive experiments on nuScenes and Argoverse 2 datasets demonstrate that GaussianMap achieves state-of-the-art perfor-mance in both camera-only and camera-LiDAR fusion settings. Our code will be made publicly available. 
+
+I. I NTRODUCTION 
+
+High-Definition (HD) maps are an essential component of autonomous driving systems, as they provide accurate representations of the road infrastructure for safe and reliable navigation [1]. These maps encode a wide range of road elements in a vectorized form, such as road boundaries, lane dividers, and pedestrian crossings [2]. Conventionally, HD maps are constructed offline from multimodal data collected by survey vehicles, typically through SLAM-based pipelines [3], [4] followed by manual annotation and re-finement. Although effective, this process is labor-intensive and costly, making map updates difficult in dynamic road environments [5]. Therefore, the online construction of HD maps has attracted increasing attention, with the aim of generating map representations around the ego vehicle at runtime from onboard sensor observations [6], [7], [8], [9]. Despite recent progress in online HD map construction, building an effective and efficient representation of the surrounding scene remains a key challenge. Existing meth-ods [10], [11], [12] commonly adopt bird’s-eye-view (BEV)            
+
+> 1The University of Sydney, Australian Centre for Robotics, Sydney, Australia. Emails:
+
+{h.lyu, m.shan, s.worrall }@acfr.usyd.edu.au       
+
+> 2The University of Queensland, Australia. Email:
+
+s.berrioperez@uq.edu.au ✘ Many empty cells   
+
+> ✘Uniform capacity allocation
+> ✘Limited flexibility
+
+Existing Methods 
+
+Grid-based BEV Features 
+
+GaussianMap 
+
+Gaussian Representation    
+
+> ✔Adaptive capacity allocation
+> ✔Map-relevant focus
+> ✔Fine-grained geometry
+
+Fig. 1: Motivation of GaussianMap. Compared with grid-based BEV features that uniformly allocate representational capacity, GaussianMap represents the surrounding scene with adaptive Gaus-sian primitives to focus on map-relevant regions and perseve fine-grained geometry. Gaussian colors are used only for visualization. 
+
+features as the intermediate scene representation. Although BEV features provide a structured top-down space for map prediction, they are typically built upon fixed-resolution dense grids, which are not well suited to the sparsity and geometric sensitivity of HD maps. Map elements usually occupy only a small fraction of the scene, yet their accu-rate prediction relies on fine-grained geometric details [1], [2]. However, BEV grids allocate representational capacity uniformly across the perception range, including regions with limited map-relevant information. This uniform allocation leads to redundancy and limits the model’s ability to focus on geometrically informative regions. To address these challenges, we propose GaussianMap, an online HD map construction framework that adaptively al-locates representational capacity to map-relevant regions. As illustrated in Fig. 1, GaussianMap represents the surrounding scene with a set of Gaussian primitives on the BEV plane. Each Gaussian corresponds to a flexible local region and is parameterized by a mean, covariance, opacity, and feature vector. Unlike 3D Gaussian Splatting [13], which optimizes the Gaussian parameters offline for each scene, we design a feed-forward Gaussian encoder that learns to generate a Gaussian representation of the scene from onboard sensor observations. This representation is then splatted into BEV features and fed into a vectorized map decoder. To effectively learn such a representation, the Gaussian encoder progressively updates Gaussian primitives through feature interaction and property refinement. We introduce Gaussian self-attention to model interactions among Gaus-sians based on their spatial distributions, while Gaussian-camera attention incorporates visual information from multi-
+
+> arXiv:2606.31177v1 [cs.CV] 30 Jun 2026
+
+camera image features. When LiDAR is available, we design Gaussian-LiDAR attention to leverage complementary geo-metric cues from LiDAR BEV features. The encoder refines Gaussian properties based on the updated features. Our main contributions are summarized as follows:  
+
+> •
+
+We propose GaussianMap, a multi-sensor online HD map construction framework that represents the surrounding scene with adaptive Gaussian primitives on the BEV plane.  
+
+> •
+
+We design a Gaussian encoder that generates Gaussian representations from sensor observations, with Gaussian self-attention modeling interactions among Gaussians.  
+
+> •
+
+We formulate multi-sensor fusion in the Gaussian repre-sentation space and introduce Gaussian-LiDAR attention to incorporate geometric cues from LiDAR BEV features.  
+
+> •
+
+Extensive experiments on nuScenes and Argoverse 2 show that GaussianMap achieves state-of-the-art performance in both camera-only and camera-LiDAR fusion settings. II. R ELATED WORK 
+
+A. Online HD Map Construction 
+
+Online HD map construction has attracted increasing at-tention for building local map representations from onboard sensor observations. Early methods [14], [15], [16] mainly rely on BEV semantic segmentation to predict rasterized map layouts, while HDMapNet [6] further groups segmentation results into vectorized instances. Recent works have shifted toward end-to-end vectorized map construction. VectorMap-Net [7] introduces a two-stage auto-regressive framework for sequential point prediction, while the MapTR series [8], [10] formulates this task as one-stage point-set prediction with permutation-equivalent modeling. BeMapNet [17] and Piv-otNet [18] explore piecewise B´ ezier curves and pivot points to represent map elements. Other works improve vectorized map construction from complementary perspectives, includ-ing temporal modeling [19], mask-guided learning [20], and diffusion-based refinement [21]. MapQR [11] intro-duces scatter-and-gather queries to mitigate content conflicts among points of the same map element, while ADMap [22] models point-sequence relationships within and across map elements using a cascading design. DAMap [12] inves-tigates classification-localization misalignment to improve prediction consistency. While existing methods commonly adopt grid-based BEV features, GaussianMap represents the surrounding scene with adaptive Gaussian primitives on the BEV plane to focus on map-relevant regions. 
+
+B. Gaussian Representation 
+
+Gaussian representation has attracted increasing attention as an efficient explicit approach for 3D scene modeling. 3D Gaussian Splatting [13] represents a scene as a set of 3D Gaussians and enables real-time radiance field rendering via differentiable splatting. Compared with voxel grids and neural radiance fields [23], Gaussian primitives provide an explicit and adaptive representation that concentrates model-ing capacity around spatial structures. This representation has been extended to dynamic scene reconstruction [24], 3D con-tent generation [25], and semantic scene understanding [26]. Recent works have explored Gaussian representation for autonomous driving. The GaussianFormer series [27], [28] adopts sparse 3D semantic Gaussians for 3D occupancy prediction, reducing redundancy in dense voxel representa-tions. GaussianBeV [29] predicts 3D Gaussians from multi-view images for BEV semantic segmentation, while Gaus-sianLSS [30] models depth uncertainty with 3D Gaussians for BEV feature aggregation. GaussianAD [31] models future scene evolution with 3D Gaussian flows for end-to-end autonomous driving. While most existing methods rely on 3D Gaussians, GaussianMap generates Gaussian primitives on the BEV plane in a feed-forward manner, making it well suited for online HD map construction. 
+
+C. Multi-Sensor Fusion 
+
+Multi-sensor fusion has attracted increasing attention in autonomous driving perception for integrating complemen-tary information from different sensors. Existing methods can be broadly categorized into point-level, proposal-level, and BEV-level fusion paradigms. Point-level fusion meth-ods [32], [33], [34] typically project image features or semantic predictions onto LiDAR points to augment point properties or generate denser point clouds. Proposal-level fusion methods [35], [36], [37] usually associate object proposals with features from different modalities to en-hance instance-level representations. BEV-level fusion meth-ods [38], [15], [16] integrate multi-modal features within a unified BEV space to obtain structured scene representations. Recent works have explored multi-sensor fusion for online HD map construction. MapFusion [39] proposes cross-modal interaction and dual dynamic fusion modules to improve BEV feature fusion. RoboMap [40] addresses robustness under multi-sensor corruptions through data augmentation and modality dropout training. SEF-Map [41] decomposes multi-modal BEV features into specialized subspaces and integrates them with uncertainty-aware expert fusion. Unlike these methods that mainly fuse dense BEV features, Gaus-sianMap employs adaptive Gaussian primitives as geometry-aware queries to aggregate multi-sensor features, allowing more focused fusion for map-relevant regions. III. M ETHOD 
+
+GaussianMap constructs vectorized maps around the ego vehicle from multi-camera images and an optional LiDAR point cloud in an end-to-end manner. As illustrated in Fig. 2, the input images are first processed by a shared camera backbone to extract perspective-view features FPV cam . When LiDAR is available, the point cloud is encoded by a LiDAR backbone into BEV features FBEV lidar . These sensor features are fed into the Gaussian encoder (Sec. III-A) to generate a Gaussian representation G = {gi}Mi=1 on the BEV plane. Each primitive gi is parameterized by a mean position mi,scale si, rotation ri, opacity αi, and feature vector fi.The Gaussian representation is then converted into a BEV feature map B via Gaussian-to-BEV splatting (Sec. III-B). Gaussian-Camera Attention   
+
+> Multi-Camera Features
+> Multi-View Aggregation
+> 3D Lifting
+> Gaussian-LiDAR Attention
+> Geometric Aggregation
+> Ref. Points
+> LiDAR BEV Feature BEV Feature Map
+> Gaussian Self-Attention
+> Spatial Interaction
+> Gaussian-to-BEV
+
+Gaussian Encoder Layer  Layers 
+
+> Initial Properties
+> Initial Features
+
+Gaussian 
+
+Encoder 
+
+> (Sec. III-A)
+> Gaussian
+> Representation
+
+Gaussian-
+
+to-BEV 
+
+Splatting 
+
+> (Sec. III-B)
+> BEV Feature
+> Map
+> Decoder
+> Prediction
+> LiDAR Point Cloud (optional)
+> Camera
+> Backbone
+> LiDAR
+> Backbone
+> Multi-Camera Images
+> Gaussian Refinement
+> Residual Refine
+> Property Heads
+
+Fig. 2: Overall framework of GaussianMap. The framework takes multi-camera images and an optional LiDAR point cloud as inputs. The Gaussian encoder generates an adaptive Gaussian representation on the BEV plane from the extracted sensor features. This representation is converted into a BEV feature map via Gaussian-to-BEV splatting, from which the map decoder produces the vectorized map prediction. For clarity, we visualize Gaussians with opacity higher than 0.4 and show the BEV feature map after principal component analysis. 
+
+Finally, a map decoder takes B as input and predicts the vectorized map ˆY = {ˆyk}Kk=1 , where each map element ˆyk
+
+is represented by a class label and a point sequence. 
+
+A. Gaussian Encoder 
+
+The Gaussian encoder generates a Gaussian representation from the extracted sensor features. It first initializes Gaussian primitives on the BEV plane and iteratively refines them through L stacked layers. At each layer ℓ, Gaussian features are updated by Gaussian self-attention (GSA), Gaussian-camera attention (GCA), optional Gaussian-LiDAR attention (GLA), and a feed-forward network. The updated features are then used to refine the Gaussian properties. 
+
+Gaussian Initialization. We initialize a set of M Gaussian primitives on the BEV plane, denoted by G0 = {g0 
+
+> i
+
+}Mi=1 .The mean positions are initialized uniformly over the BEV perception range, with fixed scales, identity rotations, and opacities set to 0.5. To initialize the Gaussian features, we lift camera features FPV cam to BEV space using an LSS-style transformation [14], obtaining FBEV cam . This feature is used directly in the camera-only setting, or fused with LiDAR BEV features when LiDAR is available, yielding FBEV init .Each Gaussian feature f 0 
+
+> i
+
+is then obtained by bilinearly sampling FBEV init at its mean position m0 
+
+> i
+
+.
+
+Gaussian Self-Attention. GSA models interactions among Gaussian primitives based on their spatial distributions. For each Gaussian gi, we generate a set of reference points 
+
+Pi = {pi,q }Qq=1 within its local region to guide feature ag-gregation. Specifically, local offsets {oi,q }Qq=1 are predicted from fi and transformed according to the geometry of gi:
+
+pi,q = mi + Ri (oi,q ⊙ si) , (1) where mi and si are the mean position and scale of gi,and Ri is the rotation matrix derived from ri. To obtain the feature source, the Gaussian representation is splatted into a BEV feature map FBEV self using Gaussian-to-BEV splatting (Sec. III-B). The Gaussian feature is then updated by 
+
+f gsa  
+
+> i
+
+= DA  fi, Pi, FBEV self 
+
+ , (2) where f gsa  
+
+> i
+
+denotes the updated feature of gi after GSA, and 
+
+DA( ·) denotes the deformable attention operation [42]. 
+
+Gaussian-Camera Attention. GCA incorporates visual in-formation from multi-camera image features into the Gaus-sian representation. For each Gaussian gi, we lift its mean position to a set of 3D reference points P3d  
+
+> i
+
+= {p3d 
+
+> i,h
+
+}Hh=1 .Specifically, height offsets {∆zi,h }Hh=1 are predicted from the Gaussian feature and added to predefined height anchors: 
+
+p3d  
+
+> i,h
+
+= [ mi, z h + ∆ zi,h ], (3) where zh denotes the h-th height anchor. These reference points are then projected onto the image feature planes using camera intrinsics and extrinsics, yielding 2D reference locations P2d  
+
+> i,c
+
+for camera c. The Gaussian feature is updated by aggregating image features from all camera views: 
+
+f gca  
+
+> i
+
+= 1
+
+|C| 
+
+X
+
+> c∈C
+
+KA  f gsa  
+
+> i
+
+, P2d  
+
+> i,c
+
+, FPV cam ,c 
+
+ , (4) where f gca  
+
+> i
+
+denotes the updated feature of gi after GCA, and 
+
+KA( ·) denotes the kernel-based attention operation [43]. 
+
+Gaussian-LiDAR Attention. When LiDAR is available, we introduce GLA to incorporate complementary geometric cues into the Gaussian representation. GLA uses each Gaussian primitive as an adaptive query to aggregate LiDAR features from its spatially relevant region. For each Gaussian gi, we generate another set of reference points P′ 
+
+> i
+
+using the same transformation as in Eq. 1. These reference points guide feature aggregation on the LiDAR BEV feature map FBEV lidar .The Gaussian feature is then updated by 
+
+f gla  
+
+> i
+
+= DA  f gca  
+
+> i
+
+, P′ 
+
+> i
+
+, FBEV lidar 
+
+ , (5) where f gla  
+
+> i
+
+denotes the updated feature of gi after GLA. 
+
+Gaussian Refinement. After feature interaction in each encoder layer, we refine the Gaussian properties based on the updated features. For the i-th Gaussian primitive gi =(mi, si, ri, α i, fi), its updated feature f ′ 
+
+> i
+
+encodes contextual information from Gaussian interactions and sensor features. We use separate multi-layer perceptron (MLP) heads to predict intermediate Gaussian properties: 
+
+m′ 
+
+> i
+
+= MLP m(f ′ 
+
+> i
+
+), s′ 
+
+> i
+
+= MLP s(f ′ 
+
+> i
+
+),
+
+r′ 
+
+> i
+
+= MLP r (f ′ 
+
+> i
+
+), α′ 
+
+> i
+
+= MLP α(f ′ 
+
+> i
+
+). (6) We then update the mean with the predicted residual m′
+
+> i
+
+,while directly replacing the remaining properties: 
+
+g′ 
+
+> i
+
+= ( mi + m′
+
+> i
+
+, s′
+
+> i
+
+, r′
+
+> i
+
+, α ′
+
+> i
+
+, f ′ 
+
+> i
+
+) . (7) The residual mean update allows Gaussians to progressively adjust their positions and stabilizes the refinement process. 
+
+B. Gaussian-to-BEV Splatting 
+
+Gaussian primitives provide an adaptive scene represen-tation on the BEV plane, while many feature aggregation operators, such as deformable attention [42] and convolu-tion, require structured feature maps. We therefore introduce Gaussian-to-BEV splatting to transform the Gaussian repre-sentation into a structured BEV feature map. Specifically, we model Gaussian primitives as mixture components and aggregate their features using posterior responsibilities. For a BEV cell centered at location x, we evaluate the conditional probability density of x under the i-th Gaussian primitive gi = ( mi, si, ri, α i, fi) as 
+
+p(x | gi) = 12π|Σi| 12
+
+exp  − 12 (x−mi)⊤Σ−1 
+
+> i
+
+(x−mi) (8) where Σi is the covariance matrix derived from si and ri.We use the opacity αi as the mixture prior and compute the posterior responsibility of gi for location x as 
+
+p(gi | x) = p(x | gi)αi
+
+PMj=1 p(x | gj )αj
+
+. (9) The BEV feature B at x is then obtained as the expectation of Gaussian features under this posterior distribution: 
+
+B(x) = 
+
+> M
+
+X
+
+> i=1
+
+p(gi | x)fi. (10) This operation is implemented with a CUDA-based splatter that evaluates Gaussian contributions at BEV cell centers. 
+
+C. Vectorized Map Prediction and Supervision 
+
+After Gaussian-to-BEV splatting, we feed the resulting BEV feature B into a vectorized map decoder to produce structured map elements. Since B follows the standard BEV feature format, it is compatible with existing vectorized map decoders, such as MapTR/MapTRv2 [8], [10], MapQR [11], and DAMap [12]. Consequently, the proposed Gaussian representation does not require a specialized map decoder. Instead, it provides an enhanced scene representation for vectorized map prediction, as evaluated in Sec. IV-C. The training objective follows common practice in map construction [10], [11], [12] and consists of a vectorized map prediction loss and a dense auxiliary loss: 
+
+L = λmap Lmap + λdense Ldense , (11) where λmap and λdense balance the two terms. The map loss 
+
+Lmap includes classification, point-to-point, and edge direc-tion losses, while the dense loss Ldense includes depth, BEV segmentation, and perspective-view segmentation losses. IV. E XPERIMENTS 
+
+A. Experimental Setup 
+
+Datasets. We evaluate our method on two public real-world benchmarks, nuScenes [44] and Argoverse 2 [45]. nuScenes contains 1,000 driving scenes recorded in Boston and Singa-pore, each lasting about 20 s . Each sample provides images from six surrounding cameras, point clouds from a 32-beam LiDAR, and vector maps annotated at 2 Hz . Argoverse 2 consists of 1,000 driving logs collected in six U.S. cities, with each log lasting about 15 s . Each sample includes images from seven surrounding cameras, point clouds from two 32-beam LiDARs, and vector maps annotated at 10 Hz .Following previous works [10], [11], we use 700 scenes for training and 150 scenes for validation on both datasets. We report performance on three categories, including lane dividers, pedestrian crossings, and road boundaries. 
+
+Evaluation Metrics. For a fair comparison, we follow the standard evaluation protocol used in previous works [10], [11]. The perception range is centered on the ego vehicle and is set to [−15 m , 15 m] along the X-axis and [−30 m , 30 m] 
+
+along the Y-axis. We use mean Average Precision (mAP) to evaluate the quality of vectorized map predictions. Specifi-cally, a predicted map element is considered a true positive if its Chamfer distance to a ground-truth instance is smaller than a given threshold. For each category, AP is computed under three thresholds {0.5 m , 1.0 m , 1.5 m }. The final mAP is reported by averaging the AP scores across all categories. TABLE I: Comparison with state-of-the-art methods on the nuScenes validation set. “C” and “L” denote camera and LiDAR inputs, respectively. † indicates results reproduced with the official code; for camera-LiDAR fusion, we follow the mechanism in [10]. Results of other methods are taken from the corresponding papers.                                                                                                                                                                                                
+
+> Method Modality Epoch AP div. ped. bou. mean HDMapNet [6] C30 21.7 14.4 33.0 23.0 VectorMapNet [7] C110 51.4 42.5 44.1 46.0 MapTR [8] C24 51.5 46.3 53.1 50.3 MapVR [48] C24 54.4 47.7 51.4 51.2 PivotNet [18] C24 56.5 56.2 60.1 57.6 BeMapNet [17] C30 62.3 57.7 59.4 59.8 MapTRv2 [10] C24 62.4 59.8 62.4 61.5 HeightMapNet [49] C24 62.6 60.4 62.2 61.7 ADMap [22] C24 63.5 61.9 63.3 62.9 RefDiffMap [21] C24 64.0 64.6 64.3 64.3 MGMap [20] C24 65.0 61.8 67.5 64.8 MapQR [11] C24 68.0 63.4 67.7 66.4 HIMap [50] C30 68.4 62.6 69.1 66.7 RelMap [51] C24 70.5 66.3 68.4 68.4 MapQR +DAMap [12] C24 70.8 65.2 70.3 68.8
+> GaussianMap (Ours) C24 72.2 68.1 71.3 70.5
+> HDMapNet [6] C & L 30 29.6 16.3 46.7 31.0 VectorMapNet [7] C & L 110 60.1 48.2 53.0 53.7 MapTR [8] C & L 24 62.3 55.9 69.3 62.5 MapVR [48] C & L 24 62.7 60.4 67.2 63.5 MapFusion [39] C & L 24 64.4 61.6 72.5 66.1 SEF-Map [41] C & L 24 66.7 61.6 71.8 66.7 MapTRv2 [10] C & L 24 66.5 65.6 74.8 69.0 GeMap [52] C & L 110 69.8 68.0 73.4 70.4 ADMap [22] C & L 24 69.0 68.0 75.2 70.8 MGMap [20] C & L 24 71.1 67.7 76.2 71.7 MapQR †[11] C & L 24 71.0 70.6 77.1 72.9 HIMap [50] C & L 24 72.4 71.0 79.4 74.3 MapQR +DAMap †[12] C & L 24 75.6 71.6 78.4 75.2 RoboMap [40] C & L 24 74.5 74.6 82.0 77.0
+> GaussianMap (Ours) C & L 24 78.1 74.4 82.3 78.3
+
+Implementation Details. Unless otherwise specified, we fol-low the implementation settings used in previous works [10], [11]. We use ResNet-50 [46] and SECOND [47] as the image and LiDAR backbones, respectively. For a fair comparison, we set the number of Gaussians to 20,000, which is the same as the number of cells in the BEV feature of size 200 × 100 .The Gaussian encoder refines the features and properties of these Gaussians using 3 encoder layers. We adopt the MapQR +DAMap [12] decoder with 6 decoder layers and 100 instance queries. Each map element is represented by a class label and a sequence of 20 points. Our model is trained on 8 NVIDIA GPUs with a batch size of 32. The training schedule is 24 epochs on nuScenes and 6 epochs on Argoverse 2. We use the AdamW optimizer with a learning rate of 6 × 10 −4 and a cosine annealing schedule. 
+
+B. Comparisons with State-of-the-art Methods 
+
+Results on nuScenes. Table I compares GaussianMap with state-of-the-art methods on the nuScenes validation set. In the camera-only setting, GaussianMap achieves 70.5 mAP with a 24-epoch training schedule, surpassing the previous best camera-based method MapQR +DAMap [12] by 1.7 mAP. In the camera-LiDAR fusion setting, GaussianMap achieves 78.3 mAP under the same training schedule, outperform-ing RoboMap [40] and the strong MapQR +DAMap [12] TABLE II: Comparison with state-of-the-art methods on the Argoverse 2 validation set. “C” and “L” denote camera and LiDAR inputs, respectively. † indicates results reproduced with the official code; for camera-LiDAR fusion, we follow the mechanism in [10]. Results of other methods are taken from the corresponding papers.                                                                                                                        
+
+> Method Modality Epoch AP div. ped. bou. mean HDMapNet [6] C-5.7 13.1 37.6 18.8 VectorMapNet [7] C-36.1 38.3 39.2 37.9 MapVR [48] C660.0 54.6 58.0 57.5 MapTR [8] C665.5 56.6 61.8 61.3 HeightMapNet [49] C670.6 67.9 62.7 67.1 MapTRv2 [10] C672.1 62.9 67.1 67.4 GeMap [52] C667.6 59.3 64.7 63.9 MapQR +DAMap †[12] C672.2 63.9 68.3 68.1 MapQR [11] C672.3 64.3 68.1 68.2 ADMap [22] C672.4 64.5 68.9 68.7 HIMap [50] C669.5 69.0 70.3 69.6 RelMap [51] C674.2 65.3 70.1 69.9
+> GaussianMap (Ours) C673.1 65.2 71.9 70.1
+> MapTR [8] C & L 665.1 61.6 75.1 67.3 MapFusion [39] C & L 669.4 65.8 78.9 71.4 SEF-Map [41] C & L 666.7 70.7 78.8 72.1 MapQR +DAMap †[12] C & L 677.0 70.5 80.9 76.1 ADMap [22] C & L 676.2 72.8 81.5 76.9
+> GaussianMap (Ours) C & L 679.4 73.7 83.8 79.0
+
+TABLE III: Integrating the Gaussian encoder into other methods. “C” and “L” denote camera and LiDAR input modalities, respectively. † indicates results reproduced with the official code; for camera-LiDAR fusion, we follow the mechanism used in [10]. The best results under the same settings are highlighted in bold.                                          
+
+> Method Modality AP div. ped. bou. mean MapQR †C68.0 63.4 67.7 66.4 C & L 71.0 70.6 77.1 72.9 MapQR +Ours C70.9 65.0 69.5 68.5 ↑2.1
+> C & L 77.9 75.5 79.9 77.8 ↑4.9
+> MapQR +DAMap †C70.8 65.2 70.3 68.8 C & L 75.6 71.6 78.4 75.2 MapQR +DAMap +Ours C72.2 68.1 71.3 70.5 ↑1.7
+> C & L 78.1 74.4 82.3 78.3 ↑3.1
+
+baseline by 1.3 and 3.1 mAP, respectively. These consistent improvements under both input settings suggest that the proposed Gaussian representation serves as an effective inter-mediate scene representation for vectorized map prediction. 
+
+Results on Argoverse 2. Table II compares GaussianMap with state-of-the-art methods on the Argoverse 2 valida-tion set. In the camera-only setting, GaussianMap achieves 70.1 mAP with a 6-epoch training schedule, outperform-ing RelMap [51] and the strong MapQR +DAMap [12] baseline by 0.2 and 2.0 mAP, respectively. In the camera-LiDAR fusion setting, GaussianMap achieves 79.0 mAP under the same training schedule, surpassing ADMap [22] and MapQR +DAMap [12] by 2.1 and 2.9 mAP, respec-tively. These consistent improvements on Argoverse 2 further demonstrate the effectiveness of the proposed Gaussian rep-resentation across different benchmarks and input settings. TABLE IV: Ablation study of main components in the Gaus-sian encoder. “C” and “L” denote camera and LiDAR inputs, respectively. “Gauss. Rep.”, “GSA”, and “GLA” denote Gaussian representation, Gaussian self-attention, and Gaussian-LiDAR atten-tion. Best results under the same setting are highlighted in bold.                                  
+
+> Modality Gauss. Rep. GSA GLA AP div. ped. bou. mean C68.0 63.4 67.7 66.4
+> ✓69.8 64.7 69.1 67.9
+> ✓✓70.9 65.0 69.5 68.5
+> C & L 71.0 70.6 77.1 72.9
+> ✓✓74.9 73.3 78.0 75.4
+> ✓✓✓77.9 75.5 79.9 77.8
+
+C. Ablation Study 
+
+We conduct ablation studies on the nuScenes dataset to evaluate the effectiveness of the proposed GaussianMap. All experiments are conducted for 24 epochs. Unless otherwise specified, we adopt MapQR [11] as the baseline method. 
+
+Effect of Gaussian Encoder. To validate the effectiveness of the proposed Gaussian encoder, we integrate it into two baselines, MapQR [11] and MapQR +DAMap [12]. As shown in Table III, the Gaussian encoder consistently improves both baselines across different input settings, in-dicating that the Gaussian representation generated by the encoder benefits vectorized map prediction. In the camera-only setting, it improves MapQR and MapQR +DAMap by 2.1 and 1.7 mAP, respectively, suggesting that refining Gaus-sian primitives from visual features allows more effective capacity allocation to map-relevant regions. In the camera-LiDAR fusion setting, the gains increase to 4.9 and 3.1 mAP, respectively, suggesting that the encoder further enhances the Gaussian representation with complementary geometric cues. 
+
+Contributions of Main Components. To analyze the con-tribution of each component in the Gaussian encoder, we progressively add Gaussian representation, Gaussian self-attention (GSA), and Gaussian-LiDAR attention (GLA) to the baseline, as reported in Table IV. In the camera-only setting, introducing the Gaussian representation brings a 1.5 mAP gain, suggesting that adaptive Gaussian primitives provide a more effective representation for map-relevant re-gions. Building on this representation, GSA further increases performance to 68.5 mAP by modeling interactions among Gaussians. In the camera-LiDAR fusion setting, Gaussian representation and GSA together bring a 2.5 mAP gain over the baseline. Adding GLA brings an additional gain of 2.4 mAP, suggesting that GLA effectively incorporates LiDAR geometric cues into the Gaussian representation. 
+
+Ablation on Gaussian-Guided Feature Aggregation. To evaluate the effect of Gaussian-guided feature aggregation in GSA and GLA, we vary the number of reference points used by each Gaussian primitive. As shown in Table V, increasing the number of reference points from 4 to 16 improves the mAP from 76.9 to 77.8, suggesting that denser reference points help each Gaussian capture richer spatial context. Further increasing the number to 32 yields a comparable TABLE V: Ablation on Gaussian-guided feature aggregation.                           
+
+> “Ref. Points per Gauss.” denotes the number of reference points used by each Gaussian for feature aggregation. “GSA” and “GLA” denote Gaussian self-attention and Gaussian-LiDAR attention.
+> Ref. Points per Gauss. AP GSA GLA div. ped. bou. mean 4476.2 75.2 79.3 76.9 8877.6 75.4 79.7 77.6 16 16 77.9 75.5 79.9 77.8
+> 32 32 77.5 75.2 80.5 77.7
+
+TABLE VI: Ablation of multi-sensor fusion mechanisms. “C” and “L” denote camera and LiDAR input modalities, respectively. Camera-only results are included for reference.                          
+
+> Method Modality AP div. ped. bou. mean Camera Only C70.9 65.0 69.5 68.5 Convolutional Fusion [10] C & L 74.9 73.3 78.0 75.4 Deformable Attention [42] C & L 77.1 75.3 79.4 77.3 Gaussian-LiDAR Attention C & L 77.9 75.5 79.9 77.8
+
+mAP of 77.7, indicating that the benefit tends to saturate once the reference points become sufficiently dense. 
+
+Ablation on Multi-Sensor Fusion Mechanisms. To evaluate the effectiveness of Gaussian-LiDAR attention, we compare it with two alternative multi-sensor fusion mechanisms: convolutional fusion following [10] and deformable atten-tion [42]. As shown in Table VI, convolutional fusion and de-formable attention achieve 75.4 and 77.3 mAP, respectively. Gaussian-LiDAR attention achieves the best performance, outperforming the two alternatives by 2.4 and 0.5 mAP, respectively. This suggests that using Gaussian primitives as spatially adaptive queries allows more effective aggregation of LiDAR geometric cues into the Gaussian representation. 
+
+D. Qualitative Results 
+
+We present qualitative comparisons on the nuScenes [44] dataset in both the camera-only and camera-LiDAR fusion settings, as shown in Fig. 3(a) and (b), respectively. We also visualize Gaussians with opacity higher than 0.4 to highlight regions with stronger responses. Compared with MapQR [11] and MapQR +DAMap [12], GaussianMap produces vector-ized maps that are better aligned with the ground truth across diverse driving scenes. The Gaussians tend to concentrate in map-relevant regions, suggesting that the proposed Gaussian representation can adaptively allocate modeling capacity to geometrically informative regions. We further observe that incorporating LiDAR geometric cues yields more compact and better localized Gaussians around map-relevant regions. V. C ONCLUSION 
+
+In this paper, we present GaussianMap, a multi-sensor on-line HD map construction framework that learns an adaptive Gaussian representation of the surrounding scene. Built upon Gaussian primitives on the BEV plane, GaussianMap focuses modeling capacity on map-relevant regions and alleviates the redundancy of grid-based BEV features. A feed-forward Gaussian encoder refines these primitives through Gaussian Ground Truth MapQR  GaussianMap (Ours) FRONT_LEFT  FRONT  FRONT_RIGHT  MapQR+DAMap    
+
+> Gaussians Prediction BACK_LEFT BACK BACK_RIGHT
+
+(a) Camera-only setting        
+
+> Ground Truth MapQR GaussianMap (Ours) FRONT_LEFT FRONT FRONT_RIGHT MapQR+DAMap
+> Gaussians Prediction BACK_LEFT BACK BACK_RIGHT
+
+(b) Camera-LiDAR fusion setting   
+
+> Lane Divider Ped. Crossing Road Boundary Ego Car
+
+Fig. 3: Qualitative results on the nuScenes validation set. (a) Camera-only setting. (b) Camera-LiDAR fusion setting. We compare the vectorized map predictions by GaussianMap with those from MapQR and MapQR +DAMap, using the ground truth as the reference. For GaussianMap, we additionally visualize the Gaussians alongside the predictions, retaining those with opacity higher than 0.4 for clarity. 
+
+interaction modeling and multi-sensor feature aggregation. Experiments on nuScenes and Argoverse 2 demonstrate that GaussianMap achieves state-of-the-art performance in both camera-only and camera-LiDAR settings. These results show that adaptive Gaussian representations provide an effective and flexible alternative for online HD map construction. REFERENCES [1] H. Lyu, J. S. Berrio Perez, Y. Huang, K. Li, M. Shan, and S. Worrall, “Online high-definition map construction for autonomous vehicles: A comprehensive survey,” Journal of Sensor and Actuator Networks ,vol. 14, no. 1, p. 15, 2025. [2] G. Elghazaly, R. Frank, S. Harvey, and S. Safko, “High-definition maps: Comprehensive survey, challenges, and future perspectives,” 
+
+IEEE Open Journal of Intelligent Transportation Systems , vol. 4, pp. 527–550, 2023. [3] J. Zhang, S. Singh et al. , “Loam: Lidar odometry and mapping in real-time.” in Robotics: Science and systems , vol. 2, no. 9. Berkeley, CA, 2014, pp. 1–9. [4] T. Shan and B. Englot, “Lego-loam: Lightweight and ground-optimized lidar odometry and mapping on variable terrain,” in 2018 IEEE/RSJ international conference on intelligent robots and systems (IROS) . IEEE, 2018, pp. 4758–4765. [5] J. S. Berrio, S. Worrall, M. Shan, and E. Nebot, “Long-term map maintenance pipeline for autonomous vehicles,” IEEE Transactions on Intelligent Transportation Systems , vol. 23, no. 8, pp. 10 427–10 440, 2021. [6] Q. Li, Y. Wang, Y. Wang, and H. Zhao, “Hdmapnet: An online hd map construction and evaluation framework,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2022, pp. 4628–4634. [7] Y. Liu, T. Yuan, Y. Wang, Y. Wang, and H. Zhao, “Vectormapnet: End-to-end vectorized hd map learning,” in International Conference on Machine Learning . PMLR, 2023, pp. 22 352–22 369. [8] B. Liao, S. Chen, X. Wang, T. Cheng, Q. Zhang, W. Liu, and C. Huang, “Maptr: Structured modeling and learning for online vectorized hd map construction,” in The Eleventh International Conference on Learning Representations , 2023. [9] H. Lyu, T. Monninger, J. S. B. Perez, M. Shan, Z. Ming, and S. Worrall, “Maprf: Weakly supervised online hd map construction via nerf-guided self-training,” in IEEE International Conference on Intelligent Transportation Systems (ITSC) . IEEE, 2026. [10] B. Liao, S. Chen, Y. Zhang, B. Jiang, Q. Zhang, W. Liu, C. Huang, and X. Wang, “Maptrv2: An end-to-end framework for online vectorized hd map construction,” International Journal of Computer Vision , vol. 133, no. 3, pp. 1352–1374, 2025. [11] Z. Liu, X. Zhang, G. Liu, J. Zhao, and N. Xu, “Leveraging enhanced queries of point sets for vectorized map construction,” in European Conference on Computer Vision . Springer, 2024, pp. 461–477. [12] J. Dong, C. Li, Y. Lin, J. Fu, S. Zhou, and N. Zheng, “Damap: Distance-aware mapnet for high quality hd map construction,” in 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , 2025, pp. 5285–5294. [13] B. Kerbl, G. Kopanas, T. Leimk¨ uhler, G. Drettakis et al. , “3d gaussian splatting for real-time radiance field rendering.” ACM Trans. Graph. ,vol. 42, no. 4, pp. 139–1, 2023. [14] J. Philion and S. Fidler, “Lift, splat, shoot: Encoding images from arbitrary camera rigs by implicitly unprojecting to 3d,” in European conference on computer vision . Springer, 2020, pp. 194–210. [15] Z. Li, W. Wang, H. Li, E. Xie, C. Sima, T. Lu, Q. Yu, and J. Dai, “Bev-former: learning bird’s-eye-view representation from lidar-camera via spatiotemporal transformers,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 47, no. 3, pp. 2020–2036, 2024. [16] Z. Liu, H. Tang, A. Amini, X. Yang, H. Mao, D. L. Rus, and S. Han, “Bevfusion: Multi-task multi-sensor fusion with unified bird’s-eye view representation,” in 2023 IEEE international conference on robotics and automation (ICRA) . IEEE, 2023, pp. 2774–2781. [17] L. Qiao, W. Ding, X. Qiu, and C. Zhang, “End-to-end vectorized hd-map construction with piecewise bezier curve,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2023, pp. 13 218–13 228. [18] W. Ding, L. Qiao, X. Qiu, and C. Zhang, “Pivotnet: Vectorized pivot learning for end-to-end hd map construction,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 3672–3682. [19] T. Yuan, Y. Liu, Y. Wang, Y. Wang, and H. Zhao, “Streammapnet: Streaming mapping network for vectorized online hd map construc-tion,” in Proceedings of the IEEE/CVF Winter Conference on Appli-cations of Computer Vision , 2024, pp. 7356–7365. [20] X. Liu, S. Wang, W. Li, R. Yang, J. Chen, and J. Zhu, “Mgmap: Mask-guided learning for online vectorized hd map construction,” in 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 14 812–14 821. [21] W. Gao, E. Chang, J. Fu, Z. Zhu, S. Chen, and N. Zheng, “Refdiffmap: Diffusion-guided progressive refinement for vectorized hd map con-struction,” IEEE Robotics and Automation Letters , vol. 11, no. 3, pp. 2554–2561, 2026. [22] H. Hu, F. Wang, Y. Wang, L. Hu, J. Xu, and Z. Zhang, “Admap: Anti-disturbance framework for vectorized hd map construction,” in 
+
+European Conference on Computer Vision . Springer, 2024, pp. 311– 326. [23] B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R. Ramamoor-thi, and R. Ng, “Nerf: Representing scenes as neural radiance fields for view synthesis,” Communications of the ACM , vol. 65, no. 1, pp. 99–106, 2021. [24] G. Wu, T. Yi, J. Fang, L. Xie, X. Zhang, W. Wei, W. Liu, Q. Tian, and X. Wang, “4d gaussian splatting for real-time dynamic scene rendering,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2024, pp. 20 310–20 320. [25] J. Tang, J. Ren, H. Zhou, Z. Liu, and G. Zeng, “Dreamgaussian: Generative gaussian splatting for efficient 3d content creation,” in 
+
+International Conference on Learning Representations , vol. 2024, 2024, pp. 33 879–33 896. [26] M. Qin, W. Li, J. Zhou, H. Wang, and H. Pfister, “Langsplat: 3d language gaussian splatting,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 20 051–20 060. [27] Y. Huang, W. Zheng, Y. Zhang, J. Zhou, and J. Lu, “Gaussianformer: Scene as gaussians for vision-based 3d semantic occupancy predic-tion,” in European Conference on Computer Vision . Springer, 2024, pp. 376–393. [28] Y. Huang, A. Thammatadatrakoon, W. Zheng, Y. Zhang, D. Du, and J. Lu, “Gaussianformer-2: Probabilistic gaussian superposition for efficient 3d occupancy prediction,” in Proceedings of the computer vision and pattern recognition conference , 2025, pp. 27 477–27 486. [29] F. Chabot, N. Granger, and G. Lapouge, “Gaussianbev: 3d gaussian representation meets perception models for bev segmentation,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 2250–2259. [30] S.-W. Lu, Y.-H. Tsai, and Y.-T. Chen, “Toward real-world bev per-ception: Depth uncertainty estimation via gaussian splatting,” in Pro-ceedings of the Computer Vision and Pattern Recognition Conference ,2025, pp. 17 124–17 133. [31] W. Zheng, J. Wu, Y. Zheng, S. Zuo, Z. Xie, L. Yang, Y. Pan, Z. Hao, P. Jia, X. Lang et al. , “Gaussianad: Gaussian-centric end-to-end autonomous driving,” arXiv preprint arXiv:2412.10371 , 2024. [32] S. Vora, A. H. Lang, B. Helou, and O. Beijbom, “Pointpainting: Sequential fusion for 3d object detection,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2020, pp. 4604–4612. [33] C. Wang, C. Ma, M. Zhu, and X. Yang, “Pointaugmenting: Cross-modal augmentation for 3d object detection,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2021, pp. 11 794–11 803. [34] T. Yin, X. Zhou, and P. Kr¨ ahenb¨ uhl, “Multimodal virtual point 3d detection,” Advances in Neural Information Processing Systems ,vol. 34, pp. 16 494–16 507, 2021. [35] X. Chen, H. Ma, J. Wan, B. Li, and T. Xia, “Multi-view 3d object detection network for autonomous driving,” in Proceedings of the IEEE conference on Computer Vision and Pattern Recognition , 2017, pp. 1907–1915. [36] R. Nabati and H. Qi, “Centerfusion: Center-based radar and camera fusion for 3d object detection,” in Proceedings of the IEEE/CVF winter conference on applications of computer vision , 2021, pp. 1527–1536. [37] X. Bai, Z. Hu, X. Zhu, Q. Huang, Y. Chen, H. Fu, and C.-L. Tai, “Transfusion: Robust lidar-camera fusion for 3d object detection with transformers,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 1090–1099. [38] T. Liang, H. Xie, K. Yu, Z. Xia, Z. Lin, Y. Wang, T. Tang, B. Wang, and Z. Tang, “Bevfusion: A simple and robust lidar-camera fusion framework,” Advances in neural information processing systems ,vol. 35, pp. 10 421–10 434, 2022. [39] X. Hao, Y. Diao, M. Wei, Y. Yang, P. Hao, R. Yin, H. Zhang, W. Li, S. Zhao, and Y. Liu, “Mapfusion: A novel bev feature fusion network for multi-modal map construction,” Information Fusion , vol. 119, p. 103018, 2025. [40] X. Hao, Y. Zhao, Y. Ji, L. Dai, P. Hao, D. Li, S. Cheng, and R. Yin, “What really matters for robust multi-sensor hd map construction?” in 2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2025, pp. 1298–1304. [41] H. Fu, L. Zhang, H. Li, R. Hu, Z. Li, G. Liu, Z. Tan, L. Chen, H. Ye, and X. Hao, “Sef-map: Subspace-decomposed expert fusion for robust multimodal hd map prediction,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2026. [42] X. Zhu, W. Su, L. Lu, B. Li, X. Wang, and J. Dai, “Deformable detr: Deformable transformers for end-to-end object detection,” in 
+
+International Conference on Learning Representations , 2021. [43] S. Chen, T. Cheng, X. Wang, W. Meng, Q. Zhang, and W. Liu, “Efficient and robust 2d-to-bev representation learning via geometry-guided kernel transformer,” arXiv preprint arXiv:2206.04584 , 2022. [44] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Krishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuscenes: A multimodal dataset for autonomous driving,” in Proceedings of the IEEE/CVF Conference on Computer vision and pattern recognition ,2020, pp. 11 621–11 631. [45] B. Wilson, W. Qi, T. Agarwal, J. Lambert, J. Singh, S. Khandelwal, B. Pan, R. Kumar, A. Hartnett, J. K. Pontes, D. Ramanan, P. Carr, and J. Hays, “Argoverse 2: Next generation datasets for self-driving perception and forecasting,” in Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks (NeurIPS Datasets and Benchmarks) , 2021. [46] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in Proceedings of the IEEE Conference on Computer vision and pattern recognition , 2016, pp. 770–778. [47] Y. Yan, Y. Mao, and B. Li, “Second: Sparsely embedded convolutional detection,” Sensors , vol. 18, no. 10, p. 3337, 2018. [48] G. Zhang, J. Lin, S. Wu, Y. Song, Z. Luo, Y. Xue, S. Lu, and Z. Wang, “Online map vectorization for autonomous driving: A rasterization perspective,” Advances in Neural Information Processing Systems ,2023. [49] W. Qiu, S. Pang, H. Zhang, J. Fang, and J. Xue, “Heightmapnet: Explicit height modeling for end-to-end hd map learning,” in 2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 6022–6031. [50] Y. Zhou, H. Zhang, J. Yu, Y. Yang, S. Jung, S.-I. Park, and B. Yoo, “Himap: Hybrid representation learning for end-to-end vectorized hd map construction,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 15 396–15 406. [51] T. Cai, Y. Zhang, Z. Zhou, Z. Huang, and J. Ma, “Relmap: Enhancing online map construction with class-aware spatial relation and semantic priors,” in International Conference on Robotics and Automation (ICRA) . IEEE, 2026. [52] Z. Zhang, Y. Zhang, X. Ding, F. Jin, and X. Yue, “Online vectorized hd map construction using geometry,” in European Conference on Computer Vision . Springer, 2024, pp. 73–90.
