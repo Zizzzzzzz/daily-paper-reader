@@ -1,0 +1,575 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-05T21:27:35.498045+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 3,
+    "deep_cap": 8,
+    "deep_selected": 3,
+    "quick_candidates": 10,
+    "quick_skim_target": 13,
+    "quick_selected": 10
+  },
+  "deep_dive": [
+    {
+      "id": "2606.31225v2",
+      "source": "arxiv",
+      "title": "A First Exploration of Neuromorphic OT-CFM for Multi-Speaker VSR",
+      "abstract": "Visual Speech Recognition (VSR) tasks in complex multi-speaker scenarios are severely hindered by rapid head motions, occlusions, and subtle lip articulations. Traditional RGB-based methods struggle here due to low rates and motion blur of frames. To overcome these, we propose LipsFlow, a neuromorphic-inspired VSR framework that converts RGB videos into high-temporal-resolution event streams. For multi-speaker, we employ ByteTrack tracking and TalkNet active speaker detection to temporally segment scenes into single-speaker clips, enabling focused per-speaker analysis. By explicitly capturing microsecond-level articulatory dynamics via learnable event-based representations, LipsFlow achieves inherent robustness against visual degradation. To efficiently model these dense event-based features and adapt to speaker-specific articulatory patterns, we introduce Optimal Transport Conditional Flow Matching (OT-CFM). It enforces deterministic, straight-line trajectory generation in a semantic latent space, slashing inference latency to just two Ordinary Differential Equation (ODE) steps. Furthermore, we design a Dual-Level Semantic Supervision mechanism combining token-level BERT weight tying and sentence-level priors to resolve homophene ambiguities. Validated on competitive benchmarks, LipsFlow achieves a state-of-the-art WER of 22.3\\% at 240 ms latency, establishing a highly robust and efficient paradigm for event-based VSR.",
+      "authors": [
+        "Lin Chen",
+        "Jingping Fang",
+        "Hairui Liu",
+        "Chenyang Xu",
+        "Junhao Chen",
+        "Xiaorui Li",
+        "Weidong Cai",
+        "Xiaoming Chen"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM"
+      ],
+      "published": "2026-06-30T07:05:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.31225v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "neuromorphic event stream for visual speech recognition",
+      "llm_evidence_cn": "神经形态事件流用于视觉语音识别",
+      "llm_evidence": "神经形态事件流用于视觉语音识别",
+      "canonical_evidence": "神经形态事件流用于视觉语音识别",
+      "llm_tldr_en": "LipsFlow converts RGB video to high-temporal-resolution event streams for robust multi-speaker visual speech recognition, leveraging neuromorphic principles.",
+      "llm_tldr_cn": "针对多说话人场景下视觉语音识别受快速头部运动、遮挡和模糊影响的问题，提出LipsFlow，将RGB视频转换为高时间分辨率事件流，利用神经形态表示捕捉微秒级唇动动态。结合ByteTrack和TalkNet进行多说话人分割，在多个基准上取得鲁棒性能。贡献在于首次将事件流应用于视觉语音识别。",
+      "llm_tldr": "针对多说话人场景下视觉语音识别受快速头部运动、遮挡和模糊影响的问题，提出LipsFlow，将RGB视频转换为高时间分辨率事件流，利用神经形态表示捕捉微秒级唇动动态。结合ByteTrack和TalkNet进行多说话人分割，在多个基准上取得鲁棒性能。贡献在于首次将事件流应用于视觉语音识别。",
+      "llm_tags": [
+        "query:ev-cam:composite"
+      ],
+      "matched_query_tag": "query:ev-cam:composite",
+      "matched_query_text": "Papers central to 查找事件相机（Event-based Camera）相关的学术论文, especially work that connects or combines: neuromorphic vision sensor; event data; event stream; event-based vision; event-based camera vision sensors and systems; dynamic vision sensor DVS technology and applications; Event Cameras Based Multimodal Large Model; Object Detection and Tracking Using Event Cameras; state of the art in event based vision research.",
+      "matched_requirement_id": "req-composite-ev-cam",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.28864v1",
+      "source": "arxiv",
+      "title": "On Test-Time Scaling for Vision-Language Models",
+      "abstract": "Test-time scaling is a paradigm where large models use additional compute at inference to achieve better performance, without changing model weights. While it has been widely studied for Large Language Models (LLMs), its applicability to Large Vision-Language Models (LVLMs) remains less explored and analyzed, with limited analysis of whether, when, and to what extent these approaches transfer to LVLMs. In this work, we ask a simple but fundamental question: can conventional test-time scaling methods developed for LLMs be directly applied to LVLMs? We present the first comprehensive study of test-time scaling for LVLMs, spanning multiple models and model sizes, nine test-time scaling methods, and six diverse benchmarks. Our main findings is that 1) different from previous findings, small, well-performing models benefit the most from test-time scaling, enabling performance improvements of up to around 30\\%, reaching large models performance, and often outperforming them, 2) LVLMs lose focus when given more compute than necessary, and 3) Visual information is encoded early in the reasoning chain, after which the chain is dominated by text-only reasoning and the contribution of image tokens drops significantly. Finally, we also provide a global and fine-grained analysis on the quality and information sufficiency of the reasoning chains produced. Overall, our findings and analysis provide practical guidance and insights into LVLMs and their deployment in research and industry.",
+      "authors": [
+        "Fawaz Sammani",
+        "Tzoulio Chamiti",
+        "Nikos Deligiannis"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-27T11:12:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.28864v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "test-time scaling for vision-language models matches efficient inference requirement",
+      "llm_evidence_cn": "测试时缩放策略与高效视觉语言模型推理相关",
+      "llm_evidence": "测试时缩放策略与高效视觉语言模型推理相关",
+      "canonical_evidence": "测试时缩放策略与高效视觉语言模型推理相关",
+      "llm_tldr_en": "Comprehensive study of test-time scaling methods for LVLMs across multiple models and benchmarks, revealing unique challenges compared to LLMs.",
+      "llm_tldr_cn": "本文首次系统研究了大型视觉语言模型（LVLMs）的测试时缩放策略，覆盖多个模型规模、九种方法和六个基准。研究发现，与大型语言模型不同，直接应用LLM的测试时缩放方法到LVLMs面临显著挑战，为高效推理优化提供了重要指导。",
+      "llm_tldr": "本文首次系统研究了大型视觉语言模型（LVLMs）的测试时缩放策略，覆盖多个模型规模、九种方法和六个基准。研究发现，与大型语言模型不同，直接应用LLM的测试时缩放方法到LVLMs面临显著挑战，为高效推理优化提供了重要指导。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.01658v1",
+      "source": "arxiv",
+      "title": "Teaching Vision-Language-Action Models What to See and Where to Look",
+      "abstract": "Vision-Language-Action (VLA) models have emerged as a promising paradigm for end-to-end autonomous driving. However, existing VLAs' training relies heavily on text-centric visual question answering and chain-of-thought reasoning data, which emphasizes linguistic reasoning rather than action-grounded planning. As a result, the learned representations capture semantic knowledge but lack spatial dependencies crucial for reliable trajectory prediction. We propose DriveTeach-VLA, a framework that explicitly teaches VLAs what to see and where to look. Driving-aware Vision Distillation (DVD) injects driving-specific perceptual priors into the vision encoder, while 2D Trajectory-Guided Prompts (2D-TGP) provide spatial conditioning aligned with feasible driving trajectories. Together, they form a vision-guided learning pipeline: what to see (DVD pretraining) - where to look (TGP-guided SFT) - how to act (TGP-guided GRPO). DriveTeach-VLA achieves the state-of-the-art performance on NAVSIM and nuScenes. Our code is available at: https://github.com/ShivaTeam/DriveTeach-VLA.",
+      "authors": [
+        "Yuguang Yang",
+        "Canyu Chen",
+        "Zhewen Tan",
+        "Yizhi Wang",
+        "Zichao Feng",
+        "Chunyang Liu",
+        "Kehua Sheng",
+        "Juan Zhang",
+        "Linlin Yang",
+        "Baochang Zhang",
+        "Yan Wang",
+        "Bo Zhang",
+        "Xianbin Cao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-02T03:34:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.01658v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLA model for autonomous driving scene understanding",
+      "llm_evidence_cn": "面向自动驾驶场景理解的VLA模型",
+      "llm_evidence": "面向自动驾驶场景理解的VLA模型",
+      "canonical_evidence": "面向自动驾驶场景理解的VLA模型",
+      "llm_tldr_en": "Proposes DriveTeach-VLA that improves VLA models for autonomous driving by injecting driving-aware perceptual priors and 2D trajectory-guided prompts to learn spatial dependencies for better trajectory prediction.",
+      "llm_tldr_cn": "现有视觉语言动作模型因训练数据偏向文本推理而缺乏空间依赖性，导致自动驾驶轨迹预测不准确。本文提出DriveTeach-VLA框架，通过驾驶感知视觉蒸馏注入驾驶特定先验知识，并利用二维轨迹引导提示提供空间条件，使模型学会关注关键区域。实验表明该方法显著提升轨迹预测性能。",
+      "llm_tldr": "现有视觉语言动作模型因训练数据偏向文本推理而缺乏空间依赖性，导致自动驾驶轨迹预测不准确。本文提出DriveTeach-VLA框架，通过驾驶感知视觉蒸馏注入驾驶特定先验知识，并利用二维轨迹引导提示提供空间条件，使模型学会关注关键区域。实验表明该方法显著提升轨迹预测性能。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-25",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.28864v2",
+      "source": "arxiv",
+      "title": "On Test-Time Scaling for Vision-Language Models",
+      "abstract": "Test-time scaling is a paradigm where large models use additional compute at inference to achieve better performance, without changing model weights. While it has been widely studied for Large Language Models (LLMs), its applicability to Large Vision-Language Models (LVLMs) remains less explored and analyzed, with limited analysis of whether, when, and to what extent these approaches transfer to LVLMs. In this work, we ask a simple but fundamental question: can conventional test-time scaling methods developed for LLMs be directly applied to LVLMs? We present the first comprehensive study of test-time scaling for LVLMs, spanning multiple models and model sizes, nine test-time scaling methods, and six diverse benchmarks. Our main findings is that 1) different from previous findings, small, well-performing models benefit the most from test-time scaling, enabling performance improvements of up to around 30\\%, reaching large models performance, and often outperforming them, 2) LVLMs lose focus when given more compute than necessary, and 3) Visual information is encoded early in the reasoning chain, after which the chain is dominated by text-only reasoning and the contribution of image tokens drops significantly. Finally, we also provide a global and fine-grained analysis on the quality and information sufficiency of the reasoning chains produced. Overall, our findings and analysis provide practical guidance and insights into LVLMs and their deployment in research and industry.",
+      "authors": [
+        "Fawaz Sammani",
+        "Tzoulio Chamiti",
+        "Nikos Deligiannis"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-27T11:12:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.28864v2",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "study of test-time scaling methods for vision-language models",
+      "llm_evidence_cn": "视觉语言模型测试时扩展方法的研究",
+      "llm_evidence": "视觉语言模型测试时扩展方法的研究",
+      "canonical_evidence": "视觉语言模型测试时扩展方法的研究",
+      "llm_tldr_en": "First comprehensive study of test-time scaling for LVLMs, evaluating nine methods across multiple models and benchmarks, revealing differences from LLMs.",
+      "llm_tldr_cn": "该论文首次系统研究测试时扩展（Test-time Scaling）在大型视觉语言模型（LVLM）中的适用性。涵盖多个模型、九种方法及六个基准，主要发现：LVLM上测试时扩展的效果不同于LLM，某些方法可能失效。为LVLM高效推理提供了重要指导。",
+      "llm_tldr": "该论文首次系统研究测试时扩展（Test-time Scaling）在大型视觉语言模型（LVLM）中的适用性。涵盖多个模型、九种方法及六个基准，主要发现：LVLM上测试时扩展的效果不同于LLM，某些方法可能失效。为LVLM高效推理提供了重要指导。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29267v1",
+      "source": "arxiv",
+      "title": "Enhancing Part-Level Point Grounding for Any Open-Source MLLMs",
+      "abstract": "Visual grounding aims to associate free-form textual queries with specific regions in an image. While recent Multimodal Large Language Models (MLLMs) have demonstrated promising capabilities in this domain, they primarily excel at object-level grounding and often struggle with part-level grounding-an essential requirement for fine-grained tasks such as robotic manipulation. In this work, we introduce a general approach that equips any open-source MLLMs with accurate 2D part-level point grounding, offering a more direct alternative to conventional grounding representations. Our method leverages the attention mechanisms inherently present in MLLMs. By synthesizing text-conditioned, grounding-aware queries within intermediate layers via the proposed Q-Synth Module, we capture target-relevant attention patterns and refine them with a lightweight Attention-to-Point Decoder, which converts these patterns into a point-centric heatmap for final prediction. Notably, all original MLLM parameters are frozen, ensuring full preservation of their pre-trained capabilities. Experiments show that our design consistently improves part-level grounding accuracy across datasets and can be seamlessly integrated into any open-source MLLMs.",
+      "authors": [
+        "Jin-Cheng Jhang",
+        "Fu-En Wang",
+        "Xin Yang",
+        "Nan Qiao",
+        "Lu Xia",
+        "Min Sun",
+        "Cheng-Hao Kuo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-28T08:32:35+00:00",
+      "link": "https://arxiv.org/pdf/2606.29267v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "enhancing MLLM part-level grounding for robotic manipulation",
+      "llm_evidence_cn": "增强MLLM部件级定位用于机器人操作",
+      "llm_evidence": "增强MLLM部件级定位用于机器人操作",
+      "canonical_evidence": "增强MLLM部件级定位用于机器人操作",
+      "llm_tldr_en": "Proposes a method to add part-level point grounding to any open-source MLLM via Q-Synth Module that leverages attention, enabling fine-grained visual grounding for robotics. Achieves SOTA on part-level benchmarks.",
+      "llm_tldr_cn": "针对现有MLLM缺乏部件级视觉定位能力的问题，本文提出一种通用方法，通过Q-Synth模块在中间层合成文本条件化的定位感知查询，利用注意机制为任意开源MLLM赋予精确的2D部件级点定位能力。在部件级定位基准上达到SOTA，并可直接应用于机器人操作，为细粒度视觉理解提供了有效手段。",
+      "llm_tldr": "针对现有MLLM缺乏部件级视觉定位能力的问题，本文提出一种通用方法，通过Q-Synth模块在中间层合成文本条件化的定位感知查询，利用注意机制为任意开源MLLM赋予精确的2D部件级点定位能力。在部件级定位基准上达到SOTA，并可直接应用于机器人操作，为细粒度视觉理解提供了有效手段。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.31688v1",
+      "source": "arxiv",
+      "title": "Semantic Occupancy Prediction with Dual Range-Voxel Representation",
+      "abstract": "LiDAR-based 3D semantic occupancy prediction, which aims to provide accurate and comprehensive scene representation, is crucial for autonomous driving systems. As point clouds suffer from sparsity and incompleteness, leading to insufficient semantic learning and difficult occupancy perception, existing methods often stack multi-sweep point clouds to obtain dense spatial information. However, such a naive strategy also results in efficiency (e.g., additional computational burden) and robustness (e.g., pose transformation noise) concerns, which hinder their practical applications. In this work, we propose a Dual Range-Voxel Representation (DRVR) that leverages the range-view context and voxel-view geometry of single-sweep point clouds for 3D semantic occupancy prediction, eliminating the concerns associated with the multi-sweeps. Specifically, we use the range-view encoder to extract the compact context of the scene. To fully exploit the spatial information, we design a geometry-aware voxel-view encoder that extracts multi-scale voxel-view features separately and combines them for better geometric occupancy prediction. Moreover, we propose a range-voxel fusion module to cooperate range- and voxel-view features via voxel-to-range and range-to-voxel fusions. Extensive experiments on nuScenes-Occupancy, SemanticKITTI and SemanticPOSS show the superiority of our method. Especially on nuScenes-Occupancy, our single-sweep DRVR achieves 5.4% improvement in mIoU and 2.1x acceleration compared to the multi-sweep method.",
+      "authors": [
+        "Sitao Chen",
+        "Zhuangwei Zhuang",
+        "Hui Luo",
+        "Lizhao Liu",
+        "Qingyao Wu",
+        "Mingkui Tan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T14:01:52+00:00",
+      "link": "https://arxiv.org/pdf/2606.31688v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LiDAR-based 3D semantic occupancy prediction for autonomous driving",
+      "llm_evidence_cn": "基于LiDAR的3D语义占据预测用于自动驾驶",
+      "llm_evidence": "基于LiDAR的3D语义占据预测用于自动驾驶",
+      "canonical_evidence": "基于LiDAR的3D语义占据预测用于自动驾驶",
+      "llm_tldr_en": "Proposes Dual Range-Voxel Representation (DRVR) for efficient LiDAR-based 3D semantic occupancy prediction, leveraging range-view context and voxel-view geometry from single-sweep point clouds.",
+      "llm_tldr_cn": "该文提出双范围-体素表示（DRVR）用于3D语义占据预测，利用单帧点云的范围视角上下文和体素视角几何，避免多帧堆叠带来的计算负担和位姿噪声。方法在效率和精度上均优于现有方法，为自动驾驶实时场景感知提供可行方案。",
+      "llm_tldr": "该文提出双范围-体素表示（DRVR）用于3D语义占据预测，利用单帧点云的范围视角上下文和体素视角几何，避免多帧堆叠带来的计算负担和位姿噪声。方法在效率和精度上均优于现有方法，为自动驾驶实时场景感知提供可行方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.31609v1",
+      "source": "arxiv",
+      "title": "Learning Structurally Consistent Representations for Multi-View Radar Semantic Segmentation",
+      "abstract": "Radar sensors provide reliable perception under adverse weather and lighting conditions, but their sparse, noisy, and weakly semantic measurements make dense semantic segmentation challenging. Most existing radar segmentation methods rely on grid-based encodings and pairwise interactions, which struggle to capture the higher-order relational structure formed by multiple radar returns from the same physical object. We introduce a unified higher-order structural alignment framework for multi-view radar segmentation. The proposed method refines radar feature representations using learnable hypergraphs to capture higher-order dependencies among spatially related responses. To ensure consistency across heterogeneous radar projections, we further align view-specific features using Unbalanced Optimal Transport (UOT), enabling correspondence-free alignment under varying measurement densities and partial observations. An adaptive attention mechanism then fuses complementary radar views while emphasising structurally informative responses under sparsity and noise. The resulting architecture learns structurally consistent representations across Range Angle (RA), Range Doppler (RD), and Angle Doppler (AD) views and is trained using supervised segmentation together with cross-view consistency regularisation. Experiments on the CARRADA and RADIal benchmarks demonstrate consistent improvements over strong radar-specific baselines, achieving 63.8% mIoU on CARRADA and 83.4% mIoU on RADIal, improving the previous best methods by +1.7 and +2.3 mIoU, respectively. These results highlight the importance of higher-order relational modelling for robust radar perception.",
+      "authors": [
+        "Ali Zia",
+        "Muhammad Umer Ramzan",
+        "Abdelwahed Khamis",
+        "Usman Ali",
+        "Abdul Rehman"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-30T12:57:15+00:00",
+      "link": "https://arxiv.org/pdf/2606.31609v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multi-view radar semantic segmentation for robust traffic perception",
+      "llm_evidence_cn": "多视角雷达语义分割用于鲁棒交通感知",
+      "llm_evidence": "多视角雷达语义分割用于鲁棒交通感知",
+      "canonical_evidence": "多视角雷达语义分割用于鲁棒交通感知",
+      "llm_tldr_en": "Proposes a unified higher-order structural alignment framework for multi-view radar semantic segmentation, using learnable hypergraphs to capture higher-order dependencies among radar returns.",
+      "llm_tldr_cn": "该文提出统一的高阶结构对齐框架用于多视角雷达语义分割。针对雷达数据稀疏、噪声大、语义弱的问题，利用可学习超图捕获同一物理物体反射间的高阶关系，并跨异构视角保持一致性。为自动驾驶在恶劣天气下的感知提供了新思路。",
+      "llm_tldr": "该文提出统一的高阶结构对齐框架用于多视角雷达语义分割。针对雷达数据稀疏、噪声大、语义弱的问题，利用可学习超图捕获同一物理物体反射间的高阶关系，并跨异构视角保持一致性。为自动驾驶在恶劣天气下的感知提供了新思路。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.00338v1",
+      "source": "arxiv",
+      "title": "DroneFINE: Domain-Aware Parameter-Efficient Fine-Tuning of Vision-Language Detectors for Drone Images",
+      "abstract": "Object detection for Unmanned Aerial Vehicles (UAVs) working in open and dynamic environments is a highly challenging task. While Vision-Language Models (VLMs) have offered a powerful solution for universal object detection, adapting them to UAV scenarios remains non-trivial due to a substantial domain gap between VLM pre-training data and aerial imagery. The prevailing Parameter-Efficient Fine-Tuning (PEFT) methods prove ineffective in bridging this gap, as VLMs' \"natural-scene, foreground-dominant\" visual priors misalign with the \"bird's-eye-view, background-dominant, small-object\" characteristics of UAV data. To address this issue, we propose DroneFINE, a novel PEFT paradigm comprising two domain-aware complementary modules tailored for VLM-based drone image detectors. Specifically, a data-dependent, foreground-aware, and multi-path adaptation mechanism named HyperAdapter is designed, which overcomes the static structural constraints of PEFT. In addition, a background suppression algorithm named SemanticGate is developed. It is a text-conditioned guidance strategy that employs background vocabulary to actively guide the model in suppressing responses from irrelevant regions. Extensive experiments on VisDrone and UAVDT demonstrate that DroneFINE significantly outperforms existing PEFT methods and achieves performance comparable to full fine-tuning while substantially reducing the number of trainable parameters.",
+      "authors": [
+        "Ke Wu",
+        "Yanan Zhang",
+        "Yingjie Gao",
+        "Wenhao Li",
+        "Chenyu Zhou",
+        "XinZhu Ma",
+        "Jiaxin Chen",
+        "Di Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-01T02:27:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.00338v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "parameter-efficient fine-tuning for VLMs in drone domain, addressing efficiency optimization",
+      "llm_evidence_cn": "面向无人机领域的视觉语言模型参数高效微调，关注效率优化",
+      "llm_evidence": "面向无人机领域的视觉语言模型参数高效微调，关注效率优化",
+      "canonical_evidence": "面向无人机领域的视觉语言模型参数高效微调，关注效率优化",
+      "llm_tldr_en": "DroneFINE introduces a domain-aware PEFT method for VLMs to bridge the domain gap between natural images and aerial views, improving detection in UAV scenarios through two complementary modules.",
+      "llm_tldr_cn": "本文针对视觉语言模型（VLM）在无人机场景下因域差异导致微调效果差的问题，提出了DroneFINE，一种领域感知的参数高效微调方法。该方法包含互补的领域对齐和特征增强模块，在不引入大量参数的前提下显著提升VLM在航空影像上的目标检测性能。实验表明，DroneFINE在多个无人机检测数据集上达到最优，验证了域感知微调对VLM高效适应新场景的有效性。",
+      "llm_tldr": "本文针对视觉语言模型（VLM）在无人机场景下因域差异导致微调效果差的问题，提出了DroneFINE，一种领域感知的参数高效微调方法。该方法包含互补的领域对齐和特征增强模块，在不引入大量参数的前提下显著提升VLM在航空影像上的目标检测性能。实验表明，DroneFINE在多个无人机检测数据集上达到最优，验证了域感知微调对VLM高效适应新场景的有效性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.01079v1",
+      "source": "arxiv",
+      "title": "Where Am I? Semantic Map Grounding via Vision-Language Models for Multi-Modal Localization",
+      "abstract": "We address robot localization in GPS-denied indoor environments by reframing it as a semantic reasoning task rather than a geometric estimation problem. Motivated by how humans localize using object-level cues and labeled maps, we ask whether a vision-language model, given a front camera image, a polar LiDAR scan, and a top-down semantic grid map, can infer the robot pose. We fine-tune Qwen2.5-VL-7B with LoRA and attach a lightweight regression head that predicts continuous pose coordinates (x, y, theta) directly from the final hidden state, bypassing text generation. Training uses a composite position-and-direction loss with curriculum learning on a custom Gazebo dataset of 120,112 samples and 527 scenes. On the in-distribution test set of 18,017 samples, the model achieves 98.23 percent position accuracy, 98.00 percent direction accuracy, 96.75 percent full pose accuracy, a mean position error of 0.11 m, and a mean orientation error of 5.7 degrees at 0.62 s per sample. Position accuracy drops by only 7.2 percentage points on seven unseen object categories, reaching 90.99 percent, supporting semantic spatial reasoning rather than appearance memorization. With incomplete maps, fine-tuning recovers performance to 93.72 percent position accuracy, showing adaptability to stale or partial map information. Two ablations highlight cross-modal complementarity. Without LiDAR, using only camera and map inputs, position accuracy remains 95.06 percent, only 3.2 percentage points below the full system. However, when the camera sees no visible objects in a wall-facing view, LiDAR sustains 92.33 percent position accuracy, compared with 70.74 percent when neither LiDAR nor visible objects are available. This shows that LiDAR becomes the primary localization signal when camera semantics are unavailable and provides a reliable fallback under occlusion or sparse layouts.",
+      "authors": [
+        "Suraj Borate",
+        "Aarav Shah",
+        "Madhu Vadali"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-01T15:37:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.01079v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "uses VLM for robot localization, a form of VLA model for robotics",
+      "llm_evidence_cn": "使用视觉语言模型进行机器人定位，属于VLA模型在机器人领域的应用",
+      "llm_evidence": "使用视觉语言模型进行机器人定位，属于VLA模型在机器人领域的应用",
+      "canonical_evidence": "使用视觉语言模型进行机器人定位，属于VLA模型在机器人领域的应用",
+      "llm_tldr_en": "Fine-tunes Qwen2.5-VL-7B with LoRA for semantic robot localization, bypassing text generation for efficiency.",
+      "llm_tldr_cn": "本文将机器人定位重构为语义推理任务，基于Qwen2.5-VL-7B进行LoRA微调，附加轻量回归头直接预测连续位姿，避免文本生成开销。在仿真数据集上验证了方法的有效性，为VLA模型在机器人定位中的应用提供了高效范例。",
+      "llm_tldr": "本文将机器人定位重构为语义推理任务，基于Qwen2.5-VL-7B进行LoRA微调，附加轻量回归头直接预测连续位姿，避免文本生成开销。在仿真数据集上验证了方法的有效性，为VLA模型在机器人定位中的应用提供了高效范例。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.00736v2",
+      "source": "arxiv",
+      "title": "Towards Robust Driving Perception: A Flexible Scale-Driven Family for Self-Supervised Monocular Depth Estimation",
+      "abstract": "Self-Supervised Monocular Depth Estimation (MDE) has garnered attention in recent years due to its independence from ground truth. However, most existing models are limited to a single scale and exhibit considerable performance degradation in complex driving environments. Networks specifically designed to handle dynamic traffic participants tend to be overly complex, hindering their deployment on resource-constrained automotive edge devices. To address these limitations and move towards robust driving perception, we propose FlexDepth, a scale-driven and flexible family of self-supervised MDE models tailored for challenging road scenarios. FlexDepth employs a two-stage static-dynamic decoupled training strategy, enabling the independent assessment of confidence for both static backgrounds and dynamic road objects. Furthermore, it introduces a meticulously designed Scale-Driven Decoder (SDD) to dynamically select components based on scale size, facilitating efficient feature fusion and the output of high-precision depth maps. Extensive experiments on standard driving benchmarks demonstrate that without any auxiliary information, our model achieves state-of-the-art performance across arbitrary scales with minimal computational overhead. Our smallest model, Flex-Nano, requires only 0.7 GFLOPs and achieves 37.6 FPS on mobile platforms, ensuring reliable real-time perception while maintaining excellent zero-shot generalization. Our source code is avalible: https://github.com/startnew/flexdepth",
+      "authors": [
+        "Zhaowen Zhu",
+        "Li Zhang",
+        "Yujie Chen",
+        "Tian Zhang",
+        "Yingjie Wang",
+        "Mingxia Zhan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-01T10:18:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.00736v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-supervised monocular depth estimation for robust driving perception",
+      "llm_evidence_cn": "自监督单目深度估计用于鲁棒驾驶感知",
+      "llm_evidence": "自监督单目深度估计用于鲁棒驾驶感知",
+      "canonical_evidence": "自监督单目深度估计用于鲁棒驾驶感知",
+      "llm_tldr_en": "Proposes FlexDepth, a scale-driven family of self-supervised MDE models tailored for challenging road scenarios, using a two-stage static-dynamic decoupled training strategy to improve robustness in complex driving environments.",
+      "llm_tldr_cn": "该文提出FlexDepth，一个尺度驱动的自监督单目深度估计模型族，专为挑战性道路场景设计。它采用两阶段静态-动态解耦训练策略，以克服现有模型在复杂驾驶环境中的性能退化问题，同时保持模型轻量化，适合资源受限的车载边缘设备。实验表明该方法在驾驶场景深度估计上取得显著提升。",
+      "llm_tldr": "该文提出FlexDepth，一个尺度驱动的自监督单目深度估计模型族，专为挑战性道路场景设计。它采用两阶段静态-动态解耦训练策略，以克服现有模型在复杂驾驶环境中的性能退化问题，同时保持模型轻量化，适合资源受限的车载边缘设备。实验表明该方法在驾驶场景深度估计上取得显著提升。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.00774v1",
+      "source": "arxiv",
+      "title": "Soft Mixture-of-Recursions: Going Deeper with Recursive Vision Transformers",
+      "abstract": "Recent recursive Transformer studies have primarily reused shared parameters across computation steps to construct compact, parameter-efficient models. In this work, we leverage recursion to build effectively deeper Transformers with stronger representational capacity. However, in Vision Transformers, simply increasing recursion depth does not reliably improve performance, as existing recursive approaches do not fully utilize the intermediate representations produced throughout recursive computation. We propose Soft Mixture-of-Recursions (SoftMoR) and its Vision Transformer instantiation, Soft Recursive Vision Transformer (SR-ViT). SoftMoR learns token-wise mixture weights to softly combine outputs from all recursion steps, allowing intermediate representations to be utilized in a learnable and flexible way. Across diverse vision tasks, SR-ViT consistently improves as recursion depth increases with minimal parameter overhead. On ImageNet-1K, increasing recursion depth from 1 to 4 improves SR-ViT-S top-1 accuracy from 79.83% to 82.48% with only 1.7M additional parameters, outperforming the substantially larger DeiT-B while using approximately 27% of its parameters. These results demonstrate that SoftMoR provides a parameter-efficient path to deeper and stronger Vision Transformers through recursion.",
+      "authors": [
+        "Sang In Lee",
+        "Jihun Park"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-07-01T11:00:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.00774v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "token-wise mixture weights for efficient ViT",
+      "llm_evidence_cn": "用于高效ViT的令牌级混合权重",
+      "llm_evidence": "用于高效ViT的令牌级混合权重",
+      "canonical_evidence": "用于高效ViT的令牌级混合权重",
+      "llm_tldr_en": "Proposes SoftMixture-of-Recursions (SoftMoR) for vision transformers, learning token-wise mixture weights to combine recursion step outputs, enabling deeper models efficiently.",
+      "llm_tldr_cn": "现有递归视觉Transformer未能充分利用中间表示。本文提出SoftMoR，通过可学习的令牌级混合权重软组合所有递归步的输出，使得更深的递归Transformer在参数效率下获得更强表示能力。在ImageNet等任务上验证了有效性。",
+      "llm_tldr": "现有递归视觉Transformer未能充分利用中间表示。本文提出SoftMoR，通过可学习的令牌级混合权重软组合所有递归步的输出，使得更深的递归Transformer在参数效率下获得更强表示能力。在ImageNet等任务上验证了有效性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.01798v1",
+      "source": "arxiv",
+      "title": "Approximate Attention Weighting for Sustainable FPGA-Based Vision Transformer Inference",
+      "abstract": "Vision Transformers have reshaped computer vision by using self-attention to capture global context across image regions. This makes them attractive for edge visual inspection and monitoring in applications such as renewable-energy infrastructure, industrial quality control, medical imaging, and autonomous-system sensing. However, deploying ViTs on small FPGAs remains challenging because the softmax stage in self-attention requires exponential evaluation and normalization, which are costly in hardware. Existing implementations often rely on CORDIC pipelines or BRAM-based look-up tables, increasing area and power consumption. This paper presents a BRAM-free approximate attention-weighting unit for FPGA-based ViT inference. The proposed design approximates the natural exponential in softmax using a 16-segment piecewise-linear function implemented entirely with distributed LUT fabric. Unlike base-2 approximations, the natural-exponential formulation preserves the pre-trained attention temperature and avoids model-specific recalibration. Implemented on a Xilinx Zynq-7020, the complete attention-row core uses 1444 LUTs, 77 DSPs, and no BRAM, while hardware-accurate emulation shows accuracy within a \\(0.20\\%\\) absolute top-1 difference from the exact-softmax reference on ViT-family models. These results demonstrate the potential of the proposed core for energy-efficient ViT inference on resource-constrained edge-AI platforms.",
+      "authors": [
+        "Muhammad Usman",
+        "Shujaat Khan",
+        "Dorit Merhof"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR"
+      ],
+      "published": "2026-07-02T07:15:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.01798v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "efficient ViT inference on FPGA via approximate attention",
+      "llm_evidence_cn": "基于FPGA的ViT高效推理通过近似注意力",
+      "llm_evidence": "基于FPGA的ViT高效推理通过近似注意力",
+      "canonical_evidence": "基于FPGA的ViT高效推理通过近似注意力",
+      "llm_tldr_en": "Proposes a BRAM-free approximate attention weighting unit for FPGA-based Vision Transformer inference, reducing area and power. Enables edge deployment of ViT for visual inspection.",
+      "llm_tldr_cn": "针对Vision Transformer在小型FPGA上部署时softmax计算开销大的问题，本文提出了一种无BRAM的近似注意力加权单元。该方法通过硬件友好的近似计算替代标准softmax，显著降低了面积和功耗，同时保持推理精度。实验表明该方法适用于资源受限的边缘设备，为实时视觉检测提供了高效解决方案。",
+      "llm_tldr": "针对Vision Transformer在小型FPGA上部署时softmax计算开销大的问题，本文提出了一种无BRAM的近似注意力加权单元。该方法通过硬件友好的近似计算替代标准softmax，显著降低了面积和功耗，同时保持推理精度。实验表明该方法适用于资源受限的边缘设备，为实时视觉检测提供了高效解决方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.01871v1",
+      "source": "arxiv",
+      "title": "Descriptor: LYNRED Mobility Dataset Multimodal Detection Subset (LYNRED-MDS)",
+      "abstract": "Current road safety systems primarily focus on minimizing post-collision damage. However, advances in algorithmic perception are shifting focus toward early collision prediction, especially in lowvisibility conditions like nighttime or fog, where thermal infrared sensing outperforms both human vision and RGB imaging. While available RGB-infrared datasets such as FLIR ADAS and LLVIP are good benchmarks, they mostly consist of clear weather and overly simple scenarios. In this article, we introduce the LYNRED-MDS: Multimodal Detection Subset, a subset of the LYNRED Mobility Dataset, comprised of 4000 RGB-infrared image pairs captured under diverse weather, lighting, and road conditions around Grenoble, France. Our dataset spans varied driving contexts (urban, rural, mountainous, etc.) and a vehicle fleet compliant with Western European standards. Thermal cross-dataset evaluation using a YOLOv8n baseline suggests that our dataset offers strong generalization potential for pedestrian detection in driving scenarios. By covering critical edge cases, our dataset supports the development of more reliable and deployable vision systems for advanced driver-assistance systems.",
+      "authors": [
+        "Loïc Arbez",
+        "Jessy Matias",
+        "Xavier Brenière",
+        "Jocelyn Chanussot",
+        "Ronald Phlypo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-02T08:26:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.01871v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multimodal RGB-infrared dataset for diverse traffic scenes",
+      "llm_evidence_cn": "多模态RGB-红外数据集覆盖多样交通场景",
+      "llm_evidence": "多模态RGB-红外数据集覆盖多样交通场景",
+      "canonical_evidence": "多模态RGB-红外数据集覆盖多样交通场景",
+      "llm_tldr_en": "Introduces LYNRED-MDS, a multimodal RGB-infrared dataset with 4000 image pairs captured in diverse weather and lighting conditions for advancing early collision prediction and traffic scene understanding.",
+      "llm_tldr_cn": "现有道路安全数据集多集中于晴好天气，缺乏低可见度条件下的多模态数据。本文提出LYNRED-MDS，包含4000组RGB-红外图像对，涵盖多种天气、光照和道路条件，由移动平台在法国格勒诺布尔采集。该数据集旨在推动早期碰撞预测与交通场景感知研究，提供了丰富的多模态检测标注，为复杂交通环境下的感知算法评测提供了新基准。",
+      "llm_tldr": "现有道路安全数据集多集中于晴好天气，缺乏低可见度条件下的多模态数据。本文提出LYNRED-MDS，包含4000组RGB-红外图像对，涵盖多种天气、光照和道路条件，由移动平台在法国格勒诺布尔采集。该数据集旨在推动早期碰撞预测与交通场景感知研究，提供了丰富的多模态检测标注，为复杂交通环境下的感知算法评测提供了新基准。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
