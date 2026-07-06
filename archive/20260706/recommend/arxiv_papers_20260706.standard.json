@@ -1,0 +1,320 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-06T21:57:25.864539+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 4,
+    "deep_cap": 8,
+    "deep_selected": 4,
+    "quick_candidates": 3,
+    "quick_skim_target": 13,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2606.31225v2",
+      "source": "arxiv",
+      "title": "A First Exploration of Neuromorphic OT-CFM for Multi-Speaker VSR",
+      "abstract": "Visual Speech Recognition (VSR) tasks in complex multi-speaker scenarios are severely hindered by rapid head motions, occlusions, and subtle lip articulations. Traditional RGB-based methods struggle here due to low rates and motion blur of frames. To overcome these, we propose LipsFlow, a neuromorphic-inspired VSR framework that converts RGB videos into high-temporal-resolution event streams. For multi-speaker, we employ ByteTrack tracking and TalkNet active speaker detection to temporally segment scenes into single-speaker clips, enabling focused per-speaker analysis. By explicitly capturing microsecond-level articulatory dynamics via learnable event-based representations, LipsFlow achieves inherent robustness against visual degradation. To efficiently model these dense event-based features and adapt to speaker-specific articulatory patterns, we introduce Optimal Transport Conditional Flow Matching (OT-CFM). It enforces deterministic, straight-line trajectory generation in a semantic latent space, slashing inference latency to just two Ordinary Differential Equation (ODE) steps. Furthermore, we design a Dual-Level Semantic Supervision mechanism combining token-level BERT weight tying and sentence-level priors to resolve homophene ambiguities. Validated on competitive benchmarks, LipsFlow achieves a state-of-the-art WER of 22.3\\% at 240 ms latency, establishing a highly robust and efficient paradigm for event-based VSR.",
+      "authors": [
+        "Lin Chen",
+        "Jingping Fang",
+        "Hairui Liu",
+        "Chenyang Xu",
+        "Junhao Chen",
+        "Xiaorui Li",
+        "Weidong Cai",
+        "Xiaoming Chen"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM"
+      ],
+      "published": "2026-06-30T07:05:48+00:00",
+      "link": "https://arxiv.org/pdf/2606.31225v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "neuromorphic-inspired framework converting RGB to event streams for VSR",
+      "llm_evidence_cn": "受神经形态启发将RGB转换为事件流用于视觉语音识别",
+      "llm_evidence": "受神经形态启发将RGB转换为事件流用于视觉语音识别",
+      "canonical_evidence": "受神经形态启发将RGB转换为事件流用于视觉语音识别",
+      "llm_tldr_en": "LipsFlow converts RGB videos to high-temporal-resolution event streams via learnable event representations, achieving robust visual speech recognition in multi-speaker scenarios.",
+      "llm_tldr_cn": "针对传统RGB视觉语音识别在快速头部运动、遮挡下的不足，提出LipsFlow神经形态框架。将RGB视频转换为高时间分辨率事件流，捕获微秒级唇部动态。结合ByteTrack和TalkNet进行多说话人分割，利用事件表示天然抗运动模糊和光照变化。实验在多个VSR基准上达到领先的单词错误率。",
+      "llm_tldr": "针对传统RGB视觉语音识别在快速头部运动、遮挡下的不足，提出LipsFlow神经形态框架。将RGB视频转换为高时间分辨率事件流，捕获微秒级唇部动态。结合ByteTrack和TalkNet进行多说话人分割，利用事件表示天然抗运动模糊和光照变化。实验在多个VSR基准上达到领先的单词错误率。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "neuromorphic vision sensor",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.31519v1",
+      "source": "arxiv",
+      "title": "RaBitQCache: Rotated Binary Quantization for KVCache in Long Context LLM Inference",
+      "abstract": "Long-context Large Language Model inference is severely bottlenecked by the massive Key-Value (KV) cache, yet existing sparse attention methods often suffer from static fixed-budget (Top-k) retrieval or rely on proxy scores that are computationally expensive and biased. To address these limitations, we propose RaBitQCache, a novel sparse attention framework that utilizes randomized rotated binary quantization and high-throughput binary-INT4 arithmetic to efficiently estimate attention weights. Our proxy score serves as an unbiased estimator with a proven error bound, enabling adaptive Top-p retrieval that dynamically adjusts the token budget based on actual attention sparsity. We further implement a hardware-aware system with asynchronous pipelining and lazy updates to mask overhead. Evaluations demonstrate that RaBitQCache significantly accelerates inference and reduces memory I/O while preserving generation quality compared to state-of-the-art baselines. Code is available at https://github.com/Sakuraaa0/RaBitQCache.git.",
+      "authors": [
+        "Wenhao Li",
+        "Jinhao Dong",
+        "Hailin Zhang",
+        "Wenhang Shi",
+        "Wei Lu",
+        "Xiaoyong Du"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL"
+      ],
+      "published": "2026-06-30T11:32:14+00:00",
+      "link": "https://arxiv.org/pdf/2606.31519v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression for long context LLM",
+      "llm_evidence_cn": "长上下文大语言模型中的KV缓存压缩",
+      "llm_evidence": "长上下文大语言模型中的KV缓存压缩",
+      "canonical_evidence": "长上下文大语言模型中的KV缓存压缩",
+      "llm_tldr_en": "Proposes RaBitQCache, a sparse attention framework using rotated binary quantization and binary-INT4 arithmetic to efficiently estimate attention weights and enable adaptive token budget for long-context LLM inference.",
+      "llm_tldr_cn": "长上下文大语言模型推理受限于巨大的KV缓存，现有稀疏注意力方法存在预算固定或开销大的问题。提出RaBitQCache框架，利用随机旋转二值量化和高吞吐二进制-INT4运算高效估计注意力权重，实现自适应Top-p检索动态调整令牌预算。硬件感知系统设计进一步加速，在保持精度的同时显著降低推理延迟，对高效长上下文推理具有重要价值。",
+      "llm_tldr": "长上下文大语言模型推理受限于巨大的KV缓存，现有稀疏注意力方法存在预算固定或开销大的问题。提出RaBitQCache框架，利用随机旋转二值量化和高吞吐二进制-INT4运算高效估计注意力权重，实现自适应Top-p检索动态调整令牌预算。硬件感知系统设计进一步加速，在保持精度的同时显著降低推理延迟，对高效长上下文推理具有重要价值。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29563v1",
+      "source": "arxiv",
+      "title": "Coverage-Driven KV Cache Eviction for Efficient and Improved Inference of LLM",
+      "abstract": "Large language models (LLMs) excel at complex tasks like question answering and summarization, thanks to their ability to handle long-context inputs. However, deploying LLMs is costly, not only due to the high computational demands of quadratic complexity of self-attention and auto-regressive generation, but also because of the significant memory overhead required for storing the key-value (KV) cache during inference. To reduce the memory cost, existing KV-cache eviction strategies leverage the sparsity in attention to selectively store a subset of tokens. While reducing the memory footprint, such approaches show a considerable drop in performance, especially in tasks that require long-context reasoning. We identify that the drop in performance is linked to a reduction in the coverage of unique tokens. Additionally, we theoretically show that reduced coverage limits the mutual information between inputs and outputs, thereby impairing predictive accuracy. To this end, we introduce K-VEC, a novel coverage-aware KV-cache eviction strategy that prioritizes token coverage while evicting tokens in the cache. K-VEC introduces a cross-head and a cross-layer coverage module to enhance token retention across attention heads and model layers, mitigating performance degradation caused by low coverage. Evaluated on 16 LongBench subsets, K-VEC exhibit up to 10.35 points improvement over the existing methods under the same eviction rate and memory constraint. Comprehensive evaluations validate the effectiveness of our approach and demonstrate its potential for efficient LLM deployment in resource-constrained settings.",
+      "authors": [
+        "Shuvendu Roy",
+        "Mengyao Zhai",
+        "Hossein Hajimirsadeghi",
+        "Golnoosh Samei"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T19:04:47+00:00",
+      "link": "https://arxiv.org/pdf/2606.29563v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "KV cache eviction strategy for efficient LLM inference, applicable to VLM contexts",
+      "llm_evidence_cn": "为大语言模型推理设计的KV缓存驱逐策略，可迁移至视觉语言模型",
+      "llm_evidence": "为大语言模型推理设计的KV缓存驱逐策略，可迁移至视觉语言模型",
+      "canonical_evidence": "为大语言模型推理设计的KV缓存驱逐策略，可迁移至视觉语言模型",
+      "llm_tldr_en": "Proposes coverage-driven KV cache eviction that selectively keeps tokens to preserve attention coverage, improving long-context reasoning while reducing memory.",
+      "llm_tldr_cn": "针对大语言模型长上下文推理中KV缓存占用大量内存的问题，提出覆盖驱动的驱逐策略，通过保留能维持注意力覆盖的关键token，在降低内存开销的同时甚至能提升长上下文推理性能，可扩展至视觉语言模型。",
+      "llm_tldr": "针对大语言模型长上下文推理中KV缓存占用大量内存的问题，提出覆盖驱动的驱逐策略，通过保留能维持注意力覆盖的关键token，在降低内存开销的同时甚至能提升长上下文推理性能，可扩展至视觉语言模型。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.29936v1",
+      "source": "arxiv",
+      "title": "OpenSPM: An Environment-Transferable Robotic Key Spatial Pose Memory and Closed-Loop High-Frequency Flow-Matching Action Generation Model",
+      "abstract": "Open-environment tabletop robotic manipulation requires systems to possess semantic understanding, precise geometric pose estimation, and high-frequency action generation. While end-to-end vision-language-action (VLA) models excel at semantic generalization, they often lack explicit geometric constraints for fine-grained tasks and require costly training. To bridge the gap between high-level semantics and low-level physical execution, we propose OpenSPM, an open environment spatial persistent memory framework consisting of spatial pose memory and flow-matching action generation model. OpenSPM first leverages semantically conditioned 3D perception and Kalman filtering to track continuous 6D poses. It then extracts key spatial poses from human demonstrations, keeping them as transferable, object-centric spatial persistent memory entries. During inference, OpenSPM retrieves relevant memory entries in terms of natural language instructions, transfers the spatial poses to new scenes using SE(3) transformations, and generates high-frequency action chunks via a lightweight conditional flow-matching model. Combined with real-time proprioceptive state feedback and terminal residual correction, the system effectively suppresses trajectory error accumulation. Evaluated on ten LIBERO-GOAL tasks, OpenSPM achieves an 85.6% success rate and an equivalent control frequency of 1033.3 Hz, while requiring minimal inference AI computing power. Extensive ablations illustrate that structured spatial persistent memory and closed-loop residual correction play a crucial role in reliable, high-frequency robotic manipulation.",
+      "authors": [
+        "Iok Tong Lei",
+        "Qingchen Xie",
+        "Yifan Wang",
+        "Yap Ying Jie",
+        "Zhidong Deng"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-29T08:12:58+00:00",
+      "link": "https://arxiv.org/pdf/2606.29936v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "robotic manipulation VLA with spatial pose memory",
+      "llm_evidence_cn": "具有空间位姿记忆的机器人操作VLA",
+      "llm_evidence": "具有空间位姿记忆的机器人操作VLA",
+      "canonical_evidence": "具有空间位姿记忆的机器人操作VLA",
+      "llm_tldr_en": "OpenSPM proposes spatial pose memory and flow-matching action generation for VLA models to bridge semantics and low-level execution in robotic manipulation.",
+      "llm_tldr_cn": "端到端VLA模型在机器人操作中缺乏显式几何约束。OpenSPM通过空间位姿记忆和流匹配动作生成模型，结合语义条件3D感知和卡尔曼滤波，实现了高频动作生成和语义泛化，弥合了高层语义与低层执行之间的差距。",
+      "llm_tldr": "端到端VLA模型在机器人操作中缺乏显式几何约束。OpenSPM通过空间位姿记忆和流匹配动作生成模型，结合语义条件3D感知和卡尔曼滤波，实现了高频动作生成和语义泛化，弥合了高层语义与低层执行之间的差距。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.00434v1",
+      "source": "arxiv",
+      "title": "Information-Regularized Attention for Visual-Centric Reasoning",
+      "abstract": "Vision-language models (VLMs) have become a paradigm for multimodal learning, yet remain unstable due to object hallucination, weak visual grounding, and catastrophic forgetting after full-parameter instruction tuning. We claim these failures result from a lack of explicit control over visual representation learning during the standard next-token prediction objective. As a result, visual embeddings thus become passively optimized and prone to injecting redundant or spurious signals. To counter this, we introduce Information-Regularized Attention (IRA), a stochastic attention mechanism that explicitly regulates the amount of visual information injected into the hidden states of intermediate transformer layers. This local reparameterization translates uncertainty about visual representations into local noise that is independent across data points. Beyond evaluating model performance, we also quantify embedding properties, where IRA produces smoother curvature trajectories and suppresses attention-sink across all layers, indicating a more stable transformation of the visual signal. Our results suggest that stochastic attention is not merely a regularizer but a key contributor to representation learning in a generative architecture, offering a new direction for building more reliable VLMs.",
+      "authors": [
+        "Guohao Sun",
+        "Xiaofang Wang",
+        "Yash Patel",
+        "Mengchen Liu",
+        "Zhiqiang Tao",
+        "Praveen Krishnan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-07-01T04:45:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.00434v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "stochastic attention mechanism regulates visual information for VLM efficiency",
+      "llm_evidence_cn": "随机注意力机制调控视觉信息以提升VLM效率",
+      "llm_evidence": "随机注意力机制调控视觉信息以提升VLM效率",
+      "canonical_evidence": "随机注意力机制调控视觉信息以提升VLM效率",
+      "llm_tldr_en": "IRA introduces a stochastic attention mechanism that explicitly controls visual information flow in VLMs, reducing hallucination and improving visual grounding without full fine-tuning.",
+      "llm_tldr_cn": "针对视觉语言模型（VLM）的对象幻觉和弱视觉定位问题，本文指出这些失败源于视觉表示学习缺乏显式控制。为此提出信息正则化注意力（IRA），一种随机注意力机制，在Transformer中间层显式调控注入的视觉信息量，通过局部重参数化转换不确定性。IRA在不进行全参数微调的情况下，有效减少了幻觉并增强了视觉定位能力，为VLM的稳定训练和高效推理提供了新思路。",
+      "llm_tldr": "针对视觉语言模型（VLM）的对象幻觉和弱视觉定位问题，本文指出这些失败源于视觉表示学习缺乏显式控制。为此提出信息正则化注意力（IRA），一种随机注意力机制，在Transformer中间层显式调控注入的视觉信息量，通过局部重参数化转换不确定性。IRA在不进行全参数微调的情况下，有效减少了幻觉并增强了视觉定位能力，为VLM的稳定训练和高效推理提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.00889v1",
+      "source": "arxiv",
+      "title": "DeWorldSG: Depth-Aware 3D Semantic Scene Graph Generation via World-Model Priors",
+      "abstract": "We present DeWorldSG, a novel framework that generates spatio-temporally robust 3D Semantic Scene Graphs from RGB-D sequences. Existing methods often struggle to construct reliable 3D scene graphs due to unstable 3D object representations and missing relations caused by frame-wise inference. DeWorldSG addresses these issues by estimating instance-level geometric 3D Gaussian distributions through depth-guided filtering and representing each object as a probabilistic 3D node rather than a single projected point. To mitigate relational sparsity from frame-wise inference, our framework further aggregates spatiotemporal evidence across object pairs and refines relations using contextual priors derived from a world model (V-JEPA 2). Experiments on the 3DSSG and ReplicaSSG datasets demonstrate state-of-the-art (SoTA) performance in both object and predicate prediction, while producing temporally consistent scene structures. In particular, our method improves triplet recall by 77.4% and predicate recall by 23.2% over prior SoTA approaches, making it suitable for robotic manipulation and AR applications. Our code and models are open-sourced.",
+      "authors": [
+        "Seok-Young Kim",
+        "Abdelrahman Elskhawy",
+        "Taewook Ha",
+        "Dooyoung Kim",
+        "Eunjae Shin",
+        "Benjamin Busam",
+        "Woontack Woo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-01T12:55:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.00889v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "3D semantic scene graph generation from RGB-D, relevant to autonomous driving perception",
+      "llm_evidence_cn": "从RGB-D序列生成3D语义场景图，与自动驾驶感知相关",
+      "llm_evidence": "从RGB-D序列生成3D语义场景图，与自动驾驶感知相关",
+      "canonical_evidence": "从RGB-D序列生成3D语义场景图，与自动驾驶感知相关",
+      "llm_tldr_en": "Proposes DeWorldSG, a framework generating spatio-temporally robust 3D scene graphs from RGB-D using depth-guided Gaussian distributions and world-model priors.",
+      "llm_tldr_cn": "提出DeWorldSG，通过深度引导滤波估计实例级3D高斯分布，将每个物体表示为概率节点，并利用世界模型(V-JEPA2)的先验聚合时空证据来细化关系，生成鲁棒的3D语义场景图，适用于自动驾驶环境理解。",
+      "llm_tldr": "提出DeWorldSG，通过深度引导滤波估计实例级3D高斯分布，将每个物体表示为概率节点，并利用世界模型(V-JEPA2)的先验聚合时空证据来细化关系，生成鲁棒的3D语义场景图，适用于自动驾驶环境理解。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.01633v1",
+      "source": "arxiv",
+      "title": "Bridging 3D Gaussians and Semantic Occupancy for Comprehensive Open-Vocabulary Scene Understanding from Unposed Images",
+      "abstract": "Comprehensive 3D scene understanding from sparse, unposed images requires a model to recover renderable geometry, open-vocabulary semantics, and free/occupied 3D space without relying on external camera calibration. Recent feed-forward Gaussian methods improve pose-free reconstruction and semantic rendering, but their Gaussian primitives are mainly optimized through image-space objectives and remain weakly constrained in unobserved regions. We propose \\textit{COVScene}, a pose-free semantic Gaussian framework that couples renderable Gaussian primitives with a dense semantic occupancy field through differentiable volumetric lifting. Instead of converting Gaussians to voxels only at evaluation time, COVScene lifts the predicted semantic Gaussians inside the training computation graph, so volumetric regularization provides gradients to Gaussian opacity, geometry, and semantic features. The framework combines a semantic-aware Geometry Transformer, multi-task Gaussian decoding, geometric foundation distillation, and occupancy entropy regularization to support novel view synthesis, open-vocabulary semantic querying, and semantic occupancy prediction within a single representation. Experiments on ScanNet and ScanNet++ show that COVScene maintains competitive rendering quality, improves open-vocabulary segmentation, and achieves stronger semantic occupancy prediction than the self-supervised baseline without direct voxel-level supervision.",
+      "authors": [
+        "Hu Zhu",
+        "Bohan Li",
+        "Xianda Guo",
+        "Yanlun Peng",
+        "Zheng Zhu",
+        "Xin Jin",
+        "Wenjun Zeng",
+        "Chang Wen Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-02T03:00:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.01633v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "open-vocabulary 3D scene understanding that can be applied to traffic environments",
+      "llm_evidence_cn": "可应用于交通环境的开放词汇3D场景理解",
+      "llm_evidence": "可应用于交通环境的开放词汇3D场景理解",
+      "canonical_evidence": "可应用于交通环境的开放词汇3D场景理解",
+      "llm_tldr_en": "Proposes COVScene, a pose-free semantic Gaussian framework that couples Gaussians with occupancy for open-vocabulary 3D scene understanding from unposed images.",
+      "llm_tldr_cn": "提出COVScene，无位姿语义高斯框架，将可渲染高斯原语与密集语义占用通过可微分体积提升耦合，实现从未位姿图像中恢复几何、开放词汇语义和自由/占用空间，适用于复杂场景如交通。",
+      "llm_tldr": "提出COVScene，无位姿语义高斯框架，将可渲染高斯原语与密集语义占用通过可微分体积提升耦合，实现从未位姿图像中恢复几何、开放词汇语义和自由/占用空间，适用于复杂场景如交通。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
