@@ -1,0 +1,145 @@
+Title: Photonic Extreme Learning Machines using Event-Based detection
+
+URL Source: https://arxiv.org/pdf/2607.03975v1
+
+Published Time: Tue, 07 Jul 2026 02:34:09 GMT
+
+Number of Pages: 4
+
+Markdown Content:
+> Letter 1
+
+# Photonic Extreme Learning Machines using Event-Based detection 
+
+## VICENTE ROCHA 1,2,* , T OMÁS LOPES 1,2 , J OANA TEIXEIRA 1,2 , T IAGO FERREIRA 1, C ATARINA MONTEIRO 1,
+
+AND NUNO SILVA 1,2 
+
+> 1INESC TEC, Centre of Applied Photonics, Rua do Campo Alegre 687, 4169-007 Porto, Portugal
+> 2Faculdade de Ciências da Universidade do Porto, Departmento de Física e Astronomia, Rua do Campo Alegre 687, 4169-007 Porto, Portugal
+> *vicente.v.rocha@inesctec.pt Compiled July 7, 2026
+
+Photonic extreme learning machines use random optical propagation, detection nonlinearity, and a trained linear readout for energy-efficient and scalable optical comput-ing. However, conventional intensity readout with CCD or CMOS cameras constrain the dimensionality of the hidden representation space. Here, we experimentally replace intensity detection with event-based camera, whose thresholded log-intensity response provides al-ternative pixel-wise hidden representations: first-event time, binary activation, and event count. In nonlinear two spiral classification task we obtain accuracies of 
+
+93 ± 3% with strong intrinsic generalization, and compa-rable ridge and pseudo-inverse performance indicating sample-limited effective dimensionality. Regression results reveal sensitivity to systematic optical-intensity drift, identifying stability requirements for future event-based PELMs. These results establish event-based de-tection as a route toward richer photonic hidden repre-sentations while clarifying current limitations. 
+
+http://dx.doi.org/10.1364/ao.XX.XXXXXX 
+
+1. INTRODUCTION 
+
+Photonic Extreme Learning Machines (PELM) have recently emerged as energy-efficient neuromorphic processors bypassing training of the hidden layer, enabling scalable optical learning architectures [ 1]. Their versatility has led to multiple implemen-tations including integrated circuits [ 2, 3], optical fibers [ 4], and free-space propagation [ 1]. However, their performance can be limited by the dimensionality of the hidden space, which is constrained by the available optical nonlinearities and detector response functions [ 5]. Recent works on PELMs for Natural Language Models [ 6], camera saturation responses [ 1 , 5], and detection with perovskite-solar-cells [ 7] motivate the search for alternative readouts for higher-performance machines. At the foundational level, PELMs build on the Extreme Learn-ing Machine (ELM) framework [ 8, 9], consisting of a random hid-den layer with non-polynomial activation functions, followed by a trained linear output layer which is capable of universal function approximation and features intrinsic generalization ca-pabilities [ 10 ]. A direct mapping between the optical systems and ELM framework was established in [ 1 , 5]. In PELMs, speckle generation provides the random linear weights and bias, while the interferometric process and saturated camera response de-fine a nonlinear activation function [ 1, 5]. However, due to the properties of the activation function related to the square-law detection, the intrinsic generalization capabilities of PELMs with a saturated detector are hardly observed if the input space is of low dimensionality, in particular due to the use of additional regularizations filtering the dimensions carrying noise [5]. Motivated by this context and the recent emergence of event-based camera detectors for optical sensing applications [ 11 –15 ], this work explores the use of this type of detector to generate distinct pixel-wise nonlinear activation functions based on the native thresholded log-intensity variation of such detectors. In particular, in section 3 we evaluate the resulting Event-based PELMs (EV-PELM) on classification and regression tasks using ridge and pseudo-inverse linear readouts, and relate the results with the increase of the usable rank of the hidden-layer output matrix, estimated from regularization dependence and effective dimensionality. Generalization capability is also assessed un-der repeated noisy measurements, fueling a final discussion in Section 4 regarding the opportunities and limitations of event-based detection for photonic neuromorphic computing in ELM architectures. 
+
+2. MATHEMATICAL FORMALISM AND OPERATION PRIN-CIPLES 
+
+An ELM maps each input vector Xi to a high-dimensional hid-den representation O (Xi ), followed by a trained linear read-out β yielding a prediction y(Xi ) = β ⊙ O(Xi )[10 ]. In a pho-tonic ELM, the information is typically encoded in the ampli-tude/phase profile of the input optical beam (e.g. an image), be-fore undergoing a random projection implemented optically by propagation through a complex medium, followed by a square-law detection that provides the effective nonlinear activation.   
+
+> arXiv:2607.03975v1 [physics.optics] 4 Jul 2026 Letter 2
+> Fig. 1.
+
+Event-based photonic extreme learning machine. Input features are encoded on a digital micromirror device and propagated through a multimode fiber, whose random transmission implements the fixed hidden-layer projection. The resulting speckle field is detected by an event-based camera. Each pixel is then mapped into one of three hidden representations: time of first event, binary activation, or total event count. The final layer is a digital linear readout obtained analytically. For Ntrain samples and Np detector pixels, the hidden-layer out-put matrix is ¯H =
+
+
+
+O1(X1) · · · ONp (X1)
+
+... . . . ...
+
+O1(Xtrain ) · · · ONp (Xtrain )
+
+ , (1) 
+
+Under the theory of the ELMs if one can write O(Xi ) =
+
+G( ¯W X i + b) it can be shown that if the weights ¯W are extracted from a random distribution, and G is a non-polynomial nonlin-ear activation function, ¯H will be full-rank and the ELM will feature universal approximation capabilities [8, 10]. To obtain the output weights of the linear readout layer β,multiple methods can be used depending on the task and regu-larization [ 16 ]. A robust method is the ridge regression, that for a training ¯H and associated target matrix ¯T, gives a solution for the readout layer as 
+
+βλ =
+
+
+
+HT H + λI
+
+−1
+
+HT T, (2) 
+
+where λ controls the regularization strength, with λ = 0 the Moore-Penrose pseudo-inverse solution. The role of λ can be understood from the singular values σi of ¯H. Indeed, the effec-tive dimensionality for a ridge regression is a common metric for the flexibility of the model and is defined as [16] 
+
+deff =  
+
+> min (Ntrain ,Np)
+
+# ∑
+
+> i=1
+
+σ2
+
+> i
+
+σ2 
+
+> i
+
++ λ . (3) 
+
+Thus, ridge regression suppresses directions with σ2 
+
+> i
+
+≲ λ and preserves larger components. In the context of PELMs, this sup-pression can mitigate the experimental noise [ 5] but effectively it reduces the dimensionality of the hidden representation space. Scanning λ therefore probes directly the usable dimensionality of the hidden representation. Event-based PELMs, as represented in Figure 1, replace con-ventional intensity readout with asynchronous event detection, providing a nonlinear and sparse optical-to-digital mapping with potentially lower energy consumption [ 11 ]. Event detection with dynamic vision sensors (DVS) records binary events and their timestamps whenever the log intensity at a pixel changes by a threshold value. Combining the PELM model (see [ 5] for details) with the DVS response [ 11 ], the pixel-wise log-intensity can be written as 
+
+L (X) = log 
+
+
+
+| ¯w · E(in ) (X) + b|2 + B
+
+
+
+, (4) 
+
+where E(in ) (X) is the input state whose transverse mode is amplitude-modulated with the digital micromirror device (DMD) to encode the feature X (see Figure 1), ¯w and b are the random linear weights and bias provided by the transmission on the complex medium and unmodulated part of the beam, and the logarithmic intensity response defines the scale for the detection-induced activation function with B denoting the back-ground signal, ensuring the equation remains defined in the absence of the beam. An event is registered at pixel rk = ( xk, yk )
+
+when 
+
+∆L (rk, tk ) = |L (rk, tk ) − L (rk, tk−1) | > C, (5) 
+
+with C being a tunable event threshold and tk−1 the previous event time. The event can also have a polarity p = ±1 de-pending if it corresponds to an increase or decrease in the pixel intensity. During each acquisition, the detector returns a set of events E = {ek }Nk=1, containing pixel addresses, timestamps, and polarities. This event stream may be converted into the ELM hidden state through a pixel-wise mapping as 
+
+O(X) = ϕ (E ) , (6) 
+
+where ϕ defines the detector-induced activation. We test three pixel-wise mappings ϕ: A. the time of the first event at each pixel, B. a binary activation indicating whether a pixel fired, and C. the total number of events recorded by each pixel. These thresh-olded responses can enrich the hidden space beyond polynomial square-law activation, but may also inherit DVS nonidealities such as missed events at high rates, charge accumulation, and noise-triggered events [ 17 ]. Therefore, a careful evaluation of EV-PELMs in terms of noise robustness, representation dimen-sionality, and generalization, in specific for cases of low dimen-sionality of the input feature space, is highly relevant for optical computing and in specific PELMs. Letter 3 
+
+> Fig. 2.
+
+Spiral classification using the three event-based hidden representations. Top row: decision maps obtained from a trained lin-ear readout with test sample overlaid. Shapes indicate the subset - Squares/dots/triangles correspond to training/validation/tests points, respectively - whereas edges correspond to correct (green) or incorrect (red) prediction. Bottom row: train and validation accuracy as a function of the ridge parameter λ, as detailed in the main text. 
+
+3. EXPERIMENTAL RESULTS AND MODEL VALIDATION 
+
+To evaluate the EV-PELM against typical intensity-based PELMs, we focused on nonlinear low-dimensional tasks where PELMs are known to struggle [ 5]. For this we will evaluate the EV-PELM on two standard yet highly challenging benchmark tasks for this type of hardware: classification of two spiral distributions and regression of a target sinc function. For the classification another two distributions were tested and are presented in the supplementary material Section 1.A. The acquisition protocol used to induce reproducible feature-dependent events is shown in Figure 1. The event-based camera records continuously, requiring synchronization between the DMD, background LED, and the camera. Input features X are encoded on the optical beam with the DMD using Jarvis-Judice-Ninke dithering to approximate continuous amplitudes with binary micromirror states [ 18 ]. The DMD updates every 10 ms ,cycles through previous input, reference mask, and target input at t1, t2 = t1 + 10 ms , and t3 = t1 + 20 ms , respectively. Delayed LED switching at t2 + 8 ms erases previous event history and sets the reference state. Feature-dependent events are integrated over [t3 − 0.1 ms, t3 + 1.6 ms ]. Each dataset is acquired by iter-ating this protocol over the set of input features, while the full dataset is composed of 30 repetitions of all feature measurements resulting in 30 distinct samplings of noise under the same input features. Starting our analysis with the spiral classification task, Fig-ure 2 shows good prediction accuracy and efficient learning of the true spiral distribution on the background decision maps for the three pixel-wise features. Furthermore, the accuracy curves show the best performance for weak or negligible additional regularization in the ridge model. The regression task reveals the main limitation of the config-uration. As shown in Figure 3, predictions for the train dataset accurately follow the target sinc function, including points not used for fitting (validation and test points). However, on inde-pendent test repetitions (e.g. distinct single run), the prediction trend remains visible but the error increases, indicating repre-sentation drift rather than simple additive noise. This drift may be related with intensity fluctuations, and the associated DVS re-sponse to optical-intensity fluctuations. For example a change in laser intensity shifts the time required for each pixel to reach the event threshold, modifying the first-trigger map. Besides, it can also turn pixels on or off and change the total number of events. Thus, slow intensity variations can systematically alter the hid-den representation between repetitions. In line with the curves for classification, the MAE obtained shows best generalization performance for small additional regularization. Quantitatively, the 5-fold cross-validation on independent test points of test repetitions gives the performance summarized in Table S1 and Table S2 for classification and sinc regression, respectively (supplementary material). For spiral classification, the pseudo-inverse achieves mean accuracy of 83%, 89%, and 93% for first-trigger time, binary activation, and event count, re-spectively. For sinc regression, the corresponding MAEs are 0.13, 0.10, and 0.11. The classification results correspond to higher performances than previously obtained for saturation activa-tion functions, but regression errors may perform worse in this framework [ 5]. Finally, we also note that the comparable perfor-mance between ridge and the pseudo-inverse solution indicates the rank of H reaches the sample limit. Effectively, we can make 
+
+λ = 0, from which equation 3 gives de f f = min (Nf , Np) for nonzero singular values. Since Np ≫ Nf , the hidden repre-sentation is limited by the number of input samples, yielding 
+
+de f f = Nf = 64. 
+
+4. DISCUSSION AND CONCLUDING REMARKS 
+
+Event-based cameras provides an alternative optical-to-digital nonlinear response based on intensity variations rather than absolute intensity. In the context of PELMs, this response in-creases the dimensionality of the hidden representation while preserving the simplicity of a trained linear output layer. How-ever, as observed this information readout not only presents opportunities but also some challenges. Overall, and compared with the camera saturation-based PELM in [ 5] in low-dimensional feature spaces, the DVS readout achieves higher classification accuracy and stronger generaliza-tion in spiral task. This is consistent with the higher nonlinearity of the detector response compared with the saturable response of a standard camera, allowing a higher effective dimensionality of the intermediate space. Indeed, the comparable performance Letter 4
+
+Fig. 3. Sinc regression using the three event-based hidden representations. Top and middle row shows predictions within the train and test datasets for the train (blue), validation (orange), and test (green) points. The dashed black curve corresponds to the target sinc function. Bottom row shows train and validation mean absolute error curves as function of the ridge parameter λ.of ridge and pseudo-inverse readouts in both tasks indicates that the hidden representation reaches the sample-limited rank, which was a problem previously identified in saturation-based PELMs. This is due in part to the highly nonlinear readout intro-duced by the system, but also to the robustness provided by the event-generation threshold against small intensity fluctuations. However, further tests on the regression task also revealed a drift in the representation due to systematic fluctuations that modify event timing, binary activations, and event counts. While this effect is not very pronounced for classification it limits the system for regression tasks. Thus heading towards more gen-eral implementations, stabilizing the optical power, or adding calibration frames shall be considered to improve stability. Nev-ertheless, the results enclosed clearly present and map the ca-pabilities of event-based PELMs over previously explored con-figurations, thus paving the way for future applications of such hardware solutions for fast and energy-efficient computational tasks. 
+
+5. BACK MATTER 
+
+Acknowledgment. This work is financed by National Funds through the FCT - Fundação para a Ciência e a Tecnologia, I.P. (Portuguese Foundation for Science and Technology) within the project QuAC, with reference 2024.16086.PEX (https://doi.org/10.54499/2024.16086.PEX). V.R, T.L, and J.T. are supported by Fundação para a Ciência e Tecnologia through Grants No. 2025.07060.BD, 2024.01830.BD, and 2024.00426.BD, respectively. 
+
+Disclosures. The authors declare no conflicts of interest. 
+
+Data availability. Data underlying the results presented in this paper are not publicly available at this time but may be obtained from the authors upon reasonable request. 
+
+Supplemental document. See Supplement 1 for supporting content. 
+
+REFERENCES 
+
+1. D. Pierangeli, G. Marcucci, and C. Conti, Photonics Res. 9, 1446 (2021). 2. S. Biasi, R. Franchi, L. Cerini, and L. Pavesi, APL photonics 8 (2023). 3. J. R. Rausell-Campo, A. Hurtado, D. Pérez-López, and J. Cap-many Francoy, Laser & Photonics Rev. 19 , 2400870 (2025). 4. B. Redding, J. B. Murray, J. D. Hart, et al. , Commun. Phys. 7, 75 (2024). 5. V. V. Rocha, D. Silva, F. C. Moreira, et al. , New J. Phys. (2025). 6. C. M. Valensise, I. Grecco, D. Pierangeli, and C. Conti, Photonics Res. 
+
+10 , 2846 (2022). 7. K. Zhang, J. Harwell, D. Pierangeli, et al. , Photonics Res. 13 , 382 (2025). 8. G.-B. Huang, Q.-Y. Zhu, and C.-K. Siew, “Extreme learning machine: a new learning scheme of feedforward neural networks,” in 2004 IEEE international joint conference on neural networks (IEEE Cat. No. 04CH37541), , vol. 2 (Ieee, 2004), pp. 985–990. 9. M.-B. Li, G.-B. Huang, P. Saratchandran, and N. Sundararajan, Neuro-computing 68 , 306 (2005). 10. G.-B. Huang, Q.-Y. Zhu, and C.-K. Siew, Neurocomputing 70 , 489 (2006). 11. G. Gallego, T. Delbrück, G. Orchard, et al. , IEEE transactions on pattern analysis machine intelligence 44 , 154 (2020). 12. R. Guo, Q. Yang, A. S. Chang, et al. , Light. Sci. & Appl. 13 , 144 (2024). 13. Z. Ni, C. Pacoret, R. Benosman, et al. , J. microscopy 245 , 236 (2012). 14. C. E. Willert and J. Klinner, Exp. Fluids 63 , 101 (2022). 15. C. Su, Y. Chen, Z. Lin, et al. , Photonics Res. 13 , 2843 (2025). 16. T. Hastie, R. Tibshirani, J. Friedman et al. , “The elements of statistical learning,” (2009). 17. B. McReynolds, R. Graca, and T. Delbruck, Opt. Eng. 61 , 074103 (2022). 18. J. F. Jarvis, C. N. Judice, and W. H. Ninke, Comput. graphics image processing 5, 13 (1976).

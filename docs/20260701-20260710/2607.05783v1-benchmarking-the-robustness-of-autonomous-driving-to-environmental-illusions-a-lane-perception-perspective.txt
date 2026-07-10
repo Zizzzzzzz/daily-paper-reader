@@ -1,0 +1,1006 @@
+Title: Benchmarking the Robustness of Autonomous Driving to Environmental Illusions: A Lane Perception Perspective
+
+URL Source: https://arxiv.org/pdf/2607.05783v1
+
+Published Time: Wed, 08 Jul 2026 00:25:11 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 1
+
+# Benchmarking the Robustness of Autonomous Driving to Environmental Illusions: A Lane Perception Perspective 
+
+Tianyuan Zhang , Xianglong Liu B , Aishan Liu , Lu Wang , Yitong Zhang , Peng Yue ,Mingchuan Zhang, Siyuan Liang , Dacheng Tao , Fellow, IEEE 
+
+Abstract —Environmental illusions ( e.g., shadows, reflections, and tire marks) are naturally existing yet overlooked phenomena in real-world driving environments. They can disturb visual perception, leading to misinterpretation of the scene and posing serious safety risks to autonomous driving (AD) systems. However, existing researches largely overlook these phenomena, leaving a critical gap. To address this issue, we study AD robustness through the lane perception perspective, a fundamental task supporting core functions like cruise control and lane centering. We focus on two representative models: conventional lane detection (LD) and vision-language model-based systems (ADVLMs). In this work, we introduce the first benchmark, LanEvil++ , for evaluating the robustness of lane perception under environmental illusions. LanEvil++ encompasses 14 types of illusions and leverages the CARLA simulator to generate 94 high-fidelity, fully controllable 3D scenes, yielding a dataset of 90,292 annotated images, 1,596 video clips, and 41,855 visual question answering pairs. Extensive evaluations demonstrate that environmental illusions substantially degrade the performance of state-of-the-art LD methods. On average, LD models experience a 5.27% drop in Accuracy and a 10.49% decline in F1-score, while ADVLMs show a 2.03% reduction in GPT-score and a 0.75% drop in Language-score. Among all illusions, shadows emerge as the most disruptive factor, reducing accuracy by up to 7.20%. Furthermore, closed-loop simulations using OpenPilot and LMDrive reveal that these illusions can lead to incorrect driving decisions, underscoring their real-world implications. Complementary real-world case studies highlight safety-critical failures in actual traffic scenes. To enhance robustness, we propose the Multimodal Illusion Defense Approach (MIDA), which uses hard examples to improve illusion resistance. MIDA achieves substantial gains under challenging conditions, boosting robustness by 4.23% on LD models and 3.82% on ADVLMs. We hope this work brings greater attention to the threats posed by environmental illusions and motivates the development of more robust AD systems. Part of our dataset and demos can be found at the https://tianyuan2001.github.io/lanevilpp.github.io/. 
+
+Index Terms —Autonomous driving, environmental illusion, robustness benchmark. 
+
+✦
+
+1 INTRODUCTION 
+
+# ENVIRONMENTAL illusions are naturally existing yet over-looked phenomena that can mislead autonomous driving (AD) systems. In real-world traffic scenarios, environmental illusions such as shadows and reflections, as shown in Fig. 1, frequently appear but remain insufficiently addressed. Un-like adverse weather, motion blur, or synthetic noise that primarily degrade global visual quality, environmental illu-sions introduce natural yet structurally misleading patterns that resemble lane boundaries or road markings. These natural corruptions pose serious risks to the safety of AD systems by increasing their vulnerability and potentially endangering human lives and property [1]. Nevertheless, the impact of environmental illusions on AD models re-
+
+T. Zhang, X. Liu ( Bcorresponding author), A. Liu, L. Wang and Y. Zhang are with SKLCCSE, the School of Computer Science and Engineering, Beihang University, Beijing 100191, China. P. Yue is with the School of Cyber Science and Technology, Sun Yat-sen University, Shenzhen 518107, China. M. Zhang is with Henan University of Science and Technology, Luoyang 471023, China. S. Liang is with the School of Computing, National University of Singapore, Singapore 117417. D. Tao is with the College of Computing & Data Science, Nanyang Techno-logical University, Singapore 639798. (a) (b) 
+
+(c) (d) 
+
+Fig. 1: Illustration of naturally existing yet overlooked en-vironmental illusions ( e.g., shadows). Misinterpreting these visually deceptive but physically patterns can lead to incor-rect perception, posing potential safety risks for AD systems. mains largely unexplored. Given the safety-critical nature of AD, thoroughly evaluating its robustness to such illusions is essential before real-world deployment. arXiv:2607.05783v1 [cs.CV] 7 Jul 2026 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 2
+
+Lane perception is a fundamental task in AD, responsible for identifying lane lines and road edges [2]–[4], and forms the basis for key functions such as lane centering and adap-tive cruise control [5]. It is typically approached through two representative methods: conventional lane detection (LD) and vision-language model-based AD systems (ADVLMs). LD relies on pixel-level supervision to produce accurate geometric predictions, while ADVLM combines visual input with language guidance to enable reasoning and multi-modal understanding. Although lane perception models have shown strong performance on standard traffic datasets (e.g., CULane [6], DriveLM-nuScenes [7]), their robustness to environmental illusions remains largely unexplored. To address this, we investigate the robustness of AD models to environmental illusions from the perspective of lane perception. Unlike common corruption datasets [8], [9] ( e.g., snow), which introduce uniform noise across the entire input, environmental illusions involve localized, case-specific alterations that appear natural, making them more difficult to identify and address. Although environmental illusions naturally occur in real-world scenarios, collecting large-scale data with diverse types of these illusions remains challenging. Simulation testing, known for its cost-efficiency and reproducibility, has become a widely used alternative to real-world experiments, particularly in AD research [10]– [12]. Therefore, we employ a simulation testing pipeline [13]–[15] to generate synthetic images [16]–[18]. Particularly, we first design 3D environments in the CARLA simulator [19], then apply perturbations to target objects ( e.g., roads) with environmental illusions, and finally render the cor-rupted images. Based on the pipeline, we rigorously analyze the influ-ence factors in lane perception including Dynamic Objects ,
+
+Static Facilities , and Environmental Conditions , and systemat-ically design 14 types with 5 severity levels that collectively address a wide spectrum of environmental illusions on the road and propose the LanEvil++ robustness evaluation benchmark. Overall, our LanEvil++ benchmark consists of two parts. For conventional LD models, LanEvil++ includes 94 editable 3D environments and a dataset of 90,292 sam-pled images, comprising 40,000 clean training images and 50,292 test images. For ADVLMs, LanEvil++ defines 6 dis-tinct task categories tailored to lane perception scenarios, including 1,596 clips and 41,855 QA pairs. Leveraging LanEvil++ , we conducted extensive experi-ments to benchmark the robustness of lane perception mod-els. For conventional LD models, we observed significant performance degradation, with an average drop of 5.27% in Accuracy and 10.49% in F1-score. Among all illusion types, 
+
+shadow had the most severe impact, reducing Accuracy by 7.20%. For ADVLMs, we similarly observed notable degra-dation, with GPT Score decreasing by 2.03% and Language Score by 0.75% on average. The Traffic Obstruction 
+
+illusion had the greatest effect, causing a 3.51% drop in GPT Score. To enhance model robustness against envi-ronmental illusions, we propose the Multimodal Illusion Defense Approach (MIDA), a novel noise defense baseline that leverages hard examples for lane perception models. MIDA achieves a 4.23% improvement on conventional LD models and a 3.82% improvement on ADVLMs compared to vanilla detectors under these illusions. To better demon-strate the potential of LanEvil++ , we conducted closed-loop experiments on AD systems both in the simulation world (OpenPilot [20] and LMDrive [21]), where we observed incorrect decisions resulting in vehicle accidents. Finally, we conducted case studies on real-world scenarios containing environmental illusions, which demonstrate the threats in practice. We hope this work will raise awareness regarding potential security threats [22]–[27] in AD scenarios. A preliminary version of this work [28] was accepted as a poster at ACM MM 2024. ❶ Expanded Research Scope .While the earlier work focused on environmental illusions in conventional LD models, the current study targets the broader AD system. We adopt lane perception as a rep-resentative lens to systematically analyze illusion-induced vulnerabilities in AD. ❷ Benchmark Augmentation. The original lanEvil benchmark has been significantly expanded and restructured. We added new annotations and tasks ( e.g., Scene Description and Object Recognition), enabling the evaluation of ADVLMs. ❸ Methodological Advancements. 
+
+We improve the AAM method by introducing AAM++, which enhances robustness by incorporating both high/low attention regions from hard examples. Additionally, we pro-pose PAT++, a specialized prompt-tuning scheme adapted for ADVLMs, improving their resilience to environmental illusions in multimodal settings. ❹ Comprehensive Exper-iments. We evaluated not only conventional LD models on 
+
+LanEvil++ , but also several state-of-the-art ADVLMs ( e.g., LMDrive, Dolphins), demonstrating that environmental il-lusions pose significant challenges to both types of models. Our contributions are as follows:  
+
+> •
+
+To our knowledge, this is the first study to investigate the impact of environmental illusions on the robust-ness of AD from the lane perception perspective.  
+
+> •
+
+We developed the LanEvil++ benchmark, comprising 14 typical environmental illusions, 90,292 images, 94 editable 3D cases, and 1,596 clips with 41,855 QA pairs, supporting user customization.  
+
+> •
+
+Extensive experiments show that environmental illu-sions significantly degrade performance in both con-ventional LD models and ADVLMs. Shadow caused the largest drop in LD Accuracy (-7.20%), while 
+
+Traffic Obstruction led to the greatest impact on ADVLMs, reducing GPT Score by 3.51%.  
+
+> •
+
+We propose MIDA to improve the robustness of lane perception models against environmental illusions. It includes AAM++ for conventional LD, which aug-ments hard examples with mixed attention regions, and PAT++ for ADVLMs, a prompt-tuning scheme enhancing robustness in multimodal settings.  
+
+> •
+
+Compared to our previous work [28], this study expands the scope from conventional LD to the en-tire AD, from the perspective of lane perception to highlight the threat of environmental illusions. 
+
+2 RELATED WORK 
+
+2.1 Lane Detection 
+
+LD refers to the process of identifying lane markings or road boundaries. In recent years, deep learning-based approaches have become the dominant framework for LD, leveraging JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 3
+
+their capacity to autonomously learn intricate feature repre-sentations and spatial patterns. In general, LD methods can be systematically categorized into five major paradigms: ❶
+
+segmentation-based methods [6], [29], [30], which formulate LD as a pixel-level semantic segmentation problem; ❷ keypoint-based methods [31]–[33], which detect sparse but discrim-inative keypoints along lane markings and subsequently cluster them into coherent lane structures through geometric or learned association rules; ❸ anchor-based methods [34]– [38], where LD is framed as an anchor-driven regression task, leveraging predefined reference points to efficiently localize and parameterize lane boundaries; ❹ row-wise clas-sification methods [2], [4], [39], [40], which adopt a vertical scanning strategy, sequentially predicting the most probable lane-containing regions for each image row to reconstruct complete lane markings; ❺ parameter-based methods [41]– [44], which reformulate LD as an optimization problem by directly estimating the parametric representations ( e.g., polynomial curves). In this study, we conduct a comprehensive benchmark-ing analysis to evaluate and compare the robustness of all aforementioned LD methodologies. 
+
+2.2 VLMs for Autonomous Driving 
+
+The integration of ADVLMs has attracted substantial re-search interest, primarily due to its multimodal processing prowess. This integration holds the promise of bolstering the performance of AD systems in real-world scenarios. Early AD research explored the combination of LLMs with driving tasks. For instance, DriveLikeHuman [45] em-ulated human driving learning processes using LLMs, while GPT-Driver [46] and Agent-Driver [47] utilized GPT-3.5 for motion planning. Nevertheless, these studies predomi-nantly relied on linguistic input, neglecting the integration of rich visual features. Subsequently, an increasing number of studies have been dedicated to exploring ADVLMs. Recent works, such as Reason2Drive [48], LingoQA [49], and Dolphins [50], have concentrated on the Visual Question Answering (VQA) ca-pabilities of VLMs in AD. These studies have probed into how VLMs can enhance scene comprehension, behavior pre-diction, and dialogue in driving-related tasks, highlighting the models’ reasoning and explanatory abilities crucial for informed driving decisions. In the domain of driving planning and control, several studies have made notable contributions. GPT-Driver [46], Driving with LLMs [51], and MTD-GPT [52] were among the first to apply VLMs to driving planning. However, their open-loop operation failed to account for cumulative errors and end-to-end interpretability issues. LMDrive [21] repre-sented a significant advancement by introducing a VLM-based driving method in closed-loop settings, enabling con-tinuous feedback for more accurate decision-making. Furthermore, methods like DriveLM [7], DriveMLM [53], OmniDrive [54], and DriveGPT4 [55] have integrated VQA with driving planning and control within VLM frameworks. These approaches transcend basic interactions, implement-ing more refined driving control and decision-making rea-soning by leveraging VLMs to analyze complex driving scenarios and generate sophisticated driving strategies. Despite these achievements, the safety of ADVLMs re-main significant concerns. Deep neural networks, includ-ing VLMs, encounter difficulties when handling out-of-distribution data [56]–[58]. In AD, the inability to manage rare or unexpected scenarios can pose severe safety risks. 
+
+2.3 Lane Perception Benchmarks 
+
+The advancement of lane perception technologies has been largely driven by the availability of benchmark datasets. Existing benchmarks generally fall into two categories: con-ventional LD benchmarks and those designed for ADVLMs. 
+
+Conventional LD Benchmarks Traditional LD bench-marks have enabled significant progress by offering datasets under increasingly diverse and challenging conditions. Ini-tial datasets are notably limited in scope, exemplified by the CalTech dataset [59] with its collection of 1,224 frames captured in standard urban environments under consistent weather conditions. More recent benchmarks demonstrate significantly greater sophistication. VPGNet [60] substan-tially expands the complexity with 20,000 images capturing challenging urban traffic situations, while TuSimple [61] specializes in highway scenarios with precise lane annota-tions. Additionally, contemporary datasets incorporate even more varied driving conditions: CULane [6] provides an extensive set of over 130,000 images where approximately 72.3% present difficult scenarios including congested traf-fic and intense glare; BDD-100K [62] encompasses a wide spectrum of illumination conditions and six distinct severe weather patterns; LLAMAS [63] exhibits variable lane mark-ing density that correlates with observation distance and spatial location; furthermore, CurveLane [64] specifically targets the detection of curved lane geometries. Despite their scale, the aforementioned standard datasets are not designed with robustness evaluation in mind. Ded-icated robustness benchmarks examining natural corrup-tions in LD scenarios remain scarce. Existing pioneering robustness benchmarks primarily focus on evaluating the robustness of image classification [8], [65]–[69] and object detection [8], [70]–[90] against common perturbations in-cluding blur effects, adverse weather conditions, and dig-ital artifacts. Recent work has begun exploring perception robustness for autonomous driving systems under com-mon corruptions [9], [91]–[96], though these investigations predominantly address general 3D perception tasks like detection and segmentation, with the simulated corruptions (e.g., motion blur) not being specifically tailored for LD. Furthermore, while some studies have developed special-ized lane-like adversarial attacks for autonomous driving systems [97], [98], such approaches fall outside the purview of our current investigation. In summary, while current LD datasets have made sig-nificant progress in evaluating method performance, a sys-tematic examination of scenario-specific corruptions, par-ticularly shadows and reflections, remains conspicuously absent. Our LanEvil++ addresses this critical gap by intro-ducing a comprehensive benchmark specifically designed for robustness evaluation against LD corruptions. 
+
+ADVLMs Benchmarks With the growing interest in applying ADVLMs tasks, several benchmarks have been proposed [7], [21], [50], [99]. For example, nuScenesQA [100] JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 4
+
+provides a wide array of driving scenarios, accompanied by rich sensor data and annotations, which is conducive to evaluating the perception and prediction capabilities of VLMs. BDD100K [62] focuses on heterogeneous mul-titask learning, offering a large-scale dataset for diverse driving-related tasks. The Waymo Dataset [99], renowned for its high-quality and extensive data, is advantageous for training and assessing advanced VLMs. Additionally, datasets like DriveLM [7] integrate language-based annota-tions with traditional driving datasets, facilitating language-driven perception and decision-making in AD. Regarding evaluation metrics, traditional metrics such as ROUGE [101], BLEU [102], and CIDEr [103], originally developed for NLP tasks like text summarization and ma-chine translation, are applied to assess language-driven interactions in AD. Modern GPT-based scoring methods [7], [51] harness the power of large language models to score model responses in AD tasks. Critically, the robustness of ADVLMs in LD tasks re-mains an open problem. Existing benchmarks do not as-sess model performance under long-tail or corrupted lane scenarios, nor do they evaluate failure modes specific to language-guided LD. Safety-critical edge cases, such as occluded or low-visibility lanes, are rarely emphasized. To mitigate these issues, safety-oriented benchmarks like DriveBench [104] have been proposed. DriveBench eval-uates VLM reliability across multiple settings, including different corruptions and text-only inputs. It assesses 12 VLMs on four driving tasks using various metrics, aiming to expose VLM limitations and promote reliable AD, but it does not explicitly target LD. This work aims to advance research on the robustness of LD in ADVLMs, further promoting the systematic study of LD perception robustness in real-world AD scenarios. 
+
+3 THE LanEvil++ DATASET 
+
+3.1 Problem Definition 
+
+Lane detector. A lane detection model, formalized as a parametric function fθ (I) → loc ∈ NK with learnable parameters θ, processes an input image I ∈ [0 , 255] 3 and generates K predicted lane positions loc . The learning objective is mathematically expressed as: 
+
+min  
+
+> θ
+
+E(I,loc gt )∼DL(fθ (I), loc gt ), (1) where D represents the training dataset, and L(·) denote the objective function that quantifies the discrepancy be-tween the predicted lane localization and the corresponding ground-truth annotations loc gt .
+
+ADVLMs. An ADVLM Fθ (I, t ) → res ∈ R with pa-rameters θ takes a query (I, t ) as input, where I ⊂ Iall is a sequence of visual inputs consisting of multiple frames rather than a single image, and t ∈ T is a textual input. In the context of lane detection, the response res contains structured signals such as lane presence indicators, lane topology, or even continuous lane representations L ∈ res .The training objective is formulated as: 
+
+min  
+
+> θ
+
+E(( I,t ),res gt )∼QL(Fθ (I, t ), res gt ), (2) where Fθ represents the probability function, res gt is the ground truth response, Q is the input query domain consist-ing of visual inputs I ⊂ Iall and textual inputs t ∈ T, and R
+
+is the response domain. 
+
+Environment. In practical deployment, the AD system initially captures the surrounding physical environment Φ
+
+through its onboard sensors. Subsequently, the perceived 3D scene is transformed into a 2D image representation 
+
+I = R(Φ), which serves as the input for downstream processing. Here, R(·) denotes the environmental projection function that encodes the 3D-to-2D mapping. Specifically, the environmental elements pertinent to AD scenarios can be broadly categorized into two classes: static infrastruc-ture components S = {s1, s2, ..., sn} (e.g., road surfaces, traffic barriers) and dynamic entities X = {x1, x2, ..., xm}
+
+(e.g., moving pedestrians, surrounding vehicles). Further-more, environmental conditions C including illumination and meteorological factors, constitute additional influential variables. Consequently, the comprehensive environmental representation Φ should be formally expressed as: 
+
+Φ = ( < S, X >, C). (3) The input image representation I for the AD system should be synthesized from the environment Φ, incorpo-rating defined configurations of both static and dynamic elements under specified conditions, formally expressed as: 
+
+I = R(< S, X >, C). (4) 
+
+Environmental illusions on LD models. The perfor-mance of AD systems may degrade due to inherent vari-ations in the static infrastructure, dynamic entities, and environmental conditions, which introduce distortions in the synthesized input representation I. To systematically generate environmental illusions, we deliberately manipu-late the constituent parameters of the environmental model 
+
+Φ in Equation 3, thereby obtaining a modified environment representation ˆΦ. The resulting rendered image ˆI = R( ˆΦ)
+
+exhibits localized perturbations that introduce carefully crafted environmental illusions in specific spatial regions. Consequently, the performance of LD models, denoted by fθ (ˆI)/Fθ (ˆ I, t ), may experience measurable degradation. Our methodological focus in this work centers on system-atically designing single-factor changes to generate corre-sponding environmental illusions. 
+
+3.2 Illusion Category Selection 
+
+To ensure that the selected illusion categories are grounded in real-world safety relevance, we examined national crash databases that explicitly encode environmental contributory factors, including the U.S. FARS/CRSS system [105] and the U.K. DfT Road Safety Statistics [106]. Both datasets report 
+
+shadows , dazzling reflections , and visibility obstruction as causal factors in traffic accidents, highlighting their tangible safety impact. Complementing these cause-coded sources with the occurrence frequency observed in large-scale driving datasets (CULane [6], BDD100K [62], LLAMAS [63]) and the failure ratios recorded in closed-loop lane-perception logs (OpenPilot [20]), we derive a unified danger level to rank illusion categories by their combined prevalence JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 5Vehicle Reflection 
+
+Shadow Reflection  • Sunlight Reflection 
+
+## LanEvil ++ Benchmark 
+
+> Environmental
+> Conditions
+
+Road Damage     
+
+> •Road Crack
+> •Road Repair
+> •Tire Marks
+> •Guard Rail
+> Static Facilities
+
+…
+
+> shadow
+> Tire mark
+
+Traffic Obstruction     
+
+> Dynamic Object •Pedestrian
+> •Vehicle
+> •Bicycle
+
+…   
+
+> •Streetlight Reflection •Vehicle Reflection
+> puddle
+
+• Streetlight  • Fence  • Rail  • Wire 
+
+… …
+
+Fig. 2: The framework of our LanEvil++ benchmark, which contains 14 specially-designed environmental illusion types from 4 categories, including road damage, traffic obstruction, reflection, and shadow. and risk significance. This analysis serves as the empirical foundation for the subsequent illusion design in Sec. 3.3, where these high-risk visual factors are systematically pa-rameterized and synthesized under simulation conditions. 
+
+A detailed comparison is provided in Supplementary Materials. 
+
+3.3 Environmental Illusion Design 
+
+As illustrated in Fig. 2, our proposed benchmark systemati-cally incorporates four distinct categories of environmental illusions, comprising a total of 14 specific variants. Subse-quently, we elaborate on the methodological design prin-ciples underlying each categorical implementation. Each illusion type is implemented with five controllable severity levels to emulate progressive real-world variations in visual intensity ( e.g., illumination, occlusion, and structural com-plexity). Detailed parameter definitions for these severity levels are provided in the Supplementary Materials. 
+
+❶ The road damage effects correspond to the perturba-tions introduced to the static infrastructure components S
+
+within the roadway environment. Specifically, we formulate four representative categories of environmental illusions: 
+
+Road Crack , Road Repair , Tire Marks , and Guard Rail . Notably, the Road Crack simulation incorporates a comprehensive spectrum of crack formations, spanning from localized transverse and longitudinal fractures to ex-tensive interconnected fissure networks. The repaired road segments present distinctive visual characteristics, with certain instances demonstrating linear features resembling lane markings; we formally designate this phenomenon as the Road Repair illusion. Additionally, we introduce the 
+
+Tire Marks illusion to simulate vehicular skid patterns resulting from emergency braking maneuvers or collision scenarios. Furthermore, we investigate potential misidentifi-cation scenarios where Guard Rail structures may be erro-neously identified as lane markings, thereby compromising the accurate detection of road boundary delineations. For a given static object si (e.g., road surface) within the environmental model Φ, we systematically alter its visual characteristics by physically applying the aforementioned perturbation patterns to targeted regions. This transforma-tion yields the modified object representation ˆsi = si + g(δ),where g(·) represents the perturbation transformation func-tion and δ encapsulates both the intensity parameters and spatial mask defining the perturbation. Furthermore, we introduce new static objects sj (e.g., guard rails) along road boundaries within the environmental model Φ. Con-sequently, the environmental illusions induced by Road Damage can be mathematically represented through per-turbing or adding new objects to the static infrastructure components, expressed as ˆS = {ˆs1, ..., ˆsi, si+1 , · · · , si+N }
+
+where N denotes the number of newly incorporated objects. 
+
+❷ Traffic Obstruction. This category of environmental illusions stems from the impact of dynamic entities X within roadway environments. As critical components in LD sce-narios, traffic participants demand rigorous safety consider-ations and particularly robust detection mechanisms. This study primarily examines three fundamental types of traffic participants: Pedestrian , Vehicle , and Bicycle . These dynamic elements may occlude critical lane markings and consequently degrade LD performance. Furthermore, we systematically vary participant densities to simulate diverse traffic scenarios with varying complexity levels. For each experimental scenario, we generate n distinct instances xi corresponding to the specified illusion type. Unlike the Road Damage scenario where static infrastruc-ture is modified, we initialize the dynamic object set X as ∅
+
+and subsequently introduce traffic participants at strategic spatial locations throughout the roadway. Formally, the Traffic Obstruction illusion can be represented through the augmentation of m dynamic entities in the environment: 
+
+ˆX = {x1, x2, x3, · · · , xm}.
+
+❸ Shadow. Environmental conditions C, including me-teorological and illumination variations, significantly influ-ence the visual perception of roadway surfaces and asso-ciated infrastructure, thereby inducing additional environ-mental illusions. A particularly impactful factor involves temporal variations in illumination conditions, which gen-erate dynamic shadow patterns across road surfaces. These shadows ( e.g., from guardrails or streetlights) often exhibit JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 6
+
+morphological similarities to authentic lane markings, po-tentially compromising LD model performance. To illus-trate, during twilight conditions, the pronounced solar ele-vation angle produces extensive shadow coverage, whereas midday illumination with high intensity and minimal solar angle yields sharply defined shadow boundaries. Account-ing for these photometric variations, we formulate four dis-tinct categories of shadow-based environmental illusions: 
+
+Streetlight , Fence , Rail , and Wire . In particular, the 
+
+Streetlight and Fence illusions generate substantially elongated shadow patterns on pavement surfaces under low-angle solar illumination. Furthermore, we introduce a novel shadow deception phenomenon induced by the semi-transparent structural components of Rail . Through careful modulation of illumination angles, these railings produce luminous linear projections on road surfaces that exhibit striking geometric and chromatic similarities to authentic lane markings, thereby generating particularly challenging visual ambiguities. Our investigation also reveals analogous effects with Wire infrastructure, where both the opaque shadow regions and the semi-luminous inter-wire spaces may be misinterpreted as legitimate lane demarcations. Building upon this analytical framework, we synthesize shadow-induced illusions through systematic modulation of illumination parameters in the simulated environment. The resulting perturbed images I(l,a ) are derived from Equation 4, where the hyperparameters (l, a ) respectively correspond to luminance intensity and angular configura-tion of the light source. 
+
+❹ Reflection. Meteorological variations, such as rain-fall, would lead to the formation of reflective water ac-cumulations on road surfaces. These specular reflections adversely affect lane marking detection accuracy. Further-more, image acquisition under backlit conditions intro-duces significant photometric distortions due to heightened reflective interference. Building upon these observations, we systematically formulate three types of illusion Re-flection illusions: Sunlight Reflection , Streetlight Reflection , and Vehicle Reflection . The Sunlight Reflection phenomenon manifests most prominently during solar alignment scenarios, where intense glare sig-nificantly degrades the visibility of lane demarcations, particularly affecting white and dashed line recognition. This optical interference is further amplified under post-precipitation conditions, as aqueous road surfaces generate specular reflections that completely obscure lane markings in visual sensor data. Analogously, nocturnal Streetlight Reflection substantially impairs lane marking detection accuracy. To enhance the realism and severity of this il-lusion, we incorporate two predominant streetlight chro-maticities, i.e., white and yellow, which exhibit spectral congruence with conventional lane marking colors. Further-more, we propose Vehicle Reflection to characterize retroreflective phenomena from vehicle surfaces, which may occlude preceding vehicles in visual field. 
+
+3.4 Scenario Construction 
+
+While the environmental illusions we examine occur nat-urally in real-world scenarios, acquiring a comprehensive dataset with sufficient diversity and scale of these phenom-ena presents significant practical challenges. To address this 1. Environment Build 2. Properties Modification   
+
+> 3. Facilities/Traffic Generation 4. Image Collection
+> a. b.
+> c.
+> static
+> facilities
+> dynamic
+> objects
+> construction
+
+Fig. 3: Illustration of our scenario construction pipeline. limitation, we leverage the CARLA simulator [19] to sys-tematically generate high-fidelity perturbed scenarios, from which we subsequently extract visually authentic image samples. Our data collection pipeline operates through two sequential phases: ❶ employing real-world traffic patterns as reference, we architect customized 3D environments in-corporating prototypical road geometries (including map segmentations), such as T-junctions and other prevalent configurations; ❷ implementing the illusion synthesis tech-niques established in Sec. 3.3, we systematically alter object attributes within the simulated environment; ❸ we strategi-cally position objects and simulate diverse traffic patterns; 
+
+❹ deploying our autonomous agent along predetermined routes, we record each scenario and capture egocentric visual data. The RGB sensor, configured with a resolution of 1280 × 720 pixels and a 90 .0◦ field of view, is mounted at the frontal position of the vehicle agent. To enhance practical relevance, we adopt the methodology established in [107], [108] and faithfully reproduce fundamental yet fre-quently encountered traffic scenarios for autonomous vehi-cles, including car-following maneuvers and sharp turning operations. The complete data generation framework and representative captured images are illustrated in Fig. 3 and Fig. 5, respectively. 
+
+Quality control. We adhere to rigorous annotation qual-ity control protocols consistent with established benchmark datasets [61], [109]. Our annotation pipeline requires all an-notators to strictly follow standardized guidelines specify-ing both lane annotation targets and methodology. To ensure annotation fidelity, we implement a three-tier verification process: each image undergoes independent annotation by two distinct groups, with the third group performing con-sensus validation on the averaged results. 
+
+3.5 Data Generation 
+
+To accommodate the characteristics of ADVLMs, LanEvil++ 
+
+extends the original benchmark by additionally incorporat-ing both video clips and QA pairs. Each clip is paired with multiple QA items, carefully designed according to the type of environmental illusion present. This section details the generation process of these two components. 
+
+Video clip generation. In the scenario construction pro-cess outlined in Sec. 3.4, we generate coarse-grained scene videos for each type of environmental illusion, encompass-ing the entire illusion-affected road segment. We perform a refined extraction of the raw videos to create a dataset JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 7Road  
+
+> Damage
+> Traffic
+> Obstruction
+> Shadow Reflection
+> 0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+
+46 50 
+
+22 
+
+45 46 
+
+100 
+
+81 
+
+168 Original 
+
+> Perturbed
+
+(a) Road  
+
+> Damage
+> Traffic
+> Obstruction
+> Shadow Reflection
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+
+111 138 
+
+66 
+
+150 
+
+450 
+
+138 
+
+243 
+
+300  
+
+> Original
+> Perturbed
+
+(b) LanEvil ++    
+
+> ◼Road Damage ◼Reflection
+> ◼Traffic Obstruction ◼Shadow
+> R
+> o
+> a
+> d
+> D
+> a
+> m
+> a
+> g
+> e
+> R
+> e
+> f
+> l
+> e
+> c
+> t
+> i
+> o
+> n
+> Fence
+> 2050
+> SunLight
+> Reflection
+> 9100
+> StreetLight
+> Reflection
+> 10400
+> Vehicle
+> 5400
+> Wire
+> 1920
+> Rail
+> 2550
+> Vehicle
+> Reflection
+> 2100
+> StreetLight
+> 1972
+> Guard Rail
+> 1600
+> Road Repair
+> 1200
+> Road Crack
+> 1200 Tire Marks
+> 1200
+> Bicycle
+> 4800
+> Pedestrian
+> 4800
+
+(c) Scene      
+
+> Description
+> 2655
+> Object
+> Behavior
+> 2627
+> Action
+> 2649
+> Action
+> 1291
+> Action
+> 1410
+> Scene
+> Description
+> 2017
+> Object
+> Recognition
+> 2018
+> Object
+> Behavior
+> 1987
+> Move
+> Reasoning
+> 2017
+> Action
+> 2012
+> Object
+> Recognition
+> 2638
+> Move
+> Reasoning
+> 2638
+> LanEvil ++
+> Lane Recognition
+> 819
+> Object Recognition
+> 1295
+> Lane Recognition
+> 927
+> nRoad Damage nReflection
+> nTraffic Obstruction nShadow
+> Object Behavior
+> 129 3
+> Scene Description
+> 129 8
+> Move Reasoning
+> 1287
+> Object Behavior
+> 1460
+> Scene Description
+> 146 9
+> Move Reasoning
+> 147 3
+> Object Recognition
+> 148 3
+> Lane Recognition
+> 135 0
+> Lane Recognition
+> 1743
+
+(d) 
+
+Fig. 4: The statistics of LanEvil++ dataset. (a) The number of original and perturbed cases under four categories. (b) The number of original and perturbed clips under four cat-egories. (c) The case distribution of four illusion categories. (d) The QA pair distribution of four illusion categories. TABLE 1: Detailed data properties of LanEvil++ .
+
+(a) Scenario diversity 
+
+Type Number Typical examples 
+
+Scene 5 Urban, Highway Lane line 9 White single solid, Yellow double solid Weather 12 SoftRainNoon, ClearNoon Road type 9 T-junction, Uphill 
+
+(b) Quality distribution 
+
+Image Type Road Damage Traffic Obstruction Shadow Reflection 
+
+Original 2,600 5,000 2,051 4,600 Perturbed 2,600 10,000 6,441 17,000 Total 5,200 15,000 8,492 21,600 
+
+better suited for model inference. Specifically, each scene video is segmented into three distinct clips, each consisting of a fixed six-frame sequence. The selection of frame rate and segmentation points is determined based on the specific characteristics of the illusion type. This refinement process aims to further delineate and emphasize the deceptive nature of each illusion while maximizing coverage across different sampling perspectives and variations in illusion presentation, thereby enhancing the dataset’s diversity and representational richness. For instance, in the case of the road crack illusion, our clips are segmented to capture the crack at different stages of vehicle interaction, specifically before the vehicle passes over it, during the vehicle’s traver-sal, and as the vehicle moves alongside it. 
+
+Question-answering design. LanEvil++ provides 6 cat-egories of question-answering pairs that are important for AD perception, prediction and planning, including: ❶ Scene Description , which requires a high-level understanding of the driving environment, such as road conditions, weather, and lighting. ❷ Object Recognition , which focuses on iden-tifying key traffic participants such as vehicles, pedestrians, and traffic signs. ❸ Lane Recognition , which assesses the understanding of lane structures, markings, and bound-aries. ❹ Object Behavior , which is related to the move-ment and interactions of dynamic objects in the scene. ❺
+
+Motion Reasoning , which emphasizes the interpretation and analysis of object behaviors. ❻ Action , which evaluates appropriate driving decisions based on situational aware-ness and traffic dynamics. Our QA design adheres to the principle of incorporating illusion-induced cues within the questions, ensuring that each question considers potential deceptive perspectives that may mislead the AD system’s understanding under the influence of the given illusion. The structure and QA examples are shown in Fig. 6. 
+
+Question-answering generation. We leverage the ad-vanced vision-language model GPT-4o [110] to annotate our dataset. Specifically, following the aforementioned design principles, we provide GPT-4o with structured templates to guide the QA generation process, enabling it to gener-ate five QA pairs for each video clip. Notably, the same set of QA pairs is shared between the clean dataset and its perturbed counterpart to facilitate direct comparative analysis. We conduct a two-turn GPT generation process, during which human experts evaluate and refine the quality of the generated QA pairs. Through rigorous assessment and correction, the most optimal QA pairs are selected for inclusion in the final dataset. The details of QA generation are in the Supplementary Materials. 
+
+3.6 Data Properties 
+
+Subset division. ❶ For conventional LD models, our 
+
+LanEvil++ comprises two distinct subsets: a training set containing unperturbed reference images and a test set incorporating systematically generated environmental il-lusions. The training corpus consists of 40,000 randomly selected clean images devoid of artificial perturbations. For evaluation purposes, we construct a comprehensive test set of 50,292 images featuring controlled illusion scenarios. For every fundamental environmental illusion type, we include an unperturbed baseline scenario alongside 1 - 10 systematically modified variants, with each case comprising 50 to 300 temporally coherent driving frames. The quantita-tive distribution of baseline and perturbed scenarios across prevalent lane detection models is presented in Fig. 4a and Tab. 1b. ❷ For ADVLMs, LanEvil++ provides only a test set, which is divided into two subsets: an original scenario set and a perturbed scenario set, containing 465 clips and 1,131 clips, respectively. The statistics of different categories for ADVLMs are shown in Fig. 4b. 
+
+Category distribution. ❶ For conventional LD models, the LanEvil++ test set comprises 50,292 annotated images spanning 94 fundamental driving scenarios ( e.g., straight JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 8(a) Origin  (b) Road Damage  (c) Traffic Obstruction  (d) Shadow  (e) Reflection 
+
+Fig. 5: Visualization of images from our LanEvil++ dataset under different environmental illusions. Scene Description                                                                                                                                                                               
+
+> <Question >What types of
+> structures or elements are present
+> along the sides of the road?
+> <Answer >On the left side, there
+> is ahigh chain -link fence, possibly for
+> security, while the right side features a
+> black barrier with pointed posts .In the
+> background, there are buildings and
+> trees on the left side and open green
+> hills on the right …
+> Lane Recognition
+> <Question >What are the types of the lane lines in the scene?
+> <Answer >The lane line types from left to right are :single solid line,
+> single dashed line, single dashed line .…
+> Object Recognition
+> <Question >Are there any road
+> signs visible in the scene?
+> <Answer >No road signs are
+> visible in the scene .The area …
+> Moving Reasoning
+> <Question >Is it advisable for the vehicle to change
+> lanes at this point?
+> <Answer >No, it is not advisable for the vehicle to
+> change lanes because there are no clear markers
+> indicating the presence of additional lanes …
+> Action
+> <Question >Is there aneed for the vehicle to change
+> lanes in this scenario?
+> <Answer >There is no need for the vehicle to change
+> lanes .The road ahead is clear with no traffic or
+> obstructions, and the lane ….
+> Object Behavior
+> <Question >How are the
+> streetlights behaving, and why?
+> <Answer >The streetlights are
+> inactive throughout the clip …
+
+Fig. 6: Structure and examples of the QA pairs in LanEvil++ .TABLE 2: Coverage of 4 environmental illusion categories across representative LD benchmarks. Symbols denote cov-erage status. ( ": included, ◦: partially covered, %: missing.) 
+
+Dataset Traffic Obstruction Road Damage Shadow Reflection 
+
+CalTech [59] ◦ % ◦ ◦
+
+VPGNet [60] ◦ % % %
+
+TuSimple [61] ◦ % % %
+
+CULane [6] ◦ % ◦ ◦
+
+LLAMAS [63] ◦ % % %
+
+BDD100K [62] " % % %
+
+CurveLane [64] ◦ % % %
+
+VIL-100 " ◦ ◦ ◦
+
+LanEvil [28] " " " "
+
+LanEvil++ (Ours) " " " "
+
+paths, turning maneuvers) with fully customizable 3D en-vironments. Fig. 4c presents the quantitative distribution of cases and images across each environmental illusion category. Furthermore, the LanEvil++ benchmark incorpo-rates 9 distinct lane marking types with varying geometries and chromatic characteristics, while encompassing diverse driving contexts and roadway topologies, as demonstrated in Tab. 1a. ❷ For ADVLMs, our LanEvil++ includes 48,155 QA pairs based on 1,596 fundamental clips. The number of QA pairs for each task is summarized in Fig. 4d. 
+
+Comparison with existing benchmarks. Tab. 2 summa-rizes the coverage of 4 environmental illusion categories across representative LD datasets. Most benchmarks pro-vide only partial coverage of the traffic obstruction illusion, while road damage, shadow, and reflection are largely miss-ing. In contrast, LanEvil++ comprehensively encompasses all 4 illusion categories, enabling a more comprehensive evaluation of model robustness to environmental illusions. 
+
+Other application possibilities. Beyond comprehensive image collection, our dataset incorporates rigorously de-signed large-scale 3D simulation environments with system-atic perturbations. These scenarios are preserved in modular file formats to facilitate extensible development, while their Attention Area Extraction Attention Map Generation   
+
+> Hard Examples
+> Common Data HAA Repository
+
+Heat Map 
+
+Initial AD Mode l Robust AD Model 
+
+Attention Area Mixing  
+
+> finetune
+> Mixing
+> LAA Repo
+> AD
+> Model
+> AD
+> Model
+
+Fig. 7: Visual modality of MIDA: Attention Area Mixing++ (AAM++). AAM++ enhances robustness by extracting high-and low-attention regions from hard examples and mixing them separately into training examples. dynamic nature enables seamless integration with third-party evaluation systems through CARLA’s established in-teroperability framework. 
+
+4 MULTIMODAL ILLUSION DEFENSE APPROACH 
+
+To tackle environmental illusions, we propose the Multi-modal Illusion Defense Approach (MIDA). Our previous work [28] introduced the Attention Area Mixing (AAM) method, which focused solely on the visual modality and lacked support for textual inputs, rendering it inadequate for the broader requirements of ADVLMs. In this paper, we propose two improved components to address these limitations: ❶ AAM++, which incorporates features from both high- and low-attention areas to mitigate bias and further strengthen the model’s resistance to visual distractions; ❷ PAT++, a prompt-based adversarial tun-ing approach specifically designed to enhance robustness against textual perturbations. 
+
+4.1 MIDA for LD Models: Attention Area Mixing++ 
+
+We first extract high/low attention areas (HAA/LAA) to identify mismatches between the model’s attention and the ground truth. The process begins by applying Gaussian blurring to the heatmap M to improve generalization: 
+
+M ′ = G(M, σ ), (5) where G denotes the Gaussian blurring function, M is the attention map generated by an attention module H for a given image I (i.e., M = H(I)), and M ′ is the resulting blurred heatmap with σ as the standard deviation of the JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 9
+
+Gaussian kernel. Details of H are provided in the Supplementary Materials. The method focuses on hard examples, defined as images with accuracy below the dataset mean. Thresholding 
+
+M ′ yields a binary mask B:
+
+BHAA (x, y ) = 
+
+(
+
+1 if M ′(x, y ) > T HAA ,
+
+0 otherwise , (6) where THAA is the threshold, and M ′(x, y ) represents the value of the blurred attention map at pixel location (x, y ).Similarly, the low attention area mask BLAA is computed using a threshold TLAA with the condition M ′(x, y ) ≤
+
+TLAA . Connected components in B smaller than a size threshold S are discarded, resulting in the final interest regions Ak, where k ∈ { HAA , LAA }.
+
+Ak = {r | area (r) > S, r ⊂ Bk}. (7) Discrepancies are identified by comparing each region 
+
+r ∈ Ak with the ground truth G, defining mismatches as re-gions with insufficient overlap and extracting the minimum bounding rectangles (MBR) for these regions: 
+
+Rk = {MBR (r) | r ∈ Ak ∧ overlap (r, G ) < θ }, (8) where Rk represents the set of mismatched regions enclosed by minimum bounding rectangles, and θ establishes the threshold for acceptable overlap. After generating Rk, we mix hard examples into the dataset. For each image I in D,we integrate a randomly selected attention area Hk from Rk:
+
+Imixed  
+
+> k
+
+= I ⊕ S k(Hk, G I ), (9) where Imixed  
+
+> k
+
+is the augmented image incorporating Hk
+
+based on the ground truth GI , and ⊕ represents the blend-ing operation. The Sk function searches for low or high attention areas in the ground truth, opposite to the type of 
+
+k. That is, SHAA locates low attention areas. The framework of AAM++ is illustrated in Fig. 7. 
+
+4.2 MIDA for ADVLMs: Prompt Adversarial Tuning++ 
+
+The textual modality, with its discontinuous nature and large search space, poses unique challenges for ADVLM-sand does not lend itself to visual mixing-based approaches. While the original PAT [111] was devised for LLMs, it did not account for image interactions. Therefore, we enhance PAT with a specialized prompt-tuning scheme, bolstering the model’s robustness against text-based adversarial illu-sions in multimodal contexts. Given a visual input I ⊂ Iall and a textual input t ∈ T, an ADVLM generates a response res = tn+1: n+L, where each 
+
+tn is a token. The likelihood of generating the next token sequence is defined as: 
+
+p(tn+1: n+L|I, t ) = 
+
+> L
+
+Y
+
+> i=1
+
+p(tn+i|t1: n+i−1, I, t ). (10) The training objective is to minimize the negative log-likelihood of generating the target sequence tn+1: n+L given the visual and textual inputs: 
+
+L(I, t ) = − log p(tn+1: n+L|I, t n). (11) <Question > Please pay more attention           
+
+> to …. Is it safe for the vehicle to make a left
+> turn at the current moment? Why?
+> <Answer >It is not safe for the vehicle to
+> make a left turn at the current moment. The
+> lane line on the left is a solid line .
+> Protected
+> ADVLM
+> Vanilla
+> ADVLM <Question >Is it safe for the vehicle to
+> make a left turn at the current moment? Why?
+> <Answer >Yes, it is safe for the vehicle to
+> make a left turn . The road is clear, and there
+> are no obstructions or obstacles that would
+> prevent the vehicle from turning.
+
+Fig. 8: Textual modality of MIDA: Prompt Adversarial Tuning++ (PAT++). PAT++ enhances robustness against environmental illusions through prefix-based prompt tun-ing. Illustrated using DriveLM, where the ground illusion 
+
+Tiremarks misleads lane recognition. With the addition of a protective prefix (shown in blue), DriveLM correctly identifies the lane markings. Let ˜t1: n = {˜t1, ˜t2, . . . , ˜tn} denote the defense prompt, where ˜ti ∈ T represents the i-th token of the de-fense prompt. Then the textual prompt can be defined as CONCAT (˜ t1: n, t ), where CONCAT (·) denotes the concate-nation operation over the token sequences. Similar to the visual modality, we distinguish between benign examples Ibgn and hard examples Ihard . For hard examples, we aim to enhance the model’s focus on the illusion area by adjusting the defense prompt. To achieve this, we define a malicious target res goal (i.e., “I will focus on the factors affecting the road”). The loss function for hard examples is then formulated as: 
+
+Lhard (˜ t1: n, Ihard , res goal ) = − log p(res goal |Ihard , ˜t1: n). (12) For benign examples, the goal is to enable the model to respond normally without interference from the defense prompt. The loss function for benign examples is defined as: 
+
+Lbgn (t1: n, Ibgn , res gt ) = − log p(res gt |Ibgn , t 1: n). (13) Combining the two stages, the general optimization ob-jective can be formulated as: 
+
+˜t⋆ = arg min 
+
+> ˜t∈T
+
+αLbgn (t1: n, Ibgn , res gt )+ (1 − α)Lhard (˜ t1: n, Ihard , res goal ), (14) where α ∈ [0 , 1] is a hyper-parameter that balances the loss terms. This adjustment ensures that the defense prompt enhances the model’s robustness to hard examples while maintaining normal responses for benign cases. 
+
+5 EXPERIMENTS 
+
+5.1 Experimental Setup 
+
+Dataset. For conventional LD models, we first train the LD models from scratch using the training set of our 
+
+LanEvil++ , and then evaluate their robustness on the test JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 10 
+
+TABLE 3: Evaluation results of different LD models using ResNet-18 on the LanEvil++ dataset. LD models are trained using the LanEvil++ training set. For each category of illusion, we report the average value over different types and severity levels. The bold values represent the maximum in each column, and “Gap” is computed by “Perturbed” minus “Original”. 
+
+(a) Results under Accuracy (%)                                                                                                                        
+
+> Road Damage Traffic Obstruction Shadow Reflection Average
+> Method Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap LaneATT [35] 76.23 78.66 -2.43 73.18 75.84 -2.66 79.48 86.07 -6.59 71.33 78.93 -7.59 73.53 78.85 -5.32 UFLD [2] 65.90 68.47 -2.57 65.64 67.58 -1.94 67.73 74.01 -6.27 64.45 70.88 -6.42 65.45 69.90 -4.44 BezierLaneNet [44] 73.14 75.76 -2.62 71.44 74.51 -3.07 68.79 78.32 -9.54 69.44 75.31 -5.87 70.00 75.52 -5.52 GANet [33] 85.32 89.33 -4.01 80.53 84.75 -4.22 83.44 93.02 -9.58 79.21 89.23 -10.02 80.55 88.08 -7.53
+> SCNN [6] 71.11 71.94 -0.84 67.17 69.67 -2.50 65.38 70.33 -4.95 63.88 68.05 -4.16 65.31 69.36 -4.05 LaneFormer [37] 87.14 90.06 -2.92 83.72 87.25 -3.53 86.20 93.41 -7.21 81.68 89.20 -7.52 84.69 89.98 -5.29 CLRNet [38] 86.02 88.77 -2.75 82.63 85.44 -2.81 84.95 91.22 -6.27 80.37 87.42 -7.05 83.49 88.21 -4.72
+
+(b) Results under F1-score (%)                                                                                                                        
+
+> Road Damage Traffic Obstruction Shadow Reflection Average
+> Method Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap LaneATT [35] 49.20 52.63 -3.43 46.03 51.87 -5.84 48.23 60.35 -12.12 38.81 53.23 -14.41 42.95 53.80 -10.85 UFLD [2] 21.25 24.54 -3.30 28.23 31.85 -3.62 26.18 36.32 -10.13 19.96 30.82 -10.85 23.57 31.65 -8.08 BezierLaneNet [44] 37.84 40.68 -2.85 42.53 50.03 -7.49 41.41 50.93 -9.52 37.06 45.86 -8.81 39.49 47.95 -8.46 GANet [33] 79.01 84.16 -5.15 70.34 80.79 -10.45 73.50 89.33 -15.83 65.25 83.03 -17.78 68.64 83.25 -14.61
+> SCNN [6] 48.69 52.88 -4.19 43.63 50.47 -6.85 34.92 49.42 -14.50 34.70 46.94 -12.24 37.71 49.19 -11.49 LaneFormer [37] 82.12 86.57 -4.45 74.65 82.91 -8.26 76.44 90.24 -13.80 69.52 84.71 -15.19 75.68 86.11 -10.43 CLRNet [38] 80.93 84.98 -4.05 72.44 80.36 -7.92 74.35 88.02 -13.67 67.83 82.25 -14.42 73.89 83.40 -9.51
+
+set of LanEvil++ . For ADVLMs, we use the pretrained model and fine-tune on the LanEvil++ . We also evaluate the domain gap between simulated data and real data in Sec. 5.5. 
+
+Target models. For conventional LD models, we evaluate seven representative methods covering the five LD categories introduced in Sec. 2.1: SCNN [6], GANet [33], LaneATT [35], CLRNet [38], LaneFormer [37], UFLD [2], and BezierLaneNet [44]. Among them, CLRNet and LaneFormer represent recent anchor-based architec-tures enhanced by transformer-based reasoning, enabling more global lane-level understanding. We use ResNet-18/34/50/101 [112] with ImageNet-pretrained weights [113] as backbones. For SCNN, we follow its official im-plementation and use VGG-16 [114]. For ADVLMs, we use DriveLM [7], Dolphins [50], Omni-L and Omni-Q [54] as baselines, as they are representative open-source models. 
+
+Evaluation metrics. For conventional LD models, we adopt the two most widely used metrics, Accuracy and F1 score , to evaluate model performance, both of which are tai-lored to reflect the spatial precision and detection quality in LD. Accuracy quantifies the proportion of correctly predicted lane points relative to the total number of ground truth points. A lane point within 20 pixels of the ground truth point is considered correct. Lane predictions are considered to be true positives (TP) only when more than 85% of points are correct. F1 score serves as a balanced metric by combining Precision and Recall via their harmonic mean, where P recision = T P T P +F P and Recall = T P T P +F N . For ADVLMs, we use the GPT score and Language score as the metric. GPT score measures the semantic alignment between the generated output and the expected response by the powerful ChatGPT. Language score evaluates the linguistic quality and fluency of the generated text, independent of its semantic correctness, which includes BLEU, ROUGE-L, METEOR, CIDEr and SPICE. For all metrics, higher values indicate better performance and robustness. 
+
+5.2 Main Results for Conventional LD models 
+
+We first evaluate the robustness of seven conventional LD models on LanEvil++ . Due to space limitations, we report the average performance of models on each of the four main illusion categories here. As shown in Tab. 3, we can identify :
+
+❶ Overall, the proposed environmental illusions have demonstrated certain impacts on the robustness of LD mod-els. In general, these illusions can cause an average absolute 
+
+5.27% Accuracy drop and 10.49% F1-Score drop. 
+
+❷ Different environmental illusions show different threat impacts on LD model robustness. For instance, Shadow 
+
+demonstrates the most pronounced effect, leading to an average model performance decrease of 7.20%; in contrast, 
+
+Road Damage shows comparatively weak influence with only 2.59% decreases on average. 
+
+❸ Following a comprehensive analysis of the model and backbone, we observe that different models display various degrees of resistance to these types of corruption. In particular, GANet showcases the highest clean performance. However, the Accuracy decreases the most after attacks, amounting to approximately 7.53%. Conversely, SCNN has the lowest Accuracy in clean images but experiences the least Accuracy decrease. Additionally, in terms of model backbones, as the depth of layers increases, the performance and robustness of the model tend to improve. 
+
+❹ Transformer-based architectures such as LaneFormer and CLRNet achieve the highest overall performance, with average clean accuracies of 89.98% and 88.21%, respectively, and moderate degradation gaps of 5.29% and 4.72%. 
+
+❺ As the severity level increases, the performance de-generation increases significantly. Specifically, the level-1 JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 11 
+
+TABLE 4: Evaluation results of different ADVLMs on the LanEvil++ dataset. For each category of illusion, we report the average value over different types and severity levels. The bold values represent the maximum in each column, and “Gap” is computed by “Perturbed” minus “Original”. 
+
+(a) Results under GPT Score (%)                                                                           
+
+> Road Damage Traffic Obstruction Shadow Reflection Average
+> Method Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap DriveLM [7] 80.45 81.61 -1.16 77.78 82.01 -4.24 84.04 84.55 -0.51 79.34 82.76 -3.41 80.91 83.28 -2.38
+> Dolphins [50] 62.15 63.44 -1.29 64.02 65.51 -1.49 65.63 65.96 -0.34 63.13 64.52 -1.39 63.13 64.52 -1.39 Omni-L [54] 82.91 84.02 -1.11 80.64 84.53 -3.89 85.27 86.05 -0.78 81.46 84.72 -3.26 82.57 84.83 -2.26 Omni-Q [54] 84.25 85.33 -1.08 81.72 85.14 -3.42 86.18 86.79 -0.61 82.03 85.38 -3.35 83.55 85.66 -2.11
+
+(b) Results under Language Score (%)                                                                           
+
+> Road Damage Traffic Obstruction Shadow Reflection Average
+> Method Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap Perturbed Original Gap DriveLM [7] 29.53 30.21 -0.68 28.84 30.12 -1.28 32.17 32.61 -0.44 28.76 30.68 -1.92 30.54 31.43 -0.89
+> Dolphins [50] 15.72 16.01 -0.29 16.84 16.48 0.36 16.78 16.85 -0.07 15.94 16.29 -0.35 15.92 16.34 -0.42 Omni-L [54] 30.46 31.02 -0.56 29.37 30.54 -1.17 33.21 33.65 -0.44 29.86 31.08 -1.22 30.73 31.57 -0.84 Omni-Q [54] 31.58 32.09 -0.51 30.12 31.42 -1.30 33.98 34.37 -0.39 30.54 31.72 -1.18 31.56 32.40 -0.84
+
+images cause an average 2.51% Accuracy drop and 6.94% F1-Score drop; in contrast, the level-5 images can cause an average 19.07% Accuracy drop and 33.89% F1-Score drop. 
+
+5.3 Main Results for ADVLMs 
+
+We then evaluate the robustness of four ADVLMs on 
+
+LanEvil++ . As shown in Tab. 4, we can identify :
+
+❶ Consistent with observations in conventional LD mod-els, ADVLMs also exhibit significant vulnerability to envi-ronmental illusions, reflected by a 2.03% decrease in average GPT score and a 0.75% drop in average Language score. 
+
+❷ Different categories of environmental illusions have varying impacts. Among them, Traffic Obstruction 
+
+causes the most severe decline, with an average GPT Score drop of 3.51% and a Language Score drop of 1.04%. In contrast, Shadow leads to the smallest decline, with average GPT and Language Score decreases of only 0.56% and 0.33%, respectively. This differs from conventional LD models, implying distinct attention patterns in ADVLMs. 
+
+❸ Dolphins show the highest robustness under envi-ronmental illusions (GPT Score: 1.39%, Language Score: 0.42%), whereas DriveLM exhibits the largest performance degradation (2.38%, 0.89%), with Omni-Q (2.11%, 0.84%) and Omni-L (2.26%, 0.84%) lying in between. 
+
+❹ Similar to conventional LD models, performance degradation in ADVLMs becomes more severe as the illu-sion level increases. Level-1 images lead to an average GPT Score drop of 1.34% and a Language Score drop of 0.38%, while level-5 images cause much larger average decreases of 9.11% and 2.62%, respectively. 
+
+5.4 Results on Noise Defense Methods 
+
+In this section, we further investigated the effectiveness of our proposed MIDA method and existing noise defense methods [70], [115]–[117] on LanEvil++ dataset. 
+
+Enhancement for conventional LD models. In this case, since MIDA only uses the image modality, it effectively corresponds to AAM++. Specifically, we adopt ResNet18 for LaneATT and UFLD, and apply a range of robustness enhancing techniques including PGD adversarial training [118], cutout [119], copy paste [120], HSV augmentation, and MixUP [121], all known to improve robustness against ad-versarial noise [85], [122]–[124] and natural corruptions. We also include AAM [28] as a baseline. Fig. 9a and Fig. 9b show that AAM++ achieves the highest accuracy gain of 4.23% on average, building upon the already strong performance of AAM. In contrast, other methods provide only modest improvements below 1.5%, with an average gain of 1.24%. 
+
+Enhancement for ADVLMs. We use DriveLM and Dol-phins as base models and apply a series of robustness enhancing techniques, including visual modality methods such as PGD adversarial training [118], MixUP [121], AAM [28], and AAM++; textual modality methods such as PAT [111], Self-Reminders [125], and PAT++; as well as the cross modality method MIDA. As shown in Fig. 9c and Fig. 9d, our MIDA and its components (AAM++ and PAT++) achieve the highest GPT score gain of 3.82%, outper-forming other visual, textual, and cross-modality methods, which average a gain of 1.93%. 
+
+Robustness under non-illusion perturbations. We fur-ther evaluate MIDA under non-illusion corruptions such as weather, blur, brightness/contrast shifts, noise, JPEG compression, and sensor artifacts. As shown in Fig. 9e and Fig. 9f, MIDA consistently achieves the highest performance across all perturbations. For LaneATT, the Accuracy remains within the 74–88% range and exceeds the other methods by 1–2% on several perturbations ( e.g., Snow, Gaussian Blur). For DriveLM, GPT Score remain within 78–86%, with MIDA achieving the highest results and exhibiting only small fluctuations (typically below 1%). These results confirm that MIDA enhances generalizable robustness rather than inducing illusion-specific overfitting. 
+
+5.5 Visual Fidelity Analysis 
+
+In this part, we further study the visual fidelity of our gen-erated images. Specifically, we conduct three experiments JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 12 1 2 3 4 5 6 7 8 9 10 11 12 13 14 
+
+> 55
+> 60
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Accuracy (%)
+> Initial
+> PGD-AT
+> Cutout
+> Copy-paste
+> Augment HSV
+> MixUP
+> AAM
+> AAM++(Ours)
+
+(a) LaneATT 1 2 3 4 5 6 7 8 9 10 11 12 13 14  
+
+> 55
+> 60
+> 65
+> 70
+> 75
+> 80
+> Accuracy (%)
+> Initial
+> PGD-AT
+> Cutout
+> Copy-paste
+> Augment HSV
+> MixUP
+> AAM
+> AAM++(Ours)
+
+(b) UFLD 1 2 3 4 5 6 7 8 9 10 11 12 13 14 
+
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> GPT Score (%)
+> Initial
+> PGD-AT
+> MixUP
+> AAM
+> AAM++(Ours)
+> Self-Reminders
+> PAT
+> PAT++(Ours)
+> MIDA(Ours)
+
+(c) DriveLM 1 2 3 4 5 6 7 8 9 10 11 12 13 14  
+
+> 50
+> 55
+> 60
+> 65
+> 70
+> GPT Score (%)
+> Initial
+> PGD-AT
+> MixUP
+> AAM
+> AAM++(Ours)
+> Self-Reminders
+> PAT
+> PAT++(Ours)
+> MIDA(Ours)
+
+(d) Dolphins Rain Fog 
+
+> Snow
+> M.Blur
+> G.Blur
+> Bright
+> Contrast
+> G.Noise
+> JPEG
+> Sensor
+> 55
+> 60
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> Accuracy (%)
+> Initial
+> PGD-AT
+> Cutout
+> Copy-paste
+> Augment HSV
+> MixUP
+> AAM
+> AAM++(Ours)
+
+(e) LaneATT †Rain Fog  
+
+> Snow
+> M.Blur
+> G.Blur
+> Bright
+> Contrast
+> G.Noise
+> JPEG
+> Sensor
+> 65
+> 70
+> 75
+> 80
+> 85
+> 90
+> GPT Score (%)
+> Initial
+> PGD-AT
+> MixUP
+> AAM
+> AAM++(Ours)
+> Self-Reminders
+> PAT
+> PAT++(Ours)
+> MIDA(Ours)
+
+(f) DriveLM †
+
+Fig. 9: Evaluation of noise defense methods. For the first 4 subfigures, the x-axis denotes different types of illusions. The last 2 subfigures ( †) report the performance of LaneATT and DriveLM under different non-illusion perturbations. and analysis: (1) training on either simulated or real-world datasets and then testing on another dataset; (2) conducting human perception and (3) conducting ADVLM perception studies on the visual quality of our LanEvil++ .
+
+Cross-domain LD model prediction. ❶ LanEvil → Real-world. For each of the three real-world datasets (TuSim-ple, CULane, LLAMAS), we separately train a model on the original real-world dataset, a model on the generated 
+
+LanEvil++ , and a LanEvil++ pre-trained model fine-tuning on 100 images from the corresponding real-world datasets. All the models are LaneATT with ResNet-34. Here, we report the F1-score (%) on the testing set of TuSimple (96.77, 91.56, 94.23), CULane (76.68, 69.32, 73.98), and LLAMAS (93.74, 89.15, 92.58). The results indicate acceptable domain gaps despite differences between the real world and our simulated images. Additionally, the gap can be narrowed by incorporating a small number of real images. ❷ Real-world → LanEvil. Furthermore, we use LaneATT models with ResNet-34 and train them on real-world datasets (i.e., TuSimple, CULane, and LLAMAS), and then w/ or w/o fine-tuning them on the LanEvil++ . For each model, we test it separately on corresponding real-world datasets and LanEvil++ . Tab. 5 shows minor performance reduc-tions, indicating a comparatively small domain gap between TABLE 5: F1-Scores (%) of LaneATT with ResNet-34 w/o and w/ fine-tuning on LanEvil++ training set. 
+
+Real-world test set LanEvil++ test set 
+
+Dataset w/o w/ Gap w/o w/ Gap TuSimple [61] 96.77 95.40 -1.37 48.34 62.92 +14.58 CULane [6] 76.68 76.14 -0.54 55.98 68.41 +12.43 LLAMAS [63] 93.74 93.09 -0.65 58.26 66.95 +8.69 
+
+LanEvil++ and other real-world datasets. Although the cross-domain results show only a mi-nor 2–5% drop in F1-score, these differences reveal that simulation-generated illusions may still deviate from real-world patterns in texture, scale, or contextual lighting. Such gaps could introduce a mild bias in visual statistics, limiting the model’s ability to generalize to unseen real-world en-vironments. Nevertheless, simulation-based evaluation re-mains a widely adopted and cost-efficient paradigm in AD testing, as it enables controlled, repeatable, and low-risk experimentation. With continuous advances in physically based rendering, neural material synthesis, and domain ran-domization, this gap is expected to further narrow, enhanc-ing both the realism and reliability of future evaluations. 
+
+Human perception study. Following [14], we conducted a human perception study with 100 participants from cam-pus, all with normal (corrected) vision. They evaluated the naturalness of 300 images (150 from LanEvil++ and 150 from real-world scenarios). Each participant viewed an image for 3 seconds and then rated it using a 5-point Absolute Category Rating (ACR) [126]. The entire evaluation was completed in 30 minutes. The average ACR results (our images: 3.89 and real-world images: 3.98) suggest that our simulated images are comparatively natural to human vi-sion when compared to real-world images. 
+
+ADVLM perception study. Following the human per-ception study, we further evaluate visual fidelity from the perspective of ADVLMs. We use both Dolphins and Driv-eLM as evaluation models on 300 images, including 150 from LanEvil++ and 150 from real-world scenarios. The evaluation metric is the ASR. The average ASR is 4.23 for 
+
+LanEvil++ and 4.32 for real-world images, indicating that the visual quality of LanEvil++ is comparable to real-world inputs from the perspective of ADVLM perception. 
+
+5.6 Combined Illusions Analysis 
+
+To further investigate the combined influence of multiple environmental illusions, we conduct a pilot study. Based on the four illusion categories, namely Road Damage (RD), Traffic Obstruction (TO), Shadow (SH), and Reflection (RF), we systematically construct six different two-illusion com-binations. Each combination contains 100 images for con-ventional LD evaluation and 20 clips for ADVLMs testing, created by sequentially applying both illusions within the same simulated environment. As this experiment empha-sizes analysis under single controlled factors rather than comprehensive benchmark expansion, the results provide a concise quantitative reference for assessing cross-illusion interaction and compositional effects. As shown in Tab. 6, the results from this small-scale experiment suggest that combining two types of environ-JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 13 
+
+TABLE 6: Performance under combined illusions. “Gap” denotes the performance drop compared to the original non-illusion condition. Results are reported for GANet under Accuracy (%) and DriveLM under GPT Score (%). 
+
+(a) Results for GANet under Accuracy (%)                    
+
+> Metric RD+TO RD+SH RD+RF TO+SH TO+RF SH+RF
+> Original 81.5 82.1 82.4 81.0 81.3 82.6 Perturbed 72.9 73.0 74.1 71.6 72.5 73.4 Gap -8.6 -9.1 -8.3 -9.4 -8.8 -9.2
+
+(b) Results for DriveLM under GPT Score (%)                    
+
+> Metric RD+TO RD+SH RD+RF TO+SH TO+RF SH+RF
+> Original 79.5 79.8 80.1 78.9 79.2 80.3 Perturbed 76.0 75.6 76.7 73.9 74.8 76.2 Gap -3.5 -4.2 -3.4 -5.0 -4.4 -4.1
+
+mental illusions leads to a stronger performance degrada-tion compared with individual factors, although the increase remains moderate. For the conventional model (GANet), the average Accuracy decreases from 7.5% under single illusion conditions to 8.9% when two illusions appear simultane-ously. For the ADVLMs (DriveLM), the GPT Score decreases from 2.3% to 4.1%. These findings imply that concurrent environmental illusions indeed aggravate recognition dif-ficulty, but the overall influence grows within a limited range rather than explosively. Experiment of overlaying more environmental illusions is in the Supplementary Materials. 
+
+5.7 Parameter Sensitivity Analysis 
+
+We further analyze the influence of MIDA’s main hyperpa-rameters using one representative conventional LD model (LaneATT for AAM++) and one representative ADVLM (DriveLM for PAT++). Each parameter was varied over a wide range. Tab. 7 indicates that all metrics exhibit only minor fluctuations across different settings. The final config-urations ( THAA =0 .6, TLAA =0 .4, β=0 .5, α=0 .6) are chosen as they provide consistently stable performance plateaus for both conventional LD models and ADVLMs, avoiding overfitting to specific hyperparameter values. All metrics exhibit only minor variations (within approx-imately 0.6% for AAM++ and 0.3% for PAT++), which con-firms the overall stability of the MIDA. The final parameter configuration is selected at the point where both accuracy and robustness reach stable and consistent plateaus. 
+
+6 SIMULATION CASE STUDIES 
+
+We conduct closed-loop evaluations in a simulation envi-ronment ( i.e., CARLA) using two models: OpenPilot [20] for conventional LD models and LMDrive [21] for ADVLMs. The 3D scenarios from LanEvil++ are used as direct percep-tion inputs, and the systems are evaluated based on their final decision-making performance. 
+
+6.1 OpenPilot Simulation 
+
+We begin by evaluating LanEvil++ on OpenPilot, an open-source commercial driver assistance system that has been TABLE 7: Parameter Sensitivity Experiments Results 
+
+(a) AAM++ sensitivity to THAA on LaneATT.                   
+
+> Metric 0.2 0.3 0.4 0.5 0.6 0.7 Accuracy (%) 89.12 89.25 89.41 89.58 89.73 89.57 F1-Score (%) 83.42 83.55 83.71 83.89 84.02 83.87
+
+(b) AAM++ sensitivity to TLAA on LaneATT.                   
+
+> Metric 0.05 0.1 0.2 0.3 0.4 0.5 Accuracy (%) 88.98 89.14 89.32 89.47 89.62 89.45 F1-Score (%) 83.28 83.44 83.59 83.75 83.93 83.78
+
+(c) AAM++ sensitivity to mixing ratio β on LaneATT.                   
+
+> Metric 0.1 0.2 0.3 0.4 0.5 0.6 Accuracy (%) 89.21 89.33 89.49 89.61 89.78 89.74 F1-Score (%) 83.48 83.60 83.72 83.83 84.01 83.96
+
+(d) PAT++ sensitivity to balancing coefficient α on DriveLM.                   
+
+> Metric 0.1 0.2 0.3 0.4 0.6 0.8 GPT Score (%) 80.49 80.61 80.69 80.78 80.93 80.71 Language Score (%) 30.09 30.22 30.33 30.41 30.54 30.46
+
+(a) Clean Scenario 
+
+(b) Perturbed Scenario 
+
+Fig. 10: The Tire Marks case causes OpenPilot to make incorrect decisions leading to collisions on the wall. deployed in real-world vehicles such as those from TOY-OTA. Eight cases are selected from LanEvil++ , covering two types under each illusion category. Each case is config-ured with a defined starting point and direction to ensure traversal through the designated road sections. The eval-uation pipeline is as follows: ❶ connect OpenPilot with a source-compiled CARLA 0.9.14 simulator and configure initialization parameters such as maps; ❷ for each clean and perturbed 3D case pair, choose a vehicle model ( i.e., Audi) and set the starting position; ❸ enable autonomous driving mode with a speed limit of 45 mph and assess the system’s decision-making performance. The starting point is set approximately 5–10 meters before the illusion region. We repeat each experiment five times across all eight cases and report the average results. Following [97], we use Attack Success Rate (ASR) as the evaluation metric. Accord-JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 14 
+
+Fig. 11: The Rail case causes LMDrive to make incorrect decisions leading to collision on the road side. ing to the US traffic policy [127], a perturbation is considered successful if it causes the vehicle to deviate laterally by more than 0.285 meters within 2.5 seconds. As driving time progresses, we observe a significant increase in ASR across all types of illusions, indicating that the vehicle increasingly makes incorrect decisions. For example, in 92.31% of frames, the Road Damage scenario causes OpenPilot to deviate by more than 0.285 meters within the required timeframe. As shown in Fig. 10, the Tire Marks scenario leads to frequent recognition failures, ultimately causing the vehicle to collide with the wall. These findings demonstrate that the proposed environmental illusions substantially compromise the robustness of commercial AD systems. 
+
+6.2 LMDrive Simulation 
+
+After evaluating OpenPilot, which is based on conventional LD models, we further assess the performance of AD-VLMs using LMDrive [21], a representative ADVLM, in the CARLA simulator. The evaluation procedure is similar to that of OpenPilot: ❶ start the Docker-based CARLA 0.9.10.1 environment; ❷ launch the CARLA leaderboard with the selected agent ( i.e., Audi); and ❸ enable driving mode to begin evaluation. The starting point is set 5–10 meters before the illusion region. We select eight cases for evaluation, with each exper-iment repeated five times. The evaluation metric is ASR, following the details outlined in Sec. 6.1. Results show that ASR reaches 77.5% in environments with illusions, compared to only 11.25% in environments without illusions. As shown in Fig. 11, the Rail environmental illusion leads the vehicle controlled by LMDrive to collide. In summary, the above evaluations on both systems highlight the potential threats posed by the proposed en-vironmental illusions to closed-loop AD systems, whether based on conventional LD models or ADVLMs. These find-ings raise safety concerns for real-world AD vehicles. 
+
+7 REAL -WORLD CASE STUDIES 
+
+Finally, we extend our closed-loop experiments from sim-ulation to real-world scenarios to evaluate the impact of environmental illusions in practical settings. We use two AD test vehicles: ❶ Jetbot [128], an open-source platform with an NVIDIA Jetson Nano and an RGB camera, features two-wheel differential drive for basic motion control. ❷
+
+LIMO PRO [129], equipped with an NVIDIA Orin Nano, TABLE 8: Performance comparison between simulated and real-world routes. Each real route replicates the correspond-ing simulated layout in LanEvil++ . The Conventional LD Model is evaluated by Accuracy (%), and the ADVLMs by the GPT Score (%).                          
+
+> Route Type LaneATT Dolphins Simulated Real-world Simulated Real-world Straight 72.4 70.9 74.1 72.8 Right Turn 71.6 70.3 73.8 72.1 Left Turn 69.8 68.4 71.2 70.1 Mixed Conditions 70.5 68.9 72.0 70.7 Average 71.1 69.6 72.8 71.4
+
+TABLE 9: The experimental results of real-world case stud-ies. The values are shown in success times / total times .                          
+
+> JetBot [128] LIMO [129] Route 1 Route 2 Route 3 Route 4 Route 1 Route 2 Route 3 Route 4 w/o illusions 8 / 10 7 / 10 8 / 10 9 / 10 6 / 10 5 / 10 5 / 10 7 / 10 w/ illusions 2 / 10 2 / 10 4 / 10 1 / 10 0 / 10 1 / 10 2 / 10 1 / 10
+
+LiDAR, and a depth camera, adopts a four-wheel chassis with Ackermann steering for realistic vehicle dynamics. Due to the characteristics of both vehicles, we tested the conventional LD models on Jetbot vehicles and ADVLMs on LIMO vehicles. The experiment was conducted on an AGILE•X sand ta-ble. Four representative routes were selected from LanEvil++ 
+
+and reconstructed on the sand table, covering straight seg-ments, turning curves, and mixed conditions. Two illusion variants were applied to every route: Shadow scenes gen-erated by adjustable overhead lighting and Road Damage scenes emulated with textured surface patches. This setup ensured tight spatial and visual alignment with the simu-lated scenarios. Each scenario was tested 10 times. A trial is considered successful if the vehicle completes the route without a collision. The evaluation metric is calculated as the ratio of successful trials to the total number of trials. 
+
+Sim2Real Consistency Validation. To verify visual con-sistency, 50 frames were sampled at matched positions from both domains for LD. We chose representative models ( i.e., LaneATT for conventional LD models and Dolphins for ADVLMs). As shown in Tab. 8, the LaneATT achieved an average Accuracy of 71.1% in simulation and 69.6% in real tests, while the Dolphins reached GPT Score of 72.8% and 71.4%. The close results indicate that both models exhibit stable performance when transferred from simulation to real environments, confirming the fidelity of scene replication and the validity of the evaluation. 
+
+7.1 Jetbot Vehicle Evaluation 
+
+We deployed the LaneATT model with a ResNet34 backbone on the Jetbot vehicle. The model’s output was used to detect lane markings and compute the lane center. Steering deci-sions were made based on the center’s horizontal position in the image: left area (0–40%) triggers a right turn, center area (40–60%) drives straight, and right area (60–100%) triggers a left turn. The control loop runs every 0.5 seconds, and the vehicle speed is set to 0.2 m/s. As shown in the left part of Tab. 9, in the scenario without environmental JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 15 
+
+illusions, the JetBot achieves a success completion rate (SCR) of 80.00%. However, in the presence of environmental illu-sions, the SCR drops significantly to 22.5%. This indicates that environmental illusions continue to pose a significant threat on conventional LD models in real-world scenarios. The Fig. 12a and Fig. 12b show the performance of the Jetbot vehicle under Shadow illusions. We further inspect representative failure cases on JetBot to better understand the failure modes caused by environmental illusions. Under Shadow and Reflection illusions, critical lane boundaries become partially occluded, causing LaneATT to misidentify the lane center and issue incorrect turning commands. 
+
+7.2 LIMO Vehicle Evaluation 
+
+We deploy ADVLMs on LIMO vehicles by integrating two large models, Dolphins and LLaMA, as described in [130], [131]. This setup enables the translation of high-level driving commands into low-level control signals suitable for real-world execution. As shown in the right part of Tab. 9, the system achieves an SCR of 57.5% without environmental illusions. However, when environmental illusions are intro-duced, the SCR drops significantly to 10.0%, further high-lighting the strong impact of such illusions on ADVLMs. The Fig. 12c and Fig. 12d show the performance of LIMO under the Shadow environmental illusion. Qualitative in-spection of LIMO failure cases reveals a different failure pattern from JetBot. When Shadow illusions obscure high-contrast cues, the visual encoder provides weakened fea-tures, leading DriveLM to generate semantically plausible but operationally incorrect commands. 
+
+8 CONCLUSIONS AND FUTURE WORK 
+
+This paper investigates the potential threats posed by envi-ronmental illusions in autonomous driving (AD) from a per-spective of lane perception. We establish LanEvil++ , the first comprehensive benchmark for evaluating model robustness under such conditions. Large-scale experiments show that naturally occurring environmental illusions significantly de-grade the performance of lane perception models, under-scoring the need for greater attention to this overlooked challenge in building reliable AD systems. The proposed MIDA framework further improves robustness against these illusions. We hope this study raises awareness of the threat of environmental illusions and encourages further research toward more robust and reliable AD system. To access the dataset, please contact the authors via email. 
+
+Limitations. Despite the promising results, several ar-eas remain to be explored: ❶ evaluation of LanEvil++ on other common tasks like 3D detection; and ❷ testing more product-level real-world autonomous driving vehicles. 
+
+9 ACKNOWLEDGMENTS 
+
+This work was supported by the National Natural Science Foundation of China (Grant. 62476018), Beijing Natural Sci-ence Foundation (Grant. QY24136). 
+
+(a) Clean Scenario for Jetbot Evaluation 
+
+(b) Perturbed Scenario for Jetbot Evaluation 
+
+(c) Clean Scenario for LIMO Evaluation 
+
+(d) Perturbed Scenario for LIMO Evaluation 
+
+Fig. 12: Consecutive images showing the LD model–driven Jetbot and the ADVLM–driven LIMO failing to interpret the required actions when confronted with Shadow envi-ronmental illusions, ultimately resulting in collisions. 
+
+REFERENCES                               
+
+> [1] wiki, “Death of elaine herzberg,” https://en.wikipedia.org/ wiki/Death of Elaine Herzberg, 2018. [2] Z. Qin, H. Wang, and X. Li, “Ultra fast structure-aware deep lane detection,” in ECCV , 2020. [3] T. Zheng, H. Fang, Y. Zhang, W. Tang, Z. Yang, H. Liu, and D. Cai, “Resa: Recurrent feature-shift aggregator for lane detection,” in
+> AAAI , 2021. [4] Z. Qin, P. Zhang, and X. Li, “Ultra fast deep lane detection with hybrid anchor driven ordinal classification,” IEEE TPAMI , 2022. [5] A. B. Hillel, R. Lerner, D. Levi, and G. Raz, “Recent progress in road and lane detection: a survey,” MACH VISION APPL , 2014. [6] X. Pan, J. Shi, P. Luo, X. Wang, and X. Tang, “Spatial as deep: Spatial cnn for traffic scene understanding,” in AAAI , 2018. [7] C. Sima, K. Renz, K. Chitta et al. , “Drivelm: Driving with graph visual question answering,” in European Conference on Computer Vision .Cham: Springer Nature Switzerland, 2024, pp. 256–274. [8] D. Hendrycks and T. Dietterich, “Benchmarking neural network robustness to common corruptions and perturbations,” arXiv preprint arXiv:1903.12261 , 2019. [9] Y. Dong, C. Kang, J. Zhang, Z. Zhu, Y. Wang, X. Yang, H. Su, X. Wei, and J. Zhu, “Benchmarking robustness of 3d object detection to common corruptions,” in CVPR , 2023. [10] H. Alghodhaifi and S. Lakshmanan, “Autonomous vehicle eval-uation: A comprehensive survey on modeling and simulation approaches,” IEEE Access , 2021. [11] F. Rosique, P. J. Navarro, C. Fern´ andez, and A. Padilla, “A systematic review of perception system and simulators for au-tonomous vehicles research,” Sensors , 2019. [12] D. J. Fremont, E. Kim, Y. V. Pant, S. A. Seshia, A. Acharya, X. Bruso, P. Wells, S. Lemke, Q. Lu, and S. Mehta, “Formal scenario-based testing of autonomous vehicles: From simulation to the real world,” in ITSC , 2020. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 16
+
+[13] Q. Li, Z. Peng, L. Feng, Q. Zhang, Z. Xue, and B. Zhou, “Metadrive: Composing diverse driving scenarios for general-izable reinforcement learning,” IEEE TPAMI , 2022. [14] S. Li, S. Zhang, G. Chen, D. Wang, P. Feng, J. Wang, A. Liu, X. Yi, and X. Liu, “Towards benchmarking and assessing visual naturalness of physical world adversarial attacks,” in CVPR ,2023. [15] J. Wang, A. Liu, Z. Yin, S. Liu, S. Tang, and X. Liu, “Dual attention suppression attack: Generate adversarial camouflage in physical world,” in CVPR , 2021. [16] S. R. Richter, V. Vineet, S. Roth, and V. Koltun, “Playing for data: Ground truth from computer games,” in ECCV , 2016. [17] S. R. Richter, Z. Hayder, and V. Koltun, “Playing for bench-marks,” in ICCV , 2017. [18] A. R. Sekkat, Y. Dupuis, P. Vasseur, and P. Honeine, “The omnis-cape dataset,” in ICRA , 2020. [19] A. Dosovitskiy, G. Ros, F. Codevilla, A. Lopez, and V. Koltun, “Carla: An open urban driving simulator,” in CoRL , 2017. [20] comma, “openpilot,” https://github.com/commaai/openpilot, 2017. [21] H. Shao, Y. Hu, L. Wang et al. , “Lmdrive: Closed-loop end-to-end driving with large language models,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2024, pp. 15 120–15 130. [22] S. Liang, M. Zhu, A. Liu, B. Wu, X. Cao, and E.-C. Chang, “Bad-clip: Dual-embedding guided backdoor attack on multimodal contrastive learning,” arXiv preprint arXiv:2311.12075 , 2023. [23] A. Liu, X. Zhang, Y. Xiao, Y. Zhou, S. Liang, J. Wang, X. Liu, X. Cao, and D. Tao, “Pre-trained trojan attacks for visual recogni-tion,” arXiv preprint arXiv:2312.15172 , 2023. [24] X. Liu, X. Jia, J. Gu, Y. Xun, S. Liang, and X. Cao, “Does few-shot learning suffer from backdoor attacks?” arXiv preprint arXiv:2401.01377 , 2023. [25] J. Liang, S. Liang, A. Liu, X. Jia, J. Kuang, and X. Cao, “Poisoned forgery face: Towards backdoor attacks on face forgery detec-tion,” arXiv preprint arXiv:2402.11473 , 2024. [26] J. Liang, S. Liang, M. Luo, A. Liu, D. Han, E.-C. Chang, and X. Cao, “Vl-trojan: Multimodal instruction backdoor attacks against autoregressive visual language models,” arXiv preprint arXiv:2402.13851 , 2024. [27] X. Li, S. Liang, J. Zhang, H. Fang, A. Liu, and E.-C. Chang, “Semantic mirror jailbreak: Genetic algorithm based jailbreak prompts against open-source llms,” arXiv preprint arXiv:2402.14872 , 2024. [28] T. Zhang, L. Wang, H. Li, Y. Xiao, S. Liang, A. Liu, X. Liu, and D. Tao, “Lanevil: Benchmarking the robustness of lane detection to environmental illusions,” in Proceedings of the 32nd ACM Inter-national Conference on Multimedia , 2024, pp. 5403–5412. [29] D. Neven, B. De Brabandere, S. Georgoulis, M. Proesmans, and L. Van Gool, “Towards end-to-end lane detection: an instance segmentation approach,” in IV , 2018. [30] Y. Liu, M. Zeng, and Q. Meng, “Heatmap-based vanishing point boosts lane detection,” arXiv preprint arXiv:2007.15602 , 2020. [31] Y. Ko, Y. Lee, S. Azam, F. Munir, M. Jeon, and W. Pedrycz, “Key points estimation and point instance segmentation approach for lane detection,” IEEE Trans. Intell. Transp. Syst. , 2021. [32] Z. Qu, H. Jin, Y. Zhou, Z. Yang, and W. Zhang, “Focus on local: Detecting lane marker from bottom up via key point,” in CVPR ,2021. [33] J. Wang, Y. Ma, S. Huang, T. Hui, F. Wang, C. Qian, and T. Zhang, “A keypoint-based global association network for lane detec-tion,” in CVPR , 2022. [34] X. Li, J. Li, X. Hu, and J. Yang, “Line-cnn: End-to-end traffic line detection with line proposal unit,” IEEE Trans. Intell. Transp. Syst. ,2019. [35] L. Tabelini, R. Berriel, T. M. Paixao, C. Badue, A. F. De Souza, and T. Oliveira-Santos, “Keep your eyes on the lane: Real-time attention-guided lane detection,” in CVPR , 2021. [36] J. Su, C. Chen, K. Zhang, J. Luo, X. Wei, and X. Wei, “Structure guided lane detection,” arXiv preprint arXiv:2105.05403 , 2021. [37] J. Han, X. Deng, X. Cai, Z. Yang, H. Xu, C. Xu, and X. Liang, “Laneformer: Object-aware row-column transformers for lane detection,” in AAAI , 2022. [38] T. Zheng, Y. Huang, Y. Liu, W. Tang, Z. Yang, D. Cai, and X. He, “Clrnet: Cross layer refinement network for lane detection,” in 
+
+CVPR , 2022. [39] S. Yoo, H. S. Lee, H. Myeong, S. Yun, H. Park, J. Cho, and D. H. Kim, “End-to-end lane marker detection via row-wise classification,” in CVPR Workshop , 2020. [40] Y. Hou, Z. Ma, C. Liu, T.-W. Hui, and C. C. Loy, “Inter-region affinity distillation for road marking segmentation,” in CVPR ,2020. [41] L. Tabelini, R. Berriel, T. M. Paixao, C. Badue, A. F. De Souza, and T. Oliveira-Santos, “Polylanenet: Lane estimation via deep polynomial regression,” in ICPR , 2021. [42] R. Liu, Z. Yuan, T. Liu, and Z. Xiong, “End-to-end lane shape prediction with transformers,” in WACV , 2021. [43] H. Chen, M. Wang, and Y. Liu, “Bsnet: Lane detection via draw b-spline curves nearby,” arXiv preprint arXiv:2301.06910 , 2023. [44] Z. Feng, S. Guo, X. Tan, K. Xu, M. Wang, and L. Ma, “Rethinking efficient lane detection via curve modeling,” in CVPR , 2022. [45] D. Fu, X. Li, L. Wen et al. , “Drive like a human: Rethink-ing autonomous driving with large language models,” in 2024 IEEE/CVF Winter Conference on Applications of Computer Vision Workshops (WACVW) . IEEE, 2024, pp. 910–919. [46] J. Mao, Y. Qian, J. Ye et al. , “Gpt-driver: Learning to drive with gpt,” in NeurIPS 2023 Foundation Models for Decision Making Workshop , 2023. [47] J. Mao, J. Ye, Y. Qian et al. , “A language agent for autonomous driving,” arXiv preprint arXiv:2311.10813 , 2023. [48] M. Nie, R. Peng, C. Wang et al. , “Reason2drive: Towards inter-pretable and chain-based reasoning for autonomous driving,” in 
+
+European Conference on Computer Vision . Cham: Springer Nature Switzerland, 2024, pp. 292–308. [49] A. M. Marcu, L. Chen, J. H ¨ unermann et al. , “Lingoqa: video ques-tion answering for autonomous driving (2023),” arXiv preprint arXiv:2312.14115 , 2023. [50] Y. Ma, Y. Cao, J. Sun et al. , “Dolphins: Multimodal language model for driving,” in European Conference on Computer Vision .Cham: Springer Nature Switzerland, 2024, pp. 403–420. [51] L. Chen, O. Sinavski, J. H ¨ unermann et al. , “Driving with llms: Fusing object-level vector modality for explainable autonomous driving,” in 2024 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2024, pp. 14 093–14 100. [52] J. Liu, P. Hang, X. Qi et al. , “Mtd-gpt: A multi-task decision-making gpt model for autonomous driving at unsignalized inter-sections,” in 2023 IEEE 26th International Conference on Intelligent Transportation Systems (ITSC) . IEEE, 2023, pp. 5154–5161. [53] W. Wang, J. Xie, C. Y. Hu et al. , “Drivemlm: Aligning multi-modal large language models with behavioral planning states for autonomous driving,” arXiv preprint arXiv:2312.09245 , 2023. [54] S. Wang, Z. Yu, X. Jiang, S. Lan, M. Shi, N. Chang, J. Kautz, Y. Li, and J. M. Alvarez, “Omnidrive: A holistic vision-language dataset for autonomous driving with counterfactual reasoning,” in CVPR , 2025. [55] Z. Xu, Y. Zhang, E. Xie et al. , “Drivegpt4: Interpretable end-to-end autonomous driving via large language model,” IEEE Robotics and Automation Letters , 2024. [56] L. Kong, Y. Liu, X. Li et al. , “Robo3d: Towards robust and reliable 3d perception against corruptions,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 19 994–20 006. [57] L. Kong, S. Xie, H. Hu et al. , “Robodepth: Robust out-of-distribution depth estimation under corruptions,” Advances in Neural Information Processing Systems , vol. 36, pp. 21 298–21 342, 2023. [58] S. Xie, L. Kong, W. Zhang et al. , “Benchmarking and improving bird’s eye view perception robustness in autonomous driving,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence ,2025. [59] M. Aly, “Real time detection of lane markers in urban streets,” in 
+
+IV , 2008. [60] S. Lee, J. Kim, J. Shin Yoon, S. Shin, O. Bailo, N. Kim, T.-H. Lee, H. Seok Hong, S.-H. Han, and I. So Kweon, “Vpgnet: Vanishing point guided network for lane and road marking detection and recognition,” in ICCV , 2017. [61] Tusimple, “Tusimple benchmark,” https://github.com/ TuSimple/tusimple-benchmark, 2017. [62] F. Yu, H. Chen, X. Wang, W. Xian, Y. Chen, F. Liu, V. Madhavan, and T. Darrell, “Bdd100k: A diverse driving dataset for heteroge-neous multitask learning,” in CVPR , 2020. [63] K. Behrendt and R. Soussan, “Unsupervised labeled lane markers using maps,” in ICCV Workshop , 2019. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 17 
+
+[64] H. Xu, S. Wang, X. Cai, W. Zhang, X. Liang, and Z. Li, “Curvelane-nas: Unifying lane-sensitive architecture search and adaptive point blending,” in ECCV , 2020. [65] C. Zhang, A. Liu, X. Liu, Y. Xu, H. Yu, Y. Ma, and T. Li, “In-terpreting and improving adversarial robustness of deep neural networks with neuron sensitivity,” IEEE TIP , 2021. [66] J. Guo, W. Bao, J. Wang, Y. Ma, X. Gao, G. Xiao, A. Liu, J. Dong, X. Liu, and W. Wu, “A comprehensive evaluation framework for deep model robustness,” PR , 2023. [67] A. Liu, T. Huang, X. Liu, Y. Xu, Y. Ma, X. Chen, S. J. Maybank, and D. Tao, “Spatiotemporal attacks for embodied agents,” in ECCV ,2020. [68] Y. Xiao, A. Liu, T. Zhang, H. Qin, J. Guo, and X. Liu, “Robustmq: benchmarking robustness of quantized models,” Visual Intelli-gence , 2023. [69] Y. Xiao, T. Zhang, S. Liu, and H. Qin, “Benchmarking the robust-ness of quantized models,” arXiv preprint arXiv:2304.03968 , 2023. [70] A. Liu, S. Tang, S. Liang, R. Gong, B. Wu, X. Liu, and D. Tao, “Ex-ploring the relationship between architecture and adversarially robust generalization,” in CVPR , 2023. [71] S. Liu, J. Wang, A. Liu, Y. Li, Y. Gao, X. Liu, and D. Tao, “Harnessing perceptual adversarial patches for crowd counting,” in ACM CCS , 2022. [72] A. Liu, X. Liu, H. Yu, C. Zhang, Q. Liu, and D. Tao, “Training robust deep neural networks via adversarial noise propagation,” 
+
+IEEE TIP , 2021. [73] S. Tang, R. Gong, Y. Wang, A. Liu, J. Wang, X. Chen, F. Yu, X. Liu, D. Song, A. Yuille et al. , “Robustart: Benchmarking robustness on architecture design and training techniques,” ArXiv , 2021. [74] T. Zhang, Y. Xiao, X. Zhang, H. Li, and L. Wang, “Benchmarking the physical-world adversarial robustness of vehicle detection,” 
+
+arXiv preprint arXiv:2304.05098 , 2023. [75] W. Jiang, T. Zhang, S. Liu, W. Ji, Z. Zhang, and G. Xiao, “Exploring the physical-world adversarial robustness of vehicle detection,” Electronics , 2023. [76] X. Zhang, A. Liu, T. Zhang, S. Liang, and X. Liu, “Towards robust physical-world backdoor attacks on lane detection,” arXiv preprint arXiv:2405.05553 , 2024. [77] L. Wang, T. Zhang, Y. Han, M. Fang, T. Jin, and J. Kang, “Attack end-to-end autonomous driving through module-wise noise,” 
+
+CVPR Workshop , 2024. [78] X. Zhang, T. Zhang, Y. Zhang, and S. Liu, “Enhancing the transferability of adversarial attacks with stealth preservation,” 
+
+CVPR Workshop , 2024. [79] S. Liang, X. Wei, and X. Cao, “Generate more imperceptible adversarial examples for object detection,” in ICML , 2021. [80] S. Liang, X. Wei, S. Yao, and X. Cao, “Efficient adversarial attacks for visual object tracking,” in ECCV , 2020. [81] X. Wei, S. Liang, N. Chen, and X. Cao, “Transferable adversarial attacks for image and video object detection,” arXiv preprint arXiv:1811.12641 , 2018. [82] S. Liang, B. Wu, Y. Fan, X. Wei, and X. Cao, “Parallel rectangle flip attack: A query-based black-box attack against object detection,” 
+
+arXiv preprint arXiv:2201.08970 , 2022. [83] S. Liang, L. Li, Y. Fan, X. Jia, J. Li, B. Wu, and X. Cao, “A large-scale multiple-objective method for black-box attack against ob-ject detection,” in ECCV , 2022. [84] Z. Wang, Z. Zhang, S. Liang, and X. Wang, “Diversifying the high-level features for better adversarial transferability,” arXiv preprint arXiv:2304.10136 , 2023. [85] A. Liu, J. Guo, J. Wang, S. Liang, R. Tao, W. Zhou, C. Liu, X. Liu, and D. Tao, “X-adv: Physical adversarial object attacks against x-ray prohibited item detection,” in USENIX Security , 2023. [86] B. He, J. Liu, Y. Li, S. Liang, J. Li, X. Jia, and X. Cao, “Generating transferable 3d adversarial point cloud via random perturbation factorization,” in AAAI , 2023. [87] J. Liu, S. Zhu, S. Liang, J. Zhang, H. Fang, W. Zhang, and E.-C. Chang, “Improving adversarial transferability by stable diffusion,” arXiv preprint arXiv:2311.11017 , 2023. [88] B. He, X. Jia, S. Liang, T. Lou, Y. Liu, and X. Cao, “Sa-attack: Improving adversarial transferability of vision-language pre-training models via self-augmentation,” arXiv preprint arXiv:2312.04913 , 2023. [89] L. Muxue, C. Wang, S. Liang, A. Liu, Z. Liu, L. Yang, and X. Cao, “Adversarial instance attacks for interactions between human and object,” 2023. [90] T. Lou, X. Jia, J. Gu, L. Liu, S. Liang, B. He, and X. Cao, “Hide in thicket: Generating imperceptible and rational adversarial per-turbations on 3d point clouds,” arXiv preprint arXiv:2403.05247 ,2024. [91] L. Kong, Y. Liu, X. Li, R. Chen, W. Zhang, J. Ren, L. Pan, K. Chen, and Z. Liu, “Robo3d: Towards robust and reliable 3d perception against corruptions,” in ICCV , 2023. [92] Z. Ying, A. Liu, S. Liang, L. Huang, J. Guo, W. Zhou, X. Liu, and D. Tao, “Safebench: A safety evaluation framework for mul-timodal large language models,” International Journal of Computer Vision , vol. 134, no. 1, p. 18, 2026. [93] Y. Xiao, A. Liu, S. Liang, Z. Ying, X. Liu, and D. Tao, “Detoxi-fying large language models via autoregressive reward guided representation editing,” Advances in Neural Information Processing Systems , vol. 38, pp. 72 341–72 369, 2026. [94] Z. Ying, A. Liu, T. Zhang, Z. Yu, S. Liang, X. Liu, and D. Tao, “Jail-break vision language models via bi-modal adversarial prompt,” 
+
+IEEE Transactions on Information Forensics and Security , 2025. [95] A. Liu, X. Liu, X. Zhang, Y. Xiao, Y. Zhou, S. Liang, J. Wang, X. Cao, and D. Tao, “Pre-trained trojan attacks for visual recogni-tion,” International Journal of Computer Vision , vol. 133, no. 6, pp. 3568–3585, 2025. [96] A. Liu, Y. Zhou, X. Liu, T. Zhang, S. Liang, J. Wang, Y. Pu, T. Li, J. Zhang, W. Zhou et al. , “Compromising llm driven embodied agents with contextual backdoor attacks,” IEEE Transactions on Information Forensics and Security , 2025. [97] T. Sato, J. Shen, N. Wang, Y. Jia, X. Lin, and Q. A. Chen, “Dirty road can attack: Security of deep learning based automated lane centering under {Physical-World } attack,” in USENIX Security ,2021. [98] A. Boloor, K. Garimella, X. He, C. Gill, Y. Vorobeychik, and X. Zhang, “Attacking vision-based perception in end-to-end au-tonomous driving models,” JSA , 2020. [99] P. Sun, H. Kretzschmar, X. Dotiwalla et al. , “Scalability in per-ception for autonomous driving: Waymo open dataset,” in Pro-ceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2020, pp. 2446–2454. [100] T. Qian, J. Chen, L. Zhuo et al. , “Nuscenes-qa: A multi-modal visual question answering benchmark for autonomous driving scenario,” in Proceedings of the AAAI Conference on Artificial Intel-ligence , vol. 38, no. 5, 2024, pp. 4542–4550. [101] C. Y. Lin, “Rouge: A package for automatic evaluation of sum-maries,” in Text summarization branches out . Barcelona, Spain: Association for Computational Linguistics, 2004, pp. 74–81. [102] K. Papineni, S. Roukos, T. Ward, and et al., “Bleu: A method for automatic evaluation of machine translation,” in Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics ,2002, pp. 311–318. [103] R. Vedantam, C. Lawrence Zitnick, and D. Parikh, “Cider: Consensus-based image description evaluation,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition ,2015, pp. 4566–4575. [104] S. Xie, L. Kong, Y. Dong, C. Sima, W. Zhang, Q. A. Chen, Z. Liu, and L. Pan, “Are vlms ready for autonomous driving? an em-pirical study from the reliability, data, and metric perspectives,” 
+
+arXiv preprint arXiv:2501.04003 , 2025. [105] National Highway Traffic Safety Administration, “2019 fars/crss coding and validation manual (dot hs 813 010),” Tech. Rep., 2020, accessed: 2025-11-06. [Online]. Available: https://lindseyresearch.com/wp-content/uploads/2021/01/ 2019-FARS-CRSS-Coding-and-Validation-Manual-Revision-Date-July-9-2020. pdf [106] UK Department for Transport. (2025) Road safety statistics: data tables and topic summaries. Contributory factors / RSF series; Accessed: 2025-11-06. [Online]. Available: https://www.gov.uk/government/statistical-data-sets/ reported-road-accidents-vehicles-and-casualties-tables-for-great-britain [107] D. Bezzina and J. Sayer, “Safety pilot model deployment: Test conductor team report,” Report No. DOT HS , 2014. [108] S. Feng, X. Yan, H. Sun, Y. Feng, and H. X. Liu, “Intelligent driv-ing intelligence test for autonomous vehicles with naturalistic and adversarial environment,” Nat. Commun. , 2021. [109] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Doll´ ar, and C. L. Zitnick, “Microsoft coco: Common objects in context,” in ECCV , 2014. [110] OpenAI, “Chatgpt,” 2023, https://chat.openai.com. JOURNAL OF L ATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021 18 
+
+[111] Y. Mo, Y. Wang, Z. Wei, and Y. Wang, “Fight back against jailbreaking via prompt adversarial tuning,” in NeurIPS , 2024. [112] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in CVPR , 2016. [113] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, “Imagenet: A large-scale hierarchical image database,” in CVPR ,2009. [114] K. Simonyan and A. Zisserman, “Very deep convolutional networks for large-scale image recognition,” arXiv preprint arXiv:1409.1556 , 2014. [115] C. Sun, C. Xu, C. Yao, S. Liang, Y. Wu, D. Liang, X. Liu, and A. Liu, “Improving robust fairness via balance adversarial training,” in 
+
+AAAI , 2023. [116] J. Liang, S. Liang, A. Liu, K. Ma, J. Li, and X. Cao, “Exploring inconsistent knowledge distillation for object detection with data augmentation,” in ACM MM , 2023. [117] S. Liang, K. Liu, J. Gong, J. Liang, Y. Xun, E.-C. Chang, and X. Cao, “Unlearning backdoor threats: Enhancing backdoor de-fense in multimodal contrastive learning via local token unlearn-ing,” arXiv preprint arXiv:2403.16257 , 2024. [118] A. Madry, A. Makelov, L. Schmidt, D. Tsipras, and A. Vladu, “Towards deep learning models resistant to adversarial attacks,” 
+
+arXiv preprint arXiv:1706.06083 , 2017. [119] T. DeVries and G. W. Taylor, “Improved regularization of convolutional neural networks with cutout,” arXiv preprint arXiv:1708.04552 , 2017. [120] G. Ghiasi, Y. Cui, A. Srinivas, R. Qian, T.-Y. Lin, E. D. Cubuk, Q. V. Le, and B. Zoph, “Simple copy-paste is a strong data augmentation method for instance segmentation,” in CVPR , 2021. [121] H. Zhang, M. Cisse, Y. N. Dauphin, and D. Lopez-Paz, “mixup: Beyond empirical risk minimization,” arXiv preprint arXiv:1710.09412 , 2017. [122] A. Liu, X. Liu, J. Fan, Y. Ma, A. Zhang, H. Xie, and D. Tao, “Perceptual-sensitive gan for generating adversarial patches,” in 
+
+AAAI , 2019. [123] A. Liu, J. Wang, X. Liu, B. Cao, C. Zhang, and H. Yu, “Bias-based universal adversarial patch attack for automatic check-out,” in 
+
+ECCV , 2020. [124] A. Liu, S. Tang, X. Chen, L. Huang, H. Qin, X. Liu, and D. Tao, “Towards defending multiple lp-norm bounded adversarial per-turbations via gated batch normalization,” IJCV , 2023. [125] Y. Xie, J. Yi, J. Shao, J. Curl, L. Lyu, Q. Chen, X. Xie, and F. Wu, “Defending chatgpt against jailbreak attack via self-reminders,” 
+
+Nature Machine Intelligence , 2023. [126] V. Hosu, H. Lin, T. Sziranyi, and D. Saupe, “Koniq-10k: An ecologically valid database for deep learning of blind image quality assessment,” IEEE TIP , 2020. [127] A. A. of State Highway and T.O.(AASHTO), Policy on Geometric Design of Highways and Streets (7th Edition) . American Associ-ation of State Highway and Transportation Officials (AASHTO), 2018. [128] JetBot, “JetBot,” https://github.com/NVIDIA-AI-IOT/jetbot, 2021. [129] “Limo,” 2024, https://global.agilex.ai/products/limo-pro. [130] T. Zhang, L. Wang, X. Zhang, Y. Zhang, B. Jia, S. Liang, S. Hu, Q. Fu, A. Liu, and X. Liu, “Visual adversarial attack on vision-language models for autonomous driving,” Machine Intelligence Research , 2026. [131] L. Wang, T. Zhang, Y. Qu, S. Liang, Y. Chen, A. Liu, X. Liu, and D. Tao, “Black-box adversarial attack on vision language models for autonomous driving,” arXiv preprint arXiv:2501.13563 , 2025.
