@@ -1,0 +1,727 @@
+Title: ESAR: Event-Based Synthetic Aperture Reconstruction
+
+URL Source: https://arxiv.org/pdf/2607.15073v1
+
+Published Time: Fri, 17 Jul 2026 01:42:19 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# ESAR: Event-Based Synthetic Aperture Reconstruction ∗
+
+Harbir Antil 1, Daniel Blauvelt 1, and David Sayre 11Center for Mathematics and Artificial Intelligence and Department of Mathematical Sciences, George Mason University, Fairfax, Virginia 22030 
+
+Abstract 
+
+Event cameras report asynchronous polarity events when changes in log–radiance exceed a fixed contrast threshold, producing signed temporal contrast measurements rather than con-ventional image frames. We formulate monocular event-based imaging as a synthetic-aperture inverse problem for a static ground-domain log–radiance field θ ∈ RNg . Instead of reconstruct-ing a latent pixel-time volume v ∈ RNpNt , we impose the geometric relation v = P θ , where P
+
+maps the fixed scene into motion-dependent latent views. Aggregating events over finite time intervals gives the linearized model 
+
+AP θ = b + η, 
+
+where A is a temporal differencing operator, b contains signed binned event counts, and η
+
+represents measurement and modeling errors. This decomposition exposes a synthetic-aperture structure: under near-nadir motion, successive projections are approximately shifted views of a common scene, while the composite operator AP remains ill-conditioned because it combines spatial averaging with temporal differencing. We therefore use regularized inversion to recover 
+
+θ. Numerical experiments on simulated data and real near-nadir Falcon Neuro event data show that the proposed θ-based formulation recovers coherent large-scale spatial structure, relative to dynamic latent-image and learned event-reconstruction baselines, while suppressing fine-scale texture. 
+
+# 1 Introduction 
+
+Neuromorphic event cameras differ fundamentally from conventional frame-based imagers in that they do not measure absolute intensity at fixed sampling intervals. Instead, each pixel independently reports asynchronous “events” whenever the local change in log–radiance exceeds a fixed contrast threshold [1]. This sensing paradigm enables extremely high temporal resolution, high dynamic range, and low latency, but it also complicates downstream inference: the sensor outputs a sparse stream of signed contrast changes rather than a sequence of images. A substantial body of recent work has addressed the reconstruction of intensity images or videos from event data. Existing approaches include deep learning methods [2, 3, 4, 5], variational and optimization-based formulations [6, 7, 8], and hybrid methods that fuse events with conventional frame measurements. While these methods have demonstrated strong empirical performance, many 
+
+> ∗
+
+This work is partially supported by the Office of Naval Research (ONR) under Award NO: N00014-24-1-2147. NSF grant DMS-2408877, and the Air Force Office of Scientific Research (AFOSR) under Award NO: FA9550-25-1-0231 
+
+1arXiv:2607.15073v1 [eess.IV] 16 Jul 2026 rely on learned priors, additional sensing modalities, or motion models that are difficult to interpret and analyze theoretically. Most of these approaches reconstruct a latent image or video sequence 
+
+v ∈ RNpNt ,
+
+so that each pixel-time pair is treated as an independent unknown. This is also the perspective adopted in [7], where the reconstruction target is a time-indexed latent signal constrained by event measurements. The present work instead parameterizes the unknown as a static ground-domain log–radiance field 
+
+θ ∈ RNg ,
+
+with the latent sequence induced geometrically through 
+
+v = P θ. 
+
+This parameterization is the central modeling distinction of the paper. It reduces the degrees of freedom from a pixel-time volume to a single scene representation, enforces geometric consistency across views through the projection operator P , and naturally extends to multi-pass or multi-sensor settings in which several trajectories observe the same underlying scene. While one could impose static-scene constraints inside a v-based formulation, the inverse problem would still be posed over the latent pixel-time volume. Here the static-scene assumption is built directly into the unknown, so the geometry and identifiability structure are expressed at the level of θ.In parallel, synthetic aperture radar (SAR) and related imaging modalities have shown that high-resolution scene reconstruction can be achieved by coherently integrating multiple views ac-quired along a platform trajectory [9, 10]. In SAR, scene resolution is not limited by the instan-taneous aperture size, but is determined by the diversity of observations accumulated over time. This perspective raises the question of whether a similar synthetic-aperture interpretation can be developed for monocular event-based sensing, particularly when platform motion induces repeated observations of a static scene. We develop an operator-theoretic framework that casts monocular event sensing as a synthetic-aperture inverse problem. The forward model is separated into a temporal differencing operator, which encodes the event-generation mechanism, and a spatial projection operator, which maps a static ground-referenced log–radiance field into latent views along the platform trajectory. This gives the linearized model 
+
+AP θ = b + η, 
+
+where θ is the unknown scene log–radiance, P encodes platform geometry and footprint integration, 
+
+A captures temporal differencing induced by event generation, b contains signed temporally binned event measurements, and η collects measurement and modeling errors. The formulation reveals a close analogy with strip-map SAR imaging. Under near-nadir mo-tion and mild regularity assumptions on the projection operator, the operators {Pk} are approxi-mately shifted versions of a common blur-and-sample operator. Consequently, successive rows of 
+
+AP encode shifted differences of spatial footprints, producing a synthetic-aperture effect driven by platform motion rather than antenna geometry. At the same time, AP is ill-conditioned be-cause it combines spatial averaging through P with temporal differencing through A, so stable reconstruction requires regularization. The contributions of this paper are threefold: 
+
+• We formulate monocular event-based synthetic-aperture reconstruction through the static-scene parameterization v = P θ , yielding the composite forward model AP θ = b + η for a ground-domain log–radiance field θ ∈ RNg .2• We analyze the shift structure and ill-conditioning of the composite operator AP and derive a regularized reconstruction framework for stable inversion. 
+
+• We present synthetic-aperture reconstructions on both simulated data and real near-nadir Falcon Neuro event data, a neuromorphic payload aboard the International Space Station [11], and compare the proposed θ-based reconstructions against dynamic latent-image and learned event-reconstruction baselines. By framing event-based imaging through the lens of synthetic aperture inversion, this work con-nects neuromorphic sensing, inverse problems, and SAR-style imaging, while remaining compatible with both model-based and learned extensions. 
+
+# 2 Forward Model for Event Synthetic Aperture 
+
+We now build the forward model in one pass. We begin from the temporal event-modeling frame-work inherited from prior latent-sequence formulations, then impose the static-scene geometry through the projection operator P , which leads to the inverse problem 
+
+AP θ = b + η
+
+that we use throughout the remainder of the paper. 
+
+2.1 Temporal Event Model 
+
+Event cameras do not measure absolute brightness. Instead, each pixel reports asynchronous events when the change in log–radiance exceeds a fixed contrast threshold [1]. This subsection introduces a discrete temporal model for event sensing and defines the noise term η that collects the resulting modeling errors. 
+
+Log–Radiance and Threshold Events. Let qρ(t) > 0 denote the true physical radiance at pixel ρ and time t ∈ [0 , T ], and define the corresponding true log–radiance 
+
+ℓρ(t) := log qρ(t).
+
+The positivity assumption ensures that the log–radiance is well defined. An event is generated at pixel ρ whenever the accumulated change in ℓρ(t) since the previous event crosses a fixed contrast threshold c > 0. Let {sj } denote the (strictly increasing) sequence of event times at pixel ρ, and let p(sj ) ∈ {− 1, +1 } denote the polarity of the event occurring at time 
+
+sj , indicating the sign of the change [1, 12]. Individual events do not encode the exact magnitude of the log–radiance increment; they provide only signed threshold crossings. 
+
+Binned Events and Additive Error Model. Fix a temporal grid 0 = t1 < t 2 < · · · < t Nt . For each pixel ρ and interval ( tk, t k+1 ], define the signed binned event measurement 
+
+bρ,k = X  
+
+> sj∈(tk,t k+1 ]
+
+p(sj ).
+
+The net change in true log–radiance over the interval ( tk, t k+1 ] can be written as a sum of incremental changes between successive events occurring in that interval. To capture threshold 3variability, missed events, and temporal discretization in a single additive term, let ηρ,k denote the aggregate error over the interval ( tk, t k+1 ]. Then 
+
+ℓρ(tk+1 ) − ℓρ(tk) = c (bρ,k + ηρ,k ).
+
+Thus, while events do not provide direct access to absolute log–radiance values, their aggregation over a temporal bin yields the corresponding log–radiance difference up to the scaling factor c and the additive error ηρ,k .
+
+Latent Variables and Scaling. Following prior work, we introduce discrete latent variables 
+
+vρ,k . To obtain a clean linear model, we normalize by the contrast threshold and define 
+
+vρ,k := ℓρ(tk)
+
+c .
+
+With this convention, the temporal relation becomes 
+
+vρ,k +1 − vρ,k = bρ,k + ηρ,k .
+
+This normalization absorbs the contrast threshold into the latent variables and ensures that the forward model does not explicitly depend on c.
+
+Relation to Prior Latent-Sequence Models. Prior work formulates binned event measure-ments through a latent time-indexed image sequence v satisfying a temporal differencing relation of the form 
+
+vρ,k +1 − vρ,k = bρ,k + ηρ,k ,
+
+an approach developed in the bilevel inverse formulation of [7] and the dynamic reconstruction framework of [13]. We adopt this temporal event model as the starting point for our formulation, but depart from prior work in how the unknown is parameterized. Stacking vρ,k across all pixels and times yields 
+
+v ∈ RNpNt ,
+
+while stacking bρ,k and ηρ,k yields 
+
+b ∈ RNp(Nt−1) , η ∈ RNp(Nt−1) .
+
+Let Atime ∈ R(Nt−1) ×Nt denote the forward difference operator and define 
+
+A = Atime ⊗ INp .
+
+Then the temporal model can be written compactly as 
+
+Av = b + η. 
+
+This temporal relation supplies the differencing operator A inherited from prior latent-sequence models. We now incorporate the static-scene geometry through the projection operator P .42.2 Static Scene Projection Model 
+
+To encode the static-scene assumption directly in the unknown, we parameterize the scene by a ground-domain log–radiance field 
+
+θ ∈ RNg
+
+and define the projection operator 
+
+P : RNg → RNpNt .
+
+Here Throughout, θ is understood in the same contrast-threshold-normalized units as v (Sec-tion 2.1), i.e. physical log–radiance divided by c, so that v = P θ requires no additional scaling factor. P is the geometric component of the forward model: it maps the static scene parameter θ
+
+into the sequence of projected views to which the temporal differencing operator A is applied. Instead of reconstructing the latent sequence v directly, we impose the static-scene relation 
+
+v = P θ, 
+
+which converts the prior temporal model into the composite synthetic-aperture equation 
+
+AP θ = b + η, 
+
+used throughout the remainder of the paper. Here η is understood to collect not only temporal event-model errors, but also the projection-side linearization and discretization errors introduced in this subsection. We now describe the imaging geometry that defines the rows of P and the footprint structure of its time-indexed blocks {Pk}. Because each pixel footprint sweeps different ground regions as the camera moves, the stacked operator P exhibits a synthetic-aperture structure; its formal relationship to SAR is made precise in Section 5. 
+
+Imaging Geometry and Pixel Footprints. We represent the ground log–radiance field on a fixed discretized grid consisting of Ng surface elements. The unknown log–radiance is modeled as a finite-dimensional vector 
+
+θ = ( θ1, . . . , θ Ng )⊤ ∈ RNg ,
+
+where θi denotes the log–radiance associated with the ith surface cell. Each cell is represented by a point Xi ∈ R2, corresponding to its horizontal location in a world (ground) reference frame, for example the horizontal coordinates of the cell’s geometric center. We orient this frame so that 
+
+e3 = (0 , 0, 1) ⊤
+
+points in the vertical (altitude) direction, while the first two coordinates describe horizontal ground position. The camera is modeled as a calibrated pinhole system [14] with intrinsic matrix 
+
+K =
+
+
+
+fx 0 cx
+
+0 fy cy
+
+0 0 1
+
+ .
+
+Here fx and fy denote the effective focal lengths in pixel units along the horizontal and vertical image axes, and ( cx, c y) denotes the principal point (the projection of the camera center onto the image plane). 5At discrete time tk, the camera pose is described by a rotation Rk ∈ SO (3) and a platform position Ck ∈ R3, mapping world coordinates into the camera frame according to 
+
+xcam = Rk(xworld − Ck).
+
+Let ρ denote a pixel index with image-plane coordinates 
+
+xρ = ( xρ, y ρ)⊤.
+
+Under the pinhole model, this pixel defines a ray with direction 
+
+dρ = K−1
+
+
+
+xρ
+
+yρ
+
+1
+
+ .
+
+This ray, together with the finite spatial extent of the pixel, induces a footprint on the ground surface. The sensor integrates radiance over this footprint before the logarithm enters the event model. To remain consistent with the log–radiance formulation above, we adopt a local lineariza-tion: when the radiance varies moderately across a localized footprint, the log of the footprint-averaged radiance is approximated by the corresponding weighted average of local log–radiance values. Under this approximation, the projected quantity ( Pkθ)ρ can be modeled directly from the ground log–radiance samples θi associated with cells whose representative points Xi lie within or near the footprint. Any residual error from this linearization, together with footprint discretization error, is absorbed into the aggregate modeling term η in the composite forward model introduced above. 
+
+Footprint kernel and weights. To model footprint averaging, we introduce a fixed kernel 
+
+κ : R2 → [0 , ∞),
+
+which is assumed to be Lipschitz continuous, bounded, and compactly supported. For each pixel ρ and time tk, let Xρ,k ∈ R2 denote the center of the corresponding ground footprint. We define the associated footprint neighborhood as the discrete support of the kernel: 
+
+Nρ,k = { i ∈ { 1, . . . , N g} : κ(Xi − Xρ,k )̸ = 0 }.
+
+We assume that the normalization denominator is uniformly bounded below, i.e., there exists 
+
+m > 0 such that X
+
+> j∈N ρ,k
+
+κ(Xj − Xρ,k ) ≥ m for all ρ, k. 
+
+We define the normalized footprint weights by 
+
+wρ,k,i = κ(Xi − Xρ,k )
+
+P 
+
+> j∈N ρ,k
+
+κ(Xj − Xρ,k ) , i ∈ N ρ,k .
+
+Construction and Sparsity of the Projection Operator. For each time tk, the projection operator 
+
+Pk ∈ RNp×Ng
+
+6maps θ to the corresponding latent image. Its ρ-th row is supported on Nρ,k , and is given by (Pkθ)ρ = X
+
+> i∈N ρ,k
+
+wρ,k,i θi.
+
+Stacking the operators Pk across all times yields 
+
+P =
+
+
+
+P1
+
+P2
+
+...
+
+PNt
+
+ ∈ RNpNt×Ng .
+
+Each row of each Pk contains at most |N ρ,k | nonzero entries, and therefore P has at most 
+
+NpNt max  
+
+> ρ,k
+
+|N ρ,k |
+
+nonzero entries. This sparsity is essential for efficient evaluation of the composite operator AP ,and mirrors the sparsity patterns exploited in synthetic-aperture forward models [9, 15]. 
+
+# 3 Synthetic-Aperture Structure of the Forward Operator 
+
+With the composite forward model AP θ = b + η established in Section 2, we now analyze the structure of the signal operator AP . This section develops the structural properties of AP , estab-lishes the approximate shift-invariance that arises in the nadir regime, and analyzes the operator’s rank and identifiability. The resulting structure underlies the SAR comparison formalized later in Section 5 and also parallels optical synthetic-aperture imaging [9, 15, 16]. 
+
+3.1 Block Structure of the Composite Operator 
+
+Applying the temporal differencing operator to the projected view sequence gives (AP θ )ρ,k = ( Pk+1 θ)ρ − (Pkθ)ρ.
+
+Thus 
+
+AP =
+
+
+
+P2 − P1
+
+P3 − P2
+
+...
+
+PNt − PNt−1
+
+ ∈ RNp(Nt−1) ×Ng .
+
+Hence the event stream measures temporal differences of successive spatial projections; Section 5 relates this difference structure to classical synthetic-aperture systems [9]. 
+
+3.2 Synthetic-Aperture Interpretation 
+
+Event cameras do not provide absolute image-brightness measurements; instead, after temporal binning they constrain changes between the projected views {Pkθ}Nt 
+
+> k=1
+
+of the fixed ground log– radiance field θ ∈ RNg . Reconstruction therefore depends critically on how the projection operators 
+
+{Pk} evolve as the sensing platform moves. We consider a near-nadir flight regime in which the camera undergoes primarily horizontal motion with small attitude and altitude variations. In this setting, the geometric effect of platform 7motion is that each pixel footprint moves laterally across the ground with limited deformation. Thus the operators {Pk} are expected to behave approximately as translated versions of a common kernel-weighted footprint operator. This behavior is the structural basis for the SAR analogy formalized in Section 5. Each mea-surement observes the same scene from a shifted viewpoint, and the collection of these shifted observations encodes aperture diversity [9, 15, 16]. The following result makes this approximate shift-structure precise. For nonzero vectors u, v , let ∠(u, v ) denote the angle between them, and let ∥ · ∥ F denote the Frobenius norm on matrices. For each pixel ρ and time tk, let Ω ρ,k ⊂ R2 denote the horizontal footprint of that pixel on the ground. The associated discrete neighborhood is given by Nρ,k , and define diam(Ω ρ,k ) = sup 
+
+> x,y ∈Ωρ,k
+
+∥x − y∥2.
+
+Near-nadir regime. We assume a near-nadir acquisition regime characterized by a small pa-rameter ε > 0 such that, for all relevant pixels ρ and time indices k:(i) Viewing geometry. The viewing directions remain close to nadir. Writing ˆdworld  
+
+> ρ,k
+
+:= 
+
+R⊤ 
+
+> k
+
+dρ/∥dρ∥2 for the ray direction dρ expressed in the world frame at time tk:
+
+∠( ˆdworld  
+
+> ρ,k
+
+, ±e3) ≤ ε, ∥Rk − R1∥F ≤ ε. 
+
+with the sign in ±e3 fixed by the nadir-pointing convention. (ii) Platform motion. The platform motion is predominantly horizontal: 
+
+Ck = ( ξk, h k), |hk − h1| ≤ ε, 
+
+and we define the horizontal displacement 
+
+δk = ξk − ξ1.
+
+(iii) Terrain regularity. Over each footprint domain Ω ρ,k ⊂ R2, the terrain can be locally represented as 
+
+z = ζ(x), x ∈ Ωρ,k ,
+
+with ζ ∈ C2(Ω ρ,k ) satisfying 
+
+∥∇ ζ∥L∞(Ω ρ,k ) ≤ ε, diam(Ω ρ,k )∥D2ζ∥L∞(Ω ρ,k ) ≤ ε. 
+
+Finally, define the footprint-center mismatch ∆ = max  
+
+> ρ,k
+
+∥Xρ,k − (Xρ, 1 + δk)∥2.
+
+We also assume that the footprint kernel κ satisfies the hypotheses stated in Section 2.2: it is Lipschitz, bounded, compactly supported, and its normalization denominator is uniformly bounded below. Let 
+
+M := max  
+
+> ρ,k
+
+|N ρ,k |
+
+denote the maximum footprint cardinality. We assume, as is natural for a localized footprint discretization, that the overlap multiplicity of the footprints is uniformly bounded: there exists 8Q > 0 such that each ground index belongs to at most Q footprint neighborhoods for a fixed time level. The near-nadir regime (i)–(iii) above is the physical scenario in which the footprint-center mismatch ∆ is expected to be small; the theorem below is stated, and proved, directly in terms of ∆ itself, without further use of (i)–(iii). 
+
+Theorem 3.1 (Approximate translation invariance of Pk). Given the footprint-center mismatch ∆
+
+defined above, there exists a family of linear operators 
+
+ePk ∈ RNp×Ng
+
+and a constant C > 0, independent of k and θ, such that for all θ ∈ RNg ,
+
+Pkθ = ePkθ + rk(θ), ∥rk(θ)∥2 ≤ C∆∥θ∥2,
+
+where: 
+
+• ePk is obtained by translating the reference operator P1 by the horizontal displacement δk,
+
+• ∆ = max ρ,k ∥Xρ,k − (Xρ, 1 + δk)∥2 measures the footprint-center mismatch. Proof. Recall that Pk is defined rowwise by (Pkθ)ρ = X
+
+> i∈N ρ,k
+
+wρ,k,i θi, where wρ,k,i = κ(Xi − Xρ,k )
+
+P 
+
+> j∈N ρ,k
+
+κ(Xj − Xρ,k ) .
+
+For each k, define the translated reference footprint center 
+
+eXρ,k := Xρ, 1 + δk.
+
+Let eNρ,k be the discrete support of the kernel centered at eXρ,k , and define 
+
+ewρ,k,i = κ(Xi − eXρ,k )
+
+P  
+
+> j∈eNρ,k
+
+κ(Xj − eXρ,k ) , i ∈ eNρ,k .
+
+The translated reference operator ePk is given by ( ePkθ)ρ = X 
+
+> i∈eNρ,k
+
+ewρ,k,i θi.
+
+By construction, ePk is obtained by translating the reference kernel-weighted footprint operator at time t1 by the horizontal displacement δk.We estimate Pk − ePk. Since 
+
+∥Xρ,k − eXρ,k ∥2 ≤ ∆,
+
+it remains to quantify how the normalized weights change under perturbations of the footprint center. For two admissible centers X, Y , define 
+
+S(X) := X 
+
+> j∈N (X)
+
+κ(Xj − X), w(X, i ) := κ(Xi − X)
+
+S(X) ,
+
+9where N (X) denotes the discrete support of the kernel centered at X. Extend w(X, ·) by zero outside N (X). Using the assumptions that κ is Lipschitz with constant Lκ, bounded by κmax , and that S(X) ≥
+
+m > 0 for all admissible centers, we obtain, on any common finite support of cardinality at most 
+
+M ,
+
+|w(X, i ) − w(Y, i )| ≤ |κ(Xi − X) − κ(Xi − Y )|
+
+S(X) + κmax 
+
+1
+
+S(X) − 1
+
+S(Y )
+
+≤ Lκ
+
+m ∥X − Y ∥2 + κmax 
+
+m2 |S(X) − S(Y )|.
+
+Moreover, 
+
+|S(X) − S(Y )| ≤ X
+
+> j
+
+|κ(Xj − X) − κ(Xj − Y )| ≤ M L κ∥X − Y ∥2.
+
+Therefore, 
+
+|w(X, i ) − w(Y, i )| ≤ 
+
+ Lκ
+
+m + κmax M L κ
+
+m2
+
+
+
+∥X − Y ∥2.
+
+Applying this estimate with X = Xρ,k and Y = eXρ,k gives 
+
+|wρ,k,i − ewρ,k,i | ≤ Lw∆, where Lw := Lκ
+
+m + κmax M L κ
+
+m2 .
+
+We now compare the corresponding rows. Extend both weight vectors by zero outside their supports and set 
+
+Sρ,k := Nρ,k ∪ eNρ,k .
+
+Since each footprint contains at most M grid indices, we have |Sρ,k | ≤ 2M . Hence 
+
+|(Pkθ)ρ − ( ePkθ)ρ| ≤ X
+
+> i∈Sρ,k
+
+|wρ,k,i − ewρ,k,i | | θi|≤ Lw∆ X
+
+> i∈Sρ,k
+
+|θi|≤ Lw∆ √2M
+
+ X
+
+> i∈Sρ,k
+
+|θi|2
+
+
+
+> 1/2
+
+,
+
+where the last step follows from Cauchy–Schwarz. Squaring and summing over ρ yields 
+
+∥Pkθ − ePkθ∥22 ≤ 2M L 2
+
+> w
+
+∆2 X
+
+> ρ
+
+X
+
+> i∈Sρ,k
+
+|θi|2.
+
+By the bounded overlap assumption, each ground index i appears in at most Q sets Sρ,k for fixed 
+
+k. Therefore, X
+
+> ρ
+
+X
+
+> i∈Sρ,k
+
+|θi|2 ≤ Q∥θ∥22.
+
+Consequently, 
+
+∥Pkθ − ePkθ∥2 ≤ p2M Q L w ∆ ∥θ∥2.
+
+Finally define 
+
+rk(θ) := ( Pk − ePk)θ. 
+
+10 Then 
+
+Pkθ = ePkθ + rk(θ), ∥rk(θ)∥2 ≤ C∆∥θ∥2,
+
+with C = √2M Q L w, which proves the result. 
+
+# 4 Ill-Posedness of the Forward Model and the Role of Regulariza-tion 
+
+The forward model for event-based synthetic-aperture log–radiance reconstruction is 
+
+AP θ = b + η, 
+
+where A is the temporal differencing operator from Section 2.1 and P is the spatial projection operator from Section 2.2. Although linear, the operator AP is fundamentally ill-posed due to the combined effects of temporal differencing and spatial averaging. These features mirror conditioning challenges in classical inverse problems [17, 18] and synthetic-aperture systems [9, 16]. This section characterizes these sources of ill-posedness and motivates the regularized formula-tion used for reconstruction. All operators are analyzed with respect to the Euclidean inner product on the discretized log–radiance space. 
+
+4.1 Rank, Nullspace, and Ill-Conditioning of AP 
+
+Ignoring the additive noise term, the forward model reads 
+
+b = AP θ, (AP θ )ρ,k =  (Pk+1 − Pk)θ
+
+> ρ
+
+.
+
+Thus identifiability and stability depend on the structure of the projection sequence {Pk} and the temporal differencing operator A. Ill-posedness arises from two mechanisms: a geometric nullspace induced by insufficient viewpoint diversity and poor conditioning of the operators. 
+
+Geometric nullspace and synthetic-aperture diversity. By construction, 
+
+AP θ = 0 ⇐⇒ Pk+1 θ = Pkθ ∀k. 
+
+Thus any log–radiance field producing identical projections across all viewpoints lies in ker( AP ). The size of this nullspace depends on the variation in {Pk}.Under the near-nadir regime of Theorem 3.1, the projection operators satisfy 
+
+Pkθ = ePkθ + rk(θ), ∥rk(θ)∥2 ≤ C∆∥θ∥2,
+
+where ePk is obtained by translating a reference operator. Thus, to leading order, the projections behave as translated versions of a common footprint operator, and identifiability depends on the sequence of displacements {δk}.If the displacements δk span a sufficiently large range, the operators { ePk} probe distinct regions of the scene, reducing the nullspace. Conversely, if δk is nearly constant, then Pk+1 ≈ Pk and AP 
+
+has a large nullspace. This behavior reflects the synthetic-aperture principle: spatial diversity is generated by viewpoint translation [9, 15]. 11 Degenerate camera geometries. The geometric diversity of {Pk} collapses under several de-generacies: 
+
+• Pure rotation: if Ck is constant, then Pk = Pk′ .
+
+• Near-zero baseline: insufficient lateral motion yields Pk+1 ≈ Pk and highly correlated measurements. 
+
+• Textureless regions: if θ is nearly constant, shifted footprints produce nearly identical event signals. In the first two cases, the effective rank of AP itself is reduced, leading to synthetic-aperture collapse and loss of identifiability [16]. In the third case, AP remains well-determined, but the resulting event signal is weak and easily dominated by noise, reducing practical observability. 
+
+Algebraic conditioning of A, P , and AP . Even when the geometric nullspace is small, the operators A and P are individually ill-conditioned due to their spectral behavior. The temporal differencing operator A annihilates constant signals: 
+
+A(y + c1) = Ay, 
+
+so 1 ∈ ker( A). In particular, since the footprint weights are normalized ( P 
+
+> i
+
+wρ,k,i = 1, Section 2.2), Pk1Ng =
+
+1Np for every k, so AP (θ + α1Ng ) = AP θ for any scalar α: the ground-domain log–radiance field θ
+
+is identifiable from event data only up to a global additive constant, unless an anchoring condition (e.g. 1⊤θ = 0) or a gauge-fixing regularizer is imposed. More generally, A suppresses slowly varying temporal components and amplifies rapidly varying ones. For standard finite-difference constructions, its singular values vanish at zero frequency and increase with temporal frequency [19]. Thus A acts as a temporal high-pass operator. The projection operator P acts as a spatial averaging operator. Each row represents a localized average of θ, so P attenuates high spatial frequencies while preserving low-frequency structure. Consequently, P behaves as a spatial low-pass operator, leading to decay of singular values at high spatial frequencies [17, 18]. The composite operator AP therefore combines spatial smoothing with temporal differencing. This suppresses fine spatial detail while amplifying temporal variations, producing a wide spread in singular values. In particular, 
+
+σmax (AP ) ≤ σmax (A) σmax (P ),
+
+the norm of the composite operator is therefore controlled by the norms of A and P , while small singular values can arise from temporal differencing, spatial averaging, or geometric lack of diversity. Since AP has a nontrivial nullspace (the geometric nullspace discussed above), σmin (AP ) = 0 exactly; conditioning is therefore more meaningfully quantified by cond +(AP ) = σmax (AP )
+
+σ+min (AP ) ,
+
+where σ+min (AP ) is the smallest positive singular value, i.e. conditioning restricted to the orthogonal complement of the nullspace; the combined smoothing and differencing effects above make this quantity large, indicating severe ill-conditioning on the identifiable subspace. 12 4.2 Regularized Inversion 
+
+The linearized forward model takes the form 
+
+AP θ = b + η, 
+
+where η ∈ RNp(Nt−1) is the stacked noise vector introduced in Section 2.1. To obtain a stable reconstruction, we combine the data misfit with a regularization term that encodes prior information about the spatial structure of the scene. This leads to the estimator 
+
+bθ = arg min 
+
+> θ
+
+ 12 ∥AP θ − b∥22 + R(θ)
+
+
+
+,
+
+where R(θ) is a regularization functional, such as Total Variation or quadratic ( L2) regulariza-tion. Total Variation is implemented via a smoothed (differentiable) approximation, TV ϵ(θ) = P
+
+> i
+
+p|∇ hθi|2 + ϵ2, compatible with the L–BFGS solver and analytic gradients used in Section 6. The role of the regularizer is to compensate for both the nullspace and the poor conditioning of AP . In particular, it suppresses unstable components associated with small singular values while promoting physically plausible solutions with controlled spatial variation. In the examples below, we consider both Total Variation and quadratic ( L2) regularization, and the framework accommodates alternative priors depending on the application regime [17, 18, 20]. 
+
+# 5 Relationship to Synthetic-Aperture Radar 
+
+Before turning to computational results, we formalize the SAR analogy invoked in the preceding sections. The comparison is between classical SAR forward operators and the event-based composite model 
+
+AP θ = b + η, 
+
+whose rows encode aperture-indexed differences of projected scene measurements. Although the sensing modalities differ—optical radiance versus radar backscatter—the underlying mathematical structure is similar: a moving platform collects data whose measurements at each position depend on how a spatially smoothed scene changes across the aperture. This section describes these connections, emphasizing how the geometry and conditioning of the composite operator AP parallel those of classical SAR operators. 
+
+5.1 Comparison of Forward Models 
+
+In SAR imaging, the measurement at aperture position k is typically modeled as a convolution of the surface reflectivity with a range–azimuth kernel determined by the transmitted waveform and platform geometry [9]. Successive radar pulses produce shifted versions of this kernel as the platform moves along-track, and inversion relies on spanning a sufficiently large baseline to ensure coverage of spatial frequencies in the aperture domain [16]. Our event-based optical model exhibits an analogous structure at the level of the composite forward operator. The event measurements satisfy (AP θ )ρ,k = ( Pk+1 θ − Pkθ)ρ.
+
+Under the near-nadir regime (Theorem 3.1), the projection operators admit the approximation 
+
+Pkθ = ePkθ + rk(θ), ∥rk(θ)∥2 ≤ C∆∥θ∥2,
+
+13 where ePk is obtained by translating a reference footprint operator. Substituting this into the forward model yields (AP θ )ρ,k =  ( ePk+1 − ePk)θ 
+
+> ρ
+
++  rk+1 (θ) − rk(θ)
+
+> ρ
+
+.
+
+Thus each event measurement is a difference of shifted, spatially smoothed scene samples across adjacent aperture positions, up to a controlled perturbation. This shift-difference structure is the direct analogue of aperture-indexed SAR measurements: the comparison arises from how the aperture encodes differences across translated views, rather than from an exact convolutional representation. In both systems, sufficient platform motion is required to generate diversity in the rows of the forward operator. 
+
+5.2 Ill-Conditioning and Aperture Diversity 
+
+As in SAR, the invertibility of the composite forward model depends critically on the platform’s geometric baseline. If the lateral displacement δk is too small, then adjacent operators Pk become nearly identical, so the corresponding rows of AP lose diversity and many spatial modes of the scene become weakly observable or unobservable. In SAR, such degeneracy corresponds to poor angular diversity or insufficient Doppler band-width [9, 15]. In the present setting, it manifests as an inability to resolve spatial variations in θ
+
+from the shifted-difference measurements generated by AP .Moreover, both SAR and the event-based model exhibit strong low-pass characteristics. The projection operator P smooths θ spatially through the footprint kernel κ, analogous to the point-spread function in SAR imaging. In both cases, deblurring amplifies instability and leads to severe ill-conditioning [16, 18]. The temporal differencing operator A further exacerbates this by eliminating all temporally constant modes. Consequently, the composite operator AP combines spatial low-pass filtering with temporal high-pass filtering, leading to a broad spread in singular values. This mirrors the conditioning challenges encountered in multi-aperture SAR systems [15]. The SAR analogy is therefore most faithful at the level of the composite operator AP , rather than the projection family 
+
+{Pk} alone. 
+
+5.3 Event Cameras vs. SAR Sensors 
+
+Despite their differences, both sensing modalities share key structural features: 
+
+• Shift-difference forward operators. Both systems generate aperture-indexed measure-ments from a moving platform observing a common scene through shifted, geometry-dependent kernels. In the event-camera case, the additional temporal differencing induced by the sensor produces a shift-difference operator. 
+
+• Dependence on aperture diversity. Both require platform motion to span sufficient spa-tial frequencies; reduced baseline leads to degraded conditioning of the measurement operator. 
+
+• Intrinsic ill-posedness. SAR inherits ill-conditioning from convolutional blur and lim-ited aperture; the event-based model combines spatial smoothing with temporal differencing, yielding a structurally similar inverse problem. The primary distinction lies in the sensing mechanism. SAR actively illuminates the scene and measures coherent returns, capturing phase and Doppler information. Event cameras, by contrast, 14 passively record asynchronous changes in log–radiance, effectively measuring temporal gradients of intensity. Despite these differences, both modalities produce aperture-driven measurement oper-ators whose inversion depends on baseline diversity, blur, and differencing structure. The closest correspondence is therefore between SAR forward maps and the composite operator AP .
+
+# 6 Computational Results 
+
+This section presents computational results obtained using a direct implementation of the forward model and regularized estimator developed in Sections 2–4.2. Rather than relying on idealized operators, all experiments use explicit constructions of the temporal differencing operator, motion-induced alignment, and projection matrices, closely reflecting how the method would be deployed in practice. The key distinction from the dynamic inverse formulation of [13] is the reconstruction variable. The method in [13] recovers a latent time-dependent image sequence, whereas the present work solves directly for the static ground-domain log–radiance field θ under the composite model AP θ =
+
+b + η. The synthetic-aperture reconstructions shown here are therefore specific to the θ-based formulation, while the dynamic reconstruction method of [13] is included only as a baseline in the real-data comparison. 
+
+6.1 Computational Pipeline 
+
+The computational pipeline consists of four main stages: (i) event loading and dynamic temporal binning, (ii) motion-induced alignment of event coordinates, (iii) construction of the projection operators {Pk}, and (iv) numerical solution of the regularized optimization problem. Each stage corresponds directly to a component of the analytical model. Event loading and temporal binning are performed jointly, rather than using fixed-duration bins. Instead, events are dynamically grouped so that each bin corresponds to an estimated one-pixel horizontal shift of the underlying scene relative to the previous bin. This binning strategy is designed to enforce the translated-footprint geometry assumed in the forward model and thereby produce a tractable approximation of the composite operator AP .Specifically, events are accumulated over candidate temporal windows and projected onto the sensor grid. For each candidate bin boundary, a small set of integer horizontal shifts is evaluated by applying the shift to the accumulated events and computing a contrast metric on the resulting image. A bin is closed when the shift that maximizes contrast corresponds to a one-pixel translation relative to the previous bin. This procedure yields a sequence of bins whose effective motion is approximately uniform and consistent with the translated-footprint model analyzed in Section 3. This one-pixel shift binning also provides a direct and computationally efficient approximation of the projection operators {Pk}, and hence of the composite forward map AP . Under near-nadir motion, Theorem 3.1 shows that each Pk is well approximated by a translated convolution operator. By dynamically selecting bins such that successive event accumulations correspond to estimated integer-pixel translations, the action of Pk is discretized as a sparse shift operator on the ground-domain grid. In implementation, this approximation replaces continuous footprint motion with piecewise-constant integer translations, so that each Pk acts as a sparse shift operator on θ while masking enforces a fixed reconstruction domain. Applying the temporal differencing operator A to this approximated projection sequence yields a tractable realization of the composite operator AP .The resulting operators capture the dominant geometric effect of platform motion while avoiding the computational cost and modeling uncertainty associated with subpixel footprint interpolation. 15 6.2 Synthetic Reconstruction Experiments 
+
+Synthetic experiments are designed to isolate and validate the shift-difference behavior of the com-posite forward operator under controlled, simulator-generated conditions. A ground-truth log– radiance map θ⋆ ∈ R240 ×180 is defined on a fixed ground-domain grid. The platform’s horizontal position ξk is set to a pure rightward translation, with hk ≡ h1 and Rk ≡ R1:
+
+ξk = ( k − 1) pixels , k = 1 , . . . , 101 .
+
+By the definition δk := ξk − ξ1 from Theorem 3.1, this makes Pkθ⋆ exactly the rightward translation of θ⋆ by δk = ( k − 1) pixels, with P1 as the unshifted reference frame and no additional geometric deformation. Synthetic event measurements are generated using the open-source v2e event camera simulator [21], which converts image sequences into asynchronous event streams according to a standard contrast-threshold event model. The translated projected views induced by θ⋆ are provided to the simulator, and events are generated from successive frames corresponding to known one-pixel horizontal shifts. For consistency with the analytical model, the resulting event stream is then binned and accu-mulated to form signed polarity counts satisfying 
+
+Pk+1 θ⋆ − Pkθ⋆ = bk + ηk, k = 1 , . . . , 100 ,
+
+where bk, η k ∈ RNp denote the pixel-stacked measurement and error vectors for the kth temporal bin, so that the stacked measurements satisfy the composite forward model AP θ ⋆ = b + η. All noise and thresholding options were kept at their defaults provided by the v2e software; in particular, the nominal ON/OFF contrast thresholds were left at 0 .2 in log-intensity units for both polarities. In implementation, the dynamic binning and projection pipeline described in Section 6.1 reduces to a known, fixed sequence of one-pixel shifts. Each projection operator Pk is therefore implemented as a sparse shift matrix acting on the static log–radiance estimate θ. To enforce a consistent reconstruction domain across all shifts, pixels that leave the field of view over the motion sequence are masked, ensuring that all operators act on a common support. Reconstruction is performed by minimizing the regularized objective from Section 4.2. Opti-mization is carried out using L–BFGS with analytic gradients. Figure 1 shows that the recovered log–radiance closely matches the ground truth. These results confirm that, when the shift-difference composite model is satisfied exactly, the implemented operator faithfully recovers the underlying scene structure from temporal differences alone. The comparatively modest PSNR should be inter-preted with care: the event-only model constrains temporal changes and relative spatial contrast more directly than exact absolute log–radiance values. As a result, strong structural agreement can coexist with lower pixelwise log–intensity agreement, which is consistent with the high SSIM observed here. 
+
+6.3 Real Event-Camera Data Under Near-Nadir Motion 
+
+We next apply the proposed reconstruction framework to real event-camera data collected by the 
+
+Falcon Neuro neuromorphic payload aboard the International Space Station (ISS) [11]. The dataset consists of asynchronous polarity events recorded during nominal ISS operations, with the sensor viewing the Earth in a near-nadir configuration. Platform motion induces lateral translation of the scene across the sensor, providing the aperture diversity required for synthetic-aperture reconstruc-tion. 16 Figure 1: Synthetic reconstruction experiment. Left: ground-truth log–radiance θ⋆. Center: 
+
+reconstructed log–radiance estimate bθ. Right: squared error map. The reconstruction achieves PSNR = 17 .11 dB and SSIM = 0 .9128. SSIM remains high even though PSNR is modest, reflecting that the event-only model recovers relative spatial structure and contrast more reliably than exact absolute log–radiance values. Event loading and temporal binning are performed dynamically, following the procedure de-scribed in Section 6.1. Rather than fixing the bin duration, events are accumulated until the contrast-maximizing horizontal shift between successive accumulations corresponds to an estimated one-pixel translation. This produces a sequence of bins whose effective motion is approximately uniform and directly compatible with the translated-footprint forward model. For each bin, events are aligned by compensating for the estimated shift, mapping all mea-surements into a common ground-referenced coordinate system. This alignment step reduces the effect of residual motion within bins and ensures that each projection operator Pk acts on a fixed reconstruction domain. The operators {Pk} are then constructed as sparse matrices encoding the association between aligned sensor pixels and ground-domain cells, approximating the translated convolution operators predicted by Theorem 3.1. Reconstruction is performed by minimizing the regularized objective derived in Section 4.2. Optimization is carried out using an L–BFGS solver with analytic derivatives. Figure 2 shows a synthetic comparison on the same one-pixel-shift experiment described in Section 6.2. In that figure, the proposed method is compared against FIRENET and E2VID using data generated from the known translated projection sequence. Figure 3 shows the correspond-ing comparison on real Falcon Neuro data, where the dynamic reconstruction of [13] is included as an additional baseline because it reconstructs a time-dependent image sequence rather than the static scene parameter θ. The synthetic-aperture reconstruction exhibits coherent large-scale spatial structure, with clear delineation of scene geometry and consistent extended boundaries, de-spite relying solely on event-based temporal measurements. Fine-scale texture and high-frequency detail are largely suppressed, consistent with the effects of spatial footprint averaging, temporal differencing, and regularization inherent to the formulation. In the real-data comparison shown in Figure 3, the reconstruction in panel 1 is an L2-regularized estimate computed on the native 240 × 180 grid rather than the super-resolved ablation setting. In contrast, the dynamic reconstruc-tion shows similar large-scale geometry but with increased spatial variation and residual artifacts. Learning-based methods (FIRENET and E2VID) recover fine-scale texture and local contrast, but also introduce granular noise, streaking, and spatially inconsistent intensity patterns, particularly in regions of dense event activity. Overall, the comparison highlights the ability of the synthetic-aperture approach to recover stable, geometrically aligned log–radiance structure while trading off high-frequency texture for robustness and spatial coherence. 17 These results demonstrate that dynamic one-pixel binning and shift-based approximations of 
+
+Pk are sufficient to recover meaningful spatial information from real spaceborne event data in the native-resolution reconstruction setting shown here, supporting the practical applicability of the synthetic-aperture framework. In these experiments, the number of sensor pixels Np is fixed by the event camera, whereas the number of unknown ground-domain cells Ng is a user-chosen discretization parameter for the log–radiance field θ. The formulation does not require Ng = Np. In the super-resolved ablation study below, we choose Ng ≫ Np, so that θ is reconstructed on a grid finer than the native image resolution. The corresponding projection operators Pk map each sensor pixel to a localized footprint on this finer grid, implemented here with a 5 × 5 kernel. In this sense, super-resolution arises from solving for a higher-resolution scene representation under the same event measurements, rather than from modifying the event sensing model itself. 
+
+Figure 2: Comparison on the same synthetic one-pixel-shift experiment described in Section 6.2. From left to right: 1. Ground truth log–radiance. 2: Reconstruction obtained using the event-based synthetic-aperture (SAR-style) formulation developed in this work. 3: Reconstruction obtained using the FIRENET method by [2]. 4: Reconstruction obtained using the E2VID method by [22]. 
+
+Figure 3: Final reconstructed log–radiance maps from real event-camera data collected under near-nadir motion. From left to right: 1: Reconstruction obtained using the event-based synthetic-aperture (SAR-style) formulation developed in this work, using L2 regularization on the native 240 × 180 grid. 2: Reconstruction obtained using the dynamic reconstruction method introduced by [13]. 3: Reconstruction obtained using the FIRENET method by [2]. 4: Reconstruction obtained using the E2VID method by [22]. 
+
+6.4 Regularization Ablation Study 
+
+To assess the effect of the regularization choice and parameter magnitude, we compare reconstruc-tions obtained with Total Variation (TV) and quadratic L2 regularization over a representative range of λ values. The resulting ablation is shown in Figure 4, with rows indexed by λ and columns corresponding to the two regularizers. In all ablation runs, the reconstruction is super-resolved to 1920 × 1440 and uses a 5 × 5 projection kernel. 18 Across the sweep, small values of λ leave the inversion weakly regularized, producing recon-structions with greater local variation and reduced spatial coherence. As λ increases, both models suppress these artifacts, but they do so differently: TV better preserves sharp transitions and ex-tended boundaries, whereas L2 regularization produces smoother images with more diffuse edges. This comparison highlights the tradeoff between edge preservation and smoothing, and should be interpreted separately from the native-resolution real-data comparison shown in Figure 3.   
+
+> λTV L2
+> 0.10
+> 0.20
+> 0.30
+> 0.40
+> 0.50
+
+Figure 4: Regularization ablation study. Rows correspond to the regularization parameter λ ∈{0.1, 0.2, 0.3, 0.4, 0.5}, while columns compare TV and quadratic L2 regularization on the same reconstruction task. All reconstructions are super-resolved to 1920 × 1440 using a 5 × 5 kernel. As 
+
+λ increases, both models become smoother, with TV preserving sharper scene boundaries and L2
+
+producing more diffuse transitions. 19 7 Conclusion & Future Work 
+
+7.1 Conclusion 
+
+This work developed a synthetic-aperture interpretation of monocular event-camera sensing by formulating event measurements as the action of a composite linear operator AP on a static ground-domain log–radiance field. By explicitly separating temporal differencing from spatial projection, the resulting forward model exposes a shift-difference operator analogous to those arising in classical synthetic-aperture radar. Under near-nadir motion, this structure yields aperture diversity through lateral platform translation, providing a principled explanation for spatial identifiability from purely event-based measurements. We showed that the composite operator AP is inherently ill-conditioned due to both temporal high-pass filtering and spatial low-pass averaging. These properties motivate a regularized estima-tor for the event-based setting. Theoretical analysis clarified the roles of motion and baseline in determining conditioning and reconstruction quality. Computational experiments on both synthetic data and real spaceborne event imagery demon-strate that the proposed framework can recover coherent spatial structure using only asynchronous brightness-change measurements. The results confirm that sufficient lateral motion induces the same type of aperture diversity exploited in SAR, while regularization provides stability in the presence of severe operator ill-conditioning. 
+
+7.2 Future Work 
+
+The synthetic-aperture formulation developed in this work opens several theoretical and practi-cal directions for further investigation. These extensions naturally build on the operator-based perspective and address limitations inherent in monocular, event-only sensing. The directions be-low range from immediate extensions of the current framework to broader scene-representation questions suggested by the results. 
+
+Digital twin through multi-view and multi-sensor extensions. A natural extension of the operator-based formulation developed here is the integration of a persistent digital twin as the latent scene representation. In this setting, the unknown scene parameter is promoted from a two-dimensional log–radiance map to a three-dimensional, measurement-predictive model that is shared across repeated or distributed observations. Rather than reconstructing independent images for each collection, new event measurements are used to test and refine a common scene hypothesis through the forward model b(m) = A(m)P (m)θ.When measurements are acquired from multiple sensors or passes with distinct viewing geome-tries, the framework naturally supports joint estimation over all views. Each sensor contributes its own projection operator, while the underlying scene representation remains shared, enabling depth and vertical structure to be constrained through cross-view consistency. Platform motion further enriches the available viewpoints, allowing three-dimensional scene structure to emerge from the collective measurements without requiring explicit correspondence or pairwise matching. 
+
+Super-resolution. The formulation developed in this work supports super-resolution, as demon-strated empirically in Section 6.4, though this capability has not been fully explored. The projection operators Pk encode time-varying pixel footprints induced by sensor motion, so that measurements at different times sample overlapping but nonidentical regions of the underlying scene. When the 20 ground log–radiance field is discretized on a grid finer than the native image resolution, this over-lap introduces additional constraints that support the recovery of sub-pixel spatial detail. From an inverse problems perspective, such super-resolution behavior arises from the structure of the forward operator AP rather than from any modification of the event sensing model. A detailed analysis of identifiability, stability, and achievable resolution gains under different motion patterns and regularization choices is left for subsequent work. 
+
+Nonlinear and non-nadir imaging regimes. The approximate shift-invariance of Pk under near-nadir motion plays a central role in the synthetic-aperture interpretation. Extending the analysis to more general flight geometries, wide field-of-view sensors, and non-planar terrain remains an important open problem. Characterizing how departures from the nadir assumptions affect identifiability and conditioning will be an important step toward extending event-based synthetic-aperture methods to more complex environments. 
+
+# References 
+
+[1] G. Gallego, T. Delbr¨ uck, G. Orchard, C. Bartolozzi, B. Taba, A. Censi, S. Leutenegger, A. J. Davison, J. Conradt, K. Daniilidis, et al. , “Event-based vision: A survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 44, no. 1, pp. 154–180, 2022. [2] C. Scheerlinck, H. Rebecq, D. Gehrig, N. Barnes, R. Mahony, and D. Scaramuzza, “Fast image reconstruction with an event camera,” in IEEE Winter Conf. Appl. Comput. Vis. (WACV) ,pp. 156–163, 2020. [3] F. Paredes-Vall´ es and G. C. De Croon, “Back to event basics: Self-supervised learning of image reconstruction for event cameras via photometric constancy,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 3446–3455, 2021. [4] L. Wang, Y.-S. Ho, K.-J. Yoon, et al. , “Event-based high dynamic range image and very high frame rate video generation using conditional generative adversarial networks,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 10081–10090, 2019. [5] Y. Yang, J. Han, J. Liang, I. Sato, and B. Shi, “Learning event guided high dynamic range video reconstruction,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 13924–13934, 2023. [6] L. Pan, C. Scheerlinck, X. Yu, R. Hartley, M. Liu, and Y. Dai, “Bringing a blurry frame alive at high frame-rate with an event camera,” in CVPR , pp. 6814–6824, 2019. [7] H. Antil and D. Sayre, “Bilevel inverse problems in neuromorphic imaging,” Inverse Problems ,vol. 39, p. 094003, aug 2023. [8] Z. Zhang, A. J. Yezzi, and G. Gallego, “Formulating event-based image reconstruction as a linear inverse problem with deep regularization using optical flow,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 7, pp. 8372–8389, 2022. [9] J. C. Curlander and R. N. McDonough, Synthetic Aperture Radar: Systems and Signal Pro-cessing . Wiley, 1991. 21 [10] C. Oliver and S. Quegan, Understanding synthetic aperture radar images . SciTech Publishing, 2004. [11] M. G. McHarg, R. L. Balthazor, B. J. McReynolds, D. H. Howe, C. J. Maloney, D. O’Keefe, R. Bam, G. Wilson, P. Karki, A. Marcireau, and G. Cohen, “Falcon neuro: an event-based sensor on the international space station,” Optical Engineering , vol. 61, no. 8, p. 085105, 2022. [12] G. Gallego, H. Rebecq, and D. Scaramuzza, “A unifying contrast maximization framework for event cameras, with applications to motion, depth, and optical flow estimation,” in CVPR ,pp. 3867–3876, 2018. [13] H. Antil, D. Blauvelt, and D. Sayre, “Dynamic reconstruction from neuromorphic data,” arXiv preprint arXiv:2408.15465 , 2024. [14] R. Hartley and A. Zisserman, Multiple View Geometry in Computer Vision . Cambridge Uni-versity Press, 2 ed., 2003. [15] C. V. Jakowatz, D. E. Wahl, P. H. Eichel, D. C. Ghiglia, and P. A. Thompson, Spotlight-mode Synthetic Aperture Radar: A Signal Processing Approach . Springer, 1996. [16] W. G. Carrara, R. S. Goodman, and R. M. Majewski, Spotlight Synthetic Aperture Radar: Signal Processing Algorithms . Artech House, 1995. [17] A. Tarantola, Inverse Problem Theory and Methods for Model Parameter Estimation . SIAM, 2005. [18] H. W. Engl, M. Hanke, and A. Neubauer, Regularization of Inverse Problems . Springer, 1996. [19] R. J. LeVeque, Finite Difference Methods for Ordinary and Partial Differential Equations .SIAM, 2007. [20] A. N. Tikhonov and V. Y. Arsenin, Solutions of Ill-Posed Problems . Wiley, 1977. [21] Y. Hu, S. C. Liu, and T. Delbruck, “v2e: From video frames to realistic DVS events,” in 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW) ,IEEE, 2021. [22] H. Rebecq, R. Ranftl, V. Koltun, and D. Scaramuzza, “High speed and high dynamic range video with an event camera,” IEEE Trans. Pattern Anal. Mach. Intell. (T-PAMI) , 2019. 22
