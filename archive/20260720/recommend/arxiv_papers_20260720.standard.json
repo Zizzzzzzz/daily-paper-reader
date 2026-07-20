@@ -1,0 +1,843 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-20T20:53:26.759638+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 10,
+    "deep_cap": 8,
+    "deep_selected": 8,
+    "quick_candidates": 11,
+    "quick_skim_target": 13,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2607.15498v1",
+      "source": "arxiv",
+      "title": "VarRate: Training-Free Variable-Rate KV Cache Compression for Long-Context LLMs",
+      "abstract": "The key-value (KV) cache is the main memory bottleneck in long-context large language model (LLM) inference. Two leading training-free families are both structurally limited: token-selection methods (SnapKV, Ada-KV) score importance from an observation window and evict low-scoring tokens, but eviction is irreversible -- so when the importance signal degrades under query-agnostic reuse, accuracy collapses by 11-15 points; uniform low-rank coding keeps every token but spends equal rank everywhere, wasting budget. We observe that both failures share one cure: rank should be allocated, not evicted. We present VarRate, a training-free KV codec that assigns each token a variable low-rank budget by its query salience, keeping every token at a nonzero rank. Comparable adaptive-rank codecs reach this allocation only through training; VarRate requires none. Because no token is dropped, it degrades by only 3.5-5.5 points where query-aware selection collapses. At a matched 20% budget on LongBench (16 tasks), VarRate stays within 0.8 points of the uncompressed model on both Llama-3.1-8B and Qwen2.5-7B. Averaged over the two, it is the strongest matched-memory compressor. It significantly beats its uniform-rank ablation on both models. Against KVzip, a method purpose-built for query-agnostic reuse, it is accuracy-equivalent in three of four settings and within a point overall, at about one-eighth the prefill overhead.",
+      "authors": [
+        "Shahrzad Esmat",
+        "Dhawal Shah",
+        "Ali Jannesari"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-16T23:03:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.15498v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "KV cache compression for long-context LLMs",
+      "llm_evidence_cn": "长上下文LLM的KV缓存压缩",
+      "llm_evidence": "长上下文LLM的KV缓存压缩",
+      "canonical_evidence": "长上下文LLM的KV缓存压缩",
+      "llm_tldr_en": "VarRate is a training-free KV codec that assigns each token a variable low-rank budget by query salience, keeping every token at a nonzero rank, addressing limitations of token-selection and uniform low-rank methods.",
+      "llm_tldr_cn": "VarRate是一种无需训练的KV编解码器，通过查询显著性为每个token分配可变低秩预算，保留所有token的非零秩，克服了token选择方法不可逆驱逐和均匀低秩编码预算浪费的问题，在长上下文LLM推理中实现了更高的压缩率和准确性。",
+      "llm_tldr": "VarRate是一种无需训练的KV编解码器，通过查询显著性为每个token分配可变低秩预算，保留所有token的非零秩，克服了token选择方法不可逆驱逐和均匀低秩编码预算浪费的问题，在长上下文LLM推理中实现了更高的压缩率和准确性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.10582v1",
+      "source": "arxiv",
+      "title": "MemDecay: Region-Aware KV Cache Eviction for Efficient LLM Agent Inference",
+      "abstract": "Large language model (LLM) agents accumulate heterogeneous context, including system instructions, plans, user turns, retrieved documents, tool outputs, and intermediate reasoning, whose key-value (KV) cache can become a major memory bottleneck. Existing eviction policies generally apply the same attention- or recency-based rule to every token, ignoring semantic structure already available to the agent orchestrator.   We introduce MemDecay, a training-free, region-aware KV-cache eviction policy. MemDecay assigns tokens region-specific base priorities and decay rates, refreshes retention scores when tokens receive attention, and evicts the lowest-scoring pages under a fixed cache budget while allowing critical regions to be pinned. We also provide a procedure for calibrating decay rates from measured attention lifetimes.   We evaluate MemDecay at approximately 450 and 1,700 token contexts using Qwen2.5-1.5B and 3B. Across all settings, attention lifetimes differ by an order of magnitude across regions: system-token half-lives range from 148 to 189 decoding steps, compared with 14 to 16 for scratchpad tokens. Pinning preserves system-region facts at full-cache accuracy in every setting, while no baseline preserves more than 13 of 24. Region-aware retention remains effective as context grows, whereas recency-based retention collapses. Accumulated-attention retention performs better on unpinned content, however, and ablations identify attention-score normalization as the main limitation of the current formulation. These results establish semantic prompt structure as a robust signal for KV-cache management while clarifying how it should be combined with attention-based importance.",
+      "authors": [
+        "Venkatesha Matam",
+        "Keon Kim"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-12T05:35:26+00:00",
+      "link": "https://arxiv.org/pdf/2607.10582v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache eviction for efficient LLM agent inference",
+      "llm_evidence_cn": "KV缓存驱逐用于高效LLM智能体推理",
+      "llm_evidence": "KV缓存驱逐用于高效LLM智能体推理",
+      "canonical_evidence": "KV缓存驱逐用于高效LLM智能体推理",
+      "llm_tldr_en": "MemDecay proposes a region-aware KV cache eviction policy that assigns token-specific priorities and decays, enabling efficient LLM agent inference under fixed cache budget.",
+      "llm_tldr_cn": "大型语言模型智能体在推理过程中积累了大量异构上下文，导致KV缓存成为内存瓶颈。本文提出MemDecay，一种无需训练的区域感知KV缓存驱逐策略。该方法根据语义区域分配基础优先级和衰减率，并允许固定关键区域，从而在固定缓存预算下高效管理缓存。实验表明，该方法在保持推理质量的同时显著降低内存占用，为长上下文LLM应用提供了实用方案。",
+      "llm_tldr": "大型语言模型智能体在推理过程中积累了大量异构上下文，导致KV缓存成为内存瓶颈。本文提出MemDecay，一种无需训练的区域感知KV缓存驱逐策略。该方法根据语义区域分配基础优先级和衰减率，并允许固定关键区域，从而在固定缓存预算下高效管理缓存。实验表明，该方法在保持推理质量的同时显著降低内存占用，为长上下文LLM应用提供了实用方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.13429v1",
+      "source": "arxiv",
+      "title": "Generalizable VLA Finetuning via Representation Anchoring and Language-Action Alignment",
+      "abstract": "Finetuning a pretrained vision-language model (VLM) on robot demonstrations via behavior cloning (BC) has become the standard recipe for vision-language-action (VLA) policies. However, BC finetuning progressively overwrites the pretrained representations that support visual and semantic generalization. Co-training on web image-text data, a common remedy, does not prevent this; it applies language and action losses to separate observations, leaving VLAs with language-action misalignment that standard manipulation benchmarks do not expose. We propose Anchor-Align, which augments BC with two objectives: Vision-Language Anchoring distills layer-wise representations from a frozen VLM copy to prevent this drift, while Language-Action Alignment converts each action target into a discrete motion-direction label and jointly trains language and action prediction on the same robot observation. On a physical xArm7 robot, across two widely used VLA architectures, Anchor-Align improves real-robot success on both (28% to 54% and 37% to 60%). At scale in simulation, we demonstrate consistent improvements on OOD perturbations, perceptual robustness, and long-horizon control across LIBERO-PRO, LIBERO-Plus, and CALVIN, respectively, suggesting that preserving pretrained representations and effective action learning are not fundamentally at odds. Project page: anchoralignvla.github.io",
+      "authors": [
+        "Dwip Dalal",
+        "Shivansh Patel",
+        "Chahit Jain",
+        "Jeonghwan Kim",
+        "Utkarsh Mishra",
+        "Alex Baratian",
+        "Hyeonjeong Ha",
+        "Heng Ji",
+        "Svetlana Lazebnik",
+        "Unnat Jain"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-07-15T04:13:54+00:00",
+      "link": "https://arxiv.org/pdf/2607.13429v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "VLA finetuning with representation anchoring to prevent pretrained feature erosion",
+      "llm_evidence_cn": "提出Anchor-Align方法防止VLA微调中预训练表征退化",
+      "llm_evidence": "提出Anchor-Align方法防止VLA微调中预训练表征退化",
+      "canonical_evidence": "提出Anchor-Align方法防止VLA微调中预训练表征退化",
+      "llm_tldr_en": "Proposes Anchor-Align to prevent VLM representation drift during BC finetuning via vision-language anchoring and language-action alignment, enhancing VLA generalization.",
+      "llm_tldr_cn": "针对行为克隆微调导致视觉-语言模型预训练表征退化的问题，提出Anchor-Align方法。通过从冻结的VLM副本蒸馏层表示（视觉语言锚定）和语言-动作对齐两个目标增强微调，防止表征漂移。实验表明该方法提升了VLA策略的泛化能力，特别是对分布外场景的适应性。",
+      "llm_tldr": "针对行为克隆微调导致视觉-语言模型预训练表征退化的问题，提出Anchor-Align方法。通过从冻结的VLM副本蒸馏层表示（视觉语言锚定）和语言-动作对齐两个目标增强微调，防止表征漂移。实验表明该方法提升了VLA策略的泛化能力，特别是对分布外场景的适应性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15563v1",
+      "source": "arxiv",
+      "title": "Are All Tokens Necessary for Visual Place Recognition? An Empirical Study of Token Reduction for Efficient Inference",
+      "abstract": "Recent visual place recognition (VPR) methods based on vision transformers, particularly foundation models, have achieved remarkable recognition performance. However, these models process all visual tokens throughout the entire network, resulting in substantial computational overhead, which hinders their deployment in real-time and resource-constrained scenarios. A natural question thus arises: are all visual tokens necessary for VPR? To answer this question, we present the first systematic benchmark of token reduction for efficient visual place recognition. Our benchmark comprehensively evaluates representative token pruning, token merging, and hybrid pruning-merging methods across multiple state-of-the-art VPR models and diverse benchmark datasets covering urban, suburban, and natural environments. We further investigate token reduction from multiple perspectives, including recognition performance under different reduction configurations, computational complexity, inference speed, qualitative visualization, and deployment efficiency on edge devices. Through extensive experiments and in-depth analysis, our benchmark reveals multiple important characteristics of token reduction in VPR and provides several practical insights into the trade-offs between accuracy and inference efficiency. For example, token reduction can reduce computational cost by up to 29\\% and improve throughput by up to 44\\%, while incurring less than 1\\% degradation in recognition accuracy. Overall, this work establishes a comprehensive foundation for future research on token-efficient VPR and efficient visual retrieval systems. Our codes and models will be available at https://github.com/Tong-Jin01/TokenReduction4VPR",
+      "authors": [
+        "Tong Jin",
+        "Yunpeng Liu",
+        "Shuyu Hu",
+        "Qinghua Zhang",
+        "Ruize Han",
+        "Song Wang",
+        "Feng Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T02:13:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.15563v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "systematic benchmark of token pruning and merging for efficient VPR inference",
+      "llm_evidence_cn": "针对视觉位置识别的token剪枝与合并系统基准测试",
+      "llm_evidence": "针对视觉位置识别的token剪枝与合并系统基准测试",
+      "canonical_evidence": "针对视觉位置识别的token剪枝与合并系统基准测试",
+      "llm_tldr_en": "First systematic benchmark of token reduction methods (pruning, merging, hybrid) for efficient visual place recognition using vision transformers.",
+      "llm_tldr_cn": "该论文首次系统地对视觉位置识别中的token缩减方法进行基准测试，评估了token剪枝、token合并以及混合方法在多种先进视觉Transformer模型上的效果。实验表明，通过合理减少冗余视觉token，可以大幅降低计算开销而保持识别性能，为实时和资源受限场景下的VPR部署提供了实用指南。工作直接对应token压缩和剪枝的技术需求。",
+      "llm_tldr": "该论文首次系统地对视觉位置识别中的token缩减方法进行基准测试，评估了token剪枝、token合并以及混合方法在多种先进视觉Transformer模型上的效果。实验表明，通过合理减少冗余视觉token，可以大幅降低计算开销而保持识别性能，为实时和资源受限场景下的VPR部署提供了实用指南。工作直接对应token压缩和剪枝的技术需求。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15699v1",
+      "source": "arxiv",
+      "title": "GoStop: Reinforcement Learning for Adaptive Temporal Aggregation in Event-Based Feature Tracking",
+      "abstract": "Feature tracking plays a fundamental role in understanding scene motion and supports various downstream tasks. Event cameras, with their high temporal resolution and asynchronous sensing, enable low-latency and motion-robust perception, making them well-suited for feature tracking under fast and non-linear motion. However, existing event-based feature tracking methods rely on fixed heuristic rules based on hand-tuning for event accumulation. Such strategies fail to adapt to diverse motion dynamics, leading to degraded performance under abrupt motion changes or low-motion scenarios. In this paper, we model event accumulation as a sequential decision-making problem and introduce reinforcement learning (RL) framework to adaptively control the accumulation process for online event-based feature tracking. Our approach trains a RL agent that decides whether to continue accumulating events or to perform tracking inference based on motion cues. The proposed adaptive temporal agent enables dynamic adaptation to varying motion patterns without relying on hand-crafted rules. Furthermore, we introduce a Dynamic Event-based Tracking (DEFT) dataset with dynamic motion distributions to evaluate the robustness of the feature tracking. Extensive experiments demonstrate that integrating our plug-and-play framework to existing feature tracking methods consistently outperforms heuristic-based approaches, improving robustness under dynamic motion while offering a better balance between tracking accuracy and efficiency. Our project codes and datasets are available at https://github.com/kmax2001/GoSTOP",
+      "authors": [
+        "Youngho Kim",
+        "Hoonhee Cho",
+        "Jae-Young Kang",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T07:18:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.15699v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "event-based feature tracking with adaptive temporal aggregation",
+      "llm_evidence_cn": "基于事件相机的特征跟踪与自适应时间聚合",
+      "llm_evidence": "基于事件相机的特征跟踪与自适应时间聚合",
+      "canonical_evidence": "基于事件相机的特征跟踪与自适应时间聚合",
+      "llm_tldr_en": "Proposes GoStop, an RL-based framework for adaptive temporal aggregation in event-based feature tracking, improving robustness to diverse motion dynamics.",
+      "llm_tldr_cn": "现有事件相机特征跟踪方法依赖固定启发式规则进行事件积累，无法适应多样化的运动动态。本文提出GoStop框架，将事件积累建模为序列决策问题，利用强化学习自适应调整聚合窗口。实验表明该方法在快速和非线性运动场景下显著优于传统固定策略，提升了事件相机在复杂运动环境中的特征跟踪鲁棒性。",
+      "llm_tldr": "现有事件相机特征跟踪方法依赖固定启发式规则进行事件积累，无法适应多样化的运动动态。本文提出GoStop框架，将事件积累建模为序列决策问题，利用强化学习自适应调整聚合窗口。实验表明该方法在快速和非线性运动场景下显著优于传统固定策略，提升了事件相机在复杂运动环境中的特征跟踪鲁棒性。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15727v1",
+      "source": "arxiv",
+      "title": "Event3R: Asynchronous-to-Global 3D Reconstruction from Event Camera via Spatial-Temporal Feature Aggregation",
+      "abstract": "Robust 3D reconstruction is essential for robotics and embodied perception. Recent feed-forward approaches such as DUSt3R have demonstrated impressive progress in dense 3D reconstruction from RGB images, achieving global geometric consistency and strong generalization. However, extending such dense 3D reconstruction to event cameras remains challenging due to their asynchronous, sparse, and highly dynamic nature, as well as the lack of large-scale, well-labeled datasets. In this work, we introduce Event3R, a feed-forward framework that directly maps asynchronous event streams to globally consistent 3D point clouds. Event3R represents incoming events as spatial-temporal voxels, enabling time-aware feature integration through a temporal attention module that enhances the module's temporal feature learning. To further strengthen temporal representation learning and reduce reliance on labeled data, we propose a Masked Bin Modeling (MBM) strategy for self-supervised pre-training, enabling robust temporal representation learning with minimal labeled data, and retain it as an auxiliary fine-tuning objective. In addition, contrastive alignment and consistency regularization losses are incorporated during fine-tuning to reinforce structural correspondence and temporal coherence across views. Extensive experiments on both synthetic and real-world benchmarks demonstrate that Event3R achieves robust, temporally consistent, and globally aligned 3D reconstructions, significantly outperforming existing event-based methods.",
+      "authors": [
+        "Jian Huang",
+        "Haotian Shen",
+        "Xinhao Lou",
+        "Chengrui Dong",
+        "Wenpu Li",
+        "Peidong Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T08:04:43+00:00",
+      "link": "https://arxiv.org/pdf/2607.15727v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Event camera 3D reconstruction via spatial-temporal feature aggregation",
+      "llm_evidence_cn": "事件相机3D重建，利用时空特征聚合",
+      "llm_evidence": "事件相机3D重建，利用时空特征聚合",
+      "canonical_evidence": "事件相机3D重建，利用时空特征聚合",
+      "llm_tldr_en": "Event3R directly maps asynchronous event streams to globally consistent 3D point clouds using spatial-temporal voxel representation, achieving robust 3D reconstruction from event cameras.",
+      "llm_tldr_cn": "针对事件相机的异步稀疏特性，提出Event3R前馈框架，将事件流表示为时空体素，通过时空特征聚合直接回归全局一致的3D点云。在多个数据集上取得优于现有方法的3D重建精度，为基于事件的机器人感知和场景理解提供了有效方案。",
+      "llm_tldr": "针对事件相机的异步稀疏特性，提出Event3R前馈框架，将事件流表示为时空体素，通过时空特征聚合直接回归全局一致的3D点云。在多个数据集上取得优于现有方法的3D重建精度，为基于事件的机器人感知和场景理解提供了有效方案。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15794v1",
+      "source": "arxiv",
+      "title": "On the Geometry of Learned Representations in Event-Based Multi-Modal Egomotion Estimation",
+      "abstract": "Classical approaches to event-based egomotion estimation, including those adopted by the top-performing teams of the ELOPE challenge, rely on geometric optimization frameworks such as contrast maximization, homography estimation, or dense optical flow combined with analytic motion inversion. This work investigates the geometric structure that emerges inside a multi-modal network for egomotion estimation. Event tensors, inertial measurements, and range signals are fused through a cross-modal attention architecture and trained in a batch setting. We analyze the latent space geometry and attention dynamics, showing that (i) embeddings lie on low-dimensional manifolds aligned with motion variables, (ii) attention weights adapt with angular excitation and visual reliability, and (iii) the fused representation recovers classical observability cues. These results bridge analytical estimation theory and modern data-driven fusion.",
+      "authors": [
+        "Stefano Silvestrini",
+        "Michele Ceresoli"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-17T09:58:17+00:00",
+      "link": "https://arxiv.org/pdf/2607.15794v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Event-based vision and multi-modal egomotion estimation with event tensors",
+      "llm_evidence_cn": "基于事件的视觉和多模态自运动估计，使用事件张量",
+      "llm_evidence": "基于事件的视觉和多模态自运动估计，使用事件张量",
+      "canonical_evidence": "基于事件的视觉和多模态自运动估计，使用事件张量",
+      "llm_tldr_en": "This paper studies the geometric structure in learned representations of an event-based multi-modal network for egomotion estimation, revealing low-dimensional manifolds aligned with motion.",
+      "llm_tldr_cn": "基于事件的自运动估计传统上依赖于几何优化框架。本文探究多模态神经网络中学习表示的几何结构，该网络融合事件张量、惯性测量和距离信号，通过跨模态注意力训练。研究发现嵌入位于与运动变量对齐的低维流形上，注意力权重随角度变化自适应调整。该工作揭示了事件驱动表示的内在规律，为设计更高效的事件视觉系统提供了理论指导。",
+      "llm_tldr": "基于事件的自运动估计传统上依赖于几何优化框架。本文探究多模态神经网络中学习表示的几何结构，该网络融合事件张量、惯性测量和距离信号，通过跨模态注意力训练。研究发现嵌入位于与运动变量对齐的低维流形上，注意力权重随角度变化自适应调整。该工作揭示了事件驱动表示的内在规律，为设计更高效的事件视觉系统提供了理论指导。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based vision",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16154v1",
+      "source": "arxiv",
+      "title": "CLIFE: Camera-LiDAR Fusion Framework for Edge-Deployable Roadside VRU Perception",
+      "abstract": "Reliable roadside perception of vulnerable road users (VRUs) remains challenging under occlusions, variable lighting, and diverse weather conditions, particularly under strict edge-computing and latency constraints. Existing multi-sensor fusion systems rely on cloud or server-grade infrastructure, creating a deployment gap at real-world intersections. We present CLIFE, an edge-native camera-LiDAR fusion framework that integrates targetless online calibration and lightweight late-fusion tracking entirely on a single embedded device, without cloud offloading. CLIFE adaptively refines camera-LiDAR alignment on demand and performs multi-sensor fusion and track association with O(N log N) per-frame cost. We deploy CLIFE across 12 signalized intersections in Chattanooga and conduct an in-depth evaluation at a representative intersection using synchronized camera-LiDAR data that spans diverse daytime, nighttime, and weather conditions. Our experiments demonstrate that the fusion architecture substantially enhances the perceptual range and robustness of the individual sensors under varied environmental and traffic conditions. The late-fusion core operates at 53.2 FPS on the Jetson AGX Thor, ensuring high throughput for real-time intersection-scale applications. By centering perception at the edge, CLIFE provides a deployable foundation for downstream safety applications, while reducing bandwidth and calibration overhead for agencies operating multi-intersection corridors.",
+      "authors": [
+        "Tam Bang",
+        "Hoang H. Nguyen",
+        "Lei Cheng",
+        "Lihao Guo",
+        "Siyang Cao",
+        "Hussam Abubakr",
+        "Tianya Zhang",
+        "Austin Harris",
+        "Mina Sartipi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.SY"
+      ],
+      "published": "2026-07-17T17:35:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.16154v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "edge-native camera-LiDAR fusion for roadside VRU perception in traffic scenes",
+      "llm_evidence_cn": "面向交通场景的路侧VRU感知，边缘部署的相机-激光雷达融合框架",
+      "llm_evidence": "面向交通场景的路侧VRU感知，边缘部署的相机-激光雷达融合框架",
+      "canonical_evidence": "面向交通场景的路侧VRU感知，边缘部署的相机-激光雷达融合框架",
+      "llm_tldr_en": "Presents CLIFE, an edge-native camera-LiDAR fusion framework for reliable roadside VRU perception under occlusions and varied conditions, deployable on a single embedded device.",
+      "llm_tldr_cn": "针对路边交通场景中易受遮挡和天气影响的弱势道路使用者（VRU）感知问题，提出CLIFE框架。该框架可在单个嵌入式设备上实现无目标在线标定、轻量级后融合跟踪，无需云卸载。在12个信号交叉口部署验证，表明在边缘设备上实现了实时可靠的VRU感知。",
+      "llm_tldr": "针对路边交通场景中易受遮挡和天气影响的弱势道路使用者（VRU）感知问题，提出CLIFE框架。该框架可在单个嵌入式设备上实现无目标在线标定、轻量级后融合跟踪，无需云卸载。在12个信号交叉口部署验证，表明在边缘设备上实现了实时可靠的VRU感知。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.12789v1",
+      "source": "arxiv",
+      "title": "AVQ-Attention: Adaptive Vector-Quantized Attention",
+      "abstract": "The $\\mathcal{O}(N^2)$ complexity of attention over $N$ tokens remains a computational bottleneck in transformer models. Vector-Quantized (VQ) attention reduces this to $\\mathcal{O}(MN)$ by representing keys with $M$ codewords, but applies uniform codebook capacity regardless of where attention mass concentrates: high-attention regions of key space may be coarsely approximated while low-attention regions waste representational capacity. We propose Adaptive Vector-Quantized (AVQ) Attention, which adaptively allocates codebook capacity based on attention importance. Starting from a small set of codewords, our method identifies the most important codes during the forward pass and refines them with pre-learned child codewords, achieving fine-grained quantization where it matters most while maintaining coarse quantization elsewhere. We develop an implementation using custom Triton kernels that enables the full adaptive refinement process, including importance scoring, child codeword insertion, and parent contribution replacement, to be carried out within the tiled computation paradigm of Flash Attention with minimal overhead. Our approach maintains $\\mathcal{O}(MN)$ complexity while achieving improved accuracy-efficiency trade-offs compared to fixed-codebook VQ-attention.",
+      "authors": [
+        "Winfried van den dool",
+        "Patrick Forré",
+        "Amir Habibian",
+        "Yuki M. Asano",
+        "Max Welling"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-07-14T14:02:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.12789v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "adaptive vector-quantized attention for efficient transformers",
+      "llm_evidence_cn": "自适应向量量化注意力以提升Transformer效率",
+      "llm_evidence": "自适应向量量化注意力以提升Transformer效率",
+      "canonical_evidence": "自适应向量量化注意力以提升Transformer效率",
+      "llm_tldr_en": "AVQ-Attention adaptively allocates codebook capacity based on attention importance, reducing complexity while maintaining accuracy.",
+      "llm_tldr_cn": "Transformer中注意力的二次复杂度是计算瓶颈。AVQ-Attention通过自适应向量量化，根据注意力重要性动态分配码本容量，对高注意区域进行细粒度量化，低注意区域进行粗粒度表示，从而在降低计算量的同时保持模型精度。实验表明该方法在多项基准上实现了有效的加速。",
+      "llm_tldr": "Transformer中注意力的二次复杂度是计算瓶颈。AVQ-Attention通过自适应向量量化，根据注意力重要性动态分配码本容量，对高注意区域进行细粒度量化，低注意区域进行粗粒度表示，从而在降低计算量的同时保持模型精度。实验表明该方法在多项基准上实现了有效的加速。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.11614v1",
+      "source": "arxiv",
+      "title": "Extending LLM Context via Associative Recurrent Memory",
+      "abstract": "Extending the context length of large language models (LLMs) is critical for many real-world applications, yet standard transformers remain constrained by quadratic compute and linear memory scaling. In this work, we investigate the Associative Recurrent Memory Transformer (ARMT) as a practical approach for enabling long-context processing in LLMs, constant memory scaling, and better efficiency. We make three main contributions. First, we construct two domain-specific long-context datasets designed to evaluate realistic workloads, focusing on narrow-domain fine-tuning scenarios. Second, we propose a comprehensive training recipe for ARMT-based context extension, combining continued pre-training, synthetic long-context data generation, curriculum learning, and selective integration of associative memory into chosen model layers. Third, we present an extensive experimental study demonstrating that ARMT-augmented models: (i) process inputs well beyond their original context limits without degrading performance relative to in-limit baselines; (ii) generalize more effectively to out-of-distribution context lengths; and (iii) need 30% less FLOPs while preserving baseline performance within the original context window.",
+      "authors": [
+        "Gleb Kuzmin",
+        "Ivan Rodkin",
+        "Aydar Bulatov",
+        "Yuri Kuratov",
+        "Lyudmila Rvanova",
+        "Mikhail Katkov",
+        "Ilia Sochenkov",
+        "Misha Tsodyks",
+        "Timothy Baldwin",
+        "Mikhail Burtsev",
+        "Artem Shelmanov"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "published": "2026-07-13T14:37:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.11614v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Efficient long-context LLM via associative recurrent memory, related to efficient VLM inference",
+      "llm_evidence_cn": "通过关联递归记忆实现高效长上下文LLM，与高效VLM推理相关",
+      "llm_evidence": "通过关联递归记忆实现高效长上下文LLM，与高效VLM推理相关",
+      "canonical_evidence": "通过关联递归记忆实现高效长上下文LLM，与高效VLM推理相关",
+      "llm_tldr_en": "Proposes ARMT for extending LLM context with constant memory scaling, combining continued pre-training and curriculum learning for efficient long-context processing.",
+      "llm_tldr_cn": "针对Transformer在长上下文场景下计算和内存开销大的问题，提出关联递归记忆变换器（ARMT），通过恒定的内存缩放实现长上下文处理。该方法结合持续预训练、合成数据生成和课程学习，在领域特定长上下文数据集上提升了效率。ARMT为构建高效长上下文模型提供了可行方案，可迁移至高效视觉语言模型。",
+      "llm_tldr": "针对Transformer在长上下文场景下计算和内存开销大的问题，提出关联递归记忆变换器（ARMT），通过恒定的内存缩放实现长上下文处理。该方法结合持续预训练、合成数据生成和课程学习，在领域特定长上下文数据集上提升了效率。ARMT为构建高效长上下文模型提供了可行方案，可迁移至高效视觉语言模型。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.12419v1",
+      "source": "arxiv",
+      "title": "DeGuNet: Depth-Guided Ultra-Compact Backbones for Efficient LiDAR-Camera 3D Detection",
+      "abstract": "In autonomous driving perception, the fusion of LiDAR and camera modalities has become the dominant paradigm for 3D object detection. However, current multi-modal frameworks heavily rely on massive visual backbones pretrained on 2D semantic tasks. This reliance introduces substantial parameter redundancy and a structural misalignment, as 2D priors are ill-equipped to handle the extreme sparsity of LiDAR projections required for Bird's-Eye-View geometry. To address this, we present DeGuNet, an ultra-compact and plug-and-play image backbone explicitly designed for depth-guided representation learning. By incorporating sparsity-aware feature extraction mechanisms, DeGuNet effectively aligns multi-view images with unstructured LiDAR depth while strictly preventing invalid-region contamination. Extensive experiments on the nuScenes dataset demonstrate DeGuNet's broad plug-and-play applicability and superior efficiency. When integrated into established baselines, it fundamentally eliminates architectural redundancy, reducing GPU memory consumption by up to 66.5% and achieving a 1.16x inference speedup. Concurrently, DeGuNet delivers up to a 6.20 absolute mAP gain, establishing a new paradigm for parameter-efficient multi-modal 3D perception.",
+      "authors": [
+        "Haifa Zhang",
+        "Yijing Wang",
+        "Peixi Peng",
+        "Zhiqiang Zuo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T06:46:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.12419v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "ultra-compact backbone for LiDAR-camera 3D detection in autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶的LiDAR-相机超紧凑骨干网络",
+      "llm_evidence": "面向自动驾驶的LiDAR-相机超紧凑骨干网络",
+      "canonical_evidence": "面向自动驾驶的LiDAR-相机超紧凑骨干网络",
+      "llm_tldr_en": "DeGuNet proposes an ultra-compact depth-guided backbone for efficient LiDAR-camera 3D detection, reducing redundancy and aligning with sparsity.",
+      "llm_tldr_cn": "本文针对自动驾驶感知中现有视觉骨干网络参数冗余和结构错位的问题，提出DeGuNet超紧凑骨干网络，利用深度引导表示学习和对稀疏性的感知，高效融合LiDAR和相机特征，在3D检测中取得了优异的性能与效率权衡。",
+      "llm_tldr": "本文针对自动驾驶感知中现有视觉骨干网络参数冗余和结构错位的问题，提出DeGuNet超紧凑骨干网络，利用深度引导表示学习和对稀疏性的感知，高效融合LiDAR和相机特征，在3D检测中取得了优异的性能与效率权衡。",
+      "llm_tags": [
+        "query:mm-trf:composite"
+      ],
+      "matched_query_tag": "query:mm-trf:composite",
+      "matched_query_text": "Papers central to 基于多模态大模型的交通场景理解论文检索, especially work that connects or combines: Traffic Scene Understanding Based on Multimodal Large Language Models; Comprehensive traffic scene understanding and perception; Semantic analysis of road scenes with multimodal models; State of the art multimodal large language models for traffic scene understanding; Survey of vision language models in autonomous driving and road safety; Applications of multimodal LLMs in complex traffic environment perception.",
+      "matched_requirement_id": "req-composite-mm-trf",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.15689v1",
+      "source": "arxiv",
+      "title": "Efficient Frame Selection for Long Videos at Test Time with Attention-Based MLLM Selectors",
+      "abstract": "Understanding long videos with multimodal large language models (MLLMs) requires selecting a compact set of frames from thousands of candidates, yet identifying the right frames seemingly requires understanding the video first. We resolve this circular dependency with a simple observation: cross-modal attention at validation-selected extraction layers in MLLMs already provides query-relevant frame evidence without requiring autoregressive generation. We exploit this property to build DAFS (Dynamic Attention-based Budget-aware Frame Selection), a training-free frame selector. A lightweight MLLM selector, even with only 2B parameters, can extract frame-level evidence by converting selected-layer attention into relevance scores through query-conditioned aggregation. This enables cross-frame comparison without autoregressive decoding. To handle the selector's own context constraint, we formulate the joint allocation of candidate pool size and per-frame token budget as a discrete optimization problem solved by dynamic programming. Under a 32-frame budget, our selector improves over uniform sampling by up to 6.4 points on Video-MME and outperforms prior training-based selectors under matched frame budgets, while generalizing across selector and answerer backbones, and across tasks, without retraining.",
+      "authors": [
+        "Yilin Wang",
+        "Xiangxi Zheng",
+        "Dongxing Mao",
+        "Linjie Li",
+        "Zhengyuan Yang",
+        "Ping Yu",
+        "Rui Yan",
+        "Yuan Yao",
+        "Alex Jinpeng Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T07:04:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.15689v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient frame selection for long videos using MLLM attention, related to token selection efficiency",
+      "llm_evidence_cn": "利用MLLM注意力的高效帧选择，与token选择效率相关",
+      "llm_evidence": "利用MLLM注意力的高效帧选择，与token选择效率相关",
+      "canonical_evidence": "利用MLLM注意力的高效帧选择，与token选择效率相关",
+      "llm_tldr_en": "Proposes DAFS, a training-free frame selector using cross-modal attention from MLLM layers to select query-relevant frames for long video understanding.",
+      "llm_tldr_cn": "针对长视频理解中需要从大量候选帧中高效选择关键帧的问题，提出DAFS方法。利用MLLM验证阶段选定层的跨模态注意力作为相关性信号，无需额外训练即可选择与查询相关的帧。该方法使用轻量级2B参数MLLM即可实现有效帧选择，为长视频高效推理提供了即插即用的解决方案，可迁移至高效VLM推理。",
+      "llm_tldr": "针对长视频理解中需要从大量候选帧中高效选择关键帧的问题，提出DAFS方法。利用MLLM验证阶段选定层的跨模态注意力作为相关性信号，无需额外训练即可选择与查询相关的帧。该方法使用轻量级2B参数MLLM即可实现有效帧选择，为长视频高效推理提供了即插即用的解决方案，可迁移至高效VLM推理。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.14710v1",
+      "source": "arxiv",
+      "title": "Variational Inference for Bird's Eye View Segmentation in Autonomous Driving",
+      "abstract": "The bird's eye view (BEV) has emerged as a pivotal approach for environmental perception in autonomous driving, providing a unified spatial representation for vehicles. Nevertheless, despite BEV's significance in addressing the challenges inherent to autonomous driving, effectively fusing data from multiple camera sensors and operating in complex external driving environments remains a considerable challenge. To mitigate this issue, we recast the BEV segmentation problem within a variational inference framework. In this paper, we propose a novel transformer-based variational flow transformation network for BEV segmentation, denoted as TVB. Our architecture implicitly learns the mapping from multiple camera views to a unified canonical BEV map during training by exploiting posterior BEV supervision. TVB employs a conditional variational auto encoder (CVAE) as its backbone and produces multiple BEV map candidates. To augment the realism of the generated BEV maps, we integrate normalizing flows into the map generation process, enabling the construction of more complex and expressive probability distributions. Furthermore, we design a BEV-attention fusion (BAF) module that harnesses attention mechanisms to adaptively integrate the multiple candidate BEV maps. Experimental results, evaluated on both the nuScenes and OPV2Vdatasets, demonstrate that our proposed method achieves superior performance in multi-camera view BEV segmentation and lane environment perception.",
+      "authors": [
+        "Jingyue Shi",
+        "Huaicheng Li",
+        "Junhui Zhao",
+        "Yanxiang Jiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.SY"
+      ],
+      "published": "2026-07-16T08:20:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.14710v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "variational inference for BEV segmentation in autonomous driving",
+      "llm_evidence_cn": "基于变分推理的自动驾驶鸟瞰图分割",
+      "llm_evidence": "基于变分推理的自动驾驶鸟瞰图分割",
+      "canonical_evidence": "基于变分推理的自动驾驶鸟瞰图分割",
+      "llm_tldr_en": "TVB recasts BEV segmentation as variational inference, using a transformer-based flow network to learn multi-camera to BEV mapping.",
+      "llm_tldr_cn": "鸟瞰图分割是自动驾驶环境感知的关键任务，但多相机数据融合仍具挑战。TVB将BEV分割重述为变分推理问题，提出基于Transformer的变分流变换网络，隐式学习从多视角相机到统一BEV图的映射。实验证明该方法在复杂驾驶场景下有效提升了分割精度和鲁棒性。",
+      "llm_tldr": "鸟瞰图分割是自动驾驶环境感知的关键任务，但多相机数据融合仍具挑战。TVB将BEV分割重述为变分推理问题，提出基于Transformer的变分流变换网络，隐式学习从多视角相机到统一BEV图的映射。实验证明该方法在复杂驾驶场景下有效提升了分割精度和鲁棒性。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.12959v1",
+      "source": "arxiv",
+      "title": "ViCo3D: Empowering LiDAR-based Collaborative 3D Object Detection with Vision Foundation Models",
+      "abstract": "LiDAR-based collaborative 3D perception in Vehicle-to-Everything (V2X) systems typically relies on fusing bird's-eye-view (BEV) features across agents. However, current BEV representations, typically extracted by LiDAR backbones trained from scratch, are geometry-dominated and lack general semantic priors, inherently limiting the efficacy of feature-level collaboration. Meanwhile, vision foundation models (VFMs) pretrained on large-scale image data have demonstrated strong capability in learning general-purpose and informative visual representations for 2D tasks, and have the potential to enhance agent-wise LiDAR BEV representations for collaboration. Despite this potential, adapting VFMs to LiDAR-based 3D detection remains challenging due to the substantial image-point cloud modality gap. To bridge this gap, we propose ViCo3D, a collaborative 3D object detection framework powered by VFMs. Specifically, ViCo3D adapts VFMs to LiDAR-based collaborative perception from three aspects: First, ViCo3D projects point clouds onto the BEV plane as three-channel images, enabling DINOv2 to extract BEV-space visual features from LiDAR inputs. Besides, to effectively integrate these DINOv2-derived features with LiDAR geometric features, ViCo3D introduces a multi-scale BEV fusion module within the single-agent encoder. In addition, ViCo3D adopts an ego-centric cross-agent fusion strategy to aggregate complementary information from multiple agents. Experiments on DAIR-V2X and V2XSet demonstrate that ViCo3D achieves state-of-the-art 3D detection performance. Remarkably, it delivers up to 1.8x greater collaborative gains than prior methods on DAIR-V2X. The code will be made public available for future investigation.",
+      "authors": [
+        "Haojie Ren",
+        "Songrui Luo",
+        "Lingfeng Wang",
+        "Yan Xia",
+        "Yao Li",
+        "Jing Li",
+        "Lu Zhang",
+        "Jiajun Deng",
+        "Yanyong Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T16:56:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.12959v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "traffic scene 3D detection enhanced by vision foundation models",
+      "llm_evidence_cn": "利用视觉基础模型增强交通场景三维目标检测",
+      "llm_evidence": "利用视觉基础模型增强交通场景三维目标检测",
+      "canonical_evidence": "利用视觉基础模型增强交通场景三维目标检测",
+      "llm_tldr_en": "ViCo3D enhances LiDAR-based collaborative 3D detection with vision foundation models to improve BEV semantic understanding in V2X.",
+      "llm_tldr_cn": "针对LiDAR协同感知中BEV表示缺乏语义先验的问题，提出ViCo3D，利用视觉基础模型为BEV注入通用语义，从而增强特征协作。在多个V2X数据集上，该方法显著提升了三维目标检测精度，证明了视觉基础模型在协同感知中的有效性。",
+      "llm_tldr": "针对LiDAR协同感知中BEV表示缺乏语义先验的问题，提出ViCo3D，利用视觉基础模型为BEV注入通用语义，从而增强特征协作。在多个V2X数据集上，该方法显著提升了三维目标检测精度，证明了视觉基础模型在协同感知中的有效性。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.15516v1",
+      "source": "arxiv",
+      "title": "Cache-Aware Prompt Compression:A Two-Tier Cost Model for LLM API Caching",
+      "abstract": "Production LLM deployments combine two cost-reduction primitives: prompt caching (a discounted rate for re-used token prefixes) and prompt compression (fewer tokens sent). The compression literature has standardized on query-aware methods that produce a different compressed prefix per query, mechanically invalidating the prefix-strict cache on every call. We characterize this cost empirically on Anthropic's Sonnet 4.6 API and find caching is far from the rho=1.0 ideal the literature assumes: Sonnet's cache has a two-tier architecture with a sharp threshold near 3,500 tokens, below which the hit rate plateaus at rho~0.83 across 30-call sessions. Our cost model predicts, and experiments confirm, that under realistic rho, query-aware compression beats naive caching at high compression ratios (r>=6). We propose Cache-Aware Prompt Compression (CAPC), pairing query-agnostic compression with explicit cache_control plus a tier-preserving ratio bound that prevents over-compression from pushing the cached prefix into the hot tier. CAPC is the cheapest strategy in 16/16 configurations on LongBench-v2, with mean savings of 49% over cache-only, 64% over query-aware compression, and 90% over vanilla, at quality within 0.05 of the uncompressed baseline. We validate CAPC on three production workloads: an enterprise tool-using assistant with a 94k-token schema prefix (51.7% cost reduction at r=3); a graphify knowledge-graph RAG pipeline across two codebases (9.3x vs cache-all on FastAPI, 2.4x on httpx); and the public tau-bench retail benchmark (50 tasks), where CAPC is the cheapest of four strategies with reward exactly equal to vanilla (both 36/50, p=1.00) while query-aware compression is the most expensive at +40.1% over vanilla -- the first production confirmation of the crossover model's negative-ROI prediction on a public benchmark.",
+      "authors": [
+        "Yan Song"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-17T00:03:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.15516v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes cost model for prompt compression and caching",
+      "llm_evidence_cn": "提出提示压缩和缓存的成本模型",
+      "llm_evidence": "提出提示压缩和缓存的成本模型",
+      "canonical_evidence": "提出提示压缩和缓存的成本模型",
+      "llm_tldr_en": "This paper analyzes the cost trade-offs between query-aware prompt compression and API caching, proposing a two-tier cost model that predicts when compression is beneficial under realistic cache hit rates.",
+      "llm_tldr_cn": "本文针对LLM API部署中提示压缩与缓存之间的成本权衡，提出了一个两层成本模型。研究发现缓存命中率远非理想值，在真实场景下查询感知压缩策略可以代替缓存节省成本。实验验证了模型的有效性，为实际部署中的压缩策略选择提供了理论指导。",
+      "llm_tldr": "本文针对LLM API部署中提示压缩与缓存之间的成本权衡，提出了一个两层成本模型。研究发现缓存命中率远非理想值，在真实场景下查询感知压缩策略可以代替缓存节省成本。实验验证了模型的有效性，为实际部署中的压缩策略选择提供了理论指导。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.14547v1",
+      "source": "arxiv",
+      "title": "AdaTurn: Budget-Aware Test-Time Scaling for Active Visual Perception Agents",
+      "abstract": "Active visual agents solve fine-grained image tasks by interleaving reasoning with image-grounding actions across multiple turns. However, deployment-time rollout budgets are rarely fixed: some requests permit long rollouts, while others require the agent to act under a tight turn limit. Existing methods train the policy as if the rollout budget were hidden, so when the available budget is smaller than the trajectory the agent prefers, the interaction is often truncated before any valid answer is produced; we term this failure \\emph{catastrophic truncation}. To overcome this challenge, we present AdaTurn, a budget-aware framework that conditions the agent on the allowed number of turns and explicitly trains the boundary behavior induced by the budget. Our key component, Forced-Answer DAPO (FA-DAPO), converts the over-budget event from a masked or penalized failure into a trainable final-decision step, teaching the model to synthesize partial evidence when further tool use is no longer possible. We further randomize rollout budgets during both training and inference and introduce a load-balanced scheduler that makes such operations practical. AdaTurn substantially improves low-budget accuracy, for example raising VisualProbe-Medium from 36.7% to 47.6% at four turns, while preserving strong scaling at larger budgets and transferring effectively to multiple backbones and general multimodal benchmarks.",
+      "authors": [
+        "Susan Liang",
+        "Chao Huang",
+        "Filippos Bellos",
+        "Jing Bi",
+        "Jason J Corso",
+        "Chenliang Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T04:07:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.14547v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Budget-aware test-time scaling for active visual agents, improving inference efficiency",
+      "llm_evidence_cn": "预算感知测试时缩放，提升主动视觉代理推理效率",
+      "llm_evidence": "预算感知测试时缩放，提升主动视觉代理推理效率",
+      "canonical_evidence": "预算感知测试时缩放，提升主动视觉代理推理效率",
+      "llm_tldr_en": "AdaTurn enables active visual agents to adapt to limited rollout budgets by conditioning on allowed turns, preventing catastrophic truncation and improving task success.",
+      "llm_tldr_cn": "针对主动视觉代理在有限交互预算下容易过早截断导致任务失败的问题，提出AdaTurn框架。它将允许的交互轮数作为条件，并显式训练边界行为。实验表明，AdaTurn能有效避免截断失败，在不同预算下均保持较高成功率，提升了系统的实用性和灵活性。",
+      "llm_tldr": "针对主动视觉代理在有限交互预算下容易过早截断导致任务失败的问题，提出AdaTurn框架。它将允许的交互轮数作为条件，并显式训练边界行为。实验表明，AdaTurn能有效避免截断失败，在不同预算下均保持较高成功率，提升了系统的实用性和灵活性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.15778v1",
+      "source": "arxiv",
+      "title": "Modularized Dynamic-Granularity Video LLM for Multi-Event Long Video Understanding",
+      "abstract": "Video Large Language Models (Video LLMs) have made significant advancements in various video understanding tasks. However, long-video scenarios remain challenging due to the tension between limited visual token budgets and the need to capture multiple key events. Existing approaches typically process long videos in two stages, i.e., i) select keyframes and ii) perform detailed perception, which exhibit limitations: they lack a modular mechanism for adaptive capacity allocation and self-correction, resulting in unreliable modeling. To tackle these challenges, we propose MoD-VLLM, a novel Modularized Dynamic-Granularity Video LLM framework for multi-event long video understanding, which unifies temporal grounding and semantic understanding iteratively and self-reflectively. Specifically, we propose a Positive-Negative Video Segments Grounding module and a Modularized Dynamic-Granularity Reflection module, which form a closed loop to progressively localize the question-related video segments. The grounding module instructs a Video LLM to distinguish relevant from irrelevant video segments based on the video question. The reflection module employs a modularized scheduler that dynamically selects fine-grained encoding for relevant positive segments to capture detailed perception and coarse-grained encoding for negative segments to maintain global context. We further propose a dynamic-granularity reinforcement learning strategy, allowing MoD-VLLM to learn optimal grounding policies and dynamic granularity visual representation jointly. Moreover, we propose MEventBench, a challenging Multi-Event Long Video Benchmark for complex long video reasoning. Extensive experiments on several long video understanding benchmarks and our MEventBench demonstrate that MoD-VLLM significantly outperforms state-of-the-art baselines.",
+      "authors": [
+        "Wei Feng",
+        "Xin Wang",
+        "Yu-Wei Zhan",
+        "Yuwei Zhou",
+        "Wenwu Zhu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-17T09:21:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.15778v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "modular dynamic-granularity framework to allocate token budgets adaptively in video LLMs",
+      "llm_evidence_cn": "模块化动态粒度框架，自适应分配视频LLM中的token预算",
+      "llm_evidence": "模块化动态粒度框架，自适应分配视频LLM中的token预算",
+      "canonical_evidence": "模块化动态粒度框架，自适应分配视频LLM中的token预算",
+      "llm_tldr_en": "Proposes MoD-VLLM, a modular dynamic-granularity video LLM that unifies temporal grounding and semantic understanding, adaptively allocating visual budgets for multiple events.",
+      "llm_tldr_cn": "针对长视频理解中有限视觉token预算与多事件捕捉需求之间的矛盾，提出MoD-VLLM框架。框架采用模块化设计，动态调整每个事件的视觉粒度，并具备自校正能力。在多个长视频基准上优于现有方法，有效提升了视频LLM在有限token下的多事件理解能力。",
+      "llm_tldr": "针对长视频理解中有限视觉token预算与多事件捕捉需求之间的矛盾，提出MoD-VLLM框架。框架采用模块化设计，动态调整每个事件的视觉粒度，并具备自校正能力。在多个长视频基准上优于现有方法，有效提升了视频LLM在有限token下的多事件理解能力。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.15265v1",
+      "source": "arxiv",
+      "title": "SceneBind: Binding What and Where Across Vision, Audio and Language",
+      "abstract": "We present SceneBind, an omni-modal representation of realistic scenes with joint semantic and 3D spatial understanding across vision, audio and language. Existing omni-modal encoders excel at instance-level semantics (i.e., what is present), but often lack explicit spatial structure (i.e., where it is). SceneBind addresses this gap by representing each scene as a semantic-spatial entity, combining a global semantic embedding with object-centric semantic-spatial slots. This representation explicitly captures object-level semantics, spatial attributes, and uncertainty. We further propose SceneBind Matching, a semantic-spatial matching scheme that integrates global scene similarity with object alignment, supporting cross-modal scene retrieval and object grounding. To train and evaluate SceneBind, we curate a novel real-world binaural audio-visual dataset with structured semantic and spatial annotations, and propose a training protocol for aligning semantic and spatial signals across modalities. SceneBind is compatible with large-scale pretrained semantic encoders, adds lightweight spatial modeling with only a few additional tokens. It achieves state-of-the-art scene and spatial retrieval while enabling strong zero-shot transfer to downstream tasks such as audio-visual localization.",
+      "authors": [
+        "Mingfei Chen",
+        "Zijun Cui",
+        "Ruoke Zhang",
+        "Hyeonggon Ryu",
+        "Eli Shlizerman"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.MM",
+        "cs.SD"
+      ],
+      "published": "2026-07-16T17:55:15+00:00",
+      "link": "https://arxiv.org/pdf/2607.15265v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "omni-modal scene representation for semantic-spatial understanding",
+      "llm_evidence_cn": "全模态场景表示用于语义-空间理解",
+      "llm_evidence": "全模态场景表示用于语义-空间理解",
+      "canonical_evidence": "全模态场景表示用于语义-空间理解",
+      "llm_tldr_en": "SceneBind represents scenes with semantic-spatial slots, enabling cross-modal retrieval and object grounding across vision, audio, and language.",
+      "llm_tldr_cn": "现有多模态编码器缺乏显式的空间结构。SceneBind将每个场景表示为全局语义嵌入和物体级语义-空间槽的组合，显式捕捉物体语义、空间属性和不确定性，并提出了结合全局场景相似度和物体对齐的匹配方案，支持跨模态场景检索和物体定位。该表示方法可用于多模态场景理解任务。",
+      "llm_tldr": "现有多模态编码器缺乏显式的空间结构。SceneBind将每个场景表示为全局语义嵌入和物体级语义-空间槽的组合，显式捕捉物体语义、空间属性和不确定性，并提出了结合全局场景相似度和物体对齐的匹配方案，支持跨模态场景检索和物体定位。该表示方法可用于多模态场景理解任务。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.16156v1",
+      "source": "arxiv",
+      "title": "PRISA: Proactive Infrastructure LiDAR Framework for Intersection Safety Assessment",
+      "abstract": "Urban intersections are among the most hazardous locations in road networks, posing significant risks to vehicles and vulnerable road users (VRUs) such as pedestrians and cyclists. The complexity of multi-agent interactions demands continuous, real-time monitoring systems capable of anticipating conflicts before they escalate into crashes. We present PRISA, a modular infrastructure LiDAR framework leveraging privacy-preserving, low-light-robust roadside sensors for long-term traffic observation and real-time risk detection at the edge. The framework comprises two core components: a sensing and perception layer and a plug-and-play risk assessment module. The latter automatically curates site-specific training data from accumulated perception outputs to train a trajectory prediction model without manual annotation. It then deploys the trained model for continuous motion forecasting and dual surrogate safety evaluation, using Time-to-Collision (TTC) for longitudinal conflicts and Predicted Post-Encroachment Time (PPET) for crossing and VRU-involved interactions. PRISA is evaluated on the public R-LiViT dataset and deployed on an NVIDIA Jetson AGX Thor at a live signalized intersection in Chattanooga, Tennessee. PPET-based assessment operates at 194~ms end-to-end latency over a 2.4-second predictive horizon, with TTC-based detection and perception remaining within real-time constraints, demonstrating practical feasibility for proactive multi-agent intersection safety monitoring.",
+      "authors": [
+        "Tam Bang",
+        "Hussam Abubakr",
+        "Emiliano de la Garza Villarreal",
+        "Truc Phuong Nguyen",
+        "Austin Harris",
+        "Toru Hirano",
+        "Mina Sartipi",
+        "Yunfei Xu",
+        "Hoang H. Nguyen"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "eess.SY"
+      ],
+      "published": "2026-07-17T17:35:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.16156v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Infrastructure LiDAR framework for intersection safety assessment",
+      "llm_evidence_cn": "用于交叉口安全评估的基础设施LiDAR框架",
+      "llm_evidence": "用于交叉口安全评估的基础设施LiDAR框架",
+      "canonical_evidence": "用于交叉口安全评估的基础设施LiDAR框架",
+      "llm_tldr_en": "PRISA is a modular infrastructure LiDAR framework for long-term traffic observation and real-time risk detection at the edge, using privacy-preserving roadside sensors to anticipate conflicts.",
+      "llm_tldr_cn": "PRISA是一个模块化基础设施LiDAR框架，利用隐私保护、低光鲁棒的 roadside 传感器进行长期交通观测和实时风险检测，自动从感知数据中精选特定站点训练数据，实现交叉口安全评估。",
+      "llm_tldr": "PRISA是一个模块化基础设施LiDAR框架，利用隐私保护、低光鲁棒的 roadside 传感器进行长期交通观测和实时风险检测，自动从感知数据中精选特定站点训练数据，实现交叉口安全评估。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
