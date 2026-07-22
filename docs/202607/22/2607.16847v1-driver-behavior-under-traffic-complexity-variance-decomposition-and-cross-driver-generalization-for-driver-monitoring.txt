@@ -1,0 +1,760 @@
+Title: Driver Behavior Under Traffic Complexity: Variance Decomposition and Cross-Driver Generalization for Driver Monitoring
+
+URL Source: https://arxiv.org/pdf/2607.16847v1
+
+Published Time: Tue, 21 Jul 2026 00:40:17 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> 1
+
+# Driver Behavior Under Traffic Complexity: Variance Decomposition and Cross-Driver Generalization for Driver Monitoring 
+
+Lukas K¨ oning, Nataˇ sa Miliˇ ci´ c and Klaus Bogenberger 
+
+Abstract —Understanding why a traffic situation is demanding for the human driver is central to safe and comfortable partially automated driving. Existing complexity metrics characterize only external environmental factors, while driver monitoring systems detect only endogenous states such as distraction. Neither side captures how external demands translate into driver-perceived situational load. Driver behavior serves as the natural bridge between both, and this paper investigates the inverse inference problem of estimating traffic complexity from behavioral signals. A systematic screening of 175 behavioral features across five domains (gaze, head pose, longitudinal control, guiding fixation, scanning strategy) is applied to data from 20 drivers in real urban traffic. Of these, 31 features exhibit statistically confirmed complexity effects, while 140 are confirmed as null effects through equivalence testing. Mixed-effects variance decomposition reveals that complexity explains only 1.5% of behavioral variance, whereas driver identity accounts for 23% and residual variance for 75%. This unfavorable ratio explains both the failure of all eight evaluated feature-level personalization strategies and the convergence of four classification architectures at F1 around 0.45 under leave-one-subject-out cross-validation. Guiding fixa-tion rate emerges as the single most deployment-ready feature, combining speed-robustness, universality across drivers, and minimal inter-driver variation in complexity sensitivity. The results define three deployment regimes for complexity-adaptive advanced driver assistance systems and establish the variance structure as the primary bottleneck for complexity estimation. 
+
+Index Terms —Traffic complexity, driver behavior, driver mon-itoring system, advanced driver assistance system, guiding fixa-tion, variance decomposition, cross-driver generalization. 
+
+I. I NTRODUCTION 
+
+# THE cognitive demands placed on a driver using partially automated advanced driver assistance system (ADAS) (SAE Level 2) in urban traffic range from passive monitor-ing on empty arterials to active multi-agent coordination at complex intersections. Yet this variation in driver demand with traffic complexity remains invisible to modern Driver Monitoring Systems (DMS) and ADAS, even as these sys-tems become increasingly common in production vehicles [1]. Partially automated ADAS assume lateral and longitudinal control, but the driver must still supervise the system [2]. Accordingly, UN Regulation No. 171 on partially automated ADAS mandates DMS for such systems, and vehicle rating            
+
+> This work involved human subjects or animals in its research. Approval of all ethical and experimental procedures and protocols was granted by BMW’s ethics committee, and performed in line with the Declaration of Helsinki. Lukas K¨ oning is with the Chair of Traffic Engineering and Control, Technical University of Munich, 80333 Munich, Germany and the BMW AG, 80809 Munich, Germany (e-mail: lukas.koening@tum.de) .Nataˇ sa Miliˇ ci´ c is with the BMW AG, 80809 Munich, Germany. Klaus Bogenberger is with the Chair of Traffic Engineering and Control, Technical University of Munich, 80333 Munich, Germany.
+
+institutions award credits for advanced DMS functionality, such as phone usage and drowsiness detection [3], [4]. Maintaining driver engagement is challenging because many systems rely on warnings triggered by detected inattention, which drivers often perceive as punitive [5]. Current DMS detect the endogenous driver state but not the exogenous situational demands imposed by traffic complexity. This gap limits cooperative, context-aware ADAS, as alert drivers in complex situations receive the same system response as those on an empty road. While drivers generally adopt more de-fensive driving behaviors as complexity rises, current state-of-the-art ADAS do not adapt to driver-perceived situational demands [6], [7]. Therefore, understanding the current demand placed on the driver and incorporating it into a complexity-adaptive ADAS is crucial for providing optimal ADAS that promote active participation and avoid overload. Whether external factors impose situational load depends on whether the driver perceives them as demanding, and behavior encodes this human assessment, carrying information that purely environmental metrics cannot provide. Estimating traffic complexity from environmental features is a well-established research field [8], [9]. However, the inverse in-ference problem of deriving complexity from driver behavior, and thus from the driver’s own situational assessment, is sparsely studied, even though the required sensor setup (DMS) is already mandated in production vehicles. While a few studies have examined behavioral differences across complex-ity levels, including our own preceding work identifying 16 metrics that differentiate among three expert-labeled complex-ity levels, these analyses share several limitations [10]–[13]. Feature spaces are narrow and selected ad hoc rather than systematically screened, speed confounds are uncontrolled, variance decomposition into complexity-driven versus driver-idiosyncratic components is absent, and neither the cross-driver generalization problem nor the effectiveness of per-driver normalization at the feature level has been addressed.  
+
+> •
+
+RQ1: Which driver-behavior features are sensitive to traffic complexity, and which are not?  
+
+> •
+
+RQ2: How much of the observed feature variance is ex-plained by traffic complexity versus stable driver identity?  
+
+> •
+
+RQ3: Can per-driver normalization recover complexity signal that is masked by inter-driver differences?  
+
+> •
+
+RQ4: To what extent can complexity be inferred from driver behavior when the driver is previously unseen? This paper contributes a systematic screening of 175 be-havioral features across five domains (Kruskal-Wallis, TOST, speed residualization), a mixed-effects variance decomposition 
+
+> This work has been submitted to the IEEE for possible publication. Copyright may be transferred without notice, after which this version may no longer be accessible. arXiv:2607.16847v1 [eess.SY] 18 Jul 2026 2
+
+separating complexity from driver identity, a factorial eval-uation of eight feature-level personalization strategies, and a cross-driver classification benchmark across four architec-tures under Leave-One-Subject-Out (LOSO) cross-validation and block-aware cross-validation. Together, these contribu-tions provide an end-to-end analysis framework, from feature screening through variance explanation to classification, that links the statistical structure of driver-behavior features to design constraints for complexity-adaptive DMS and ADAS. II. R ELATED WORK 
+
+A. Traffic Complexity 
+
+Despite widespread use in recent traffic safety, human factors, and automated driving research, the concept of traffic complexity lacks a consensus definition [14]. Publications use different terms, e.g., traffic scene complexity, traffic situation complexity, and environmental complexity [8], [15], [16]. For simplicity, this paper uses traffic complexity to encompass all concepts, knowingly disregarding minor differences. Con-ceptually, traffic complexity is understood as an exogenous property of the traffic situation, independent of the driver’s individual characteristics. Specifically, it denotes the demand imposed on the driver by factors such as road geometry, traffic interactions, and environmental conditions. Traffic complexity is related to, but distinct from, mental workload: complexity describes the external task demand, whereas workload refers to the internal cognitive cost of meeting that demand [17], [18]. This paper targets complexity as the exogenous construct. Existing approaches to quantify traffic complexity can be sep-arated into objective approaches that derive traffic complexity from measurable features of the traffic situation and subjective approaches that rely on cognitive models and expert judgment. The following paragraphs review both. 
+
+1) Objective Quantification: Objective approaches derive complexity from measurable features of the traffic situation, typically distinguishing static elements (road geometry, traffic signs, weather) from dynamic elements (vehicles, pedestrians, cyclists) [8], [16], [19]. Methods range from weighted sums and entropy-based measures to potential field models and deep learning [8], [9], [19]. The primary use cases are scenario selection for ADAS testing and online complexity estimation for behavior adaptation [8], [9]. While criticality is sometimes used as a proxy, a complex situation need not be critical [20]. A fundamental limitation shared across objective approaches is that ground-truth labels are either expert-rated or derived from downstream algorithm performance, leaving no independently annotated complexity benchmark. Recent work attempts to bridge objective and subjective evaluations, but a standardized benchmark remains absent [21]. 
+
+2) Subjective Quantification: The closest theoretical anchor to subjective traffic complexity is Fuller’s Task-Capability In-terface (TCI) model, which characterizes driving as a dynamic control task in which the outcome balances task demand, i.e., the objective complexity imposed by road, traffic, and environ-ment, and driver capability [17]. The complexity of the current traffic situation strongly influences task demand, particularly for perception tasks [18]. Teh et al. [22] demonstrated that complexity fluctuates over time during a drive and affects both subjective workload ratings and objective driving perfor-mance. Drivers tend to drive more defensively, and increased complexity reduces lane-keeping performance and raises the probability of errors [6], [7], [18]. In the context of automated driving, research has found declining take-over performance as complexity increases [15]. Although the effects of traffic complexity on the human driver are well known and actively researched, the subjective quantification of traffic complexity remains restricted to questionnaires and expert labeling [22], [23]. Fastenmeier and Gstalter [24] operationalized the TCI concept through driving task analysis, decomposing routes into subtasks and assigning ordinal complexity ratings by expert judgment, an approach that forms the basis for expert-labeling protocols. The behavioral response to traffic complexity has received comparatively little attention in the literature. Beyond the previously mentioned longitudinal control adaptations, only a few publications investigate other driver behavior metrics, such as gaze and head tracking, even though they are used as state of the art in driver state detection by DMS. Prior research has identified wider, more dispersed gaze behavior in more complex scenarios [10]–[12]. Our previously published analysis, which this paper extends, revealed significant patterns across 16 behavior metrics covering longitudinal control, gaze metrics, fixation frequency, and guiding fixation behavior [13]. Overall, subjective complexity quantification remains lim-ited to questionnaires and expert ratings, and the inverse in-ference problem of estimating complexity from driver behavior remains sparsely studied. 
+
+B. Driver Behavior Features for Task Demand and Complexity Estimation 
+
+Ohn-Bar and Trivedi [25] survey visual cues for intelligent vehicles and distinguish endogenous driver state monitoring (fatigue, distraction) from exogenous context understanding (traffic complexity), noting that the latter is mostly addressed via infrastructure sensors rather than driver behavior. Current DMS research focuses on endogenous states using gaze and head pose features, achieving high accuracy under controlled conditions but degrading with driver heterogeneity [26]. For exogenous task demand, drivers produce more ex-ploratory scanning patterns as demand increases [27]. Simula-tor studies reported increased vertical gaze dispersion in com-plex situations [11], [12], while real-world lane-change studies found more dispersed glances [10]. Information-theoretic gaze metrics complement distributional measures: Shiferaw et al. [28] distinguish stationary gaze entropy (spatial dispersion) from gaze transition entropy (sequential predictability), with the former being more robust to inter-driver heterogeneity [29]. Sample entropy captures temporal irregularity and in-creases with cognitive load [30], though Arutyunova et al. [31] question whether entropy reflects experience rather than task demands. Head pose provides complementary but coarser at-tention information [25], [32], [33], and research has identified driver-idiosyncratic patterns that mask complexity variance [32], [33]. Scanning strategy features (fixation frequency, scan-path length, head-gaze coupling) capture how drivers distribute 3
+
+visual attention, with exploration increasing under complexity [25], [27], [28]. Physiological measures track task demand with higher accuracy but require intrusive sensors incompatible with production vehicles [26]. Guiding fixation couples gaze behavior with the driving task, defined as fixating the tangent point and trajectory about 2 seconds ahead [34], [35]. These patterns persist in assisted driving [36], but apart from our preceding publication, no prior work examines complexity effects on guiding fixation [13]. Longitudinal control features reflect complexity-adapted behavior: drivers increase braking and reduce speed as com-plexity rises [6], [7], and behavioral entropy of control inputs has been validated for distraction detection [37], [38]. No prior study applies such a comprehensive multi-domain screening with variance decomposition to separate complexity from driver identity, and most prior work targets generic task demands rather than traffic complexity specifically. 
+
+C. Cross-Driver Generalization and ADAS Personalization 
+
+When driver monitoring models are evaluated in LOSO set-tings, performance drops substantially compared with within-driver evaluation for both distraction and drowsiness detection [39]. Pe˜ na et al. [40] report that physiological clustering before model training partially mitigates this gap, but their approach requires intrusive sensors. The underlying cause of stable inter-driver differences in baseline behavior has been quantified via Intraclass Correlation Coefficient (ICC) analysis for isolated driving decisions, e.g., overtaking maneuvers [41]. However, no study has systematically applied ICC decomposition across a multi-domain feature set to explain the cross-driver gap. To address inter-driver heterogeneity, personalization strate-gies operate at multiple levels. At the feature level, per-driver z-score normalization removes between-subject offsets and is common in affective computing [42]. Per-driver baseline sub-traction has been used in driver behavior analysis [43], [44]. At the model level, domain adaptation transfers a pretrained model to a target driver without labeled data [39], while few-shot and meta-learning approaches require only a small calibration set [45]. These strategies are typically evaluated on binary state detection tasks (e.g., attentive versus distracted) and have not been tested on the more subtle signal of traffic complexity, where effect sizes are considerably smaller. No prior work formally decomposes the variance sources that cause the cross-driver gap into complexity-driven, driver-identity, and residual components, nor evaluates whether feature-level personalization can recover a complexity signal masked by inter-driver differences. III. M ETHODS 
+
+The analysis follows a four-stage pipeline, illustrated in Figure 1: (1) systematic feature screening across five be-havioral domains with speed-confound control, (2) variance decomposition via mixed-effects ICC analysis, (3) feature-level personalization testing, and (4) cross-driver classification benchmarking with post-hoc SHapley Additive exPlanations (SHAP) analysis [46].  
+
+> Fig. 1. Overview of the analysis pipeline of this paper.
+
+A. Dataset and Experimental Setup 
+
+The analysis is based on data from a real-vehicle study conducted in urban traffic in Munich, Germany, described in detail in [13], [47]. From the original 57 participants, a subsample of 20 drivers ( μ = 38 .8 years, σ = 10 .2 years, 3 female, 17 male) was selected via stratified sampling. Con-tinuous expert labeling of synchronized front-camera video re-quires approximately 3× real-time effort per drive. Therefore, labeling all 57 drives was not feasible within the available annotation budget. Stratified sampling across age and driving experience ensured maximum demographic coverage within this constraint. The resulting 20-group design provides ade-quate power for fixed-effects estimation but limits precision of random-slope covariance estimates (Section V-F). All par-ticipants declared informed consent. For the real-vehicle study, a pre-series BMW i5 M60 was used. The vehicle was equipped with the 2021 version of BMW’s production-grade Adaptive Cruise Control (ACC) and Lane Keeping Assistant (LKA), classifying it as a partially automated ADAS [2]. A specialized software version enabled fully shared longitudinal control, allowing the driver to brake without deactivating the system [47], [48]. For the analysis in this paper, only the first drives of participants were selected, during which the ADAS was characterized by fully-shared lon-gitudinal control. Therefore, only segments with active ADAS were analyzed, as fully-shared longitudinal control resulted in nearly 100% ADAS usage. Participants were informed in advance that they would use a partially automated ADAS that assists with maintaining a safe distance from preceding vehicles and staying in lane. Participants were instructed to use the ADAS as often as possible, provided they felt comfortable doing so. The route, displayed in Figure 2, spanned approx-imately 11 km of multi-lane, single-lane, and side roads in urban traffic, covering diverse scenarios including construction sites, intersections, and varying traffic densities. Drives were conducted between 9 am and 5 pm during summer, resulting 4
+
+in varying traffic, lighting, and weather conditions.  
+
+> Fig. 2. Route driven in the real-vehicle study.
+
+Driver behavior data were extracted from the vehicle’s control units at a native sampling rate between 20 and 100 ms and linearly interpolated onto a fixed 100 ms grid. The extracted dataset includes GPS position, vehicle speed, ADAS activation state, brake pedal usage, and DMS signals (gaze yaw, gaze pitch, head yaw, head pitch, head roll) from the vehicle’s camera-based DMS located behind the steering wheel. The total dataset comprises approximately 400,000 samples (11 hours cumulative driving) after filtering periods where vehicle speed was below 1 km/h or the driver was not looking outside the vehicle windows. Three experts covering automotive engineering, traffic psy-chology, and usage safety independently labeled each drive using three ordinal complexity classes: simple (clearly struc-tured, low attention demand), normal (partially structured, mi-nor adjustments needed), and complex (multifaceted, frequent adjustments, heightened attention). Experts labeled complexity based solely on the traffic scene (road layout, traffic par-ticipants, infrastructure) visible in synchronized front-camera video, without access to driver behavior data. Labeling was performed time-continuously without predefined segments us-ing a dedicated software tool [13]. A ±2 s tolerance window was applied to account for reaction time variability in label-change timestamps [42]. A sensitivity analysis was conducted to assess the impact of temporal tolerance ( ±0 s to ±3 s) on inter-rater reliability. Krippendorff’s α increased from 0.50 at ±0 s to 0.57 at ±2.0 s (+14.3%). Beyond ±2.0 s, improvements followed a pattern of diminishing returns, at the cost of temporal precision required for event-level analysis. Temporal stability, measured by Spearman’s ρ, remained high across all tolerances ( ρ ≥ 0.83 ), confirming that the aggregated labels are robust to the choice of window size. Based on this trade-off between reliability and temporal precision, ±2 s was selected for all subsequent analyses, matching typical human reaction/annotation latency ( ∼1-2 s) [42]. Individual labels were aggregated using the Dawid-Skene algorithm [49]. The resulting class distribution is 27% simple, 45% normal, and 28% complex. Inter-rater reliability yields Krippendorff’s α = 0 .57 (moderate agreement), while individ-ual rater agreements with the combined labels reach substantial values (κ = 0.68 –0.82 ), justifying the labels as expert-aggregated proxy labels of subjective traffic complexity [50]. More details on the labeling can be found in the preceding conference publication [13]. 
+
+B. Feature Space Definition 
+
+The 175 candidate metrics arise from a systematic cross-product of 35 base signals, organized into five behavioral domains, and a standard derivation set. This design ensures uniform coverage: every base signal is characterized by the same statistical descriptors, producing directly comparable features across domains. Each base signal s(t) is expanded into up to six time-series derivations computed over causal, right-aligned rolling windows (3 s at 10 Hz): (D1) raw value s(t), (D2) rolling mean 
+
+M (s(t)) , (D3) rolling standard deviation SD (s(t)) (spherical standard deviation for angular signals), (D4) rolling Shannon entropy HSh (s(t)) , (D5) rolling sample entropy HSa (s(t)) 
+
+(m = 2 , r = 0 .2 SD ), and (D6) first temporal derivative (gradient). Base signals that are themselves kinematic deriva-tives (velocity, acceleration) receive a reduced set (D2-D5). Combined 2D dispersion signals receive D3-D5 only. Pre-smoothed signals, i.e., those that are themselves rolling means or continuous rates (e.g., braking intensity as a 15 s rolling mean of the binary brake signal), receive the full set D1–D6 except for D2, as a rolling mean of an already-smoothed signal trivially correlates with D1. The 35 base signals span five behavioral domains. Gaze Behavior (10 signals, 45 metrics) covers camera-based gaze yaw Ψg and pitch θg at 10 Hz, their velocities and acceler-ations, combined 2D dispersion gcomb , and blink rate fblink .
+
+Head Pose (9 signals, 42 metrics) comprises 3D head orien-tation (yaw, pitch, roll) with velocity and acceleration deriva-tives. Longitudinal Control (4 signals, 24 metrics) includes braking acceleration during active braking abrake , time- and distance-based braking intensity BR t/s , and speed-limit de-viation ∆v. Guiding Fixation (6 signals, 36 metrics) captures the guiding fixation rate GF R (proportion of time the driver’s gaze falls within ±10° of the trajectory tangent point at a speed-dependent look-ahead distance), forward and backward polling rates, angular deviation from the guiding fixation point δGF , and time since last guiding fixation tGF . Scanning Strategy (6 signals, 36 metrics) covers fixation frequency ff ix ,scanpath length SP L , look-ahead distance, head–gaze cou-pling ρhg,θ (yaw and pitch), and extreme head pose rate. 
+
+C. Feature Screening 
+
+The screening pipeline operates in two stages: (1) sample-level statistical screening with False Discovery Rate (FDR) correction, speed-residual control, and TOST equivalence test-ing, and (2) driver-level tier ranking to address temporal autocorrelation. For each of the 175 metrics, the non-parametric Kruskal-Wallis H test is applied to test whether complexity levels differ. Features are retained when effect size η2 ≥ 0.01 5
+
+(Cohen’s [51] small effect-size benchmark) and padj < 0.05 
+
+(Benjamini-Hochberg [52] FDR correction across all 175 tests). The η2 ≥ 0.01 threshold reflects that complexity produces subtle behavioral modulations, with N ≈ 400 k, post-hoc power exceeds 0.99 for this effect size, so features failing the threshold genuinely lack practical relevance. To isolate complexity-driven effects from speed-mediated effects, OLS residualization is applied to each retained metric y:
+
+yres = y − ( ˆβ0 + ˆβ1 · speed ) (1) where ˆβ0 and ˆβ1 are estimated via ordinary least squares. Kruskal-Wallis is then re-run on yres . Features with η2 
+
+> res
+
+≥ 0.01 
+
+are classified as speed-robust , those with η2 
+
+> res
+
+< 0.01 as 
+
+speed-mediated . For all metrics that fail the initial Kruskal-Wallis test ( η2 < 0.01 ), Two-One-Sided Tests (TOST) with equivalence bounds of ∆ = ±0.2 pooled standard deviations (Cohen’s d = 0 .2) are applied to formally confirm absence of a practically significant effect [53]. The sample-level Kruskal-Wallis test operates on N ≈ 400 ksamples at 10 Hz, violating the independence assumption. To verify that effects survive aggregation, each feature is aggregated to per-driver per-complexity-level medians ( N =60 ) and the Kruskal-Wallis test is re-run. Features with 
+
+η2 
+
+> driver
+
+≥ 0.01 and pdriver < 0.05 are classified as Tier 1 (robust) and those with η2 
+
+> driver
+
+≥ 0.01 but pdriver ≥ 0.05 as Tier 2 (power-limited, retained because the effect is present but statistical power is insufficient at N = 60 ). Features with η2 
+
+> driver
+
+< 0.01 are dropped (Tier 3). Ranking stability is assessed via Spearman correlation between η2 
+
+> sample
+
+and η2
+
+> driver
+
+.
+
+D. Variance Decomposition 
+
+For each retained feature (Tier 1 + Tier 2), a linear mixed-effects model with random intercept and random slope is fitted: 
+
+yij = β0 + β1 · xij + u0j + u1j · xij + εij (2) where i indexes samples, j indexes drivers, x ∈ { 0, 1, 2}
+
+codes complexity ordinally, u0j is the random intercept (driver baseline), u1j is the random slope (driver-specific complexity sensitivity), and εij ∼ N (0 , σ 2 
+
+> ε
+
+) [54]. Variance is decomposed following the Nakagawa and Schielzeth [55] framework into three components: marginal 
+
+R2 
+
+> m
+
+(variance explained by complexity), ICC (σ2
+
+> u0
+
+/σ 2
+
+> total
+
+,proportion attributable to stable driver identity), and slope share ( σ2
+
+> u1
+
+/(σ2 
+
+> u0
+
++σ2
+
+> u1
+
+), proportion of between-driver variance reflecting differences in complexity sensitivity versus baseline level). Features with ICC < 0.5 are classified as universal 
+
+(consistent across drivers), those with ICC ≥ 0.5 as idiosyn-cratic (dominated by driver identity). Because σ2 
+
+> total
+
+includes the intercept-slope covariance term, a strongly negative covari-ance (drivers with higher baselines showing weaker complex-ity sensitivity) can reduce the denominator below σ2
+
+> u0
+
+, yielding ICC values exceeding unity for features with pronounced negative intercept-slope coupling. A dummy-coding sensitivity check confirmed coding-invariance (median ∆R2 
+
+> m
+
+= 0 .001 ,Spearman ρ = 0 .70 , p < 0.001 ). 
+
+E. Personalization Strategies 
+
+To test whether feature-level normalization can recover complexity signal from inter-driver variance, eight normal-ization strategies plus a raw baseline (L0) are evaluated in a 
+
+2×4 factorial design. The two normalization types are z-score (center + scale; L1–L4) and mean-subtraction (center only; M1–M4). Each type is crossed with four temporal scopes: full-drive (L1/M1, non-causal), calibration phase using only the first 3 minutes (L2/M2, causal), expanding window from drive start with 60 s warmup (L3/M3, causal), and sliding window over the preceding 5 minutes (L4/M4, causal and driver-agnostic). Each strategy is applied independently per feature before recomputing η2. Effectiveness is measured as 
+
+∆η2 relative to L0. 
+
+F. Classification Pipeline 
+
+Four model architectures are evaluated: Gradient Boosting (GB, HistGradientBoosting with per-fold tuning of depth, learning rate, and number of estimators), Support Vector Machine (SVM, per-fold grid search over C and γ), a 2-layer GRU with temporal attention (128 units, 3 s input windows, dropout 0.1, early stopping), and Logistic Regression. Addi-tionally, two reference baselines are included: an unsupervised PCA baseline (PC1 projected onto the test set, sign-flipped for positive label correlation, and discretized into three classes via equal-frequency quantile binning) and majority-class predic-tion. All features use causal rolling windows, i.e., no future information enters the computation. Two cross-validation strategies disentangle inter-driver and within-driver generalization. LOSO trains on 19 drivers and tests on the held-out driver’s complete drive, serving as the pri-mary evaluation because it mimics deployment on a previously unseen driver. BlockGroupKFold (5-fold, stratified by driver, within-driver block shuffling) evaluates within-driver general-ization while respecting temporal structure. Hyperparameter tuning is performed via per-fold grid search on the training set. Macro F1 is reported to account for 3-class imbalance. SHAP values are computed using TreeExplainer on the GB model under LOSO (up to 2,000 test samples per fold, concatenated across all 20 folds). The global importance metric is mean |SHAP | per feature, averaged over samples and classes. Unlike univariate screening ( η2), SHAP reflects multivariate predictive importance and captures redundancy, complementarity, and interaction effects. IV. R ESULTS 
+
+A. Feature Screening 
+
+The two-stage screening pipeline reduces 175 candidate features to 31 retained metrics. In Stage 1, 32 features pass the Kruskal-Wallis test ( η2 ≥ 0.01 , padj < 0.05 ). Table I lists all 32 features grouped by behavioral domain, together with the variance decomposition results discussed in Section IV-B. ICC values exceeding unity reflect strongly negative intercept-slope covariance (see Section III-D). Detailed test statistics are provided in supplementary Table S.I. Longitudinal control dominates with the highest hit rate (13 of 24 candidates) and the four strongest effects ( η2 =6
+
+TABLE I FEATURE SCREENING AND VARIANCE DECOMPOSITION RESULTS OF ALL METRICS PASSING KRUSKAL -W ALLIS SCREENING . R OB .: SPEED -ROBUST (✓)
+
+> OR SPEED
+
+-MEDIATED (✗). T IER : 1 = ROBUST AT DRIVER LEVEL , 2 = POWER -LIMITED , 3 = NOT DRIVER ROBUST .
+
+Feature Simple Normal Complex η2 η2 
+
+> res
+
+Rob. Tier R2 
+
+> m
+
+ICC Slope 
+
+μ (σ) μ (σ) μ (σ)
+
+Longitudinal Control 
+
+BR t [%] 2.79 (10.64) 4.86 (10.96) 11.02 (17.49) 0.057 0.036 ✓ 1 0.002 1.161 0.211 
+
+HSa (BR t) [−] 0.01 (0.05) 0.03 (0.07) 0.06 (0.10) 0.046 0.031 ✓ 1 0.047 0.011 0.604 
+
+HSh (BR t) [−] 0.21 (0.68) 0.32 (0.76) 0.60 (0.97) 0.033 0.021 ✓ 2 0.033 0.020 0.396 
+
+M (abrake ) [m/s2] -1.23 (0.86) -1.05 (0.66) -0.88 (0.62) 0.030 0.036 ✓ 2 0.001 0.251 0.242 
+
+abrake [m/s2] -1.33 (0.92) -1.23 (0.78) -0.99 (0.73) 0.028 0.019 ✓ 2 0.001 0.102 0.812 
+
+M (∆ v) [%] -21.65 (30.78) -30.94 (30.72) -34.98 (30.16) 0.028 0.006 ✗ 1 0.025 0.044 0.463 
+
+∆v [%] -21.82 (30.59) -31.33 (31.52) -34.81 (31.09) 0.026 0.009 ✗ 1 0.023 0.043 0.450 
+
+BR s [%] 3.83 (6.16) 5.17 (6.47) 6.93 (9.20) 0.025 0.013 ✓ 1 0.025 0.309 0.470 
+
+HSa (∆ v) [−] 0.71 (0.69) 0.59 (0.64) 0.47 (0.50) 0.021 0.006 ✗ 1 0.021 0.017 0.478 
+
+SD (BR t) [%] 0.56 (2.26) 0.75 (1.97) 1.41 (2.79) 0.020 0.013 ✓ 1 0.019 0.018 0.385 
+
+HSa (BR s) [−] 0.48 (0.72) 0.61 (0.76) 0.74 (0.79) 0.016 0.015 ✓ 1 0.014 0.064 0.196 
+
+HSh (∆ v) [−] 0.95 (0.97) 1.09 (0.95) 1.27 (0.93) 0.015 0.004 ✗ 1 0.015 0.013 0.502 
+
+SD (∆ v) [%] 2.89 (3.85) 3.32 (3.79) 3.94 (3.92) 0.010 0.003 ✗ 1 0.008 0.005 0.708 
+
+Gaze Behavior 
+
+fblink [1/min ] 17.49 (31.93) 24.28 (42.40) 32.96 (48.55) 0.019 0.017 ✓ 2 0.022 0.262 0.113 
+
+HSh (Ψ g ) [−] 1.54 (0.80) 1.76 (0.82) 1.77 (0.83) 0.016 0.004 ✗ 1 0.015 0.099 0.107 
+
+HSh ( ˙Ψg ) [−] 1.13 (0.68) 1.31 (0.67) 1.33 (0.68) 0.016 0.005 ✗ 2 0.011 0.178 0.051 
+
+SD (gcomb ) [rad ] 0.15 (0.03) 0.15 (0.02) 0.15 (0.02) 0.015 0.014 ✓ 2 0.018 0.960 0.147 
+
+SD (Ψ g ) [rad ] 0.14 (0.03) 0.15 (0.03) 0.15 (0.03) 0.015 0.014 ✓ 2 0.011 1.340 0.156 
+
+HSh ( ¨Ψg ) [−] 1.08 (0.61) 1.23 (0.61) 1.25 (0.63) 0.014 0.004 ✗ 1 0.010 0.140 0.061 
+
+HSh (gcomb ) [−] 2.51 (0.80) 2.70 (0.82) 2.69 (0.84) 0.011 0.003 ✗ 2 0.017 0.239 0.233 
+
+Head Pose 
+
+SD (Ψ h) [rad ] 0.11 (0.02) 0.12 (0.02) 0.12 (0.02) 0.020 0.018 ✓ 2 0.019 1.376 0.254 
+
+HSh ( ¨Ψh) [−] 1.31 (0.54) 1.37 (0.52) 1.46 (0.57) 0.010 0.006 ✗ 2 0.015 0.811 0.192 
+
+Guiding Fixation 
+
+GF R [%] 77.01 (22.76) 73.17 (22.58) 66.31 (24.94) 0.029 0.022 ✓ 1 0.017 0.468 0.033 
+
+HSh (δGF ) [−] 1.14 (0.75) 1.33 (0.77) 1.41 (0.78) 0.018 0.004 ✗ 1 0.016 0.076 0.115 
+
+HSh (δGF,out ) [−] 0.75 (0.80) 0.93 (0.87) 1.05 (0.90) 0.017 0.005 ✗ 1 0.017 0.094 0.105 
+
+HSa (δGF,out ) [−] 0.17 (0.25) 0.21 (0.27) 0.25 (0.30) 0.011 0.004 ✗ 1 0.006 0.310 0.028 
+
+HSh (tGF ) [−] 0.09 (0.28) 0.13 (0.34) 0.18 (0.39) 0.011 0.005 ✗ 3 — — —
+
+Scanning Strategy 
+
+SP L [◦] 306.65 (145.43) 348.90 (147.78) 344.57 (152.48) 0.016 0.024 ✓ 2 0.013 0.425 0.074 
+
+M (SP L ) [◦] 303.04 (148.39) 343.31 (150.12) 339.33 (153.71) 0.014 0.025 ✓ 2 0.011 0.405 0.072 
+
+M (ρhg,θ ) [−] 0.08 (0.32) 0.09 (0.31) 0.16 (0.33) 0.012 0.011 ✓ 2 0.000 0.522 0.299 
+
+ρhg,θ [−] 0.07 (0.33) 0.09 (0.32) 0.16 (0.34) 0.011 0.010 ✓ 2 0.000 0.416 0.302 
+
+ff ix [Hz ] 2.49 (1.49) 2.82 (1.37) 2.71 (1.36) 0.010 0.006 ✗ 2 0.005 0.216 0.042 
+
+Median (Tier 1+2) 0.016 0.011 0.015 0.228 0.196 
+
+0.028 –0.057 ). Guiding fixation rate ( GF R , η2 = 0 .029 ) is the strongest non-longitudinal-control feature. Entropy-based derivations (D4, D5) account for 14 of 32 relevant features, while the gradient derivation (D6) is universally not rele-vant, formally confirmed via TOST. Of the 32 features, 17 are speed-robust ( η2 
+
+> res
+
+≥ 0.01 ): all eight braking features retain their effect after speed control, whereas the five speed-deviation metrics do not. Among gaze features, all spherical standard deviation metrics are speed-robust. For the 143 features failing screening ( η2 < 0.01 ), TOST equivalence testing confirms 140 as genuine null effects (supplementary Table S.II). Key structural findings in the null set include: (a) all pitch-axis signals (gaze and head, 28 derivations total) are null, while yaw-axis signals carry complexity information; (b) forward and backward polling rates are null, while the con-tinuous guiding fixation rate is among the strongest features. In Stage 2, features are aggregated to per-driver per-complexity-level medians. Of the 32 features, 16 are Tier 1 (robust), 15 Tier 2 (power-limited), and one dropped (Tier 3: 
+
+HSh (tGF )). Among speed-robust features, sample-level and driver-level rankings show strong agreement (Spearman ρ =0.618 , p = .008 ). 
+
+B. Variance Decomposition 
+
+The right-hand columns of Table I report the mixed-effects decomposition for all 31 retained features. Figure 3 visualizes the relationship between ICC and R2
+
+> m
+
+.Complexity explains 1.5% of feature variance (median 
+
+R2 
+
+> m
+
+= 0.015 ), while driver identity accounts for approxi-mately 23% (median ICC = 0 .228 ). The remaining ∼75% is within-driver residual variance. The ICC-to-R2 
+
+> m
+
+ratio of approximately 15:1 confirms that between-driver variance dominates the complexity signal by more than an order of magnitude. Features divide into 25 universal (ICC < 0.5) and six idiosyncratic (ICC ≥ 0.5) regimes, the latter concentrated in dispersion-based and head pose metrics (Table I). At the domain level, braking features exhibit the lowest median ICC (0.064) and highest R2 
+
+> m
+
+(0.019), while head pose features have the highest median ICC (1.09). The median slope share is 0.196, indicating that approximately 20% of between-driver variance reflects differences in complexity sensitivity (slope) rather than baseline level (intercept). Braking entropy features exhibit the highest slope shares (0.38–0.60), while guiding fixation rate has the lowest (0.033). 70.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 
+
+Variance Explained      
+
+> abrake
+> HSh (̈Ψ g)
+> HSh (̇Ψ g)
+> ffix
+> HSh (gcomb )
+> M(abrake )
+> fblink
+> BR s
+> HSa (δGF ,out )
+> M(SPL )
+> ρhg ,θ
+> SPL
+> GFR
+> M(ρhg ,θ)
+> HSh (̈Ψ h)
+> SD (gcomb )
+> BR t
+> SD (Ψ g)
+> SD (Ψ h)
+> idiosyncratic universal
+> ICC (Driver)
+> R2
+> m(Complexity)
+> Low slope share
+> High slope share
+> Longitudinal Ctrl.
+> Gaze
+> Scanning Strategy
+> Head Pose
+> Guiding Fixation
+
+Fig. 3. Variance structure of retained features with ICC ≥ 0.1. Each row shows ICC (driver identity, •) and R2 
+
+> m
+
+(complexity, ♦) connected by a line whose width encodes slope share. Vertical dashed line at ICC = 0 .5 separates universal from idiosyncratic regimes. The remaining 12 features (ICC < 0.1)have near-zero driver and complexity variance. 
+
+C. Personalization 
+
+Table II summarizes the effect of all eight normalization strategies on mean η2. The per-feature ∆η2 pattern is shown in supplementary Figure S1. All eight strategies degrade discrimination relative to the raw baseline (Table II). Among causal strategies, calibration-phase mean subtraction (M2) is least harmful ( −18 .3% ), while sliding-window z-score (L4) is most destructive ( −56 .1% ). Mean-subtraction consistently outperforms z-score, and degradation increases monotonically with shorter temporal scopes. 
+
+D. Classification 
+
+Table III reports Macro F1 scores for all six models under two cross-validation strategies (see also supplementary Fig-ure S2). 
+
+TABLE II EFFECT OF FEATURE -LEVEL NORMALIZATION STRATEGIES ON MEAN η2 .
+
+∆: CHANGE VS . L0 BASELINE . ndrop : FEATURES DROPPING BELOW 
+
+η2 = 0 .01 .
+
+Strategy Description Mean η2 ∆ (%) ndrop 
+
+L0 Raw baseline 0.019 — —L1 Full-drive z-score 0.018 -0.5 4L2 Calibration z-score (3 min) 0.012 -33.1 12 L3 Expanding-window z-score 0.014 -24.6 17 L4 Sliding-window z-score (5 min) 0.008 -56.1 23 M1 Full-drive mean-sub 0.018 -1.1 5M2 Calibration mean-sub (3 min) 0.015 -18.3 11 M3 Expanding-window mean-sub 0.015 -19.2 18 M4 Sliding-window mean-sub (5 min) 0.010 -47.8 23 
+
+Under LOSO (primary evaluation), Gradient Boosting achieves the highest Macro F1 of 0.452 ± 0.07 , followed by SVM ( 0.428 ± 0.04 ), GRU+Attention ( 0.424 ± 0.05 ), and Logistic Regression ( 0.422 ± 0.08 ). All four models converge within a three percentage-point band ( 0.422 –0.452 ); the PCA baseline achieves 0.400 ±0.04 . The cross-driver generalization gap is substantial: GB drops from 0.657 (BlockGroupKFold) to 0.452 (LOSO), a difference of 20.5 pp, while SVM exhibits the largest gap (+32.4 pp). The confusion matrices (supplementary Figure S3) reveal that under LOSO, the model struggles primarily with the normal class (37% recall), frequently confusing it with both simple (35%) and complex (28%). Simple and complex classes are better separated (62% and 49% recall, respectively). Un-der BlockGroupKFold, all three classes achieve substantially higher recall (78%, 56%, 70%). 
+
+E. Feature Importance via SHAP 
+
+SHAP values computed on the GB model under LOSO CV reveal the multivariate predictive importance of each feature (Figure 4, full ranking in supplementary Table S1). 0.00 0.02 0.04 0.06 0.08 0.10 0.12 0.14 0.16 
+
+Mean |SHAP| (GB × LOSO) 
+
+> SD (BR t)
+> fblink
+> HSa (BR t)
+> SD (gcomb )
+> BR s
+> SD (Ψ g)
+> GFR
+> BR t
+> SD (Ψ h)
+> M(Δ v)
+> Longitudinal Ctrl.
+> Gaze
+> Head Pose
+> Guiding Fixation
+
+Fig. 4. Top ten features by mean |SHAP | (GB × LOSO). Color encodes behavioral domain. Full ranking in supplementary Table S.III. 
+
+The top-ranked SHAP feature is rolling mean speed-limit deviation ( M (∆ v), mean |SHAP | = 0 .167 ), followed by head yaw dispersion ( SD (Ψ h), 0.095 ), braking intensity ( BR t,
+
+0.083 ), guiding fixation rate ( GF R , 0.080 ), and gaze yaw dispersion ( SD (Ψ g ), 0.072 ). These top five features span four of five behavioral domains and account for 42% of total SHAP importance. Notably, the SHAP ranking diverges from the 
+
+TABLE III CLASSIFICATION RESULTS : M ACRO F1 ( ± SD) ACROSS FOLDS .GAP = B LOCK GROUP − LOSO IN PERCENTAGE POINTS .
+
+Model LOSO BlockGroup Gap (pp) 
+
+Gradient Boosting 0.452 ± 0.07 0.657 ± 0.02 +20.5 SVM 0.428 ± 0.04 0.752 ± 0.01 +32.4 GRU+Attention 0.424 ± 0.05 0.649 ± 0.01 +22.5 Log. Regression 0.422 ± 0.07 0.464 ± 0.01 +4.2 PCA 0.400 ± 0.04 0.402 ± 0.01 +0.2 Majority class 0.210 ± 0.01 0.210 ± 0.00 0.0 8
+
+univariate screening ranking: M (∆ v) ranks first by SHAP but only seventh by η2, while HSa (BR t) (highest η2 = 0 .046 )ranks eighth by SHAP. Three of the top five SHAP features are idiosyncratic (ICC ≥ 0.5): SD (Ψ h), SD (Ψ g ), and BR t.Per-feature importance ranks domains as: head pose ( 0.065 ), longitudinal control ( 0.044 ), gaze ( 0.033 ), scanning strategy (0.031 ), and guiding fixation ( 0.022 ). V. D ISCUSSION 
+
+The presented multi-stage analysis pipeline screened 175 behavioral features from 20 drivers in real urban traffic, de-composed their variance structure, tested eight personalization strategies, and benchmarked four classification architectures. The following subsections interpret these results along the four research questions, derive deployment implications, and identify limitations. 
+
+A. Behavioral Sensitivity to Traffic Complexity 
+
+Research question RQ1 asked which behavioral features are sensitive to traffic complexity. The complete feature screening retains 31 of 175 features (17 speed-robust, 14 speed-mediated) and identifies four structural patterns that substantially revise and extend the findings of our preceding conference publication [13]. First, complexity modulates the temporal structure of driver behavior, not steady-state averages. Entropy-based derivations dominate the retained feature set, while gradient and raw-mean derivations are universally null. Our conference pub-lication already identified entropy-based gaze and guiding fixation metrics as novel complexity indicators, but the present systematic screening across 175 features confirms that this pattern holds universally across all five behavioral domains. This extends the finding of Boer [37] that behavioral entropy captures control performance variation, and is consistent with Shiferaw et al. [28], who identified entropy-based gaze metrics as more sensitive to task demand than distributional measures. Complexity thus manifests as altered behavioral regularity over short time scales rather than shifts in average level, driven by the unpredictable demands of real urban traffic. Second, the behavioral domains differ markedly in sensitiv-ity, with longitudinal control dominating and head pose con-tributing least (Table I). Longitudinal control features achieve the highest hit rate and strongest effect sizes, reflecting the most direct behavioral response to complexity. Drivers reduce situational dynamics through speed reduction and anticipatory braking, thereby gaining perceptual time for the increased information-processing demands of complex traffic [18]. This mechanism aligns with Fuller’s TCI model [17]. Head pose features, by contrast, are dominated by stable inter-driver differences that mask the complexity signal, compounded by the coarser spatial resolution of head movements relative to eye movements [32], [33]. Third, in both gaze and head pose domains a systematic yaw-pitch asymmetry can be observed. All pitch-axis sig-nals are irrelevant, while yaw-axis signals carry complexity information. This contrasts with simulator findings reporting increased vertical dispersion but no change in horizontal dispersion [11], [12], likely because real urban traffic requires horizontal scanning for intersections, while vertical gaze re-mains constrained by the fixed dashboard-road geometry. Fourth, speed residualization separates two distinct path-ways. Speed-mediated features (e.g., speed-limit deviation) lose their effect after regressing out speed, operating entirely through speed adaptation, an ecologically valid response on the causal path from complexity to behavior [13]. Speed-robust features (e.g., braking) retain their full effect, demonstrating that even at matched speeds, drivers brake more frequently and less intensely in complex traffic [6], [7]. This mechanistic decomposition is practically relevant for feature selection. TOST equivalence testing confirms 140 of 143 failing features as null effects. Within guiding fixation, only the continuous guiding fixation rate survives as a speed-robust feature, while all other metrics are null. This indicates that the complexity signal in guiding fixation operates independently of speed adaptation. Mechanistically, complex traffic forces drivers to distribute gaze across peripheral hazard sources, reducing trajectory-aligned guiding fixation [35]. 
+
+B. Variance Structure: Complexity vs. Driver Identity 
+
+Addressing RQ2, the variance decomposition reveals a15:1 ratio of driver identity to complexity variance ( ∼23% vs. ∼1.5%), with residual variance dominating at ∼75%. This makes complexity extraction a fundamentally difficult estimation problem and explains all downstream phenomena: the failure of feature-level personalization (Section V-C), the cross-driver generalization gap (Section V-D), and the con-vergence of model architectures at a common performance ceiling. While ICC-based variance partitioning is established in psychometrics, no prior study in the driving domain has quantified this ratio across a multi-domain behavioral feature set, identifying the variance structure as the primary bottleneck for complexity estimation. However, since inter-rater agree-ment is only moderate, part of the residual variance could reflect label noise and mask complexity variance. The ICC-based taxonomy separates universal from idiosyn-cratic features (Table I). 25 of 31 retained features are uni-versal, meaning that drivers differ in their absolute behavioral levels but respond to complexity in the same direction and with comparable magnitude. Speed-limit deviation features, braking entropy features, and guiding fixation rate are precisely the metrics identified in Section V-A as most sensitive to com-plexity, and can be used in cross-driver models without per-driver calibration. The six idiosyncratic features concentrate in dispersion-based derivations and the head pose domain matching findings in the literature [31]–[33]. They require per-driver calibration for cross-driver use. The random slope analysis reveals a dissociation between braking and guiding fixation. Braking features have high slope shares, meaning that drivers differ substantially in how they modulate braking under complexity. Guiding fixation rate, by contrast, has the lowest slope share of all retained features, meaning that all drivers reduce it by essentially the same amount under complexity. This uniformity is consistent with the task-imposed nature of guiding fixation and makes guid-9
+
+ing fixation rate uniquely suited for driver-agnostic deploy-ment [34], [35]. Combining the evidence from research ques-tions RQ1 and RQ2, guiding fixation rate is the only feature that simultaneously satisfies all four deployment criteria, i.e., speed-robustness, Tier 1 replication, universality, and minimal slope share, establishing it as the single most deployment-ready behavioral complexity indicator (Section V-E). 
+
+C. Personalization: Feature-Level Normalization Fails 
+
+RQ3 tested whether per-driver normalization can recover complexity signal masked by inter-driver differences. The answer is unambiguously negative. All eight normalization strategies degrade complexity discrimination relative to the raw baseline, including the non-causal oracle that represents an upper bound on retrospective normalization. Per-driver z-score normalization is standard practice in driver behavior analysis [42]–[44]. While most prior applications targeted binary state detection tasks with substantially larger effect sizes, for the subtle signal of traffic complexity, the same strategies actively degrade discrimination. Note that z-score normalization rescales feature variance, altering the effect size denominator. However, the identical degradation pattern under mean-subtraction, which preserves the original scale, confirms that this finding is substantive rather than a metric artifact. The mechanistic explanation follows directly from the vari-ance decomposition: for universal features, no large between-driver offset exists to normalize, while for idiosyncratic fea-tures, offset and complexity slope are entangled, so normal-ization partially removes the signal. Since residual variance dominates at ∼75%, even perfect driver removal recovers only marginal signal. This rules out feature-level personalization as a viable path for complexity-adaptive DMS. Model-level approaches are necessary, and the slope share identifies which features benefit most from calibration (e.g. braking entropy) and which can be shared without adjustment (e.g. guiding fixation) [39], [45]. 
+
+D. Cross-Driver Generalization 
+
+For RQ4, the classification experiments assessed to what extent complexity can be inferred from driver behavior when the driver is previously unseen. The central result is that complexity estimation from driver behavior is feasible, but per-formance is fundamentally bounded by the variance structure identified in RQ2. Under LOSO, all four model architectures converge within a narrow performance band ( F 1 ≈ 0.45 ), and even the GRU with temporal attention does not break through this ceiling. The convergence confirms that the bottleneck is not model capacity but the 15:1 ratio of driver identity to complexity variance. The cross-driver generalization gap precisely matches the ICC-predicted inter-driver barrier. The confusion matrices reveal that the normal class is the primary source of cross-driver error, as it represents an intermediate regime where behavioral adaptation is partial and less distinct from both adjacent classes. The SHAP analysis confirms that the GB model distributes importance across all five domains, with guiding fixation rate ranking fourth. 
+
+E. Implications for Complexity-Adaptive DMS and ADAS 
+
+The findings from research questions RQ1 to RQ4 jointly define three deployment regimes for complexity-adaptive DMS, differentiated by the availability of driver-specific cali-bration data. The first regime is driver-agnostic deployment. Using only universal features, a population-level GB model achieves 
+
+F 1 ≈ 0.45 under LOSO, which is above the majority-class baseline ( F 1 = 0 .21 ) but insufficient for standalone deploy-ment. This confirms that the complexity signal is extractable from driver behavior alone, while the performance gap quan-tifies the cost of the unfavorable variance ratio. Here, guiding fixation rate is the single most deployment-ready feature, combining speed-robustness, Tier 1 status, universality, and the lowest slope share and is the only pure gaze metric meeting all four criteria. Combining guiding fixation rate with braking entropy features yields the optimal trade-off between signal strength and universality. The second regime is personalized deployment, where few-shot model-level calibration could enable safety-relevant applications such as Takeover Request (TOR) timing [15]. The third regime is hybrid deployment, combining behavioral features with external context (route complexity priors [16], [19], V2X traffic density) to push performance beyond the behavioral-only ceiling. 
+
+F. Limitations 
+
+The results are based on a limited set of scenarios due to a sample of 20 individual drivers, unequal gender distribution, urban-only driving on a single route, and driving solely with active, partially automated ADAS. The specific variance ratios are dataset-bound, and speed-mediated features may be route-specific due to fixed speed-limit zones. Therefore, the analysis should be validated on a more diverse dataset that includes additional drivers, routes, and environmental conditions. Another limitation concerns the traffic complexity labeling. The expert labels yielded only moderate inter-rater agreement, introducing label noise particularly between normal and com-plex classes. As a posteriori labeling lacks the real driving dynamics, situational aspects not covered by the video, and the real consequences of actions, it can only serve as an approximation of the real, felt subjective traffic complexity. As noted by Cao et al. [21], a standardized complexity benchmark remains absent, making expert labeling the current best practice. Future studies should complement expert ratings with in-situ driver feedback and validate the labeling approach against objective measures. Furthermore, traffic complexity was labeled using three ordinal classes. A continuous com-plexity score should be considered to better capture gradual transitions. Because the label definition already included state-ments about needed adjustments, criterion overlap with the analyzed behavioral metrics cannot be ruled out. The η2-based screening uses the full dataset rather than nested within the cross-validation loop. Since it is a univariate population-level filter with a theory-driven threshold, the risk of overfitting is minimal. SAE Level 2 automation with fully shared longitudinal control influences braking and speed behavior [47], [48]. The 10 
+
+observed braking effects may partly reflect driver-ADAS inter-action rather than purely voluntary behavioral adaptation. This confound is inherent to the deployment context, as production DMS will operate under the same ADAS influence, but limits transferability to manual driving scenarios. Random-slope estimation with only 20 groups limits sta-tistical power for the 2 ×2 random-effects covariance ma-trix, and one feature ( abrake ) did not converge. A sensitiv-ity check confirmed that random-intercept-only models yield nearly identical ICC rankings (Spearman ρ = 0.99 , 2/30 regime changes), indicating robustness to model specification. A gender-balanced replication would allow separating gender effects from idiosyncratic driver differences. Only the first ADAS-assisted drive per participant is analyzed, leaving learn-ing effects, habituation, and the effects of traffic complexity on inattentive drivers unexamined. VI. C ONCLUSION 
+
+This paper presented an end-to-end analysis of driver behav-ior as an indicator of traffic complexity in real urban traffic with partially automated ADAS, spanning systematic feature screening, variance decomposition, personalization testing, and cross-driver classification. The screening retained 31 of 175 features with genuine complexity effects, with entropy-based derivations dominating, longitudinal control as the most sensitive domain, a yaw-pitch asymmetry separating relevant from irrelevant signals, and speed residualization distinguishing two mechanistically distinct pathways. The variance decomposition revealed a 15:1 ratio of driver identity to complexity variance, constituting the fundamental bottleneck. All eight feature-level personalization strategies degraded discrimination, and all four model archi-tectures converged at F 1 ≈ 0.45 under LOSO, confirming that this ceiling is imposed by the variance structure. Across all analysis stages, guiding fixation rate emerged as the single most deployment-ready behavioral complexity indicator. It is the only feature that simultaneously satisfies speed-robustness, driver-level replication, universality across drivers, and mini-mal inter-driver variation in complexity sensitivity. These findings carry direct implications for ADAS design. The complexity signal is extractable from driver behavior using only production-grade DMS sensors, but the unfavor-able variance ratio limits standalone deployment. Combining behavioral features with external context, such as route com-plexity priors or traffic density, offers the most promising path toward complexity-adaptive ADAS. The slope share analysis provides a principled basis for selecting which features benefit from per-driver calibration and which can be shared across drivers without adjustment. Future work should validate these findings on larger, more diverse datasets and evaluate binary complexity classification. Model-level personalization through few-shot calibration and hierarchical Bayesian approaches should be investigated as alternatives to the feature-level strategies evaluated here. ACKNOWLEDGMENTS 
+
+In this paper generative artificial intelligence (GitHub Copi-lot (Claude Opus 4.6)) was used for code generation, result summary, and text improvements. The authors reviewed and edited the content as needed and take full responsibility for the content of the published article. REFERENCES [1] S. Chalmers, “The challenges of next-gen adas and ads and re-lated vehicle safety topics,” SAE International, SAE Research Report EPR2025003, 2025. [2] SAE International, “SAE J3016: Taxonomy and Definitions for Terms Related to Driving Automation Systems for On-Road Motor Vehicles,” p. 41, 2021. [3] United Nations Economic Commission for Europe, “UN Regulation No. 171: UN Regulation on uniform provisions concerning the approval of vehicles with regard to Driver Control Assistance Systems,” 2024. [4] Euro NCAP, “Safe driving driver engagement,” European New Car Assessment Program, Protocol v1.1, 2025. [5] P. Bazilinskyy and J. de Winter, “Auditory interfaces in automated driving: an international survey,” PeerJ Comput. Sci. , vol. 1:e13, pp. 1–28, 2015. [6] L. Xie, C. Wu, M. Duan, and N. Lyu, “Analysis of Freeway Safety Influencing Factors on Driving Workload and Performance Based on the Gray Correlation Method,” J. Adv. Transp. , vol. 2021, p. 1–11, 2021. [7] N. Lyu, L. Xie, C. Wu, Q. Fu, and C. Deng, “Driver’s Cognitive Workload and Driving Performance under Traffic Sign Information Exposure in Complex Environments: A Case Study of the Highways in China,” Int. J. Environ. Res. Public Health , vol. 14, p. 203, 2017. [8] T. Liu, C. Wang, Z. Yin, Z. Mi, X. Xiong, and B. Guo, “Complexity Quantification of Driving Scenarios with Dynamic Evolution Character-istics,” Entropy , vol. 26, no. 12, 2024. [9] C. Zhang, A. Eskandarian, and X. Du, “Attention-based Neural Network for Driving Environment Complexity Perception,” in 2021 IEEE Inter-national Intelligent Transportation Systems Conference (ITSC) , 2021, p. 2781–2787. [10] W. Wang and G. Cheng, “The characteristics of driver lane-changing behaviour in congested road environments,” Transp. Saf. Environ. , vol. 6, pp. 1–15, 2023. [11] A. Halin, A. Deli` ege, C. Devue, and M. Van Droogenbroeck, “Gaze-based indicators of driver cognitive distraction: Effects of different traffic conditions and adaptive cruise control use,” in Adjunct Proceedings of the 17th International Conference on Automotive User Interfaces and Interactive Vehicular Applications , 2025, pp. 151–156. [12] K. Kunst, D. Hoffmann, A. Erkan, K. Lazarova, and T. Q. Khanh, “Analyzing Gaze During Driving: Should Eye Tracking Be Used to Design Automotive Lighting Functions?” J. Eye Mov. Res. , vol. 18, p. 13, 2025. [13] L. K¨ oning, N. Miliˇ ci´ c, and K. Bogenberger, “Investigating Driver Be-havior in Complex Traffic Situations While Driving Partially Automated Vehicles,” 2026, in press, arXiv, 10.48550/arXiv.2607.00855. [14] H. Zhou, A. Carballo, K. Fujii, and K. Takeda, “From Concept to Representation: Modeling Driving Capability and Task Demand with a Multimodal Large Language Model,” Sensors , vol. 25, no. 18, p. 5805, 2025. [15] M. S. L. Scharfe-Scherf and N. Russwinkel, “Familiarity and Com-plexity during a Takeover in Highly Automated Driving,” Int. J. Intell. Transp. Syst. Res. , vol. 19, p. 525–538, 2021. [16] S. Yang, L. Gao, Y. Zhao, and X. Li, “Research on the Quantitative Eval-uation of the Traffic Environment Complexity for Unmanned Vehicles in Urban Roads,” IEEE Access , vol. 9, p. 23139–23152, 2021. [17] R. Fuller, “The task-capability interface model of the driving process,” 
+
+Rech. - Transp. - Secur. , vol. 66, p. 47–57, 2000. [18] J. Paxion, E. Galy, and C. Berthelon, “Mental workload and driving,” 
+
+Front. Psychol. , vol. 5, p. 1–11, 2014. [19] Y. Cheng, Z. Liu, L. Gao, Y. Zhao, and T. Gao, “Traffic Risk Envi-ronment Impact Analysis and Complexity Assessment of Autonomous Vehicles Based on the Potential Field Method,” Int. J. Environ. Res. Public Health , vol. 19, no. 16, p. 10337, 2022. [20] L. Westhofen, C. Neurohr, T. Koopmann, M. Butz, B. Sch¨ utt, F. Utesch, B. Neurohr, C. Gutenkunst, and E. B¨ ode, “Criticality Metrics for Automated Driving: A Review and Suitability Analysis of the State of the Art,” Arch. Comput. Methods Eng. , vol. 30, no. 1, p. 1–35, 2023. [21] H. Cao, Q. Meng, B. Li, and L. Zhang, “Objective-Subjective Consistent Evaluation of Scene Complexity Based on Multiscale Fuzzy Entropy,” in 2025 9th CAA International Conference on Vehicular Control and Intelligence (CVCI) , 2025, p. 1–6. 11 
+
+[22] E. Teh, S. Jamson, O. Carsten, and H. Jamson, “Temporal fluctuations in driving demand: The effect of traffic complexity on subjective measures of workload and driving performance,” Transp. Res. Part F Traffic Psychol. Behav. , vol. 22, p. 207–217, 2014. [23] A. Boelhouwer, A. P. van den Beukel, M. C. van der Voort, and M. H. Martens, “Determining Infrastructure- and Traffic Factors that Increase the Perceived Complexity of Driving Situations,” in Advances in Human Aspects of Transportation . Springer, 2020, p. 3–10. [24] W. Fastenmeier and H. Gstalter, “Driving task analysis as a tool in traffic safety research and practice,” Saf. Sci. , vol. 45, no. 9, p. 952–979, 2007. [25] E. Ohn-Bar and M. M. Trivedi, “Looking at Humans in the Age of Self-Driving and Highly Automated Vehicles,” IEEE Trans. Intell. Veh. ,vol. 1, no. 1, p. 90–104, 2016. [26] M. S. Al-Quraishi, S. S. Azhar Ali, M. Al-Qurishi, T. B. Tang, and S. Elferik, “Technologies for detecting and monitoring drivers’ states: A systematic review,” Heliyon , vol. 10, no. 20, p. e39592, 2024. [27] A. Doshi and M. M. Trivedi, “Head and eye gaze dynamics during visual attention shifts in complex environments,” J. Vis. , vol. 12, no. 2, 2012. [28] B. Shiferaw, L. Downey, and D. Crewther, “A review of gaze entropy as a measure of visual scanning efficiency,” Neurosci. Biobehav. Rev. ,vol. 96, p. 353–366, 2019. [29] C. M. Goodridge, R. C. Gonc ¸alves, A. Arabian, A. Horrobin, A. Sol-ernou, Y. T. Lee, Y. M. Lee, R. Madigan, and N. Merat, “Gaze entropy metrics for mental workload estimation are heterogenous during hands-off level 2 automation,” Accid. Anal. Prev. , vol. 202, pp. 1–13, 2024. [30] A. Bakhchina, K. Arutyunova, E. Burashnikov, A. Filatova, A. Fil-imonov, and I. Shishalov, “Discriminative Capabilities of Eye Gaze Measures for Cognitive Load Evaluation in a Driving Simulation Task,” 
+
+J. Eye Mov. Res. , vol. 19, no. 1, 2025. [31] K. Arutyunova, E. Burashnikov, N. Timakin, I. Shishalov, A. Filimonov, and A. Bakhchina, “Eye Gaze Entropy Reflects Individual Experience in the Context of Driving,” Entropy , vol. 28, no. 1, 2025. [32] S. Jha, N. Al-Dhahir, and C. Busso, “Driver Visual Attention Estimation Using Head Pose and Eye Appearance Information,” IEEE Open J. Intell. Transp. Syst. , vol. 4, p. 216–231, 2023. [33] L. Mikula, S. Mej´ ıa-Romero, R. Chaumillon, A. Patoine, E. Lugo, D. Bernardin, and J. Faubert, “Eye-head coordination and dynamic visual scanning as indicators of visuo-cognitive demands in driving simulator,” PLoS One , vol. 15, no. 12, p. e0240201, 2020. [34] M. F. Land and D. N. Lee, “Where we look when we steer,” Nature ,vol. 369, p. 742–4, 1994. [35] O. Lappi, “Gaze Strategies in Driving–An Ecological Approach,” Front. Psychol. , vol. 13, pp. 1–15, 2022. [36] C. Mole, J. Pekkanen, W. E. A. Sheppard, G. Markkula, and R. M. Wilkie, “Drivers use active gaze to monitor waypoints during automated driving,” Sci. Rep. , vol. 11, pp. 1–18, 2021. [37] E. Boer, “Behavioral Entropy as a Measure of Driving Performance,” in 
+
+Driving Assessment Conference Archive , vol. 1, 2001, p. 226–229. [38] N. Chang, C. Dong, S. Zhu, P. Li, X. Li, L. Xia, and X. Yan, “Towards recognizing cognitive distraction levels with low-cost and high-sensitive measures: The effectiveness of sample, approximate, and traditional steering entropies,” Transp. Res. Part F Traffic Psychol. Behav. , vol. 109, p. 1063–1079, 2025. [39] G. Li, G. Wang, Z. Guo, Q. Liu, X. Luo, B. Yuan, M. Li, and L. Yang, “Domain Adaptive Driver Distraction Detection Based on Partial Feature Alignment and Confusion-Minimized Classification,” IEEE Trans. Intell. Transp. Syst. , vol. 25, no. 9, p. 11227–11240, 2024. [40] J. C. Pe˜ na, E. V´ asquez, G. A. Feo-Cediel, A. Negroni, and J. F. Medina-Lee, “Beyond “One-Size-Fits-All”: Estimating Driver Attention with Physiological Clustering and LSTM Models,” Electronics , vol. 14, no. 23, p. 4655, 2025. [41] A. Rasch, C. Flannagan, and M. Dozza, “When Is It Safe to Complete an Overtaking Maneuver? Modeling Drivers’ Decision to Return After Passing a Cyclist,” IEEE Trans. Intell. Transp. Syst. , vol. 25, no. 11, p. 15587–15599, 2024. [42] S. Mariooryad and C. Busso, “Correcting Time-Continuous Emotional Labels by Modeling the Reaction Lag of Evaluators,” IEEE Trans. Affect. Comput. , vol. 6, p. 97–108, 2015. [43] K. Krejtz, A. T. Duchowski, A. Niedzielska, C. Biele, and I. Krejtz, “Eye tracking cognitive load using pupil diameter and microsaccades with fixed gaze,” PLoS One , vol. 13, no. 9, p. e0203629, 2018. [44] H. Dong, W. Wang, Y. Wang, L. Li, Y. Yue, J. Tian, and J. Han, “Driver Personalized Lane Change Behavior Analysis Based on Attention Deep Embedding Clustering,” in SAE 2025 Intelligent and Connected Vehicles Symposium . SAE International, 2025. [45] L. Lu and S. Xiong, “Few-shot driver identification via meta-learning,” 
+
+Expert Syst. Appl. , vol. 203, p. 117299, 2022. [46] S. M. Lundberg and S.-I. Lee, “A unified approach to interpreting model predictions,” in Proceedings of the 31st International Conference on Neural Information Processing Systems . Curran Associates Inc., 2017, p. 4768–4777. [47] L. K¨ oning, P. Santos, N. Milicic, and K. Bogenberger, “Driver engagement and fully shared longitudinal control - insights from real partially automated vehicles,” 2026, techRxiv, 10.36227/techrxiv.177126589.99792150/v1. [48] J. Illgner, N. Milicic, B. Biebl, and M. Baumann, “Improving Driver Engagement with Level 2 Automated Systems: The Impact of Fully Shared Longitudinal Control,” in Proceedings of the 16th International Conference on Automotive User Interfaces and Interactive Vehicular Applications , 2024, p. 43–52. [49] A. P. Dawid and A. M. Skene, “Maximum Likelihood Estimation of Observer Error-Rates Using the EM Algorithm,” J. R. Stat. Soc. Ser. C Appl. Stat. , vol. 28, p. 20–28, 1979. [50] J. R. Landis and G. G. Koch, “The measurement of observer agreement for categorical data,” Biometrics , vol. 33, p. 159–74, 1977. [51] J. Cohen, Statistical Power Analysis for the Behavioral Sciences . New York, NY, USA: Routledge, 1988, vol. 2. [52] Y. Benjamini and Y. Hochberg, “Controlling the false discovery rate: A practical and powerful approach to multiple testing,” J. R. Stat. Soc. Ser. B Methodol. , vol. 57, no. 1, pp. 289–300, 1995. [53] D. Lakens, “Equivalence tests: A practical primer for t tests, correlations, and meta-analyses,” Soc. Psychol. Personal. Sci. , vol. 8, no. 4, pp. 355– 362, 2017. [54] A. Agresti, Analysis of Ordinal Categorical Data . Gainesville, FL, USA: Wiley, 2010, vol. 2. [55] S. Nakagawa and H. Schielzeth, “A general and simple method for obtaining r2 from generalized linear mixed-effects models,” Methods Ecol. Evol. , vol. 4, no. 2, pp. 133–142, 2013. 
+
+VII. B IOGRAPHY SECTION 
+
+Lukas K¨ oning received the B.Sc. degree and the M.Sc. degree in Automotive Engineering from the Technical University of Munich (TUM), in 2022 and 2024, respectively. He is currently pursuing the Ph.D. degree at the Chair of Traffic Engineering and Control (TUM) in cooperation with BMW AG. He has held research and engineering positions at TUM, BMW AG and BMW of North America LLC. His research interests include driver behavior modeling, traffic complexity estimation, and cooperative ad-vanced driver assistance systems. 
+
+Nataˇ sa Miliˇ ci´ c received the Dr. Dipl.-Ing. degree in Electrical Engineering and Information Technology from the Technical University of Munich (TUM). She is currently Cluster Product Owner for Assisted Driving Level 2 at BMW AG, Munich, Germany, where she is responsible for the customer-centric conception of advanced driver assistance systems. She has held leading positions in product manage-ment and human–machine interface development for automated driving. She has contributed to research on automated driving and human–machine interac-tion. Her research interests include driver behavior, user-centered design, and human–machine interaction for cooperative and automated driving systems. 
+
+Klaus Bogenberger received the Diploma degree in civil engineering and the Ph.D. degree in traffic engineering from the Technical University of Mu-nich, Germany, in 1996 and 2001, respectively. He was a Research Engineer with BMW Group from 2001 to 2008. At first, he was responsible for the traffic flow theory and models with the Department of Science and Transportation and later on, he was with the Department of Corporate Quality. From 2008 to 2011, he was the Managing Director and a Partner of TRANSVER GmbH (consultant office for transport planning and traffic engineering), Munich and Hannover. From 2012 to 2019, he was with Bundeswehr University Munich, as a Professor of traffic engineering. Since 2020, he has been the Chair of Traffic Engineering and Control and the head of the Mobility System Engineering Department, Technical University of Munich. His main research interests include on demand systems, tradeable travel credits, and autonomous vehicles. 12 
+
+Supplementary Material L1 L2 L3 L4 M1 M2 M3 M4 
+
+Normalization Strategy     
+
+> HSa (Δ v)
+> fblink
+> abrake
+> ρhg ,θ
+> HSh (Δ v)
+> M(ρhg ,θ)
+> M(abrake )
+> SD (Δ v)
+> SPL
+> HSh (gcomb )
+> M(SPL )
+> ffix
+> HSa (δGF ,out )
+> HSa (BR s)
+> HSh (̈Ψ h)
+> HSh (Ψ g)
+> HSh (δGF ,out )
+> SD (BR t)
+> HSh (δGF )
+> M(Δ v)
+> GFR
+> Δv
+> HSh (̈Ψ g)
+> HSh (̇Ψ g)
+> BR s
+> HSh (BR t)
+> SD (Ψ g)
+> SD (gcomb )
+> HSa (BR t)
+> SD (Ψ h)
+> BR t
+
+−0.04 
+
+−0.03 
+
+−0.02 
+
+−0.01 
+
+0.00 
+
+0.01 
+
+0.02 
+
+0.03 
+
+0.04 
+
+> Δη²
+
+Fig. S1. Change in η2 (∆η2) per feature and normalization strategy relative to raw baseline (L0). Blue indicates degradation, red indicates improvement. 0.0 0.2 0.4 0.6 0.8 1.0 
+
+Macro F1 
+
+Gradient Boosting 
+
+SVM (RBF) 
+
+GRU+Attention 
+
+Logistic Regression 
+
+PCA (unsup.) 
+
+Majority class 
+
+Majority 
+
+LOSO (Cross-Driver) 
+
+BlockGroupKFold (Within) Fig. S2. Classification performance (Macro F1) for six models under two cross-validation strategies. Error bars indicate ±SD across folds. Vertical dotted line marks the majority-class baseline. LOSO: leave-one-driver-out, Block: BlockGroupKFold, Strat: StratifiedKFold. 13 Simple Normal Complex 
+
+Predicted 
+
+Simple 
+
+Normal 
+
+Complex 
+
+> True
+
+62% 
+
+(69,751) 
+
+24% 
+
+(26,496) 
+
+14% 
+
+(16,013) 
+
+35% 
+
+(62,039) 
+
+37% 
+
+(65,251) 
+
+28% 
+
+(49,524) 
+
+23% 
+
+(21,911) 
+
+29% 
+
+(27,668) 
+
+49% 
+
+(47,011) 
+
+LOSO (Cross-Driver) 
+
+Simple Normal Complex 
+
+Predicted 
+
+Simple 
+
+Normal 
+
+Complex 
+
+78% 
+
+(87,096) 
+
+12% 
+
+(13,210) 
+
+11% 
+
+(11,954) 
+
+22% 
+
+(38,227) 
+
+56% 
+
+(99,342) 
+
+22% 
+
+(39,245) 
+
+14% 
+
+(13,074) 
+
+17% 
+
+(16,204) 
+
+70% 
+
+(67,312) 
+
+BlockGroupKFold (Within) 
+
+Fig. S3. Normalized confusion matrices for the GB model under two cross-validation strategies. TABLE S.I DETAILED SCREENING STATISTICS FOR 32 FEATURES PASSING KRUSKAL -W ALLIS SCREENING (η2 ≥ 0.01 , pADJ < . 05 ). H: K RUSKAL -W ALLIS TEST STATISTIC . pADJ : B ENJAMINI -H OCHBERG CORRECTED p-VALUE . D UNN p: PAIRWISE DUNN POST -HOC COMPARISONS (S–M, S–C, M–C). pRES : p-VALUE OF RESIDUALIZED KRUSKAL -W ALLIS TEST . η2 
+
+> d
+
+: DRIVER -LEVEL EFFECT SIZE (N = 60 ). pd : DRIVER -LEVEL p-VALUE . R EGIME : UNIVERSAL (U, ICC < 0.5) OR IDIOSYNCRATIC (I, ICC ≥ 0.5). 
+
+Feature H padj Dunn pS-M Dunn pS-C Dunn pM-C pres η2 
+
+> d
+
+pd Reg. Longitudinal Control 
+
+BR t [%] 31717 <.001 <.001 <.001 <.001 <.001 0.025 <.001 I
+
+HSa (BR t) [−] 28415 <.001 <.001 <.001 <.001 <.001 0.309 <.001 U
+
+HSh (BR t) [−] 19126 <.001 <.001 <.001 <.001 <.001 0.062 .138 U
+
+M (abrake ) [m/s2] 1010 <.001 <.001 <.001 <.001 <.001 0.034 .377 U
+
+abrake [m/s2] 775 <.001 <.001 <.001 <.001 <.001 0.034 .377 U
+
+M (∆ v) [%] 15917 <.001 <.001 <.001 <.001 <.001 0.438 <.001 U
+
+∆v [%] 13419 <.001 <.001 <.001 <.001 <.001 0.406 <.001 U
+
+BR s [%] 17177 <.001 <.001 <.001 <.001 <.001 0.039 <.001 U
+
+HSa (∆ v) [−] 6556 <.001 <.001 <.001 <.001 <.001 0.221 <.001 U
+
+SD (BR t) [%] 22812 <.001 <.001 <.001 <.001 <.001 0.144 <.001 U
+
+HSa (BR s) [−] 13000 <.001 <.001 <.001 <.001 <.001 0.178 .004 U
+
+HSh (∆ v) [−] 6560 <.001 <.001 <.001 <.001 <.001 0.375 <.001 U
+
+SD (∆ v) [%] 9792 <.001 <.001 <.001 <.001 <.001 0.475 <.001 U
+
+Gaze Behavior 
+
+fblink [1/min ] 6067 <.001 <.001 <.001 <.001 <.001 0.043 .271 U
+
+HSh (Ψ g ) [−] 6304 <.001 <.001 <.001 .048 <.001 0.163 .012 U
+
+HSh ( ˙Ψg ) [−] 6233 <.001 <.001 <.001 .176 <.001 0.113 .055 U
+
+SD (gcomb ) [rad ] 5490 <.001 <.001 <.001 <.001 <.001 0.013 .553 I
+
+SD (Ψ g ) [rad ] 5759 <.001 <.001 <.001 <.001 <.001 0.010 .718 I
+
+HSh ( ¨Ψg ) [−] 5495 <.001 <.001 <.001 <.001 <.001 0.102 .036 U
+
+HSh (gcomb ) [−] 4478 <.001 <.001 <.001 .255 <.001 0.079 .064 U
+
+Head Pose 
+
+SD (Ψ h) [rad ] 8150 <.001 <.001 <.001 <.001 <.001 0.027 .448 I
+
+HSh ( ¨Ψh) [−] 3378 <.001 <.001 <.001 <.001 <.001 0.016 .744 I
+
+Guiding Fixation 
+
+GF R [%] 14683 <.001 <.001 <.001 <.001 <.001 0.070 <.001 U
+
+HSh (δGF ) [−] 7158 <.001 <.001 <.001 <.001 <.001 0.218 .002 U
+
+HSh (δGF,out ) [−] 7047 <.001 <.001 <.001 <.001 <.001 0.190 <.001 U
+
+HSa (δGF,out ) [−] 6855 <.001 <.001 <.001 <.001 <.001 0.047 .002 U
+
+HSh (tGF ) [−] 5155 <.001 <.001 <.001 <.001 <.001 0.000 .996 —
+
+Scanning Strategy 
+
+SP L [◦] 5901 <.001 <.001 <.001 <.001 <.001 0.018 .466 U
+
+M (SP L ) [◦] 5135 <.001 <.001 <.001 <.001 <.001 0.013 .510 U
+
+M (ρhg,θ ) [−] 4282 <.001 <.001 <.001 <.001 <.001 0.021 .382 I
+
+ρhg,θ [−] 3942 <.001 <.001 <.001 <.001 <.001 0.022 .413 U
+
+ff ix [Hz ] 5685 <.001 <.001 <.001 <.001 <.001 0.070 .141 U14 
+
+TABLE S.II TOST EQUIVALENCE -CONFIRMED NULL FEATURES BY DOMAIN . 140 OF 
+
+175 FEATURES RECEIVE FORMAL EQUIVALENCE CONFIRMATION . pTOST :
+
+> MAXIMUM ACROSS ALL SIX ONE
+
+-SIDED TESTS . nBF > 10 : FEATURES WITH 
+
+BAYES FACTOR BF 01 > 10 (STRONG EVIDENCE FOR NULL ). 
+
+Domain nnull η2 range pTOST nBF > 10 
+
+Gaze Behavior 35 0.000–0.008 all <.05 3Head Pose 40 0.000–0.007 all <.05 4Guiding Fixation 28 0.000–0.009 all <.05 7Scanning Strategy 29 0.000–0.009 all <.05 6Longitudinal Control 8 0.000–0.006 all <.05 1
+
+Total 140 0.000–0.009 138: <.001 21 
+
+TABLE S.III SHAP FEATURE IMPORTANCE FOR ALL 31 RETAINED FEATURES 
+
+(G RADIENT BOOSTING × LOSO CROSS -VALIDATION ): MEAN |SHAP | 
+
+> AVERAGED ACROSS
+
+20 FOLDS .
+
+Rank Feature Domain Mean |SHAP | η2 ICC 
+
+1 M (∆ v) [%] Long.Ctrl 0.167 0.028 0.044 2 SD (Ψ h) [rad ] Head 0.095 0.020 1.376 3 BR t [%] Long.Ctrl 0.083 0.057 1.161 4 GF R [%] Guid.Fix 0.080 0.029 0.468 5 SD (Ψ g ) [rad ] Gaze 0.072 0.015 1.340 6 BR s [%] Long.Ctrl 0.070 0.025 0.309 7 SD (gcomb ) [rad ] Gaze 0.066 0.015 0.960 8 HSa (BR t) [−] Long.Ctrl 0.057 0.046 0.011 9 fblink [min −1] Gaze 0.051 0.019 0.262 10 SD (BR t) [%] Long.Ctrl 0.050 0.020 0.018 11 SD (∆ v) [%] Long.Ctrl 0.050 0.010 0.005 12 M (SP L ) [◦] Scan.Strat 0.048 0.014 0.405 13 ff ix [Hz ] Scan.Strat 0.041 0.010 0.216 14 HSa (BR s) [−] Long.Ctrl 0.037 0.016 0.064 15 HSh ( ¨Ψh) [−] Head 0.035 0.010 0.811 16 M (ρhg,θ ) [−] Scan.Strat 0.034 0.012 0.522 17 HSh (∆ v) [−] Long.Ctrl 0.033 0.015 0.013 18 HSh ( ˙Ψg ) [−] Gaze 0.022 0.016 0.178 19 SP L [◦] Scan.Strat 0.019 0.016 0.425 20 ∆v [%] Long.Ctrl 0.017 0.026 0.043 21 ρhg,θ [−] Scan.Strat 0.014 0.011 0.416 22 HSh (Ψ g ) [−] Gaze 0.010 0.016 0.099 23 HSa (∆ v) [−] Long.Ctrl 0.005 0.021 0.017 24 HSh ( ¨Ψg ) [−] Gaze 0.004 0.014 0.140 25 HSh (δGF,out ) [−] Guid.Fix 0.004 0.017 0.094 26 M (abrake ) [m s −2] Long.Ctrl 0.004 0.030 0.251 27 HSh (gcomb ) [−] Gaze 0.004 0.011 0.239 28 abrake [m s −2] Long.Ctrl 0.003 0.028 0.102 29 HSh (δGF ) [−] Guid.Fix 0.003 0.018 0.076 30 HSh (BR t) [−] Long.Ctrl 0.002 0.033 0.020 31 HSa (δGF,out ) [−] Guid.Fix 0.002 0.011 0.310

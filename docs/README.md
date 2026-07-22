@@ -6,83 +6,69 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-21
-- 运行时间：2026-07-21 21:25:23 UTC
+- 最新运行日期：2026-07-22
+- 运行时间：2026-07-22 20:22:40 UTC
 - 运行状态：成功
-- 本次总论文数：21
-- 精读区：8
-- 速读区：13
+- 本次总论文数：15
+- 精读区：6
+- 速读区：9
 
 ### 今日简报（AI）
-今日精读8篇速读13篇，亮点文章聚焦高效LVLM推理与可信自动驾驶场景解释。值得精读《CRISP》的视觉token剪枝方案和《What Do They See》的VLM路况解释能力。建议读者优先关注这两篇9分论文，为高效多模态模型部署与自动驾驶安全性提供新视角。
-- 详情：[/202607/21/README](/202607/21/README)
+今日精选15篇论文，6篇精读，重点聚焦事件视觉与无人机视觉技术。
+
+最值得关注的方向：事件视觉传感器用于三维气泡流测量（满分10分），以及RGB-Event无人机检测跟踪数据集SkyEV（9分）。
+
+建议优先精读这两篇高分论文，掌握事件相机在高速流动和无人机场景的落地应用。
+- 详情：[/202607/22/README](/202607/22/README)
 
 ### 精读区论文标签
-1. [CRISP: Pre-LLM Yet Text-Driven Visual Token Pruning for Efficient LVLM Inference](/202607/21/2607.16326v1-crisp-pre-llm-yet-text-driven-visual-token-pruning-for-efficient-lvlm-inference)  
-   标签：评分：9.0/10、query:evlm
-   evidence：视觉token剪枝方法
-2. [What Do They See? Interpreting Complex Road Scenarios Through the Eyes of Vision-Language-Action Models for Safe and Trustworthy Autonomous Vehicle Learning](/202607/21/2607.16938v1-what-do-they-see-interpreting-complex-road-scenarios-through-the-eyes-of-vision-language-action-models-for-safe-and-trustworthy-autonomous-vehicle-learning)  
-   标签：评分：9.0/10、query:mm-trf
-   evidence：使用视觉语言动作模型和反事实消融解释道路场景
-3. [Searching for Task-Specific Vision Paths: Evolutionary Block Pruning Across Vision-Language Models](/202607/21/2607.17052v1-searching-for-task-specific-vision-paths-evolutionary-block-pruning-across-vision-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：视觉语言模型的进化块剪枝
-4. [CoCurve: Cross-Module Co-Pruning Curvature for Training-Free Structured LLM Pruning](/202607/21/2607.17568v1-cocurve-cross-module-co-pruning-curvature-for-training-free-structured-llm-pruning)  
-   标签：评分：9.0/10、query:evlm
-   evidence：通过跨模块协同剪枝曲率实现LLM免训练结构化剪枝
-5. [C$^2$KV: Compressed and Composable KV Cache Reuse for Efficient LLM Inference](/202607/21/2607.17715v1-c2kv-compressed-and-composable-kv-cache-reuse-for-efficient-llm-inference)  
-   标签：评分：9.0/10、query:evlm
-   evidence：压缩且可组合的KV缓存重用用于高效LLM推理
-6. [ST-Veto: Spatio-Temporal Token Veto for Diffusion MLLMs via Taylor Prediction and Visual Grounding](/202607/21/2607.17884v1-st-veto-spatio-temporal-token-veto-for-diffusion-mllms-via-taylor-prediction-and-visual-grounding)  
-   标签：评分：9.0/10、query:evlm
-   evidence：通过Taylor预测和视觉定位实现扩散MLLM中的token否决（剪枝）
-7. [Modularized Dynamic-Granularity Video LLM for Multi-Event Long Video Understanding](/202607/21/2607.15778v1-modularized-dynamic-granularity-video-llm-for-multi-event-long-video-understanding)  
+1. [Three-Dimensional Bubbly Flow Measurement Using Event-based Vision Sensor Cameras](/202607/22/2607.18823v1-three-dimensional-bubbly-flow-measurement-using-event-based-vision-sensor-cameras)  
+   标签：评分：10.0/10、query:ev-cam
+   evidence：使用事件视觉传感器测量气泡流
+2. [SkyEV: RGB-Event UAV detection and tracking dataset and baseline](/202607/22/2607.18747v1-skyev-rgb-event-uav-detection-and-tracking-dataset-and-baseline)  
+   标签：评分：9.0/10、query:ev-cam
+   evidence：用于无人机检测跟踪的RGB-事件相机数据集
+3. [GMoT: Gated Motion-Aware Tokenization for Fine-Grained Micro-Gesture Video Reasoning with Multimodal LLMs](/202607/22/2607.16322v1-gmot-gated-motion-aware-tokenization-for-fine-grained-micro-gesture-video-reasoning-with-multimodal-llms)  
    标签：评分：8.0/10、query:evlm
-   evidence：通过动态粒度实现长视频理解中的token压缩
-8. [LookME: Lookup-Based Multimodal Embeddings for Layer Injection in Vision-Language Models](/202607/21/2607.16305v1-lookme-lookup-based-multimodal-embeddings-for-layer-injection-in-vision-language-models)  
+   evidence：门控运动感知Token化，用于多模态大模型的令牌压缩
+4. [Robust PnP on a Neuromorphic Processor for Object Pose Estimation](/202607/22/2607.16834v1-robust-pnp-on-a-neuromorphic-processor-for-object-pose-estimation)  
+   标签：评分：8.0/10、query:ev-cam
+   evidence：神经形态处理器上的鲁棒PnP用于物体姿态估计
+5. [Driver Behavior Under Traffic Complexity: Variance Decomposition and Cross-Driver Generalization for Driver Monitoring](/202607/22/2607.16847v1-driver-behavior-under-traffic-complexity-variance-decomposition-and-cross-driver-generalization-for-driver-monitoring)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：基于驾驶员行为分析估计交通复杂度
+6. [Anticipate Before Acting: Future-State-Conditioned Vision-Language Navigation](/202607/22/2607.18042v1-anticipate-before-acting-future-state-conditioned-vision-language-navigation)  
    标签：评分：8.0/10、query:evlm
-   evidence：提出基于查找的多模态嵌入用于高效VLM层注入，降低内存和延迟
+   evidence：视觉-语言-动作模型用于导航
 
 ### 速读区论文标签
-1. [Token-Wise Latent Streaming from Slow Reasoners to Fast Planners for Dynamic Vision Language Navigation](/202607/21/2607.16806v1-token-wise-latent-streaming-from-slow-reasoners-to-fast-planners-for-dynamic-vision-language-navigation)  
-   标签：评分：8.0/10、query:evlm
-   evidence：将慢速VLM推理流式传输给快速规划器，提升效率
-2. [SWE-Pruner Pro: The Coder LLM Already Knows What to Prune](/202607/21/2607.18213v1-swe-pruner-pro-the-coder-llm-already-knows-what-to-prune)  
-   标签：评分：8.0/10、query:evlm
-   evidence：在agent内部剪枝工具输出以节省token
-3. [Patch Policy: Efficient Embodied Control via Dense Visual Representations](/202607/21/2607.18236v1-patch-policy-efficient-embodied-control-via-dense-visual-representations)  
-   标签：评分：8.0/10、query:evlm
-   evidence：通过密集视觉表征实现高效具身控制，降低VLM骨干网络成本
-4. [DeGuNet: Depth-Guided Ultra-Compact Backbones for Efficient LiDAR-Camera 3D Detection](/202607/21/2607.12419v1-degunet-depth-guided-ultra-compact-backbones-for-efficient-lidar-camera-3d-detection)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：自动驾驶中高效LiDAR-相机3D检测
-5. [LaCache: Exact Caching and Precision-Adaptive Inference for Diffusion Large Language Models](/202607/21/2607.16339v1-lacache-exact-caching-and-precision-adaptive-inference-for-diffusion-large-language-models)  
+1. [DPNeXt: A Lightweight Multi-Scale Feature Fusion Framework for Efficient ViT-Based Multi-Task Dense Prediction](/202607/22/2607.16012v1-dpnext-a-lightweight-multi-scale-feature-fusion-framework-for-efficient-vit-based-multi-task-dense-prediction)  
    标签：评分：7.0/10、query:evlm
-   evidence：扩散LLM的精确缓存与精度自适应推理
-6. [VLN-AVP: Zero-Shot Vision-Language Navigation with Hybrid Long-Short-Term Memory for Autonomous Valet Parking](/202607/21/2607.17767v1-vln-avp-zero-shot-vision-language-navigation-with-hybrid-long-short-term-memory-for-autonomous-valet-parking)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：视觉语言模型用于自动驾驶场景
-7. [PGN: Design and Implementation of a Vision-Language Navigation System Based on Pangu Multimodal Foundation Model](/202607/21/2607.17806v1-pgn-design-and-implementation-of-a-vision-language-navigation-system-based-on-pangu-multimodal-foundation-model)  
+   evidence：轻量级多尺度特征融合用于高效ViT密集预测
+2. [JoyNexus: Service-Oriented Multi-Tenant Post-Training for VLA Models](/202607/22/2607.16074v1-joynexus-service-oriented-multi-tenant-post-training-for-vla-models)  
    标签：评分：7.0/10、query:evlm
-   evidence：面向具身导航的视觉语言动作模型
-8. [The Ebb and Flow of Multimodal Focus: Scheduling Visual Relay Windows for Grounded VLM Reasoning](/202607/21/2607.11436v1-the-ebb-and-flow-of-multimodal-focus-scheduling-visual-relay-windows-for-grounded-vlm-reasoning)  
+   evidence：面向服务的多租户VLA模型后训练
+3. [SkyVLaM: Multimodal Large Language Model for UAV Video Understanding in Remote Sensing](/202607/22/2607.17386v1-skyvlam-multimodal-large-language-model-for-uav-video-understanding-in-remote-sensing)  
+   标签：评分：7.0/10、query:evlm
+   evidence：稀疏token构建用于高效视频理解
+4. [OrientSAM: Mitigating Camera-Centric Shortcut in Multimodal Spatial Reasoning via Orientation-Aware Spatial Alignment](/202607/22/2607.17657v1-orientsam-mitigating-camera-centric-shortcut-in-multimodal-spatial-reasoning-via-orientation-aware-spatial-alignment)  
+   标签：评分：7.0/10、query:mm-trf
+   evidence：面向多模态大模型的方向感知空间对齐，与交通场景理解相关
+5. [U-shaped Multi-granularity Learning for Vision-Language Models](/202607/22/2607.14966v1-u-shaped-multi-granularity-learning-for-vision-language-models)  
    标签：评分：6.0/10、query:evlm
-   evidence：揭示VLM中三阶段注意力重分布；定义视觉中继窗口用于有依据推理
-9. [DA-Nav: Direction-Aware City-Scale Vision-Language Navigation](/202607/21/2607.11638v2-da-nav-direction-aware-city-scale-vision-language-navigation)  
+   evidence：提出U形多粒度提示学习框架用于VLM
+6. [Trajectory-aware Cross-view Geo-localization with Sequential Observations](/202607/22/2607.15491v1-trajectory-aware-cross-view-geo-localization-with-sequential-observations)  
    标签：评分：6.0/10、query:mm-trf
-   evidence：利用方向指令的城市级视觉-语言导航
-10. [Efficient Frame Selection for Long Videos at Test Time with Attention-Based MLLM Selectors](/202607/21/2607.15689v1-efficient-frame-selection-for-long-videos-at-test-time-with-attention-based-mllm-selectors)  
+   evidence：利用视频和路线描述的跨视角地理定位实现轨迹理解
+7. [Convolution for Large Language Models](/202607/22/2607.18413v1-convolution-for-large-language-models)  
    标签：评分：6.0/10、query:evlm
-   evidence：使用MLLM进行长视频高效帧选择
-11. [From Modalities to Propositions: A Language-Centric Framework for Multimodal Intelligence](/202607/21/2607.16560v1-from-modalities-to-propositions-a-language-centric-framework-for-multimodal-intelligence)  
-   标签：评分：6.0/10、query:mm-trf
-   evidence：在自动驾驶上展示的多模态理解框架
-12. [G2-Nav: Grounded and Guarded Vision-Language Costmaps for Robot Social Navigation](/202607/21/2607.16956v1-g2-nav-grounded-and-guarded-vision-language-costmaps-for-robot-social-navigation)  
+   evidence：在LLM中引入轻量卷积以提升效率
+8. [STeP: Signal Temporal Logic for Precise Specifications for Action Generation with Vision Language Models](/202607/22/2607.18580v1-step-signal-temporal-logic-for-precise-specifications-for-action-generation-with-vision-language-models)  
    标签：评分：6.0/10、query:evlm
-   evidence：将VLM语义推理转化为成本图，用于机器人社交导航
-13. [Efficient Audio-Visual Event Recognition via Knowledge Distillation and Dynamic INT8 Quantization of a Hybrid Cross-Attention Network](/202607/21/2607.16980v1-efficient-audio-visual-event-recognition-via-knowledge-distillation-and-dynamic-int8-quantization-of-a-hybrid-cross-attention-network)  
+   evidence：使用视觉语言模型进行机器人动作生成
+9. [Norm or Direction? Decoding Vision Mambas for High-Resolution Vision](/202607/22/2607.18625v1-norm-or-direction-decoding-vision-mambas-for-high-resolution-vision)  
    标签：评分：6.0/10、query:evlm
-   evidence：通过蒸馏和量化对多模态模型进行效率优化
+   evidence：分析视觉Mamba表示，与高效视觉架构相关
 
 
 <div class="dpr-home-promo-card">
