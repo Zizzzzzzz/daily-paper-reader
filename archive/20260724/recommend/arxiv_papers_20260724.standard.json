@@ -1,0 +1,653 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-24T21:25:48.129603+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 10,
+    "deep_cap": 8,
+    "deep_selected": 8,
+    "quick_candidates": 8,
+    "quick_skim_target": 13,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2607.21179v1",
+      "source": "arxiv",
+      "title": "Out of Sight, Still in Mind: Token Compression for Omni-LLMs",
+      "abstract": "The goal of this paper is to reduce the input token cost of Omni-modal large language models (Omni-LLMs) at inference time. Omni-LLMs reason jointly over audio, video and text, but the cost of the three streams is highly unbalanced: visual tokens account for the vast majority of the input, and are highly redundant. In this paper, we propose ReMo, a training-free framework that compresses visual tokens by redistributing their information across modalities: a visual token is kept only if its information appears nowhere else. ReMo achieves this in two ways: (i) it aligns audio and video in a common embedding space, and removes visual tokens already explained by the audio or by other visual tokens; and (ii) it replaces object-level visual tokens with compact text proxies, short descriptions of each object and its location, conveying the same content in far fewer tokens. On Qwen2.5-Omni at two model scales, ReMo removes 54% of the input tokens with no loss in accuracy. Indeed, it slightly exceeds the full-token model, reaching 101.2% and 101.3% of its average accuracy over five audio-visual benchmarks.",
+      "authors": [
+        "Suho Yoo",
+        "Youngjoon Jang",
+        "Hyebin Cho",
+        "Joon Son Chung"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T11:09:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.21179v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "token compression for omni-LLMs",
+      "llm_evidence_cn": "全模态大语言模型的令牌压缩",
+      "llm_evidence": "全模态大语言模型的令牌压缩",
+      "canonical_evidence": "全模态大语言模型的令牌压缩",
+      "llm_tldr_en": "Proposes ReMo, a training-free framework that compresses visual tokens in omni-LLMs by redistributing information across modalities, reducing input cost.",
+      "llm_tldr_cn": "全模态大语言模型推理时视觉令牌占比过高且冗余严重。本文提出ReMo，一种无需训练的令牌压缩框架，通过跨模态信息重分配来移除冗余视觉令牌：将对齐后的音频、视频共同嵌入空间中已由音频或其他视觉令牌解释的视觉令牌移除，并用紧凑文本表示替代物体级视觉令牌。实验证明该方法在保持性能的同时大幅减少输入令牌数量，为高效多模态推理提供了轻量化方案。",
+      "llm_tldr": "全模态大语言模型推理时视觉令牌占比过高且冗余严重。本文提出ReMo，一种无需训练的令牌压缩框架，通过跨模态信息重分配来移除冗余视觉令牌：将对齐后的音频、视频共同嵌入空间中已由音频或其他视觉令牌解释的视觉令牌移除，并用紧凑文本表示替代物体级视觉令牌。实验证明该方法在保持性能的同时大幅减少输入令牌数量，为高效多模态推理提供了轻量化方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14727v1",
+      "source": "arxiv",
+      "title": "WorkDrive: Roadwork Chain of Causation for Autonomous Driving",
+      "abstract": "Autonomous driving vision-language models (VLMs) struggle in roadwork zones, where familiar visual cues such as lane markings and permanent signs are altered or absent, and temporary devices such as cones and barriers redefine the drivable corridor. VLMs can detect these objects, but without explicit guidance they anchor their reasoning on familiar elements from pre-training and fail to connect work-zone observations to correct planning decisions. We propose WorkDrive, a framework that constructs perception-grounded causal reasoning for work zones and aligns it with trajectory prediction. An automated multitask perception pipeline extracts structured scene facts and injects them into a Chain-of-Causation (CoC) annotation pipeline, redirecting the annotator's attention to domain-specific elements. The resulting reasoning labels are used for supervised fine-tuning, followed by reinforcement learning with a single reward: consistency between lateral meta-actions and the predicted trajectory. On ROADWork, the largest public work-zone dataset, the proposed roadwork CoC reduces trajectory average displacement error (ADE) by 9.0\\%, and consistency-based GRPO yields a further 3.0\\%, achieving progressive improvement over the trajectory-only baseline. Code and data will be publicly released.",
+      "authors": [
+        "Tianyi Jiang",
+        "Wen Zhang",
+        "Sihan Yang",
+        "Ming Lu",
+        "Wentao Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T08:53:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.14727v1",
+      "tags": [
+        "keyword:MM-TRF",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "VLM for roadwork understanding in autonomous driving",
+      "llm_evidence_cn": "自动驾驶中基于VLM的施工区场景理解",
+      "llm_evidence": "自动驾驶中基于VLM的施工区场景理解",
+      "canonical_evidence": "自动驾驶中基于VLM的施工区场景理解",
+      "llm_tldr_en": "Proposes WorkDrive, a framework using perception-grounded causal reasoning with VLMs for roadwork zone trajectory prediction.",
+      "llm_tldr_cn": "该论文针对自动驾驶视觉语言模型在施工区场景中的推理困难，提出WorkDrive框架，通过自动多任务感知管线提取结构化场景事实，并注入因果关系链，引导VLM将观察与正确规划决策关联，提升施工区轨迹预测的准确性和安全性。",
+      "llm_tldr": "该论文针对自动驾驶视觉语言模型在施工区场景中的推理困难，提出WorkDrive框架，通过自动多任务感知管线提取结构化场景事实，并注入因果关系链，引导VLM将观察与正确规划决策关联，提升施工区轨迹预测的准确性和安全性。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16181v1",
+      "source": "arxiv",
+      "title": "Vision-Language Assistant for Emotional Reactions to Risky Driving",
+      "abstract": "This study introduces a vision-language pipeline that detects risky driving behaviors and generates emotionally expressive responses to support driver awareness and comfort. Although vision-language models have advanced perception and reasoning in autonomous driving, existing systems rarely consider the emotional dimension or real-world user experience. Keep Yelling Assistant (KYA) detects high-risk driving maneuvers in real time, such as sudden cut-ins. It then produces emotional responses through a large language model tailored to driver preferences. The framework comprises two core modules. The vision module uses YOLOv8 variants to detect nearby vehicles and identify risky behaviors such as sudden cut-ins. Key driving metrics, including relative distance, speed, and projected reach time, are extracted and normalized to produce a structured behavior log. The language module processes this log with user-defined emotional tone settings, such as neutral, humorous, and analytical, and generates verbal reactions using state-of-the-art large language models, including ChatGPT-4o, Claude 3, Gemini 2.5, and Copilot. We evaluated the proposed system using dashcam videos containing risky driving behaviors and a user study involving 108 participants. Participants selected preferred response styles, and the large language models were evaluated based on emotional alignment. All models received favorable ratings, although preferences varied across personas. Notably, the combination of YOLOv8s and ChatGPT-4o achieved the highest score of 4.29 out of 5.00. By integrating real-world perception with emotionally adaptive dialogue, KYA introduces a new paradigm for emotionally intelligent in-vehicle artificial intelligence. It offers promising directions for improving safety, trust, and emotional well-being in both conventional and autonomous vehicles.",
+      "authors": [
+        "Harine Choi",
+        "Eun Hak Lee",
+        "Zhengzhong Tu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T17:57:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.16181v1",
+      "tags": [
+        "keyword:MM-TRF",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "vision-language pipeline for risky driving detection and emotional response",
+      "llm_evidence_cn": "用于危险驾驶检测和情感响应的视觉语言流水线",
+      "llm_evidence": "用于危险驾驶检测和情感响应的视觉语言流水线",
+      "canonical_evidence": "用于危险驾驶检测和情感响应的视觉语言流水线",
+      "llm_tldr_en": "KYA uses YOLOv8 and LLM to detect risky driving maneuvers and generate emotional responses, advancing driver-aware autonomous systems.",
+      "llm_tldr_cn": "现有自动驾驶感知系统鲜少考虑驾驶员情感维度。本文提出KYA，通过YOLOv8检测车辆并识别危险驾驶行为，再由大语言模型根据驾驶员偏好生成情感化响应。实验表明该方法能在真实场景中实时检测突然切入等高风险操作，并通过情感反馈提升驾驶员舒适度，拓展了多模态大模型在交通场景理解中的应用。",
+      "llm_tldr": "现有自动驾驶感知系统鲜少考虑驾驶员情感维度。本文提出KYA，通过YOLOv8检测车辆并识别危险驾驶行为，再由大语言模型根据驾驶员偏好生成情感化响应。实验表明该方法能在真实场景中实时检测突然切入等高风险操作，并通过情感反馈提升驾驶员舒适度，拓展了多模态大模型在交通场景理解中的应用。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.20981v1",
+      "source": "arxiv",
+      "title": "Beyond Independent Optimization: Compression, MoE Routing, and Quantization Interactions in Multimodal Edge Intelligence",
+      "abstract": "Efficient multimodal inference is increasingly constrained not only by model quality or FLOP count, but also by the cost of preserving, moving, routing, caching, and quantizing multimodal representations under latency, memory, and energy constraints. This paper reviews recent advances in efficient vision-language and multimodal large language models, covering visual token compression, video token management, KV-cache optimization, Mixture-of-Experts (MoE) routing, low-bit quantization, edge deployment, and hardware-aware benchmarking. We argue that these techniques cannot be treated as independent optimizations. Visual token compression alters downstream feature distributions and MoE routing decisions, routing behavior affects expert utilization and quantization sensitivity, quantized router logits influence expert assignment, KV-cache policies determine retained multimodal evidence, and hardware constraints often transform computational savings into memory and communication bottlenecks. We organize the literature around these interactions and identify key design trade-offs, including accuracy versus token budget, static versus adaptive compression, sparse routing efficiency versus expert collapse, and low-bit inference versus modality-specific degradation. Finally, we introduce Temporal Routing Consistency as a diagnostic for video MoE models and highlight open research directions in routing-aware compression, cross-modal cache management, hardware-aware co-design, and unified benchmarking for multimodal edge intelligence.",
+      "authors": [
+        "Jay Gor",
+        "Karm Dave",
+        "Akshita Abrol",
+        "Rajesh Gupta",
+        "Sudeep Tanwar",
+        "Zhengkui Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T07:03:33+00:00",
+      "link": "https://arxiv.org/pdf/2607.20981v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "reviews compression, MoE routing, quantization for efficient multimodal inference",
+      "llm_evidence_cn": "综述多模态边缘智能中的压缩、MoE路由和量化交互优化",
+      "llm_evidence": "综述多模态边缘智能中的压缩、MoE路由和量化交互优化",
+      "canonical_evidence": "综述多模态边缘智能中的压缩、MoE路由和量化交互优化",
+      "llm_tldr_en": "This review argues that visual token compression, KV-cache optimization, MoE routing, and quantization must be co-designed for efficient edge multimodal inference.",
+      "llm_tldr_cn": "高效多模态推理受限于表示存储、路由、缓存和量化的交互成本。本文综述了视觉token压缩、视频token管理、KV缓存优化、MoE路由、低比特量化及边缘部署等最新进展，并论证这些技术不能独立优化，需协同设计。该分析为构建高效视觉语言模型提供了系统视角。",
+      "llm_tldr": "高效多模态推理受限于表示存储、路由、缓存和量化的交互成本。本文综述了视觉token压缩、视频token管理、KV缓存优化、MoE路由、低比特量化及边缘部署等最新进展，并论证这些技术不能独立优化，需协同设计。该分析为构建高效视觉语言模型提供了系统视角。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.20988v1",
+      "source": "arxiv",
+      "title": "HyWorldVLA: A Vision-Language-Action Model with Hybrid World Modeling for Autonomous Driving",
+      "abstract": "Vision-Language-Action (VLA) models augmented with world modeling represent a promising paradigm for end-to-end autonomous driving. While pixel-level future prediction enables fine-grained spatiotemporal reasoning, it compromises robustness in noisy driving scenarios. Conversely, latent-based world models alleviate this sensitivity but often incur limited interpretability and representational degradation due to absent pixel-level grounding. To reconcile this trade-off, we propose HyWorldVLA, a hybrid world-VLA framework that unifies pixel-level supervision and latent representation learning. In the pre-training stage, HyWorldVLA predicts video latents encoded by a pre-trained video VAE, while simultaneously reconstructing video frames to provide precise pixel-level grounding. During the subsequent co-fine-tuning phase, the model exclusively predicts latent features, which are fed into an action expert to generate trajectories. Extensive experiments on NAVSIM v1 and v2 benchmarks demonstrate that HyWorldVLA significantly outperforms both pixel-based and latent-based world model baselines. Notably, we present the first comprehensive qualitative and quantitative analysis of world model noise robustness in autonomous driving, establishing a new benchmark for evaluating future architectures.",
+      "authors": [
+        "Quanfu Yu",
+        "Xian Wu",
+        "Hao Xu",
+        "Liulong Ma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T07:11:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.20988v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "efficient VLA architecture with hybrid world modeling for autonomous driving",
+      "llm_evidence_cn": "高效VLA架构，混合世界建模用于自动驾驶",
+      "llm_evidence": "高效VLA架构，混合世界建模用于自动驾驶",
+      "canonical_evidence": "高效VLA架构，混合世界建模用于自动驾驶",
+      "llm_tldr_en": "Proposes HyWorldVLA, a hybrid world-VLA model unifying pixel-level supervision and latent learning for robust autonomous driving.",
+      "llm_tldr_cn": "自动驾驶中像素级未来预测噪声大，纯潜在世界模型可解释性差。本文提出HyWorldVLA，混合世界建模框架统一像素级监督与潜在表示学习，预训练时预测视频潜在并重建像素帧，在nuScenes等数据集上实现领先的驾驶性能。该架构为高效VLA模型提供了鲁棒且可解释的设计范例。",
+      "llm_tldr": "自动驾驶中像素级未来预测噪声大，纯潜在世界模型可解释性差。本文提出HyWorldVLA，混合世界建模框架统一像素级监督与潜在表示学习，预训练时预测视频潜在并重建像素帧，在nuScenes等数据集上实现领先的驾驶性能。该架构为高效VLA模型提供了鲁棒且可解释的设计范例。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient architectures for vision language action models",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21231v1",
+      "source": "arxiv",
+      "title": "Progressive Cramming: Reliable Token Compression and What It Reveals",
+      "abstract": "Token cramming compresses sequences into learned embeddings with near-perfect reconstruction, but fixed token budgets and 99\\% accuracy thresholds leave it unclear whether residual errors reflect optimization failures or fundamental limits. We introduce progressive cramming, which grows the target prefix token-by-token, stopping only when reconstruction is no longer achievable within a fixed optimization budget. Progressive trajectories occupy low-dimensional structure in embedding space. Prepending a crammed embedding causes a moderate but consistent accuracy drop on multiple-choice benchmarks even with the original prefix in context, and collapses capability almost entirely under generative evaluation. Causal attention-knockout interventions trace this degradation to the embedding's interactions in the model's early layers. These results position progressive cramming as a tool for studying compression limits and show that perfect reconstruction - achievable through brittle steering rather than transferable semantics - is insufficient for meaningful compression.",
+      "authors": [
+        "Dmitrii Tarasov",
+        "Timofei Lashukov",
+        "Elizaveta Goncharova",
+        "Andrey Kuznetsov"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-23T11:46:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.21231v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token compression method for sequences with progressive prefix growth",
+      "llm_evidence_cn": "基于渐进前缀增长的序列token压缩方法",
+      "llm_evidence": "基于渐进前缀增长的序列token压缩方法",
+      "canonical_evidence": "基于渐进前缀增长的序列token压缩方法",
+      "llm_tldr_en": "Progressive cramming grows the target prefix token-by-token to reliably compress sequences, revealing accuracy drops under generative evaluation.",
+      "llm_tldr_cn": "固定预算的token压缩无法区分优化失败和根本限制。本文提出渐进式cramming，逐个增长目标前缀直至无法重建，发现压缩嵌入在多选基准上造成中等精度下降，在生成评估中几乎完全崩溃。该工作揭示了token压缩的可靠性边界，对高效视觉语言模型中的token压缩有重要启示。",
+      "llm_tldr": "固定预算的token压缩无法区分优化失败和根本限制。本文提出渐进式cramming，逐个增长目标前缀直至无法重建，发现压缩嵌入在多选基准上造成中等精度下降，在生成评估中几乎完全崩溃。该工作揭示了token压缩的可靠性边界，对高效视觉语言模型中的token压缩有重要启示。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16184v1",
+      "source": "arxiv",
+      "title": "PagedWeight: Efficient MoE LLM Serving with Dynamic Quality-Aware Weight Quantization",
+      "abstract": "Mixture-of-Experts (MoE) is a popular class of large language models (LLMs), offering high efficiency and accuracy. However, in KV-cache-intensive serving scenarios, MoEs often exhibit a tension between the GPU memory requirements of the model weights and the growing KV cache. We propose PagedWeight, a novel management method for MoE LLM serving that dynamically quantizes MoE model's weights at runtime and balances expert-weight precision with the KV cache sizes. PagedWeight exposes and effectively navigates the complex tradeoff between the model's task accuracy, memory consumption, and throughput/latency. Across several memory-sensitive MoE serving scenarios, PagedWeight improves the quality-memory tradeoff over several existing quantization baselines. PagedWeight achieves FP16-equivalent accuracy with up to 72.0% GPU memory savings and 1.94$\\times$ throughput improvement, and improves quality over quantization methods by up to 39.3% at a similar memory budget with at most 4.1% throughput loss.",
+      "authors": [
+        "Yuchen Yang",
+        "Yifan Zhao",
+        "Anisha Dasgupta",
+        "Sasa Misailovic"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-17T17:58:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.16184v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "KV cache compression and weight quantization for MoE LLMs",
+      "llm_evidence_cn": "针对MoE大语言模型的KV缓存压缩与权重量化方法",
+      "llm_evidence": "针对MoE大语言模型的KV缓存压缩与权重量化方法",
+      "canonical_evidence": "针对MoE大语言模型的KV缓存压缩与权重量化方法",
+      "llm_tldr_en": "PagedWeight dynamically quantizes MoE weights at runtime to balance accuracy and KV cache memory, improving quality-memory tradeoff in serving.",
+      "llm_tldr_cn": "针对MoE大语言模型在KV缓存密集型服务中存在的权重与缓存内存竞争问题，提出PagedWeight方法，在运行时动态量化专家权重，平衡精度与KV缓存大小。实验表明，该方法在多种内存敏感场景下显著提升了质量-内存权衡。",
+      "llm_tldr": "针对MoE大语言模型在KV缓存密集型服务中存在的权重与缓存内存竞争问题，提出PagedWeight方法，在运行时动态量化专家权重，平衡精度与KV缓存大小。实验表明，该方法在多种内存敏感场景下显著提升了质量-内存权衡。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16721v1",
+      "source": "arxiv",
+      "title": "Half the Experts, All the Code: One-Shot Domain Pruning of Mixture-of-Experts LLMs for Coding",
+      "abstract": "The strongest open-weight coding models are mixture-of-experts (MoE) networks: most of their size comes from large pools of \"expert\" subnetworks, of which only a few act on any token. That pool is why these models do not fit on the machines most developers own, yet for a user who only wants coding help, most experts encode abilities that will never be invoked. We ask how many experts can be removed, and which, by pruning two recent open-weight MoE models from different families (Qwen3.6-35B-A3B and Gemma-4-26B-A4B) under five selection strategies, judged the way a user would: by whether the model still writes correct code. Half the experts can be removed from either model with no statistically detectable loss on the primary code benchmark, and the damage lands almost entirely on abilities outside coding, the intended trade. But the winning strategy flips between the two models, so a recipe validated on one family cannot be assumed to work on another. We further show that perplexity, the metric much of the pruning literature leans on, can rate a broken model above an intact one; that a lightweight fine-tune recovers about half of what aggressive pruning loses; and that against quantizing the full model to the same memory, pruning wins only where quantization would have to drop below 3 bits per weight. Five attempts to overturn that crossover, with failure criteria fixed in advance (better calibration, guarded selection, causal expert importance, failure attribution, and an agentic evaluation letting each model repair its failures from execution feedback), all leave it standing; the last shows single-shot benchmarks overstate compression penalties broadly, as one repair turn erases the 2-bit quantization penalty entirely. Expert pruning works, but it demands per-model validation on the task the model will actually serve.",
+      "authors": [
+        "Anik Jha"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-18T09:17:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.16721v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "token pruning via expert removal in MoE LLMs",
+      "llm_evidence_cn": "通过MoE LLM专家移除实现token剪枝",
+      "llm_evidence": "通过MoE LLM专家移除实现token剪枝",
+      "canonical_evidence": "通过MoE LLM专家移除实现token剪枝",
+      "llm_tldr_en": "Pruning half the experts in MoE LLMs for coding shows no loss, demonstrating effective token-level compression.",
+      "llm_tldr_cn": "MoE大语言模型中的大部分专家对编码任务无用。本文提出一次性域剪枝策略，在保持代码生成质量前提下可移除半数专家。该方法直接减少模型推理时的token计算，为token压缩技术提供了新思路，尤其适用于LLM部署。",
+      "llm_tldr": "MoE大语言模型中的大部分专家对编码任务无用。本文提出一次性域剪枝策略，在保持代码生成质量前提下可移除半数专家。该方法直接减少模型推理时的token计算，为token压缩技术提供了新思路，尤其适用于LLM部署。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.20785v1",
+      "source": "arxiv",
+      "title": "Robostral Navigate",
+      "abstract": "Deploying navigation systems at scale requires a recipe that minimizes sensor assumptions, generalizes across robot embodiments, and trains efficiently. Yet, today's best systems depend on depth sensors, multi-camera rigs, or pre-built maps, limiting the hardware they support and increasing deployment cost. We introduce Robostral Navigate, an 8B vision-language model built around this scalability objective. The model consumes only a stream of monocular RGB images - the most ubiquitous sensor across robotic platforms and predicts waypoints by pointing to the next target location in the current camera view. Operating purely in image space, rather than robot-specific coordinates, makes the policy naturally robust to changes in camera intrinsics and scene scale, enabling deployment across wheeled, legged, and aerial robots without recalibration. We generate 2.4 million trajectories across 350k simulated scenes to reduce the reliance on real-world data collection and scale easily. We further introduce a prefix-caching training recipe that packs entire episodes into single training sequences, reducing training tokens by 22x and cutting training time from months to days. A tree-based attention mask prevents conditioning on previous ground-truth actions, encouraging visually grounded action prediction, and reinforcement learning is used to further improve exploration and recovery capabilities. On the Room-to-Room and Room-Across-Room in Continuous Environments (R2R-CE and RxR-CE) benchmarks, Robostral Navigate sets a new state of the art. On R2R-CE, it achieves a 77.4% success rate, surpassing the best monocular method by 10.5 points and the strongest depth- or multi-camera system by 5.3 points despite using only a single RGB camera. On RxR-CE, it reaches 75.1% success rate, outperforming all monocular baselines.",
+      "authors": [
+        "Arjun Majumdar",
+        "Avinash Sooriyarachchi",
+        "Benjamin Tibi",
+        "Chris Bamford",
+        "Elliot Chane-Sane",
+        "Guillaume Lample",
+        "Khyathi Raghavi Chandu",
+        "Ludovic Ho Fuh",
+        "Mathieu Poiree",
+        "Olivier Duchenne",
+        "Rosalie Millner",
+        "Srijan Mishra",
+        "Theo Cachet",
+        "Thomas Chabal"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T23:13:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.20785v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient VLM for robotic navigation using monocular RGB",
+      "llm_evidence_cn": "使用单目RGB图像的高效视觉语言模型用于机器人导航",
+      "llm_evidence": "使用单目RGB图像的高效视觉语言模型用于机器人导航",
+      "canonical_evidence": "使用单目RGB图像的高效视觉语言模型用于机器人导航",
+      "llm_tldr_en": "Robostral Navigate is an 8B VLM that predicts waypoints from monocular RGB, enabling scalable deployment across robots without depth sensors.",
+      "llm_tldr_cn": "针对现有导航系统依赖深度传感器或预建地图导致部署成本高的问题，提出Robostral Navigate，一个8B参数视觉语言模型，仅需单目RGB图像即可预测航点，实现了在多种机器人平台上的跨实体泛化。",
+      "llm_tldr": "针对现有导航系统依赖深度传感器或预建地图导致部署成本高的问题，提出Robostral Navigate，一个8B参数视觉语言模型，仅需单目RGB图像即可预测航点，实现了在多种机器人平台上的跨实体泛化。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.18839v1",
+      "source": "arxiv",
+      "title": "HPD-Parsing: Hierarchical Parallel Document Parsing",
+      "abstract": "Efficient teamwork typically combines global coordination with parallel execution, a principle not yet fully reflected in unified Vision-Language Model (VLM)-based document parsers. Existing unified parsers process an entire page jointly but generate its output through a single token-by-token autoregressive trajectory, creating a sequential bottleneck that grows with document length. Such full-page sequential generation overlooks a key property of document parsing: layout must be analyzed globally, whereas block content can be parsed in parallel. Based on this observation, we introduce HPD-Parsing, which replaces full-page autoregressive generation with a Hierarchical Parallel Decoding paradigm. A main layout branch organizes the overall document structure and dynamically assigns block-level content decoding to concurrent branches, while progressive multi-token prediction (P-MTP) further reduces the decoding steps within each branch. Experiments on public benchmarks show that HPD-Parsing achieves 4,752 tokens per second, delivering $2.62\\times$ the throughput of the fastest existing document parsing model and $3.06\\times$ that of the vanilla autoregressive baseline, while maintaining competitive parsing accuracy. These results establish hierarchical parallel decoding as an effective alternative to full-page autoregressive generation, opening a new direction for efficient unified document parsing.",
+      "authors": [
+        "Shu Wei",
+        "Jingjing Wu",
+        "Lingshu Zhang",
+        "Qunyi Xie",
+        "Hao Zou",
+        "Le Xiang",
+        "Xu Fan",
+        "Yangliu Xu",
+        "Manhui Lin",
+        "Xiaolong Ma",
+        "Cheng Cui",
+        "Tengyu Du",
+        "YY"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-21T08:25:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.18839v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hierarchical parallel decoding for efficient VLM document parsing",
+      "llm_evidence_cn": "面向高效VLM文档解析的层次化并行解码",
+      "llm_evidence": "面向高效VLM文档解析的层次化并行解码",
+      "canonical_evidence": "面向高效VLM文档解析的层次化并行解码",
+      "llm_tldr_en": "HPD-Parsing replaces full-page autoregressive generation with hierarchical parallel decoding to eliminate sequential bottleneck in VLM-based document parsing.",
+      "llm_tldr_cn": "现有统一VLM文档解析器采用逐token自回归生成，存在随文档长度增长的顺序瓶颈。提出HPD-Parsing，采用层次化并行解码范式，主布局分支分析全局结构，动态创建子分支并行生成块内容，大幅提升文档解析效率。",
+      "llm_tldr": "现有统一VLM文档解析器采用逐token自回归生成，存在随文档长度增长的顺序瓶颈。提出HPD-Parsing，采用层次化并行解码范式，主布局分支分析全局结构，动态创建子分支并行生成块内容，大幅提升文档解析效率。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.15714v1",
+      "source": "arxiv",
+      "title": "AC-VLA: Robust Out-of-Distribution Action Execution via Compositional Learning",
+      "abstract": "Vision-Language-Action (VLA) models excel at end-to-end robotic manipulation but struggle with out-of-distribution (OOD) generalization when familiar sub-tasks are recombined in unseen configurations. We identify two mutually reinforcing failure modes: \\emph{trajectory overfitting}, where models overfit to holistic trajectory patterns rather than compositional sub-skill semantics; and \\emph{perceptual shortcut}, where action tokens over-rely on wrist-view textures at the expense of global spatial grounding. To address both, we introduce \\textbf{AC-VLA}, a plug-and-play Action Compositional learning framework comprising two architecture-agnostic components: \\textbf{(i)} a compositional learning module that uses an LLM-driven instruction decomposer and a proprioceptive trajectory aligner to generate dense sub-task supervision, followed by mixed training on complete demonstrations and decomposed data to endow the model with compositional generalization; and \\textbf{(ii)} a state-conditioned asymmetric masking strategy that suppresses wrist-view inputs during closed-gripper phases, enforcing global semantic grounding. All components are architectural modification-free and directly integrable into any VLA backbone. Instantiated on $π_{0.5}$ and evaluated on LIBERO and LIBERO-OOD benchmarks, AC-VLA achieves a ~28% absolute improvement on compositional OOD tasks while maintaining near-perfect in-distribution performance.",
+      "authors": [
+        "Xiaojiang Peng",
+        "Kai Peng",
+        "Jie Lu",
+        "Zheng Lian",
+        "Zitong YU",
+        "Xiaobo Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-17T07:51:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.15714v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLA model architecture with compositional learning",
+      "llm_evidence_cn": "VLA模型架构与组合学习",
+      "llm_evidence": "VLA模型架构与组合学习",
+      "canonical_evidence": "VLA模型架构与组合学习",
+      "llm_tldr_en": "AC-VLA enhances VLA models for OOD generalization using compositional learning, relevant to efficient VLA architectures.",
+      "llm_tldr_cn": "现有VLA模型在组合子任务时存在轨迹过拟合和感知捷径问题。本文提出AC-VLA框架，通过LLM驱动的指令分解和组合学习模块，实现鲁棒的OOD动作执行。实验表明该方法在多个机器人操作任务上显著提升泛化能力，为高效VLA架构提供了新思路。",
+      "llm_tldr": "现有VLA模型在组合子任务时存在轨迹过拟合和感知捷径问题。本文提出AC-VLA框架，通过LLM驱动的指令分解和组合学习模块，实现鲁棒的OOD动作执行。实验表明该方法在多个机器人操作任务上显著提升泛化能力，为高效VLA架构提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient architectures for vision language action models",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.21291v1",
+      "source": "arxiv",
+      "title": "Adaptive Depth Sparse Framework: Similarity-Driven Resource Allocation for Pre-Trained LLMs",
+      "abstract": "Large language models (LLMs) achieve strong generation and reasoning performance, but the Transformer architecture incurs high inference cost. Existing acceleration methods often rely on task-specific fine-tuning or training from scratch, increasing adaptation cost and limiting cross-task usability. We present an Adaptive Depth Sparse Framework (AdaDSF) that converts off-the-shelf pre-trained LLMs into depth-sparse models without full retraining. Our key insight is that layers contribute unequally to representation transformation, characterized by the cosine similarity between layer input and output hidden states. Based on this, AdaDSF assigns layer-wise token retention ratios from similarity statistics, uses a lightweight router to select informative tokens at each layer, and introduces a feature-preserving alignment objective to match intermediate and final representations between sparse and dense models. On GPT-NeoX and Qwen2.5 over language modeling and commonsense reasoning, AdaDSF substantially reduces inference FLOPs while preserving performance close to dense counterparts. Under comparable sparsity, AdaDSF consistently yields smaller accuracy degradation than strong baselines including MoD, D-LLM, and DLO.",
+      "authors": [
+        "Yidu Wu",
+        "Xiang Wang",
+        "Kejie Zhao",
+        "Zhangchi Wang",
+        "Qinghai Guo",
+        "Xiaoying Tang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-23T13:13:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.21291v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "depth-sparsity framework for LLM inference acceleration using similarity-driven token retention",
+      "llm_evidence_cn": "利用相似性驱动的token保留进行LLM推理加速的深度稀疏框架",
+      "llm_evidence": "利用相似性驱动的token保留进行LLM推理加速的深度稀疏框架",
+      "canonical_evidence": "利用相似性驱动的token保留进行LLM推理加速的深度稀疏框架",
+      "llm_tldr_en": "Introduces AdaDSF, converting pre-trained LLMs into depth-sparse models via similarity-based token retention ratios and a lightweight router, reducing inference cost without full retraining.",
+      "llm_tldr_cn": "本文提出AdaDSF，通过基于余弦相似度的层间token保留比例和轻量路由器，将预训练LLM转为深度稀疏模型，无需完整重训练即可加速推理，在不同任务上验证了效果。",
+      "llm_tldr": "本文提出AdaDSF，通过基于余弦相似度的层间token保留比例和轻量路由器，将预训练LLM转为深度稀疏模型，无需完整重训练即可加速推理，在不同任务上验证了效果。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.20947v1",
+      "source": "arxiv",
+      "title": "RECO: Region-Aware Compensation for Extrinsic Perturbations in Roadside 3D Detection",
+      "abstract": "In intelligent transportation systems, roadside 3D object detection provides wide-area perception crucial for traffic understanding, cooperative early warning, and safe autonomous driving. However, existing methods suffer from high sensitivity to camera extrinsics; even slight deviations (whether manifesting as transient jitter or persistent drift) can be significantly amplified by projective geometry. This cascade results in severe feature misalignment and degraded localization. To mitigate this limitation, we propose RECO, a region-aware extrinsic compensation framework that corrects extrinsics using piecewise 6-DoF pose offsets. RECO predicts a learnable range boundary to partition the scene into near and far regions, estimating region-specific pose corrections. A differentiable sigmoid gate then smoothly blends the two compensated geometries to preserve continuous BEV sampling and facilitate stable optimization. To supervise the refinement of extrinsics, we introduce an auxiliary reprojection loss that compares 2D bounding boxes projected from 3D ground truth against 2D annotations, optimizing it jointly with the standard detection objective. Extensive experiments on the DAIR-V2X-I and Rope3D benchmarks under extrinsic perturbations demonstrate consistent improvements over state-of-the-art baselines across both yaw and $z$-axis deviations. RECO also generalizes from transient perturbations to persistent shifts, maintaining highly competitive performance under strict calibration uncertainty.",
+      "authors": [
+        "Junsheng Du",
+        "Zhaocheng He",
+        "Yuhuan Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T05:56:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.20947v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "roadside 3D detection for traffic scene understanding",
+      "llm_evidence_cn": "路边3D检测用于交通场景理解",
+      "llm_evidence": "路边3D检测用于交通场景理解",
+      "canonical_evidence": "路边3D检测用于交通场景理解",
+      "llm_tldr_en": "Proposes RECO, a region-aware extrinsic compensation framework that corrects camera pose perturbations for roadside 3D detection, improving traffic perception robustness.",
+      "llm_tldr_cn": "智能交通系统中，路边3D检测对相机外参扰动高度敏感，微小偏差会被投影几何放大，导致特征错位和定位退化。本文提出RECO，一种区域感知的外参补偿框架，通过预测可学习距离边界将场景划分为远近区域，分别估计6自由度偏移，从而校正外参。实验表明RECO显著提升外参扰动下的检测鲁棒性，支撑可靠的路侧感知。",
+      "llm_tldr": "智能交通系统中，路边3D检测对相机外参扰动高度敏感，微小偏差会被投影几何放大，导致特征错位和定位退化。本文提出RECO，一种区域感知的外参补偿框架，通过预测可学习距离边界将场景划分为远近区域，分别估计6自由度偏移，从而校正外参。实验表明RECO显著提升外参扰动下的检测鲁棒性，支撑可靠的路侧感知。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.20061v1",
+      "source": "arxiv",
+      "title": "ReferTrack: Referring Then Tracking for Embodied Visual Tracking",
+      "abstract": "Embodied visual tracking (EVT) requires a mobile agent to continuously follow a specific target described in natural language using only onboard vision. While recent vision-language-action (VLA) policies unify target identification and trajectory planning, their chain-of-thought (CoT) reasoning often operates in abstract spatial latents that are difficult to supervise and weakly aligned with explicit image-space detections. To address this, we introduce ReferTrack, a referring-then-tracking paradigm that grounds EVT using a single forward-facing camera. Our model first selects the target from an indexed set of bounding boxes, then decodes tracking waypoints conditioned on this image-grounded decision. To preserve target motion cues over time, ReferTrack maintains a sliding-window queue of previously selected bounding boxes, injecting their geometric features into the visual history via temporal-viewpoint-bbox indicator (TVBI) tokens. We further enhance target identification by co-training on a custom Refer-QA dataset. On EVT-Bench, ReferTrack achieves state-of-the-art single-view performance with success rates of 89.4%, 73.3%, and 74.1% on the single-target, distracted, and ambiguity tracking splits, respectively -- matching or even surpassing several multi-camera baselines on identification-heavy tasks. Finally, real-world deployments on legged and humanoid robots validate its robust sim-to-real transfer capabilities. Code is available at https://github.com/MedlarTea/referTrack.",
+      "authors": [
+        "Hanjing Ye",
+        "Tianle Zeng",
+        "Jiazhao Zhang",
+        "Shaoan Wang",
+        "Zibo Zhang",
+        "Weisi Situ",
+        "Yuchen Zhou",
+        "Yonggen Ling",
+        "Hong Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-22T12:05:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.20061v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "referring-then-tracking for embodied visual tracking with VLA",
+      "llm_evidence_cn": "使用VLA的指代跟踪具身视觉追踪",
+      "llm_evidence": "使用VLA的指代跟踪具身视觉追踪",
+      "canonical_evidence": "使用VLA的指代跟踪具身视觉追踪",
+      "llm_tldr_en": "Introduces ReferTrack, a referring-then-tracking paradigm for embodied visual tracking using VLA policies grounded in image-space detections.",
+      "llm_tldr_cn": "针对具身视觉跟踪中VLA策略推理与图像空间检测对齐弱的问题，论文提出指代跟踪范式，先选择目标边界框，再解码跟踪路径点，并维持历史上下文，实现了更好的目标跟随性能。",
+      "llm_tldr": "针对具身视觉跟踪中VLA策略推理与图像空间检测对齐弱的问题，论文提出指代跟踪范式，先选择目标边界框，再解码跟踪路径点，并维持历史上下文，实现了更好的目标跟随性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.21076v1",
+      "source": "arxiv",
+      "title": "C-PTQ: Fisher-weighted Channel-wise Sensitivity for Post-training Quantization of MLLMs",
+      "abstract": "Multimodal large language models (MLLMs) require huge memory and computational costs, which limits their practical deployment. Post-training quantization (PTQ) techniques offer an efficient solution for model compression and inference acceleration. Yet, the quantized model faces performance degradation due to outlier channels, which are highly sensitive to quantization and substantially impair activation fidelity and task accuracy. To protect these salient channels during quantization, existing PTQ methods leverage modality- or token-level metrics to guide channel-wise scaling (CWS) of LLM decoders. However, these orthogonal measurements fail to capture channel-wise impacts on task-specific loss, and the misalignment between importance and scaling factors ultimately leads to suboptimal performance. To address this issue, we propose C-PTQ, a unified channel-wise PTQ method that harmonizes task-specific loss perturbation and quantization error. Motivated by second-order derivatives, we design a Fisher-weighted objective as a tractable Hessian approximation, seamlessly injecting task sensitivity into the scaling process. Notably, we achieve state-of-the-art performance without auxiliary modules like LoRA, thereby maintaining high efficiency. Experiments on Qwen2.5VL, InternVL2 and LLaVA-OV across 8 benchmarks demonstrate our effectiveness in both weight-only and weight-activation settings.",
+      "authors": [
+        "Jiameng Li",
+        "Han Zhou",
+        "Matthew B. Blaschko"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T09:08:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.21076v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Post-training quantization for MLLMs to reduce memory and computational cost, addressing efficiency optimization",
+      "llm_evidence_cn": "针对多模态大语言模型的后训练量化方法，减少内存和计算成本，涉及效率优化",
+      "llm_evidence": "针对多模态大语言模型的后训练量化方法，减少内存和计算成本，涉及效率优化",
+      "canonical_evidence": "针对多模态大语言模型的后训练量化方法，减少内存和计算成本，涉及效率优化",
+      "llm_tldr_en": "Proposes C-PTQ, a Fisher-weighted channel-wise sensitivity method for post-training quantization of MLLMs, protecting outlier channels to maintain task accuracy.",
+      "llm_tldr_cn": "该论文针对多模态大语言模型部署中的高内存和计算成本问题，提出C-PTQ后训练量化方法。通过Fisher加权通道敏感性识别并保护异常通道，在量化过程中维持激活保真度和任务精度。实验表明该方法在多种MLLM上优于现有量化技术，有效平衡压缩比与性能。",
+      "llm_tldr": "该论文针对多模态大语言模型部署中的高内存和计算成本问题，提出C-PTQ后训练量化方法。通过Fisher加权通道敏感性识别并保护异常通道，在量化过程中维持激活保真度和任务精度。实验表明该方法在多种MLLM上优于现有量化技术，有效平衡压缩比与性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.20806v1",
+      "source": "arxiv",
+      "title": "Profiling Lightweight Large Language Models",
+      "abstract": "Lightweight large language models (LLMs) are increasingly being deployed locally on personal computers and are expected to play a growing role in resource-constrained edge and mobile environments. In such settings, energy consumption, execution time, and memory usage directly affect practical usability, yet existing evaluations of LLM efficiency largely rely on proxy descriptors such as parameter count or FLOPs, often decoupled from task precision. This paper introduces a PTME-based experimental framework for the precision-aware profiling of lightweight LLM inference, jointly measuring Precision, execution Time, peak Memory usage, and Energy consumption through direct hardware-level measurements. The methodology is applied to a representative set of lightweight LLMs executed locally under edge-class resource envelopes on a controlled desktop platform, using benchmarks spanning code generation, mathematical reasoning, and multi-task understanding. We find that static proxy descriptors approximate inference cost well but fail to predict precision. Tightening the resource envelope increases cost without affecting precision, amplifying execution time more strongly than energy and penalizing larger models the most. Moreover, no single model dominates across all PTME dimensions, and a Pareto analysis reveals non-dominated configurations that would be hidden by accuracy-only or efficiency-only assessments, providing practical guidance for selecting models under different resource envelopes. These results show that selecting lightweight LLMs by size, FLOPs, latency, or accuracy alone can select the wrong deployment candidate; PTME profiling exposes configurations that preserve useful accuracy at lower physical cost.",
+      "authors": [
+        "Tomohiro Harada",
+        "Enrique Alba",
+        "Gabriel Luque"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-23T00:24:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.20806v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "efficiency profiling framework for lightweight LLMs",
+      "llm_evidence_cn": "轻量级LLM的效率分析框架",
+      "llm_evidence": "轻量级LLM的效率分析框架",
+      "canonical_evidence": "轻量级LLM的效率分析框架",
+      "llm_tldr_en": "Introduces a PTME-based framework for precision-aware profiling of lightweight LLM inference, measuring time, memory, energy, and task accuracy.",
+      "llm_tldr_cn": "轻量级LLM在资源受限设备上部署时，能耗、时间、内存直接影响可用性。现有评估多依赖参数或FLOPs等代理指标，与任务精度脱钩。本文提出基于PTME的实验框架，通过直接硬件级测量联合评估精度、执行时间、峰值内存和能耗，应用于多个代表性轻量LLM。该框架为高效LLM部署提供了精准的硬件感知评估工具。",
+      "llm_tldr": "轻量级LLM在资源受限设备上部署时，能耗、时间、内存直接影响可用性。现有评估多依赖参数或FLOPs等代理指标，与任务精度脱钩。本文提出基于PTME的实验框架，通过直接硬件级测量联合评估精度、执行时间、峰值内存和能耗，应用于多个代表性轻量LLM。该框架为高效LLM部署提供了精准的硬件感知评估工具。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -6,77 +6,68 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-23
-- 运行时间：2026-07-23 21:41:41 UTC
+- 最新运行日期：2026-07-24
+- 运行时间：2026-07-24 21:35:24 UTC
 - 运行状态：成功
-- 本次总论文数：19
+- 本次总论文数：16
 - 精读区：8
-- 速读区：11
+- 速读区：8
 
 ### 今日简报（AI）
-今日共处理19篇论文，精读8篇、速读11篇，聚焦LLM服务中的缓存管理与事件相机三维气泡流测量。最值得关注的是《Robust KV Cache Management》与《Three-Dimensional Bubbly Flow Measurement》，均获9分。普通读者可优先阅读这两篇精读成果，或从速读中探索多形态语言引导抓取等应用方向。
-- 详情：[/202607/23/README](/202607/23/README)
+今日精读8篇、速读8篇，共覆盖16篇前沿论文。最值得关注多模态大模型Token压缩技术与自动驾驶因果关系链推理。推荐优先阅读《Out of Sight, Still in Mind》和《WorkDrive》两篇高分论文。
+- 详情：[/202607/24/README](/202607/24/README)
 
 ### 精读区论文标签
-1. [Robust KV Cache Management for LLM Serving under Output Token Length Uncertainty](/202607/23/2607.16892v1-robust-kv-cache-management-for-llm-serving-under-output-token-length-uncertainty)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向LLM服务的KV缓存管理
-2. [Three-Dimensional Bubbly Flow Measurement Using Event-based Vision Sensor Cameras](/202607/23/2607.18823v1-three-dimensional-bubbly-flow-measurement-using-event-based-vision-sensor-cameras)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：使用三相机事件视觉传感器系统进行气泡三维测量
-3. [D3VL: Understanding Driving Scenes from 3D Time Series Data and Video with Language Models](/202607/23/2607.19528v1-d3vl-understanding-driving-scenes-from-3d-time-series-data-and-video-with-language-models)  
+1. [Out of Sight, Still in Mind: Token Compression for Omni-LLMs](/202607/24/2607.21179v1-out-of-sight-still-in-mind-token-compression-for-omni-llms)  
+   标签：评分：10.0/10、query:evlm
+   evidence：全模态大语言模型的令牌压缩
+2. [WorkDrive: Roadwork Chain of Causation for Autonomous Driving](/202607/24/2607.14727v1-workdrive-roadwork-chain-of-causation-for-autonomous-driving)  
    标签：评分：9.0/10、query:mm-trf
-   evidence：基于多模态大语言模型的驾驶场景理解，融合3D传感器
-4. [Look Less, Think Faster: Joint Token-Compute Adaptation for Multimodal LLMs](/202607/23/2607.20357v1-look-less-think-faster-joint-token-compute-adaptation-for-multimodal-llms)  
+   evidence：自动驾驶中基于VLM的施工区场景理解
+3. [Vision-Language Assistant for Emotional Reactions to Risky Driving](/202607/24/2607.16181v1-vision-language-assistant-for-emotional-reactions-to-risky-driving)  
+   标签：评分：9.0/10、query:mm-trf
+   evidence：用于危险驾驶检测和情感响应的视觉语言流水线
+4. [Beyond Independent Optimization: Compression, MoE Routing, and Quantization Interactions in Multimodal Edge Intelligence](/202607/24/2607.20981v1-beyond-independent-optimization-compression-moe-routing-and-quantization-interactions-in-multimodal-edge-intelligence)  
    标签：评分：9.0/10、query:evlm
-   evidence：多模态大语言模型的联合令牌-计算自适应
-5. [Training Continuous Chain of Thought Models: A Tale of Two Regimes](/202607/23/2607.16972v1-training-continuous-chain-of-thought-models-a-tale-of-two-regimes)  
+   evidence：综述多模态边缘智能中的压缩、MoE路由和量化交互优化
+5. [HyWorldVLA: A Vision-Language-Action Model with Hybrid World Modeling for Autonomous Driving](/202607/24/2607.20988v1-hyworldvla-a-vision-language-action-model-with-hybrid-world-modeling-for-autonomous-driving)  
+   标签：评分：9.0/10、query:evlm
+   evidence：高效VLA架构，混合世界建模用于自动驾驶
+6. [Progressive Cramming: Reliable Token Compression and What It Reveals](/202607/24/2607.21231v1-progressive-cramming-reliable-token-compression-and-what-it-reveals)  
+   标签：评分：9.0/10、query:evlm
+   evidence：基于渐进前缀增长的序列token压缩方法
+7. [PagedWeight: Efficient MoE LLM Serving with Dynamic Quality-Aware Weight Quantization](/202607/24/2607.16184v1-pagedweight-efficient-moe-llm-serving-with-dynamic-quality-aware-weight-quantization)  
    标签：评分：8.0/10、query:evlm
-   evidence：压缩连续思维链以提高效率
-6. [FM-VLA: Force-based Memory for Vision-Language-Action Models in Contact-Rich Manipulation](/202607/23/2607.18231v1-fm-vla-force-based-memory-for-vision-language-action-models-in-contact-rich-manipulation)  
+   evidence：针对MoE大语言模型的KV缓存压缩与权重量化方法
+8. [Half the Experts, All the Code: One-Shot Domain Pruning of Mixture-of-Experts LLMs for Coding](/202607/24/2607.16721v1-half-the-experts-all-the-code-one-shot-domain-pruning-of-mixture-of-experts-llms-for-coding)  
    标签：评分：8.0/10、query:evlm
-   evidence：基于力记忆的VLA接触丰富操作
-7. [Cognitive Dual-Process Planning for Autonomous Driving with Structured Scene Knowledge and Verifiable Reasoning-Action Consistency](/202607/23/2607.19194v2-cognitive-dual-process-planning-for-autonomous-driving-with-structured-scene-knowledge-and-verifiable-reasoning-action-consistency)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：使用VLM和结构化场景知识的自动驾驶规划
-8. [Defer to Plan: Adaptive Multi-Agent Fusion for End-to-End V2X Driving](/202607/23/2607.19774v1-defer-to-plan-adaptive-multi-agent-fusion-for-end-to-end-v2x-driving)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：端到端协同驾驶系统高效压缩空间特征为紧凑令牌用于规划
+   evidence：通过MoE LLM专家移除实现token剪枝
 
 ### 速读区论文标签
-1. [SeededGrasp: Language-Guided Grasping in Complex Scenes with Multiple Embodiments](/202607/23/2607.20207v1-seededgrasp-language-guided-grasping-in-complex-scenes-with-multiple-embodiments)  
+1. [Robostral Navigate](/202607/24/2607.20785v1-robostral-navigate)  
    标签：评分：8.0/10、query:evlm
-   evidence：语言引导抓取的VLM高效框架
-2. [Closing the Lab-to-Store Gap: A Data-Efficient Post-Training and Experience-Driven Learning VLA Framework for Retail Humanoids](/202607/23/2607.20345v1-closing-the-lab-to-store-gap-a-data-efficient-post-training-and-experience-driven-learning-vla-framework-for-retail-humanoids)  
+   evidence：使用单目RGB图像的高效视觉语言模型用于机器人导航
+2. [Adaptive Depth Sparse Framework: Similarity-Driven Resource Allocation for Pre-Trained LLMs](/202607/24/2607.21291v1-adaptive-depth-sparse-framework-similarity-driven-resource-allocation-for-pre-trained-llms)  
    标签：评分：8.0/10、query:evlm
-   evidence：面向零售人形机器人的数据高效VLA
-3. [BLUE: Semantics-Preserving Video Compression for Efficient Vision-Language Surveillance Analytics](/202607/23/2607.19515v1-blue-semantics-preserving-video-compression-for-efficient-vision-language-surveillance-analytics)  
+   evidence：利用相似性驱动的token保留进行LLM推理加速的深度稀疏框架
+3. [HPD-Parsing: Hierarchical Parallel Document Parsing](/202607/24/2607.18839v1-hpd-parsing-hierarchical-parallel-document-parsing)  
    标签：评分：7.0/10、query:evlm
-   evidence：语义保持视频压缩以减少VLM推理调用
-4. [Memory-Augmented Multimodal Large Language Models for Small Object Understanding in Streaming Aerial Videos](/202607/23/2607.19857v1-memory-augmented-multimodal-large-language-models-for-small-object-understanding-in-streaming-aerial-videos)  
+   evidence：面向高效VLM文档解析的层次化并行解码
+4. [RECO: Region-Aware Compensation for Extrinsic Perturbations in Roadside 3D Detection](/202607/24/2607.20947v1-reco-region-aware-compensation-for-extrinsic-perturbations-in-roadside-3d-detection)  
    标签：评分：7.0/10、query:mm-trf
-   evidence：将多模态大语言模型应用于流式航拍视频小目标理解，与交通场景理解相关
-5. [GaussianSeed: Hierarchical Gaussian Seeding for High-Resolution 3D Occupancy Prediction](/202607/23/2607.20071v1-gaussianseed-hierarchical-gaussian-seeding-for-high-resolution-3d-occupancy-prediction)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：分层高斯占用预测用于自动驾驶场景理解
-6. [PerceptDrive: Perception Prior World-Action Modeling with Adaptive Expert Routing for End-to-End Autonomous Driving](/202607/23/2607.20175v1-perceptdrive-perception-prior-world-action-modeling-with-adaptive-expert-routing-for-end-to-end-autonomous-driving)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：用于自动驾驶的感知先验世界-动作建模
-7. [Vision-Language-Motion Maps: An Open-Vocabulary, Uncertainty-Aware, Queryable Motion Attribute for 3D Scene Maps](/202607/23/2607.16173v1-vision-language-motion-maps-an-open-vocabulary-uncertainty-aware-queryable-motion-attribute-for-3d-scene-maps)  
+   evidence：路边3D检测用于交通场景理解
+5. [C-PTQ: Fisher-weighted Channel-wise Sensitivity for Post-training Quantization of MLLMs](/202607/24/2607.21076v1-c-ptq-fisher-weighted-channel-wise-sensitivity-for-post-training-quantization-of-mllms)  
+   标签：评分：7.0/10、query:evlm
+   evidence：针对多模态大语言模型的后训练量化方法，减少内存和计算成本，涉及效率优化
+6. [AC-VLA: Robust Out-of-Distribution Action Execution via Compositional Learning](/202607/24/2607.15714v1-ac-vla-robust-out-of-distribution-action-execution-via-compositional-learning)  
    标签：评分：6.0/10、query:evlm
-   evidence：提出VLMM，一种用于机器人的可语言查询的3D地图，包含运动属性
-8. [Kernelized Linear Attention: Breaking the Capacity Wall with Symmetric Cones](/202607/23/2607.17419v1-kernelized-linear-attention-breaking-the-capacity-wall-with-symmetric-cones)  
+   evidence：VLA模型架构与组合学习
+7. [ReferTrack: Referring Then Tracking for Embodied Visual Tracking](/202607/24/2607.20061v1-refertrack-referring-then-tracking-for-embodied-visual-tracking)  
    标签：评分：6.0/10、query:evlm
-   evidence：核化线性注意力实现高效推理
-9. [Attention from Above: A Multimodal Model for Drone-Based Object Localization](/202607/23/2607.17669v1-attention-from-above-a-multimodal-model-for-drone-based-object-localization)  
+   evidence：使用VLA的指代跟踪具身视觉追踪
+8. [Profiling Lightweight Large Language Models](/202607/24/2607.20806v1-profiling-lightweight-large-language-models)  
    标签：评分：6.0/10、query:evlm
-   evidence：基于注意力层的高效多模态目标检测
-10. [L1 Augmented Attention as an Improved Vector Similarity Metric](/202607/23/2607.18027v1-l1-augmented-attention-as-an-improved-vector-similarity-metric)  
-   标签：评分：6.0/10、query:evlm
-   evidence：改进了LLM注意力效率，可迁移至多模态模型
-11. [EGRNet: A Lightweight Semantic Segmentation Network with Edge-Gated Refinement and Adversarial Sensing](/202607/23/2607.19617v1-egrnet-a-lightweight-semantic-segmentation-network-with-edge-gated-refinement-and-adversarial-sensing)  
-   标签：评分：6.0/10、query:mm-trf
-   evidence：轻量级语义分割用于城市场景理解
+   evidence：轻量级LLM的效率分析框架
 
 
 <div class="dpr-home-promo-card">
