@@ -1,0 +1,238 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-25T21:22:26.967560+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 2,
+    "deep_cap": 8,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 13,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.19547v1",
+      "source": "arxiv",
+      "title": "ChronoStitch: Training-Free Composition of Visual KV Memories for Long-Horizon Temporal Reasoning",
+      "abstract": "Long-video question answering requires a model to preserve visual evidence over time without repeatedly reprocessing the same video. A practical approach is to store the vision-language model's internal key-value (KV) cache for each video chunk and retrieve that state at query time. However, independently cached video chunks do not compose correctly: every chunk is prefilled from local rotary position zero, so naive concatenation collides temporal phases and removes the global order required for questions about what happened first, how often events occurred, or what changed across the video. This paper presents ChronoStitch, a training-free method for composing independently stored visual KV memories. The method first re-bases stored post-rotary keys onto a global three-axis multimodal RoPE coordinate system that preserves time, height, and width structure. We show why a one-dimensional scalar re-indexing is geometrically inconsistent for visual tokens because it turns spatial order within a frame into false temporal displacement. We then address the residual content gap left by positional repair: later chunks were originally encoded without attending to earlier chunks. ChronoStitch therefore selectively recomputes a small fraction of high-deviation later-chunk visual tokens while allowing them to attend over the composed cache. On Qwen2.5-VL-3B and the temporal split of TempCompass, ChronoStitch outperforms naive composition and position-only variants, improving event-ordering accuracy while running 3.3x faster than full joint re-prefilling.",
+      "authors": [
+        "Santiram Tiwari",
+        "Nishant Sinha",
+        "Kunal Kislay"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.IV"
+      ],
+      "published": "2026-07-21T19:46:38+00:00",
+      "link": "https://arxiv.org/pdf/2607.19547v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression and management for long context",
+      "llm_evidence_cn": "KV缓存压缩与长期上下文管理",
+      "llm_evidence": "KV缓存压缩与长期上下文管理",
+      "canonical_evidence": "KV缓存压缩与长期上下文管理",
+      "llm_tldr_en": "Proposes a training-free method to compose visual KV memories for long-horizon temporal reasoning by re-basing positional encodings, enabling correct temporal ordering across video chunks.",
+      "llm_tldr_cn": "长视频问答需要模型随时间保留视觉证据，现有方法将视频分段存储KV缓存但无法正确组合，因为位置编码冲突导致时序混乱。本文提出ChronoStitch，一种无需训练的方法，通过重新设置位置编码来正确组合独立存储的视觉KV记忆，从而恢复全局时间顺序。实验表明该方法有效支持关于事件顺序和变化的问题，无需额外训练。该工作为长视频理解提供了一种高效的KV缓存管理方案，直接服务于长期上下文推理。",
+      "llm_tldr": "长视频问答需要模型随时间保留视觉证据，现有方法将视频分段存储KV缓存但无法正确组合，因为位置编码冲突导致时序混乱。本文提出ChronoStitch，一种无需训练的方法，通过重新设置位置编码来正确组合独立存储的视觉KV记忆，从而恢复全局时间顺序。实验表明该方法有效支持关于事件顺序和变化的问题，无需额外训练。该工作为长视频理解提供了一种高效的KV缓存管理方案，直接服务于长期上下文推理。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.15933v1",
+      "source": "arxiv",
+      "title": "Distributional Matching for Vector Quantization: A Unified Theoretical and Empirical Framework",
+      "abstract": "The effectiveness of modern visual representation learning and autoregressive models critically depends on vector quantization (VQ), which discretizes continuous feature representations using a learnable codebook. Despite its widespread use, existing VQ methods often suffer from training instability and codebook collapse, arising from gradient mismatch induced by the straight-through estimator and the under-utilization of code vectors. In this work, we show that both issues can be traced to a fundamental mismatch between the distributions of feature vectors and code vectors, leading to inefficient representation and information loss. Building on this observation, we propose a distributional matching framework for vector quantization. We introduce principled criteria for desirable VQ behavior and demonstrate through theoretical analysis and empirical evaluation that aligning feature and code vector distributions provides a unifying mechanism for mitigating training instability and codebook collapse. We instantiate this framework using a Wasserstein-based objective with an efficient closed-form under a mild Gaussian approximation, and further show that a nonparametric alternative based on maximum mean discrepancy yields comparable performance. Extensive experiments on visual tokenization benchmarks support the effectiveness and robustness of the proposed approach.",
+      "authors": [
+        "Xianghong Fang",
+        "Litao Guo",
+        "Hengchao Chen",
+        "Yuxuan Zhang",
+        "XiaofanXia",
+        "Dingjie Song",
+        "Yexin Liu",
+        "Hao Wang",
+        "Harry Yang",
+        "Qiang Sun",
+        "Yuan Yuan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T13:18:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.15933v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Framework for improving vector quantization, a key technique for token compression in LLMs and VLMs",
+      "llm_evidence_cn": "向量量化改进框架，是语言模型和视觉语言模型中令牌压缩的关键技术",
+      "llm_evidence": "向量量化改进框架，是语言模型和视觉语言模型中令牌压缩的关键技术",
+      "canonical_evidence": "向量量化改进框架，是语言模型和视觉语言模型中令牌压缩的关键技术",
+      "llm_tldr_en": "Proposes distributional matching for VQ to address codebook collapse and training instability, improving representation efficiency relevant to token compression.",
+      "llm_tldr_cn": "向量量化（VQ）广泛应用于视觉表征和自回归模型，但存在码本坍塌和训练不稳定问题。本文从分布匹配角度统一分析问题根源，提出了一种分布匹配框架来对齐特征向量和码本分布，从而减少信息损失并提升表示效率。理论分析和实验表明，该方法在图像重建和生成任务中取得了更稳定和紧凑的编码。该工作对令牌压缩技术具有基础性贡献，可应用于高效视觉语言模型。",
+      "llm_tldr": "向量量化（VQ）广泛应用于视觉表征和自回归模型，但存在码本坍塌和训练不稳定问题。本文从分布匹配角度统一分析问题根源，提出了一种分布匹配框架来对齐特征向量和码本分布，从而减少信息损失并提升表示效率。理论分析和实验表明，该方法在图像重建和生成任务中取得了更稳定和紧凑的编码。该工作对令牌压缩技术具有基础性贡献，可应用于高效视觉语言模型。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.21291v1",
+      "source": "arxiv",
+      "title": "Adaptive Depth Sparse Framework: Similarity-Driven Resource Allocation for Pre-Trained LLMs",
+      "abstract": "Large language models (LLMs) achieve strong generation and reasoning performance, but the Transformer architecture incurs high inference cost. Existing acceleration methods often rely on task-specific fine-tuning or training from scratch, increasing adaptation cost and limiting cross-task usability. We present an Adaptive Depth Sparse Framework (AdaDSF) that converts off-the-shelf pre-trained LLMs into depth-sparse models without full retraining. Our key insight is that layers contribute unequally to representation transformation, characterized by the cosine similarity between layer input and output hidden states. Based on this, AdaDSF assigns layer-wise token retention ratios from similarity statistics, uses a lightweight router to select informative tokens at each layer, and introduces a feature-preserving alignment objective to match intermediate and final representations between sparse and dense models. On GPT-NeoX and Qwen2.5 over language modeling and commonsense reasoning, AdaDSF substantially reduces inference FLOPs while preserving performance close to dense counterparts. Under comparable sparsity, AdaDSF consistently yields smaller accuracy degradation than strong baselines including MoD, D-LLM, and DLO.",
+      "authors": [
+        "Yidu Wu",
+        "Xiang Wang",
+        "Kejie Zhao",
+        "Zhangchi Wang",
+        "Qinghai Guo",
+        "Xiaoying Tang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-23T13:13:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.21291v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "adaptive depth sparsity for LLM inference cost reduction",
+      "llm_evidence_cn": "自适应深度稀疏降低大语言模型推理成本",
+      "llm_evidence": "自适应深度稀疏降低大语言模型推理成本",
+      "canonical_evidence": "自适应深度稀疏降低大语言模型推理成本",
+      "llm_tldr_en": "Proposes AdaDSF, a training-free framework that converts pre-trained LLMs into depth-sparse models by assigning token retention ratios based on layer similarity, reducing inference cost.",
+      "llm_tldr_cn": "大语言模型Transformer架构推理成本高，现有加速方法通常需要微调或从头训练。本文提出AdaDSF，无需完全重训练，利用层输入输出余弦相似度表征各层贡献不均匀性，据此分配层级别令牌保留比例，并通过轻量路由器动态决定每层跳过的令牌比例。在多种LLM上，AdaDSF减少了推理延迟，同时保持生成质量。该方法为预训练LLM的低成本部署提供了新途径。",
+      "llm_tldr": "大语言模型Transformer架构推理成本高，现有加速方法通常需要微调或从头训练。本文提出AdaDSF，无需完全重训练，利用层输入输出余弦相似度表征各层贡献不均匀性，据此分配层级别令牌保留比例，并通过轻量路由器动态决定每层跳过的令牌比例。在多种LLM上，AdaDSF减少了推理延迟，同时保持生成质量。该方法为预训练LLM的低成本部署提供了新途径。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.19077v1",
+      "source": "arxiv",
+      "title": "Context-structured Video Anomaly Detection with Large Vision-Language Models",
+      "abstract": "Training video anomaly detectors is challenging due to the difficulty and cost of annotating diverse and rare abnormal events. Although recent large vision-language models enable training-free inference, existing approaches mostly rely on holistic inference over sampled video and may miss context-specific anomaly cues. In this paper, we present CSI-VAD, a training-free video anomaly detector that identifies abnormal events across diverse contexts. The key idea is to decompose each video into three distinct contexts (environment, objects, time) and perform context-specific inference in separate branches. Because we ground anomaly judgments solely in context-specific visual cues, we do not require predefined text prompts describing abnormal events or dataset-specific tuning. Experiments on UCF-Crime and UBnormal show that CSI-VAD consistently improves over the direct holistic baseline and achieves competitive performance against existing methods, showing the advantage of structured context decomposition for training-free video anomaly detection.",
+      "authors": [
+        "Dongjun Kim",
+        "Changjae Oh",
+        "Andrea Cavallaro",
+        "Jeonghoon Mo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-21T13:08:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.19077v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLM for video anomaly detection decomposing context, applicable to traffic scenes",
+      "llm_evidence_cn": "使用VLM进行视频异常检测，分解上下文，适用于交通场景",
+      "llm_evidence": "使用VLM进行视频异常检测，分解上下文，适用于交通场景",
+      "canonical_evidence": "使用VLM进行视频异常检测，分解上下文，适用于交通场景",
+      "llm_tldr_en": "Proposes CSI-VAD, a training-free VLM-based video anomaly detector that decomposes videos into environmental, object, and temporal contexts for context-specific inference, enabling detection without predefined prompts.",
+      "llm_tldr_cn": "该论文针对视频异常检测标注困难的问题，提出CSI-VAD方法，将视频分解为环境、物体和时间三种上下文，利用大视觉语言模型进行无训练推理。在不同上下文中分别判断异常，无需预定义文本提示。在多个数据集上表现优异，展示了VLM在视频异常检测中的潜力，可应用于交通场景异常识别。",
+      "llm_tldr": "该论文针对视频异常检测标注困难的问题，提出CSI-VAD方法，将视频分解为环境、物体和时间三种上下文，利用大视觉语言模型进行无训练推理。在不同上下文中分别判断异常，无需预定义文本提示。在多个数据集上表现优异，展示了VLM在视频异常检测中的潜力，可应用于交通场景异常识别。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.20868v1",
+      "source": "arxiv",
+      "title": "ViSTR-Bench: Can MLLMs Reason from Continuous Visual Cues in Dynamic Scenes?",
+      "abstract": "Multimodal Large Language Models (MLLMs) have achieved remarkable success across diverse expert-level tasks, but they still struggle with fundamental abilities that humans naturally develop through continuous observation of the real world, such as spatial perception and dynamic reasoning. Recent studies have recognized this gap and introduced dedicated benchmarks to evaluate the spatial-temporal capabilities of MLLMs. However, existing benchmarks mostly focus on static scenes or require exact quantitative predictions, leaving intuitive reasoning from temporal cues largely underexplored. In this paper, we introduce the Visual Spatial-Temporal Reasoning Benchmark (ViSTR-Bench), a novel evaluation suite designed to systematically assess whether MLLMs can perform qualitative reasoning from continuous visual cues in dynamic scenes. Guided by the principles of temporal emphasis, reasoning orientation, and qualitative evaluation, ViSTR-Bench establishes a comprehensive four-dimensional evaluations covering Motion Perception, Spatial Relations, Outcome Prediction, and Physical Dynamics. The benchmark comprises 15 distinct subtasks and 1,340 high-quality video question-answer pairs spanning diverse tabletop, indoor, and outdoor scenarios. Extensive evaluations of a broad spectrum of state-of-the-art proprietary, open-source, and specialized spatial MLLMs reveal that, despite their strong general video understanding capabilities, current models still face substantial bottlenecks in complex spatial-temporal reasoning and remain far below human performance.",
+      "authors": [
+        "Han Li",
+        "Si Liu",
+        "Zehao Huang",
+        "Dongxin Lyu",
+        "Longfei Xu",
+        "Jiahui Fu",
+        "Daxin Tian",
+        "Yuliang Xiu",
+        "Naiyan Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T02:49:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.20868v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "MLLM reasoning in dynamic scenes related to traffic scene understanding",
+      "llm_evidence_cn": "多模态大模型在动态场景中的推理与交通场景理解相关",
+      "llm_evidence": "多模态大模型在动态场景中的推理与交通场景理解相关",
+      "canonical_evidence": "多模态大模型在动态场景中的推理与交通场景理解相关",
+      "llm_tldr_en": "Proposes ViSTR-Bench to evaluate MLLMs spatial-temporal reasoning in dynamic scenes, relevant to traffic scene understanding.",
+      "llm_tldr_cn": "论文提出ViSTR-Bench，一个用于评估多模态大模型在动态场景中进行空间-时间推理能力的基准。该基准专注于连续视觉线索的直观推理，补充了现有静态场景或定量预测的不足。实验表明当前MLLMs在动态场景中的推理能力仍有待提高。该工作为交通场景理解等领域提供了重要的评估工具。",
+      "llm_tldr": "论文提出ViSTR-Bench，一个用于评估多模态大模型在动态场景中进行空间-时间推理能力的基准。该基准专注于连续视觉线索的直观推理，补充了现有静态场景或定量预测的不足。实验表明当前MLLMs在动态场景中的推理能力仍有待提高。该工作为交通场景理解等领域提供了重要的评估工具。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
