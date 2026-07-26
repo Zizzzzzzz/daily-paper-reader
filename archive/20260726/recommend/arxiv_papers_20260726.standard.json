@@ -1,0 +1,188 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-26T19:51:02.982684+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 3,
+    "deep_cap": 8,
+    "deep_selected": 3,
+    "quick_candidates": 1,
+    "quick_skim_target": 13,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.17486v1",
+      "source": "arxiv",
+      "title": "SALT: Salience-Aware Lexical Trie for Long-Context Compression",
+      "abstract": "As large language models (LLMs) process increasingly longer prompts, computation and KV-cache memory costs have emerged as major bottlenecks in inference systems. Existing input-level prompt compression methods address this, but rank each sentence by a scalar relevance score, treating the document as an unstructured pool of words and sentences. Under tight budgets, this causes theme collapse, where the dominant theme(s) of a document consumes the budget, discarding less-frequent yet task-relevant themes. Preserving thematic coverage instead requires allocating the budget across recurring themes rather than scoring sentences in isolation. To this end, we propose SALT, a model-agnostic extractive framework that organizes per-sentence keywords into a trie ordered by sentence frequency (SF), a lightweight, reusable proxy for document thematic structure. This trie-based organization smooths memory allocation and prevents dominant themes from monopolizing the budget. Multi-anchor retrieval activates trie nodes labeled by query keywords at any depth, and the trie persists across dialogue turns, supporting multi-turn use without re-encoding the document. By preserving document themes, SALT reduces the prefill computation and memory cost of long-context prompts while remaining composable with KV-cache methods that target decoding-time latency and memory.",
+      "authors": [
+        "Oteo Mamo",
+        "Hyunjin Yi",
+        "Joydhriti Choudhury",
+        "Shangqian Gao",
+        "Weikuan Yu"
+      ],
+      "primary_category": "cs.PF",
+      "categories": [
+        "cs.PF",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-20T02:20:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.17486v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "long-context input compression preserving thematic coverage",
+      "llm_evidence_cn": "通过词汇树保持主题覆盖的长上下文输入压缩",
+      "llm_evidence": "通过词汇树保持主题覆盖的长上下文输入压缩",
+      "canonical_evidence": "通过词汇树保持主题覆盖的长上下文输入压缩",
+      "llm_tldr_en": "SALT proposes a salience-aware lexical trie for LLM prompt compression that avoids theme collapse by allocating budget across recurring themes, improving task-relevant information preservation under tight budgets.",
+      "llm_tldr_cn": "SALT提出了一种基于词汇树的长上下文压缩方法，通过跨重复主题分配预算来避免主题崩塌，在紧预算下更好地保留与任务相关的信息。实验表明该方法在多个压缩任务上优于现有方法，为LLM推理效率提升提供了新思路。",
+      "llm_tldr": "SALT提出了一种基于词汇树的长上下文压缩方法，通过跨重复主题分配预算来避免主题崩塌，在紧预算下更好地保留与任务相关的信息。实验表明该方法在多个压缩任务上优于现有方法，为LLM推理效率提升提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.20652v1",
+      "source": "arxiv",
+      "title": "Scaling Interpretable Transformers with Parity Bottleneck Layers",
+      "abstract": "Language models are thought to exhibit the phenomenon of superposition, representing many more features than dimensions in their residual streams. Sparse autoencoders (SAEs) are designed to recover such features post-hoc, but training models that are interpretable by construction has remained impractical, as a per-layer over-complete bottleneck is prohibitively expensive in both memory and compute. To overcome this issue, we introduce the ParityTransformer, a GPT-2-scale architecture whose intermediate representations are efficient and wide / sparse by design. At each layer, a Deep Parity Bottleneck (DPB) replaces a learned over-complete basis with a parameter-free algebraic dictionary, providing a deterministic incoherence guarantee and eliminating the memory requirements that have prevented per-layer interpretable bottlenecks at scale. A DPB is a hierarchically structured sparse bottleneck which efficiently enforces sparsity using a multi-level mixture-of-experts approach: a hardware-aware implementation that closes the cost gap between activation sparse and dense training to a manageable interpretability tax. Empirically, ParityTransformers perform at least as well as post-hoc SAEs on sparse probing tasks, while out-performing on measures of feature absorption, steering effectiveness, and fine-grained causal interventions. Because subsequent computation acts only on features that survive the sparse bottleneck, the ParityTransformer's features are native to the model's forwards pass by construction, addressing the question of whether SAEs probe features the model actually uses during computation. We see this as a step toward training models whose internal representations are interpretable by design rather than recovered post hoc.",
+      "authors": [
+        "Andrew Mack",
+        "Kraig Yuheng Tou",
+        "Mark Henry",
+        "Zhengxun Wu",
+        "Lauren Greenspan"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-07-22T18:25:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.20652v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Parity Bottleneck layers provide efficient sparse representations in transformers",
+      "llm_evidence_cn": "奇偶瓶颈层实现变换器的稀疏高效表示",
+      "llm_evidence": "奇偶瓶颈层实现变换器的稀疏高效表示",
+      "canonical_evidence": "奇偶瓶颈层实现变换器的稀疏高效表示",
+      "llm_tldr_en": "ParityTransformer introduces deep parity bottleneck layers that provide efficient, wide, and sparse representations, enabling interpretable transformers at GPT-2 scale.",
+      "llm_tldr_cn": "语言模型的超位置现象使得可解释性成为挑战，现有稀疏自编码器方法训练成本高。本文提出ParityTransformer，在每层使用无参数代数字典的深度奇偶瓶颈层，保证确定性不相关性并消除内存瓶颈。实验表明该架构在GPT-2规模上兼具效率和可解释性，推动了可解释AI的发展。",
+      "llm_tldr": "语言模型的超位置现象使得可解释性成为挑战，现有稀疏自编码器方法训练成本高。本文提出ParityTransformer，在每层使用无参数代数字典的深度奇偶瓶颈层，保证确定性不相关性并消除内存瓶颈。实验表明该架构在GPT-2规模上兼具效率和可解释性，推动了可解释AI的发展。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21291v1",
+      "source": "arxiv",
+      "title": "Adaptive Depth Sparse Framework: Similarity-Driven Resource Allocation for Pre-Trained LLMs",
+      "abstract": "Large language models (LLMs) achieve strong generation and reasoning performance, but the Transformer architecture incurs high inference cost. Existing acceleration methods often rely on task-specific fine-tuning or training from scratch, increasing adaptation cost and limiting cross-task usability. We present an Adaptive Depth Sparse Framework (AdaDSF) that converts off-the-shelf pre-trained LLMs into depth-sparse models without full retraining. Our key insight is that layers contribute unequally to representation transformation, characterized by the cosine similarity between layer input and output hidden states. Based on this, AdaDSF assigns layer-wise token retention ratios from similarity statistics, uses a lightweight router to select informative tokens at each layer, and introduces a feature-preserving alignment objective to match intermediate and final representations between sparse and dense models. On GPT-NeoX and Qwen2.5 over language modeling and commonsense reasoning, AdaDSF substantially reduces inference FLOPs while preserving performance close to dense counterparts. Under comparable sparsity, AdaDSF consistently yields smaller accuracy degradation than strong baselines including MoD, D-LLM, and DLO.",
+      "authors": [
+        "Yidu Wu",
+        "Xiang Wang",
+        "Kejie Zhao",
+        "Zhangchi Wang",
+        "Qinghai Guo",
+        "Xiaoying Tang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-07-23T13:13:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.21291v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "depth-sparse inference acceleration for LLMs via token retention allocation",
+      "llm_evidence_cn": "通过标记保留分配实现LLM深度稀疏推理加速",
+      "llm_evidence": "通过标记保留分配实现LLM深度稀疏推理加速",
+      "canonical_evidence": "通过标记保留分配实现LLM深度稀疏推理加速",
+      "llm_tldr_en": "AdaDSF converts pre-trained LLMs into depth-sparse models without retraining, allocating token retention ratios per layer based on similarity statistics.",
+      "llm_tldr_cn": "该论文提出自适应深度稀疏框架（AdaDSF），无需重新训练即可将预训练LLM转换为深度稀疏模型。通过层输入输出余弦相似度统计分配每层标记保留比例，并使用轻量路由器动态选择跳过层。实验证明在保持性能的同时显著降低推理成本。",
+      "llm_tldr": "该论文提出自适应深度稀疏框架（AdaDSF），无需重新训练即可将预训练LLM转换为深度稀疏模型。通过层输入输出余弦相似度统计分配每层标记保留比例，并使用轻量路由器动态选择跳过层。实验证明在保持性能的同时显著降低推理成本。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.19811v1",
+      "source": "arxiv",
+      "title": "Lean-SAM2: Target-Anchored Memory and Encoder Acceleration for SAM2",
+      "abstract": "The Segment Anything Model 2 (SAM2) has advanced temporal promptable segmentation, yet its deployment remains hindered by heavy memory cross-attention overhead and redundant full-frame visual feature extraction. While recent methods explore efficiency via heuristic memory pruning and window-based sparse routing, they typically suffer from catastrophic performance degradation in complex segmentation scenarios replete with occlusions and distractors. To resolve these limitations, we propose \\textbf{Lean-SAM2}, a holistic lightweight framework designed to address the above vulnerabilities while systematically eliminating computational redundancies. Specifically, Lean-SAM2 integrates three collaborative mechanisms: (1) Target-Anchored Memory Pruning (TAMP) safeguards target tokens against deceptive attention by modulating raw attention significance with semantic consistency against prompt-derived foreground anchors; (2) Temporal Condensation with Insurance Memory (TCIM) condenses historical context via a visibility-gated fusion while conditionally archiving high-confidence entries in a parallel insurance bank; and (3) Target-Anchored Risk-Aware Routing (TARR) selectively activates the heavy image encoder for target-related windows based on anchor similarity, utilizing a risk-aware fallback policy to trigger full-frame refreshes during volatile transitions. Extensive evaluations across multiple challenging benchmarks demonstrate that Lean-SAM2 establishes a superior balance between accuracy and efficiency. For example, on the LVOSv2 validation dataset, Lean-SAM2 achieves overall inference speedups of $1.412\\times$ and $1.417\\times$ on the SAM2.1-Large and SAM2.1-Base+, respectively, significantly outperforming Efficient-SAM2 while boosting the corresponding $\\mathcal{J}\\&\\mathcal{F}$ scores by $5.0\\%$ and $3.6\\%$. Code is available at https://github.com/DeawhaleQwQ/Lean-SAM2.",
+      "authors": [
+        "Xudong Ouyang",
+        "Wenlun Zhang",
+        "Yimin Xu",
+        "Huazhong Liu",
+        "Yunshan Zhong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-22T06:42:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.19811v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "target-anchored memory pruning and encoder acceleration for SAM2",
+      "llm_evidence_cn": "针对SAM2的锚定内存剪枝与编码器加速",
+      "llm_evidence": "针对SAM2的锚定内存剪枝与编码器加速",
+      "canonical_evidence": "针对SAM2的锚定内存剪枝与编码器加速",
+      "llm_tldr_en": "This paper proposes Lean-SAM2, a lightweight framework with Target-Anchored Memory Pruning and encoder acceleration, reducing computational cost while maintaining segmentation accuracy, especially in occluded scenes.",
+      "llm_tldr_cn": "该论文针对SAM2的高计算开销提出Lean-SAM2轻量化框架。通过目标锚定内存剪枝(TAMP)和编码器加速机制，有效减少冗余计算，同时保持复杂场景下的分割精度。实验表明，该方法在遮挡和干扰物较多的场景中性能优于现有启发式剪枝和稀疏路由方法，为实时分割应用提供了高效解决方案。",
+      "llm_tldr": "该论文针对SAM2的高计算开销提出Lean-SAM2轻量化框架。通过目标锚定内存剪枝(TAMP)和编码器加速机制，有效减少冗余计算，同时保持复杂场景下的分割精度。实验表明，该方法在遮挡和干扰物较多的场景中性能优于现有启发式剪枝和稀疏路由方法，为实时分割应用提供了高效解决方案。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
