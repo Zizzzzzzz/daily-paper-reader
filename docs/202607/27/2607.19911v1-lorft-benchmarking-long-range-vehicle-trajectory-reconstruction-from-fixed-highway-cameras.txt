@@ -1,0 +1,378 @@
+Title: LoRFT: Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras
+
+URL Source: https://arxiv.org/pdf/2607.19911v1
+
+Published Time: Thu, 23 Jul 2026 00:37:22 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# LoRFT: Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras 
+
+Yufan Zhu, Kefu Yi ∗
+
+, Xueju Zhang, Yunyang Tian, Long Chen, and Zixuan Xiao 
+
+School of Transportation, Changsha University of Science and Technology Changsha, China 
+
+Abstract 
+
+Long-range vehicle trajectories provide important spatio-temporal evidence for traffic safety analysis, autonomous driving evaluation, and data-driven traffic management, but obtaining such records continuously from fixed highway cameras remains difficult. As vehicles move into distant road regions, perspective compression and scale decay cause automatic tracklets to fragment or terminate prematurely, even when the same vehicle can still be verified from motion continuity across neighboring frames. We formulate this setting as a spatio-temporal data mining problem: recovering the distant continuation of a vehicle trajectory from its reliable near-field tracklet. To support this task, we introduce LoRFT, to our knowledge the first open benchmark dedicated to long-range vehicle trajectory reconstruction from fixed highway cameras. LoRFT pairs reliable near-field tracklets with context-verified far-range references, and contains 22 expressway surveillance scenes, 366,109 video frames, 6,601 manually verified trajectories, 2,694,889 bounding boxes, road-geometry annotations, scene-level splits, and evaluation scripts. We further propose Map-RSTNet, a map-aware residual Seq2Seq model that reconstructs distant trajectories by anchoring sequence modeling in a road-geometry-aligned state space and dynamically refreshing local road geometry during decoding. On LoRFT, Map-RSTNet reduces the strongest baseline errors by 11.0%, 15.4%, and 10.5% on ADE, FDE, and 5-second RMSE, respectively. These results indicate that road-geometry-aware reconstruction is a practical way to extend usable trajectory records from existing fixed-camera infrastructure. LoRFT further supports reproducible evaluation of trajectory mining, small-object detection, far-range vehicle tracking, and downstream traffic analysis. Processed trajectory annotations, road-geometry files, evaluation scripts, and source code are publicly available at https://github.com/YvfanZhu/LoRFT ; the original surveillance videos are available under controlled access. 
+
+Keywords: vehicle trajectory reconstruction; fixed-camera highway surveillance; spatio-temporal data mining; road-geometry-aware modeling; trajectory benchmark. 
+
+# 1 Introduction 
+
+Vehicle trajectory data provide essential spatio-temporal evidence for autonomous driving [1, 2], traffic safety analysis [3], and data-driven traffic management [4, 5]. Many of these applications depend on trajectory records with sufficient temporal span and spatial coverage to capture complete vehicle movements and the surrounding road context [6, 7]. In highway scenarios, long-span trajectory collection commonly relies on aerial or overhead platforms and fixed highway 
+
+> ∗
+
+Corresponding author: corfyi@csust.edu.cn 
+
+This work has been submitted to the IEEE for possible publication. Copyright may be transferred without notice, after which this version may no longer be accessible. 
+
+1arXiv:2607.19911v1 [cs.CV] 22 Jul 2026 Reliable near -range observation Degraded observation region 
+
+Short endurance 
+
+## (a) 
+
+> +240
+
+T T+60 T+120 T+180 T+240 
+
+(b) 
+
+(c) Observed tracklet Context -verified reference Figure 1: Motivation and task definition of LoRFT. (a) UAV sensing provides wide coverage but limited endurance; fixed cameras provide continuous monitoring but degraded far-range trajectory extraction. (b) Far-range vehicles cannot be reliably identified in a single frame, but their identities can be verified across neighboring frames. (c) LoRFT builds a reconstruction benchmark by pairing reliable near-field tracklets with context-verified far-range references from the same fixed-camera view. Colored regions are illustrative rather than fixed spatial thresholds. cameras [8 –11]. As shown in Fig. 1(a), UAV-based sensing provides broad spatial coverage but is constrained by endurance, whereas fixed highway cameras support continuous monitoring but suffer from degraded far-range trajectory extraction. Fig. 1(b) further shows the observation pattern targeted in this paper: distant vehicles may be difficult to identify from a single frame, but their identities can still be verified from motion continuity across neighboring frames. This motivates the LoRFT task in Fig. 1(c), which reconstructs the far-range continuation of the same vehicle from a reliable near-field tracklet within one fixed-camera view. The bottleneck in this setting is trajectory continuity rather than video acquisition. In fixed highway views, vehicles near the camera usually have sufficient image scale for detection and identity association, whereas distant vehicles are affected by perspective compression, scale decay, blurred appearance, and unstable association [12, 13]. The same vehicle may remain visually identifiable from temporal context, but its automatically extracted tracklet can become fragmented, prematurely terminated, or missing. The reconstruction problem begins at this loss of continuity: the near-field tracklet anchors the vehicle identity and motion history, while the far-range continuation must be recovered after automatic tracking becomes unreliable. This framing differs from detecting distant vehicles independently, because the target remains the 2continuation of a known trajectory within the same fixed-camera view. Highway trajectory datasets are abundant, but their annotations do not directly support the reconstruction problem described above. Overhead datasets such as highD and exiD provide accurate top-view motion records for traffic analysis and trajectory prediction [8,9]. Their sensing geometry, however, largely removes the distance-dependent scale decay, perspective compression, and identity fragmentation that appear in fixed surveillance videos. Fixed-camera datasets preserve the surveillance viewpoint, but they do not provide manual references for the far-range trajectory portions that automatically extracted tracklets fail to preserve. UA-DETRAC uses fixed traffic-camera videos but excludes low-resolution regions under its detection and tracking protocol [14]; CHD provides image-space highway trajectories, but these trajectories are mainly derived from detector-tracker outputs for prediction-oriented modeling [15]. As a result, these representative datasets do not supply a manually verified continuation after the automatically extracted tracklet has become fragmented or prematurely terminated, even when the vehicle can still be traced from neighboring frames. LoRFT manually annotates the far-range continuation that remains visible in the video after automatic tracking becomes unreliable. Starting from detector-tracker candidates, LoRFT retains the continuous and reliable segment of each selected vehicle as the observed input; when the automatic tracklet becomes fragmented or prematurely terminated in the distant road region, annotators follow the same vehicle across neighboring frames and verify its continuation as the reference segment. The resulting observed/reference pair is defined within one fixed-camera view: the model receives the trajectory portion that remains reliable after automatic extraction and verification, and is evaluated on the far-range continuation that remains visible in the video. LoRFT contains 22 expressway surveillance scenes from Sichuan Province, 366,109 video frames, and 6,601 manually verified vehicle trajectories, together with scene-level road-geometry annotations, predefined scene-level splits, and evaluation scripts. These annotations allow long-range reconstruction to be studied in the original fixed-camera image plane, under the perspective compression, scale decay, blurred far-range appearance, and association instability of routine highway monitoring. These observed/reference pairs make the task evaluable, but the reconstruction itself must still account for how perspective changes vehicle motion in the image plane. In a fixed highway view, the apparent displacement and scale of a vehicle change with depth, while its feasible continuation follows the local road direction and boundaries. We therefore propose Map-RSTNet, which represents fixed-camera trajectories in a road-aligned state space before reconstructing the distant segment. The network uses geometry-aware residual decoding and projects the reconstructed trajectory back to the image plane for evaluation. Experiments on LoRFT show that this road-aligned reconstruction design reduces long-horizon errors compared with adapted trajectory modeling baselines. The main contributions of this work are summarized as follows: 
+
+• We introduce LoRFT, to our knowledge the first open benchmark dedicated to long-range vehicle trajectory reconstruction from fixed highway cameras. LoRFT provides manually verified observed/reference trajectory pairs, vehicle bounding boxes, scene-level road-geometry annotations, predefined scene-level splits, evaluation scripts, and model code. 
+
+• We propose Map-RSTNet, a map-aware residual Seq2Seq reconstruction network for recovering distant trajectory continuations in fixed surveillance views. The method represents trajectories in a road-aligned state space and uses geometry-aware decoding to reduce perspective-induced ambiguity during long-range reconstruction. 3Table 1: Comparison with representative highway-trajectory and traffic-camera datasets. T: trajectory; BB: bounding box; “—” denotes not reported or not applicable.                                                 
+
+> Dataset View Coord. Scn. FPS Frames Ann. NGSIM [16] Fixed-high World/lane 210 11.2K TUA-DETRAC [14] Fixed-surv. Image 24 25 140K 2D BB highD [8] UAV-top Metric 625 —TexiD [9] UAV-top Metric 725 —TCHD [15] POV/high Image 85, 60 1.6M T+2D BB V2X-Seq [17] Infra.-V2X 3D/map 95 10 15K T+3D BB
+> LoRFT Fixed-surv. Image 22 25 366.1K T+2D BB
+
+# 2 Related Work 
+
+2.1 Vehicle Trajectory Datasets 
+
+Vehicle trajectory datasets differ mainly in sensing viewpoint and observation completeness. NGSIM remains a widely used source for microscopic freeway traffic analysis [16]. Drone and overhead-view datasets provide more stable geometric observations: highD and exiD cover highway and ramp scenarios [8, 9], while inD, rounD, openDD, and pNEUMA extend overhead trajectory collection to intersections, roundabouts, and urban traffic scenes [18 – 21]. These datasets have supported trajectory modeling under comparatively complete observation conditions, but their viewpoints reduce image-space degradation factors that are common in fixed highway surveillance videos, such as target-scale decay, perspective distortion, and long-range track fragmentation. Table 1 summarizes the differences between LoRFT and representative highway-trajectory or traffic-camera datasets. NGSIM provides calibrated freeway trajectories in lane or world coordinates, while highD and exiD provide accurate overhead trajectories for highway and ramp scenarios [8, 9, 16]. These datasets are useful for traffic analysis and trajectory prediction, but they do not retain the fixed-camera image-plane degradation targeted in LoRFT. Traffic-camera datasets are closer in sensing setup but differ in annotation purpose. UA-DETRAC provides vehicle bounding boxes and identities for detection and multi-object tracking, and its protocol excludes image regions where vehicles cannot be reliably annotated [14]. CHD provides image-space highway trajectories, but its trajectories are mainly generated from detector-tracker outputs for prediction-oriented modeling [15]. LoRFT instead provides manually verified observed/reference trajectory labels for the same vehicle within one fixed surveillance view, including distant portions that remain visually identifiable after automatic tracklets become fragmented or prematurely terminated. 
+
+2.2 Vehicle Trajectory Forecasting 
+
+Vehicle trajectory forecasting estimates future positions from observed motion histories. Early studies used kinematic models, maneuver recognition, probabilistic inference, hidden Markov models, or dynamic Bayesian networks to describe vehicle motion [22 – 24]. These methods are efficient and interpretable, but their simplified assumptions limit their ability to model nonlinear driving behavior and dense vehicle interactions. Recent surveys summarize this shift from model-driven prediction to learning-based trajectory forecasting [25]. Deep models such as CS-LSTM, DeepTrack, GRIP++, and SCALE-Net learn temporal dy-namics and vehicle interactions from trajectory histories [26 – 29]. Map-aware or physics-informed methods such as DenseTNT, LaneGCN, VectorNet, MixNet, and GNP further incorporate goal candidates, lane graphs, vectorized maps, or motion constraints [30 – 34]. ITPNet stud-ies prediction with limited observations by recovering missing historical information before forecasting [1]. 4Figure 2: Spatial distribution of selected LoRFT recording sites on expressways in Sichuan Province. These methods provide relevant trajectory modeling baselines, but their main task remains future prediction from usable observation histories. In LoRFT, the input is a reliable near-field tracklet from a fixed highway surveillance view, and the target is the missing distant segment of the same trajectory. The problem is therefore image-space long-range reconstruction of the same trajectory, rather than forecasting future motion from a complete and reliable observation history. 
+
+2.3 Trajectory Reconstruction Under Incomplete Observations 
+
+Trajectory imputation and reconstruction address incomplete observations more directly than standard forecasting. Xu et al. study trajectory imputation and prediction within a unified framework, showing that missing trajectory observations can be modeled as part of the learning problem [35]. I-24 MOTION provides an instrumented freeway system for continuous vehicle trajectory collection [7], and subsequent work on automatic trajectory reconstruction shows that converting imperfect visual detections into continuous trajectories is itself a substantive problem [36]. At a broader spatial scale, TrajRecovery recovers vehicle trajectories from urban traffic camera records by linking observations across a camera network [37]. Recent roadside perception work further reconstructs full-sample trajectories from low-quality sensing data by combining data-driven representation learning with kinematic constraints [38]. These studies are closely related to our motivation, but they do not cover the single-camera near-to-far setting studied in LoRFT. Trajectory imputation typically recovers missing samples within an otherwise observed sequence, dense freeway systems rely on extensive camera coverage, city-scale recovery uses network-level traffic-camera evidence, and full-sample roadside reconstruction often refines low-quality detected trajectories. LoRFT instead considers long-range reconstruction within a single fixed highway surveillance view. The input is a reliable near-field tracklet, and the target is the distant continuation of the same vehicle after automatic tracking becomes unreliable. Map-RSTNet addresses this setting by using road geometry as the main structural prior for reconstruction under partial observability. 
+
+# 3 LoRFT Dataset 
+
+3.1 Data Collection and Scene Characteristics 
+
+LoRFT is built for long-range vehicle trajectory reconstruction from fixed highway surveillance videos. The dataset was collected from 22 different sites on expressways in Sichuan Province, 5China, with videos recorded by roadside and gantry-mounted cameras. All videos are stored at 352 × 288 pixels and 25 FPS. As illustrated in Fig. 2, the collected sites cover representative fixed-camera highway scenes, including straight mainline segments, curved segments, and merge or diverge areas. These scenes vary in road layout, traffic direction, camera viewpoint, and visible road extent. Because trajectories are represented in image coordinates, these scene-level differences affect the apparent displacement, scale variation, far-range visual clarity, and tracking continuity of near-to-far vehicle motion. LoRFT focuses on the image-space degradation that occurs in fixed highway cameras. Vehicles near the camera usually have sufficient image scale for detection and tracking. As vehicles move into distant road regions, their apparent scale decreases, visual details become blurred, and identity association becomes less stable. Consequently, an automatically extracted tracklet may remain reliable near the camera but become fragmented or prematurely terminated while the vehicle is still visible in the same fixed-camera view. This observation motivates LoRFT’s reconstruction protocol: the input is a reliable partial tracklet, and the target is the visually identifiable distant continuation of the same vehicle in the original image coordinate system. 
+
+3.2 Trajectory and Road-Geometry Annotation 
+
+The final LoRFT annotation set contains 366,109 video frames, 6,601 manually verified vehicle trajectories, and 2,694,889 vehicle bounding boxes. Eight trained annotators labeled and verified the collected videos, and multiple rounds of cross-checking were conducted to improve annotation consistency and reduce labeling errors. LoRFT adopts a semi-automatic annotation pipeline: candidate vehicle bounding boxes and tracklets are first obtained using a YOLOv11 detector and the ByteTrack tracker [39]. The detector-tracker output provides initial vehicle locations and identities, and reveals common fixed-camera detection and tracking failures, including missed detections, fragmented associations, identity switches, and early track termination in distant road regions. These automatically generated tracklets are used as annotation candidates rather than final labels. The final vehicle trajectories are produced through frame-level manual verification. Annota-tors correct localization errors, association mistakes, false detections, and short occlusion-induced interruptions in the candidate tracklets. The observed segment denotes the portion where the detector-tracker output remains continuous and reliable after manual verification. In distant road regions, vehicles may be small or blurred in a single frame, but their identities can often be verified from their motion continuity across neighboring frames. If the same vehicle can still be confirmed after the automatic tracklet becomes unreliable or discontinuous, annotators extend or correct the long-range portion to form the image-space reconstruction reference. The split between the observed segment and the distant reference segment is therefore based on the reliability of the automatic tracklet, rather than on a fixed pixel threshold. Each annotation row stores the frame index, vehicle identity, bounding box, and an observed/distant-segment label. Rows with label = 0 denote the manually verified observed segment used as input in the reconstruction protocol, whereas rows with label = 1 denote the manually verified distant reference segment used for image-space reconstruction evaluation. These labels specify the input and reference portions of the same fixed-camera trajectory; they do not necessarily indicate chronological order in the original video. Depending on traffic direction and camera placement, the distant reference segment may appear later or earlier in video time. LoRFT records trajectories in image coordinates because routine highway surveillance videos often lack reliable scene-specific camera calibration. The benchmark therefore evaluates recon-struction directly in the original image plane, without assuming complete metric trajectories or scene-specific camera calibration. LoRFT also includes scene-level road-geometry annotations, referred to as scene maps in this paper. Each scene map contains road centerlines, left and right road boundaries, and zone-level 6Trajectory                                                       
+
+> preprocessing
+> Road geometry
+> query
+> Map -aware state
+> construction
+> Autoregressive
+> residual decoder
+> Geometry consistency
+> constraint
+> Near -range
+> observed tracklet
+> Road geometry
+> map
+> Bidirectional flow
+> alignment
+> Seq2Seq LSTM
+> encoder
+> Reconstructed
+> trajectories
+> Geometry -aware encoding Input observations Autoregressive reconstruction
+> Image -plane
+> tracklets
+> Map -aligned
+> geometry
+> Geometry -constrained
+> reconstruction ,,,,,
+> ,,,,
+> nnnu
+> ttttt
+> tylat LR
+> ttttt
+> uywhv
+> Svf
+> 
+> 
+> =
+> 
+> Dynamic geometry
+> refresh
+> (previous) (predicted)
+> ······
+> (previous) (predicted)
+> ···
+> Back -projection to
+> image plane
+> step -wise geometry update
+> time
+> reversal
+> lateral
+> mirroring lat lat ff→ − 1uu→−→ − left right ddlat lat ff→ − 1uu→−→ − left right dd
+
+Figure 3: Overall framework of Map-RSTNet. Near-field observed tracklets and scene-level road geometry are first encoded into a map-aware state representation. Bidirectional traffic flows are aligned into a unified motion space, and an autoregressive residual decoder reconstructs the missing segment while dynamically refreshing local road geometry. The reconstructed states are finally projected back to the image plane with geometry consistency constraints. traffic-direction metadata. The boundaries define the drivable region in the image plane, while the centerlines and zone metadata describe local road direction and traffic-flow structure. These annotations support road-aligned trajectory representation and geometry-aware reconstruction under fixed-camera surveillance views. LoRFT further provides predefined scene-level train/validation/test splits, evaluation scripts, and model code. The scene-level split prevents trajectories from the same fixed surveillance view from appearing in multiple subsets, reducing the risk of overfitting to scene-specific road geometry, camera viewpoint, and background appearance. The released package includes vehicle-trajectory files, road-geometry annotations, split definitions, evaluation scripts, and model code. 
+
+# 4 Method 
+
+This section presents Map-RSTNet, a map-aware residual Seq2Seq LSTM framework for long-range trajectory reconstruction in fixed highway surveillance scenes. As shown in Fig. 3, Map-RSTNet first converts image-space tracklets into a road-aligned state space using scene-level road geometry, then aligns bidirectional traffic into a shared motion space, and finally reconstructs the distant segment through autoregressive residual decoding with dynamic geometry refresh. 
+
+4.1 Problem Formulation 
+
+Given a fixed highway surveillance scene with a scene-level road prior M, Map-RSTNet recon-structs the distant segment of a vehicle trajectory from its reliable near-field observation. For frame t, let the detected vehicle box be 
+
+bt = ( xbt , y bt , w t, h t), (1) where ( xbt , y bt ) is the upper-left corner and ( wt, h t) is the box size. We use the bottom-center point as the image-space trajectory point: 
+
+pt = ( xbc t , y bc t ) = 
+
+
+
+xbt + wt
+
+2 , y bt + ht
+
+
+
+, (2) because it better approximates the vehicle-road contact location than the box center. The observed input is a near-field box sequence O1: To . Given O1: To and M, the model reconstructs Tp trajectory points of the same vehicle in image space. The reference segment is available during training and evaluation, but unavailable during inference. Since traffic direction and camera placement vary across scenes, Map-RSTNet normalizes each sample into an observed-to-distant reconstruction order and restores the reconstructed trajectory to the original image-space order for evaluation. 74.2 Map-Aware State Encoding 
+
+The road prior is represented as 
+
+M = {B , C, Z} , (3) where B, C, and Z denote annotated road boundaries, road centerlines, and zone-level traffic direction information, respectively. Before map matching, the bottom-center trajectory within each processed segment is smoothed with a constant-velocity Rauch–Tung–Striebel smoother to reduce frame-level localization jitter and obtain stable heading estimates. The preprocessing follows the reconstruction split: input states are constructed only from the observed segment, while the reference segment is processed separately and used only as supervision. For each smoothed point pt, candidate centerlines are selected by spatial proximity and traffic direction. The final centerline is chosen by consistency between the vehicle heading θcar t and the local road heading θroad t . The matched geometry provides the distances dLt and dRt from pt to the left and right road boundaries, with local road width 
+
+Wt = dLt + dRt . (4) Each frame is encoded as a 10-dimensional road-aware state vector: 
+
+st = [ ut, y nt , w nt , h nt , v ut , v yt , f lat t , δ t, ℓ Lt , ℓ Rt ]. (5) The position and scale terms are defined as 
+
+ut = dLt
+
+Wt
+
+, ynt = ybc t
+
+H , wnt = wt
+
+Wt
+
+, hnt = ht
+
+Wt
+
+, (6) where H is the image height. The velocity terms vut and vyt are finite differences of ( ut, y nt ) with a fixed scaling factor. The geometry terms are 
+
+f lat t = dLt − dRt
+
+Wt
+
+, ℓLt = dLt
+
+Wt
+
+,ℓRt = dRt
+
+Wt
+
+, δt = wrap( θcar t − θroad t ).
+
+(7) This representation reduces perspective-related ambiguity by describing vehicle position, scale, motion, and road geometry in a shared normalized state space. 
+
+4.3 Direction-Aligned Residual Decoder 
+
+Fixed highway surveillance scenes may contain traffic moving in opposite directions. Map-RSTNet converts opposite-direction trajectories to a common reference orientation before sequence modeling. For a trajectory moving opposite to the reference direction, the state sequence is reversed in time, the normalized lateral coordinate is mirrored, the left and right boundary-distance terms are swapped, and the signs of f lat t and δt are adjusted. Velocity terms are recomputed after this transformation, and the inverse transformation is applied before image-space evaluation. After direction alignment, Map-RSTNet uses a relative position representation. Let Pt =[ut, y nt ]T denote the normalized position. The last observed position is used as the anchor: ˜Pt = Pt − PTo . (8) This relative encoding reduces dependence on scene-specific absolute coordinates and makes the decoder focus on local motion increments. 8The encoder summarizes the observed road-aligned state sequence into hidden and cell states (h, c ), and the decoder autoregressively predicts residual displacements in the normalized position space: ∆ ˆPt = Dec( rt−1, h, c ), ˆ˜Pt = ˆ˜Pt−1 + ∆ ˆPt. (9) Before accumulation, each coordinate of ∆ ˆPt is hard-clamped to [ −δmax , δ max ] in the normalized road-aligned state space. This per-coordinate step limit reduces unstable autoregressive jumps while preserving the residual decoding form. The decoder input rt−1 contains the reconstructed position, box-size terms from the last observation, velocity feedback from the residual, and the current geometry terms. 
+
+4.4 Dynamic Geometry Refresh 
+
+A single geometry vector from the last observed frame can become inaccurate as the reconstructed vehicle moves into distant road regions. Map-RSTNet therefore refreshes local geometry during decoding. At each decoding step, the predicted relative position is restored to the normalized road-aligned coordinate system, ˆPt = ˆ˜Pt + PTo , (10) and then projected to an image-space query point using the latest valid boundary reference and road width. Let ¯xLt−1 and ¯Wt−1 denote the latest valid left-boundary reference and road width, and let ¯ut be the lateral coordinate after inverse mirroring when direction alignment has been applied. The query point is computed as 
+
+xqt = ¯ xLt−1 + ¯ ut ¯Wt−1, yqt = ˆ ynt H. (11) The query point is matched to the scene road prior to update the local road width, boundary distances, lateral offset, and heading difference. If the map query is invalid, the previous valid geometry is retained. This refresh mechanism keeps the autoregressive decoder conditioned on road geometry near the current reconstructed location rather than on outdated geometry from the observation endpoint. It is especially useful when road width, road heading, or perspective scale changes along the recovered trajectory. 
+
+4.5 Objective and Coordinate Recovery 
+
+Map-RSTNet is trained in the normalized road-aligned state space with a weighted objective: 
+
+L = λpos Lpos + λvel Lvel + λend Lend + λbdry Lbdry . (12) The position term uses mean squared error in the normalized road-aligned position space: 
+
+Lpos = 1
+
+TpTp
+
+X
+
+> k=1
+
+ˆPk − Pk 
+
+> 22
+
+. (13) The velocity term uses a smooth-L1 penalty between residual-derived velocity and target velocity features, and the endpoint term penalizes the final-frame reconstruction error. The boundary term penalizes lateral predictions outside the normalized road interval: 
+
+Lbdry = 1
+
+TpTp
+
+X
+
+> k=1
+
+max(0 , −ˆuk)2 + max(0 , ˆuk − 1) 2 . (14) The loss weights are selected on the validation set and kept fixed for all reported test experiments. 9Table 2: Performance comparison on the LoRFT benchmark. Errors are measured in pixels; lower values are better.                                                         
+
+> Model ADE FDE RMSE@1s RMSE@2s RMSE@3s RMSE@4s RMSE@5s CS-LSTM [26] 13.85 26.99 8.48 16.42 25.12 35.72 48.87 GRIP++ [28] 17.50 33.80 8.77 16.14 23.25 30.65 38.57 DeepTrack [27] 29.77 44.53 31.89 44.44 53.85 63.61 68.54 MixNet [33] 28.04 48.75 19.58 28.24 37.60 50.42 64.74 GNP [34] 20.50 36.36 18.61 21.57 24.75 35.15 64.12 PRF [40] 15.53 25.67 12.20 13.58 18.15 24.40 30.70 Map-RSTNet 12.32 21.71 8.15 13.30 17.97 22.32 27.47
+
+During inference, the anchor shift and direction-alignment transformation are inverted before coordinate recovery. Let xLk and Wk denote the left-boundary reference and refreshed road width used at step k. The reconstructed bottom-center point is recovered as ˆxbc k = xLk + ˆ ukWk, ˆybc k = ˆ ynk H. (15) The recovered points are concatenated with the observed tracklet in the original temporal order to form the reconstructed image-space trajectory. 
+
+# 5 Experiments 
+
+5.1 Experimental Setup 
+
+Map-RSTNet is evaluated on the proposed LoRFT benchmark. We use a scene-level split rather than a trajectory-level split. Specifically, the 22 fixed highway surveillance scenes are divided into 14 training scenes, 4 validation scenes, and 4 test scenes, approximately following a 60/20/20 ratio. This split is used because trajectories from the same surveillance view share similar road geometry, camera perspective, and background appearance. Separating scenes therefore provides a stricter test of generalization to unseen fixed-camera views. For each annotated trajectory, we construct an input segment and a reference segment according to the LoRFT reconstruction protocol. The final setting uses 60 observed frames as input and a 125-frame distant reference segment as the reconstruction target. During training, sliding windows with a step of 5 frames are generated from eligible trajectories. During evaluation, only rows annotated with label = 0 are provided as input, and the reconstructed segment is compared with rows annotated with label = 1. The validation set is used for model selection and hyperparameter tuning, and all reported results are computed on the held-out test scenes. Map-RSTNet is trained with Adam using a batch size of 128 and an initial learning rate of 7 × 10 −5. The loss weights are set to λpos = 1200, 
+
+λvel = 10, λend = 150, and λbdry = 40, with the velocity scaling factor αv = 10. Training is stopped according to validation performance. All experiments are conducted on an Ubuntu workstation with 64 GB RAM and two NVIDIA GeForce RTX 3090 GPUs. 
+
+5.2 Evaluation Metrics 
+
+Because LoRFT provides image-space vehicle trajectories from fixed surveillance videos without scene-level metric calibration, we use pixel-space errors as the primary evaluation metrics. After coordinate recovery, predictions are converted to the LoRFT image-coordinate format. Let ˆai,k 
+
+and ai,k denote the reconstructed and reference image-coordinate points of the i-th valid test trajectory at reconstruction step k, respectively. We define the point-wise reconstruction error as 
+
+ei,k = ∥ˆai,k − ai,k ∥2 . (16) 10 Here, N is the number of valid test trajectories and Tp is the reconstruction horizon. Average Displacement Error (ADE) measures the mean reconstruction error over the whole target segment: ADE = 1
+
+N T pNX
+
+> i=1
+> Tp
+
+X
+
+> k=1
+
+ei,k . (17) Final Displacement Error (FDE) measures the endpoint error of the reconstructed segment: FDE = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ei,T p . (18) We also report RMSE at fixed time horizons to evaluate error growth over the reconstruction period: RMSE@ τ =
+
+vuut 1
+
+NτNτX
+
+> i=1
+
+e2 
+
+> i,k τ
+
+, (19) where τ ∈ { 1, 2, 3, 4, 5} seconds, kτ = τ f , and f = 25 is the video frame rate. Nτ denotes the number of valid trajectories that reach the corresponding horizon. Lower values indicate better reconstruction accuracy. 
+
+5.3 Comparison with Representative Methods 
+
+We compare Map-RSTNet with adapted trajectory forecasting and trajectory modeling baselines under the same LoRFT reconstruction protocol. The compared methods do not use lane ID as an input feature, and trajectories from both traffic directions are included in the evaluation. CS-LSTM [26] is an encoder-decoder LSTM model with convolutional social pooling for interaction modeling. GRIP++ [28] uses graph-based spatio-temporal interaction modeling. DeepTrack [27] is a lightweight highway trajectory prediction model designed for real-time inference. MixNet [33] combines neural prediction with physics-based trajectory constraints. GNP [34] is a goal-based neural physics model that combines intention reasoning with neural motion generation. PRF [40] uses progressive retrospective learning to recover historical information for variable-length trajectory prediction. As shown in Table 2, Map-RSTNet achieves the lowest error on all metrics. Compared with the best baseline for each metric, Map-RSTNet reduces ADE from 13.85 to 12.32, FDE from 25.67 to 21.71, and RMSE@5s from 30.70 to 27.47. These correspond to relative reductions of 11.0%, 15.4%, and 10.5%, respectively. PRF narrows the gap at intermediate horizons, especially at 2s and 3s, but Map-RSTNet remains consistently better across the full reconstruction horizon. The larger gains at 4s and 5s suggest that road-aligned representation and dynamic geometry refresh help limit error accumulation during long-range reconstruction in fixed highway surveillance scenes. Fig. 4 provides a qualitative comparison with PRF, the strongest baseline in the long-horizon metrics. In this far-range example, the vehicle is small and blurred in individual frames, but the manually verified reference remains traceable from temporal context. Map-RSTNet stays closer to the reference across the sampled frames, whereas PRF shows larger drift as the vehicle moves through the distant road region. 
+
+5.4 Ablation Study and Analysis 
+
+We conduct a cumulative ablation study to examine three components of Map-RSTNet: map-aware state encoding, local offset encoding, and dynamic geometry refresh. The first row keeps the same residual Seq2Seq backbone without these three components. The following rows 11 (a) Map -RSTNet      
+
+> (b) PRF
+> Map -RSTNet reconstruction PRF reconstruction Manual reference
+
+Figure 4: Qualitative comparison between Map-RSTNet and PRF on a LoRFT test scene. The sampled frames show the same far-range vehicle during reconstruction. Orange and blue boxes with short traces denote the reconstructed results of Map-RSTNet and PRF, respectively, while green boxes denote the manually verified reference. Map-RSTNet remains closer to the reference as the vehicle moves through the degraded far-range region. Table 3: Ablation study on the LoRFT benchmark. Errors are measured in pixels; lower values are better. Mapping Offset Refresh ADE FDE RMSE@5s 15.46 28.04 32.92 
+
+✓ 14.20 26.59 31.78 
+
+✓ ✓ 13.97 25.45 30.26 
+
+✓ ✓ ✓ 12.32 21.71 27.47 
+
+progressively add the proposed designs under the same LoRFT reconstruction protocol. Table 3 reports the results. In Table 3, Map, Offset, and Refresh refer to map-aware state encoding, local offset encoding, and dynamic geometry refresh, respectively. The ablation is cumulative: starting from the residual Seq2Seq backbone, the three components are added step by step. All errors are measured in pixels, and lower values indicate better reconstruction accuracy. The first two rows evaluate the effect of introducing road geometry into the trajectory representation. After map-aware state encoding is added, ADE decreases from 15.46 to 14.20, FDE from 28.04 to 26.59, and RMSE@5s from 32.92 to 31.78. This improvement suggests that raw image coordinates alone are insufficient for fixed highway surveillance videos, where the same vehicle motion can correspond to different pixel displacements at different depths. Encoding trajectories with respect to local road geometry gives the model a more stable reconstruction space. The next comparison examines local offset encoding. Its effect on ADE is modest, but the endpoint and long-horizon errors are reduced more clearly, with FDE decreasing from 26.59 to 25.45 and RMSE@5s from 31.78 to 30.26. This trend matches the role of the relative position design: anchoring the sequence at the last observed state helps the decoder focus on local residual motion instead of fitting scene-specific absolute positions. The final row shows the contribution of dynamic geometry refresh. Refreshing the road-geometry features during decoding reduces ADE from 13.97 to 12.32, FDE from 25.45 to 21.71, and RMSE@5s from 30.26 to 27.47. The larger reductions in FDE and RMSE@5s indicate that this component mainly improves long-range stability. This is consistent with the reconstruction 12 50 60 75 90 100 125                  
+
+> 15
+> 20
+> 25
+> 30
+> 35
+> Trajectory error (pixels)
+> (a) Observation Horizon
+> 0.01 0.02 0.04 0.06 0.08 0.1
+> 12.5
+> 15.0
+> 17.5
+> 20.0
+> 22.5
+> 25.0
+> 27.5
+> 30.0
+> Trajectory error (pixels)
+> (b) Decoder Step Limit
+> 013510 15
+> 15
+> 20
+> 25
+> 30
+> Trajectory error (pixels)
+> (c) Dynamic Geometry Refresh
+> 010 20 30 40 60
+> 12.5
+> 15.0
+> 17.5
+> 20.0
+> 22.5
+> 25.0
+> 27.5
+> 30.0
+> Trajectory error (pixels)
+> (d) Boundary Loss Weight
+> RMSE@5s ADE FDE
+
+Figure 5: Impact of key hyperparameters on the LoRFT benchmark. (a) Observation horizon. (b) Decoder step limit. (c) Dynamic geometry refresh interval. (d) Boundary loss weight. Errors are measured in pixels; lower values are better. setting of LoRFT, where the predicted vehicle moves into distant road regions and a fixed geometry vector from the observation endpoint can become inaccurate. 
+
+5.5 Impact of Hyperparameters 
+
+We further analyze the sensitivity of Map-RSTNet to four hyperparameters: the observation horizon, the decoder step limit, the dynamic geometry refresh interval, and the boundary loss weight. The final configuration is selected according to validation performance and then kept fixed for the test evaluation. Fig. 5(a) shows the effect of the observation horizon. A short observation window provides limited motion context, making it difficult to infer the long-range continuation of a partially observed trajectory. Increasing the observation length initially improves reconstruction, but overly long histories do not bring further gains. In fixed highway surveillance videos, longer observations may include redundant temporal information and perspective-induced noise from the near-field tracklet. The best performance is obtained with a 60-frame observation window, which is used in the final model. Fig. 5(b) evaluates the decoder step limit. The decoder step limit denotes δmax , the per-coordinate hard-clamp threshold applied to each predicted residual in the normalized road-aligned state space. A small limit restricts the decoder and may prevent it from following valid motion changes, while a large limit weakens the regularization effect and can increase drift over long horizons. The model remains relatively stable over a moderate range of values, and the best validation performance is achieved when the step limit is set to 0.04. Fig. 5(c) examines the refresh interval used by dynamic geometry refresh. Disabling refresh gives the weakest performance, which indicates that the geometry at the last observed frame is insufficient for long-range reconstruction. Refreshing geometry more frequently allows the decoder to use road width, boundary distance, and heading information that better matches the current reconstructed location. The best result is obtained when geometry is refreshed at every decoding step, so the final model uses a refresh interval of one frame. Fig. 5(d) reports the effect of the boundary loss weight. The model is less sensitive to this parameter than to the observation horizon or geometry refresh interval, but removing or underweighting the boundary term weakens the road feasibility constraint. A very large weight can overemphasize boundary adherence and slightly interfere with motion reconstruction. The best overall validation performance is obtained with a boundary loss weight of 40, which is used in all reported experiments. 
+
+# 6 Application Scenarios 
+
+LoRFT is intended for fixed-camera highway settings where perception quality changes sub-stantially with distance. Beyond the reconstruction protocol studied in this paper, LoRFT can support evaluation and analysis of far-range vehicle detection and tracking in fixed highway views, 13 because it provides raw surveillance videos, frame-level boxes with identities, manually verified trajectories, and scene-level road geometry. These annotations make it possible to examine detection misses, identity switches, track fragmentation, and premature termination under the same surveillance views used for reconstruction. The road-boundary and centerline annotations further support perspective-aware trajectory representations, where local road geometry helps reduce ambiguity from scale decay and perspective distortion. Reconstructed trajectories can also serve as longer motion records for downstream traffic mining. In fixed highway surveillance, fragmented tracklets restrict analyses that depend on longer motion histories, such as trajectory prediction, lane-change and conflict analysis, active risk assessment, and data-driven traffic management. LoRFT provides a controlled setting for measuring how much trajectory continuity can be recovered before such downstream analyses are applied. These uses should be interpreted within the coordinate system of the dataset. LoRFT provides image-space trajectories and road-geometry annotations, but not scene-specific camera calibration parameters. Applications requiring metric speed, acceleration, or physical vehicle dynamics therefore need additional calibration or image-to-road mapping. 
+
+# 7 Conclusion 
+
+This paper studied long-range vehicle trajectory reconstruction from fixed highway surveillance videos, where reliable near-field tracklets often lose continuity in distant road regions. We introduced LoRFT, an open benchmark and evaluation protocol that provides manually verified observed/reference trajectory pairs, 6,601 vehicle trajectories from 366,109 video frames, 2,694,889 vehicle bounding boxes, and scene-level road-geometry annotations. We also proposed Map-RSTNet, a map-aware residual Seq2Seq model for road-aligned trajectory reconstruction. Experiments on the scene-level LoRFT protocol show that Map-RSTNet reduces long-horizon reconstruction errors compared with adapted forecasting and trajectory modeling baselines. The ablation results further indicate that road-aligned state encoding, local offset modeling, and dynamic geometry refresh help control error accumulation over longer reconstruction horizons. These results suggest that fixed highway cameras can provide longer usable trajectory records when far-range track fragmentation is treated as a reconstruction problem. 
+
+# Acknowledgment 
+
+This work was supported by the National Natural Science Foundation of China under Grant No. 52411540233 and the Graduate Research and Innovation Project of Changsha University of Science and Technology under Grant No. CLKYCX25007. 
+
+# Data and Code Availability 
+
+Processed trajectory annotations, road-geometry files, evaluation scripts, and source code are publicly available at https://github.com/YvfanZhu/LoRFT . The original surveillance videos are distributed separately under controlled access; access instructions and the data-use agreement are provided in the repository. 
+
+# References 
+
+[1] R. Li, C. Li, Y. Li, H. Li, Y. Chen, Y. Yuan, and G. Wang, “Itpnet: Towards instanta-neous trajectory prediction for autonomous driving,” in Proc. 30th ACM SIGKDD Conf. Knowledge Discovery and Data Mining (KDD) , 2024, pp. 1643–1654. 14 [2] K. Yang, Z. Guo, G. Lin, H. Dong, Z. Huang, Y. Wu, D. Zuo, J. Peng, Z. Zhong, X. Wang, Q. Guo, X. Jia, J. Yan, and D. Lin, “Trajectory-LLM: A language-based data generator for trajectory prediction in autonomous driving,” in Proc. International Conference on Learning Representations (ICLR) , 2025. [3] Q. Hou, Y. Yang, J. Liang, X. Huo, and J. Leng, “A deep transfer learning approach for real-time traffic conflict prediction with trajectory data,” Accident Analysis & Prevention ,vol. 214, 2025, art. no. 107966. [4] F. Wu, Z. Cheng, H. Chen, Z. Qiu, and L. Sun, “Traffic state estimation from vehicle trajectories with anisotropic gaussian processes,” Transportation Research Part C: Emerging Technologies , vol. 163, Jun. 2024, art. no. 104646. [5] X. Wang, Z. Jerome, Z. Wang, C. Zhang, S. Shen, V. V. Kumar, F. Bai, P. Krajewski, D. Deneau, A. Jawad, R. Jones, G. Piotrowicz, and H. X. Liu, “Traffic light optimization with low penetration rate vehicle trajectory data,” Nature Communications , vol. 15, no. 1, 2024, art. no. 1306. [6] D. Wen, Y. Zhu, Z. Wu, Z. Wu, Q. Zheng, S. Wang, Y. Wang, and Z. He, “HDSVT: High-density semantic vehicle trajectory dataset based on a cosmopolitan city bridge,” 
+
+Scientific Data , vol. 13, 2026, art. no. 5. [7] D. Gloudemans, Y. Wang, J. Ji, G. Zach´ ar, W. Barbour, E. Hall, M. Cebelak, L. Smith, and D. B. Work, “I-24 motion: An instrument for freeway traffic science,” Transportation Research Part C: Emerging Technologies , vol. 155, Oct. 2023, art. no. 104311. [8] R. Krajewski, J. Bock, L. Kloeker, and L. Eckstein, “The highd dataset: A drone dataset of naturalistic vehicle trajectories on german highways for validation of highly automated driving systems,” in Proc. IEEE 21st Int. Conf. Intelligent Transportation Systems (ITSC) ,2018, pp. 2118–2125. [9] T. Moers, L. Vater, R. Krajewski, J. Bock, A. Zlocki, and L. Eckstein, “The exid dataset: A real-world trajectory dataset of highly interactive highway scenarios in germany,” in Proc. IEEE Intelligent Vehicles Symposium (IV) , 2022, pp. 958–964. [10] S. Kuciemba and K. Swindler, “Transportation management center video recording and archiving best general practices,” Federal Highway Administration, Tech. Rep. FHWA-HOP-16-033, Mar. 2016. [11] Z. Zou, R. Zhang, S. Shen, G. Pandey, P. Chakravarty, A. Parchami, and H. X. Liu, “Real-time full-stack traffic scene perception for autonomous driving with roadside cameras,” in Proc. IEEE Int. Conf. Robotics and Automation (ICRA) , 2022, pp. 890–896. [12] N. K. Kanhere and S. T. Birchfield, “Real-time incremental segmentation and tracking of vehicles at low camera angles using stable features,” IEEE Transactions on Intelligent Transportation Systems , vol. 9, no. 1, pp. 148–160, Mar. 2008. [13] X. Ye, M. Shu, H. Li, Y. Shi, Y. Li, G. Wang, X. Tan, and E. Ding, “Rope3d: The roadside perception dataset for autonomous driving and monocular 3d object detection task,” in 
+
+Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR) , 2022, pp. 21 341–21 350. [14] L. Wen, D. Du, Z. Cai, Z. Lei, M.-C. Chang, H. Qi, J. Lim, M.-H. Yang, and S. Lyu, “Ua-detrac: A new benchmark and protocol for multi-object detection and tracking,” Computer Vision and Image Understanding , vol. 193, Apr. 2020, art. no. 102907. 15 [15] V. Katariya, G. Alinezhad Noghre, A. Danesh Pazho, and H. Tabkhi, “A pov-based highway vehicle trajectory dataset and prediction architecture,” IEEE Transactions on Intelligent Transportation Systems , vol. 25, no. 10, pp. 13 136–13 146, Oct. 2024. [16] V. Alexiadis, J. Halkias, G. McHale, J. Colyar, and R. Hranac, “The next generation simulation program,” ITE Journal , vol. 74, no. 8, pp. 22–26, 2004. [17] H. Yu, W. Yang, H. Ruan, Z. Yang, Y. Tang, X. Gao, X. Hao, Y. Shi, Y. Pan, N. Sun, J. Song, J. Yuan, P. Luo, and Z. Nie, “V2x-seq: A large-scale sequential dataset for vehicle-infrastructure cooperative perception and forecasting,” in Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR) , 2023, pp. 5486–5495. [18] J. Bock, R. Krajewski, T. Moers, S. Runde, L. Vater, and L. Eckstein, “The ind dataset: A drone dataset of naturalistic road user trajectories at german intersections,” in Proc. IEEE Intelligent Vehicles Symposium (IV) , 2020, pp. 1929–1934. [19] R. Krajewski, T. Moers, J. Bock, L. Vater, and L. Eckstein, “The round dataset: A drone dataset of road user trajectories at roundabouts in germany,” in Proc. IEEE 23rd Int. Conf. Intelligent Transportation Systems (ITSC) , 2020, pp. 1–6. [20] A. Breuer, J.-A. Termoehlen, S. Homoceanu, and T. Fingscheidt, “opendd: A large-scale roundabout drone dataset,” in Proc. IEEE 23rd Int. Conf. Intelligent Transportation Systems (ITSC) , 2020, pp. 1–6. [21] E. Barmpounakis and N. Geroliminis, “On the new era of urban traffic monitoring with massive drone data: The pneuma large-scale field experiment,” Transportation Research Part C: Emerging Technologies , vol. 111, pp. 50–71, Feb. 2020. [22] A. Houenou, P. Bonnifait, V. Cherfaoui, and W. Yao, “Vehicle trajectory prediction based on motion model and maneuver recognition,” in Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS) , 2013, pp. 4363–4369. [23] L. He, C. Zong, and C. Wang, “Driving intention recognition and behaviour prediction based on a double-layer hidden markov model,” Journal of Zhejiang University-SCIENCE C, vol. 13, no. 3, pp. 208–217, Mar. 2012. [24] M. Schreier, V. Willert, and J. Adamy, “An integrated approach to maneuver-based trajectory prediction and criticality assessment in arbitrary road environments,” IEEE Transactions on Intelligent Transportation Systems , vol. 17, no. 10, pp. 2751–2766, Oct. 2016. [25] V. Bharilya and N. Kumar, “Machine learning for autonomous vehicle’s trajectory pre-diction: A comprehensive survey, challenges, and future research directions,” Vehicular Communications , vol. 46, Apr. 2024, art. no. 100733. [26] N. Deo and M. M. Trivedi, “Convolutional social pooling for vehicle trajectory prediction,” in Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition Workshops (CVPRW) ,2018, pp. 1468–1476. [27] V. Katariya, M. Baharani, N. Morris, O. Shoghli, and H. Tabkhi, “Deeptrack: Lightweight deep learning for vehicle trajectory prediction in highways,” IEEE Transactions on Intelligent Transportation Systems , vol. 23, no. 10, pp. 18 927–18 936, Oct. 2022. [28] X. Li, X. Ying, and M. C. Chuah, “Grip++: Enhanced graph-based interaction-aware trajectory prediction for autonomous driving,” arXiv preprint arXiv:1907.07792, 2020. 16 [29] H. Jeon, J. Choi, and D. Kum, “Scale-net: Scalable vehicle trajectory prediction network under random number of interacting vehicles via edge-enhanced graph convolutional neural network,” in Proc. IEEE/RSJ Int. Conf. Intelligent Robots and Systems (IROS) , 2020, pp. 2095–2102. [30] J. Gu, C. Sun, and H. Zhao, “Densetnt: End-to-end trajectory prediction from dense goal sets,” in Proc. IEEE/CVF Int. Conf. Computer Vision (ICCV) , 2021, pp. 15 283–15 292. [31] M. Liang, B. Yang, R. Hu, Y. Chen, R. Liao, S. Feng, and R. Urtasun, “Learning lane graph representations for motion forecasting,” in Computer Vision – ECCV 2020 , ser. Lecture Notes in Computer Science. Cham, Switzerland: Springer, 2020, vol. 12347, pp. 541–556. [32] J. Gao, C. Sun, H. Zhao, Y. Shen, D. Anguelov, C. Li, and C. Schmid, “Vectornet: Encoding hd maps and agent dynamics from vectorized representation,” in Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR) , 2020, pp. 11 525–11 533. [33] P. Karle, F. Toeroek, M. Geisslinger, and M. Lienkamp, “Mixnet: Physics constrained deep neural motion prediction for autonomous racing,” IEEE Access , vol. 11, pp. 85 914–85 926, 2023. [34] R. Gan, H. Shi, P. Li, K. Wu, B. An, J. You, L. Li, J. Ma, C. Ma, and B. Ran, “Goal-based neural physics vehicle trajectory prediction model,” Transportation Research Part C: Emerging Technologies , vol. 179, Oct. 2025, art. no. 105283. [35] Y. Xu, A. Bazarjani, H. Chi, C. Choi, and Y. Fu, “Uncovering the missing pattern: Unified framework towards trajectory imputation and prediction,” in Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR) , 2023, pp. 9632–9643. [36] Y. Wang, D. Gloudemans, J. Ji, Z. N. Teoh, L. Liu, G. Zach´ ar, W. Barbour, and D. Work, “Automatic vehicle trajectory data reconstruction at scale,” Transportation Research Part C: Emerging Technologies , vol. 160, Mar. 2024, art. no. 104520. [37] D. Wu, Z. Fang, Q. Sun, L. Chen, H. Hu, F. Wang, and Y. Gao, “Trajrecovery: An efficient vehicle trajectory recovery framework based on urban-scale traffic camera records,” in 
+
+Proc. 30th ACM SIGKDD Conf. Knowledge Discovery and Data Mining (KDD) , 2024, pp. 5979–5990. [38] Z. Zeng, C. Zhao, S. Wang, Y. Ji, C. Wang, and Y. Du, “A data-driven and kinematics-aware approach to reconstruct full-sample vehicle trajectories from low-quality roadside perception data,” IEEE Transactions on Intelligent Transportation Systems , vol. 26, no. 10, pp. 15 041–15 054, Oct. 2025. [39] Y. Zhang, P. Sun, Y. Jiang, D. Yu, Z. Yuan, P. Luo, W. Liu, and X. Wang, “Bytetrack: Multi-object tracking by associating every detection box,” in Computer Vision – ECCV 2022 , ser. Lecture Notes in Computer Science. Cham, Switzerland: Springer, 2022, vol. 13682, pp. 1–21. [40] H. Zhou, L. Qi, X. Li, J. Zhang, Y. Liu, X. Yang, M. Fan, and F. Luo, “Recover to Predict: Progressive retrospective learning for variable-length trajectory prediction,” in 
+
+Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recogn. (CVPR) , Jun. 2026, pp. 17 863– 17 873. 17

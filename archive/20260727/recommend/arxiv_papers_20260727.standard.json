@@ -1,0 +1,424 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T21:32:10.263325+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 8,
+    "deep_cap": 8,
+    "deep_selected": 8,
+    "quick_candidates": 2,
+    "quick_skim_target": 13,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.18141v1",
+      "source": "arxiv",
+      "title": "HyMCache: A KV Cache Framework for Multi-Turn LLM Serving with CXL-Hybrid Memory",
+      "abstract": "Long-context, multi-turn, and agentic LLM workloads increasingly reuse previously processed context, making KV-cache reuse essential for reducing redundant computation. However, this reuse shifts the bottleneck to the memory tier that stores and serves reusable KV states at cluster scale. GPU HBM and host DRAM are too costly to scale to TB-scale shared context capacity, motivating remote tiers built from lower-cost, higher-capacity media. This paper presents HyMCache, a KV-cache framework that integrates CXL-hybrid memory (CXL-HM) for multi-turn LLM serving. CXL-HM combines a small amount of in-device DRAM with large SSD-backed capacity behind a CXL interface. By exploiting the read-dominant, predictable, and append-only nature of multi-turn KV-cache access, HyMCache rethinks DRAM management within CXL-HM to efficiently support TB-scale SSD-backed KV reuse. It uses request-level prefix prefetching and opportunistic write buffering to stage latency-critical reads in device DRAM, enabling DRAM-scale KV-cache efficiency at SSD-level cost. We evaluate HyMCache on a real CXL-HM prototype under both single-aggregator and PD-disaggregated serving configurations. Under the same DRAM budget, HyMCache outperforms local LMCache by 3.0x in single-node serving and 1.45x in PD-disaggregated serving. Compared with 1 TB distributed-DRAM Mooncake, HyMCache incurs about 30% lower performance but uses 16x less DRAM.",
+      "authors": [
+        "Hakbeom Jang",
+        "Inho Song",
+        "Sam H. Noh",
+        "Jongryool Kim"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-07-20T16:35:47+00:00",
+      "link": "https://arxiv.org/pdf/2607.18141v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression and management for long-context LLM serving",
+      "llm_evidence_cn": "长上下文LLM服务中的KV缓存压缩与管理",
+      "llm_evidence": "长上下文LLM服务中的KV缓存压缩与管理",
+      "canonical_evidence": "长上下文LLM服务中的KV缓存压缩与管理",
+      "llm_tldr_en": "HyMCache integrates CXL-hybrid memory to store KV cache for multi-turn LLM serving, achieving TB-scale capacity with low cost by exploiting read-dominant and append-only access patterns.",
+      "llm_tldr_cn": "针对长上下文多轮LLM服务中KV缓存容量瓶颈，本文提出HyMCache框架。它利用CXL混合内存（小量DRAM+大容量SSD）存储KV缓存，通过利用多轮工作负载读密集、可预测和仅追加的特性，实现TB级共享缓存，显著降低成本。",
+      "llm_tldr": "针对长上下文多轮LLM服务中KV缓存容量瓶颈，本文提出HyMCache框架。它利用CXL混合内存（小量DRAM+大容量SSD）存储KV缓存，通过利用多轮工作负载读密集、可预测和仅追加的特性，实现TB级共享缓存，显著降低成本。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22155v1",
+      "source": "arxiv",
+      "title": "Neuromorphic Non-Orthogonal Multiple Access for Parallel Remote Inference via Vector Symbolic Architecture",
+      "abstract": "Emerging edge intelligence systems increasingly rely on dense deployments of always-on sensors that must convey task-relevant information to a remote model under tight energy and spectral budgets. The deployment of event-driven neuromorphic sensing paired with spiking neural networks (SNNs) is attractive in this regime because it produces dynamically sparse representations, so that energy is spent on communication and computation only when informative events occur. Prior multiple-access protocols for remote inference using neuromorphic sensing and computing targeted collaborative settings, in which the server fuses information from all devices into a single decision. This paper instead addresses parallel remote inference, in which each device observes a distinct input, and requires its own classification decision. We propose NOMA-NC, a non-orthogonal multiple-access (NOMA) neuromorphic communication (NC) protocol built on the vector symbolic architecture (VSA) framework. In NOMA-NC, each device binds its sparse spike feature map with a device-specific permutation key, and all devices in a group transmit concurrently so that the over-the-air superposition directly realizes the VSA bundling operation. A shared decoding SNN, together with lightweight per-device learned unbinding, recovers all decisions in a single inference pass. Experiments on the N-MNIST and DVS128 Gesture datasets show that NOMA-NC yields goodput gains and savings in terms of receiver computing energy that are sub-proportional to the number of simultaneously active devices, without increasing the per-device transmission energy.",
+      "authors": [
+        "Jiechen Chen",
+        "Zihang Song",
+        "Dengyu Wu",
+        "Bipin Rajendran",
+        "Osvaldo Simeone"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP"
+      ],
+      "published": "2026-07-24T10:00:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.22155v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "neuromorphic sensing and event-driven processing for remote inference",
+      "llm_evidence_cn": "神经形态感知和事件驱动处理用于远程推理",
+      "llm_evidence": "神经形态感知和事件驱动处理用于远程推理",
+      "canonical_evidence": "神经形态感知和事件驱动处理用于远程推理",
+      "llm_tldr_en": "Proposes a neuromorphic multiple access protocol using event-driven sensors and SNNs for parallel remote inference, improving spectral efficiency.",
+      "llm_tldr_cn": "边缘智能系统中，事件驱动的神经形态感知与脉冲神经网络结合可产生稀疏表示，但现有协议仅支持协作推理。本文提出一种基于向量符号架构的非正交多址接入方法，支持并行远程推理，即在服务器端同时处理多个独立任务。理论分析和仿真表明，该方法在能量和频谱受限条件下显著提升了吞吐量。该工作拓展了神经形态传感在多设备并行推理中的应用。",
+      "llm_tldr": "边缘智能系统中，事件驱动的神经形态感知与脉冲神经网络结合可产生稀疏表示，但现有协议仅支持协作推理。本文提出一种基于向量符号架构的非正交多址接入方法，支持并行远程推理，即在服务器端同时处理多个独立任务。理论分析和仿真表明，该方法在能量和频谱受限条件下显著提升了吞吐量。该工作拓展了神经形态传感在多设备并行推理中的应用。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "neuromorphic vision sensor",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22389v1",
+      "source": "arxiv",
+      "title": "HiKV: Hierarchical Importance-Aware KV Cache with Hardware Acceleration for LLM Decoding",
+      "abstract": "With the rapid adoption of long-context large language models (LLMs), the continuously growing KV cache during decoding has become the critical memory bottleneck. To tackle this challenge, we propose HiKV, a novel algorithm-hardware co-design that exploits KV cache redundancy through hierarchical importance awareness. Algorithmically, HiKV compresses the KV cache at two granularities: Stage I evicts unimportant tokens within a fixed budget, and Stage II further loads only the significant elements of each retained token, reaching compression ratios unattainable at a single granularity. Architecturally, we develop a dedicated accelerator centered on a reconfigurable importance sorter that switches between the distinct sorting datapaths each stage requires, unifying the two-stage acceleration in one circuit with minimal overhead. Evaluated on representative LLMs, HiKV achieves up to 7.95x speedup and 90% energy reduction in the attention computation over the vanilla KV cache baseline within negligible 1% accuracy loss. Under iso-accuracy constraints, HiKV outperforms state-of-the-art importance-based methods by achieving an additional 1.82~4.87x reduction in external memory accesses. These benefits are enabled by specialized hardware components that add only 8% to the system area.",
+      "authors": [
+        "Chao Fang",
+        "Jun Yin",
+        "Man Shi",
+        "Marian Verhelst"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-24T15:15:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.22389v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression technique for LLMs",
+      "llm_evidence_cn": "KV缓存压缩技术，直接应对长上下文大模型的显存瓶颈",
+      "llm_evidence": "KV缓存压缩技术，直接应对长上下文大模型的显存瓶颈",
+      "canonical_evidence": "KV缓存压缩技术，直接应对长上下文大模型的显存瓶颈",
+      "llm_tldr_en": "HiKV is a hierarchical importance-aware KV cache compression method with a dedicated accelerator, achieving higher compression ratios by first evicting unimportant tokens then loading only significant elements.",
+      "llm_tldr_cn": "长上下文大模型解码时KV缓存持续增长，成为关键显存瓶颈。本文提出HiKV，一种算法-硬件协同设计，通过层次化重要性感知利用缓存冗余。算法上，第一阶段在固定预算内驱逐不重要token，第二阶段对保留token仅加载显著元素，达到单一粒度无法实现的压缩比。架构上设计可重构重要性排序器，支持两种排序数据路径。实验表明HiKV在保持生成质量的同时大幅降低显存使用。",
+      "llm_tldr": "长上下文大模型解码时KV缓存持续增长，成为关键显存瓶颈。本文提出HiKV，一种算法-硬件协同设计，通过层次化重要性感知利用缓存冗余。算法上，第一阶段在固定预算内驱逐不重要token，第二阶段对保留token仅加载显著元素，达到单一粒度无法实现的压缩比。架构上设计可重构重要性排序器，支持两种排序数据路径。实验表明HiKV在保持生成质量的同时大幅降低显存使用。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22200v1",
+      "source": "arxiv",
+      "title": "LayoutLite: Token-Level Implicit Layout Analysis for Efficient Document OCR",
+      "abstract": "End-to-end OCR systems based on vision-language models have achieved strong performance in complex document OCR, but their efficiency is limited by the large number of visual tokens produced from document images. Many of these tokens correspond to blank margins or visually redundant regions, yet directly applying generic visual token compression methods may remove OCR-critical fine-grained details. In this paper, we propose LayoutLite, a lightweight plug-and-play module for efficient document OCR. Instead of relying on explicit document layout detection, LayoutLite performs implicit layout analysis at the token level between the vision encoder and the language decoder. It aggregates multi-layer visual representations from the vision encoder, and predicts an importance score for each visual token with a lightweight scoring network. Low-information tokens are then removed before entering the language decoder while preserving the original spatial positional information of retained tokens. To train LayoutLite without human annotations, we cast token selection as a reinforcement learning problem and optimize it with a group-relative policy optimization objective driven by OCR output consistency, together with an auxiliary layout supervision signal to stabilize training. Experiments on OmniDocBench demonstrate that LayoutLite can substantially reduce visual token length and inference cost with negligible degradation in recognition quality. We further evaluate LayoutLite on two OCR-specialized VLMs, FireRed-OCR and Logics-Parsing-V2. Under up to 50% token compression, LayoutLite preserves almost the same score on both models while reducing prefill latency, FLOPs, and KV cache memory by over 40%, with only a small additional inference overhead. These results show that token-level implicit layout analysis is an effective and practical approach for accelerating VLM-based OCR systems.",
+      "authors": [
+        "Xudong Liu",
+        "Bicheng Wan",
+        "Yulin Jin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-24T11:13:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.22200v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "token-level compression for vision-language models in document OCR",
+      "llm_evidence_cn": "文档OCR中视觉语言模型的token级压缩",
+      "llm_evidence": "文档OCR中视觉语言模型的token级压缩",
+      "canonical_evidence": "文档OCR中视觉语言模型的token级压缩",
+      "llm_tldr_en": "LayoutLite is a plug-and-play module that performs implicit layout analysis at token level to reduce visual tokens from document images, improving efficiency of vision-language OCR models without sacrificing fine-grained details.",
+      "llm_tldr_cn": "针对端到端OCR系统中视觉token过多导致效率低下的问题，本文提出LayoutLite轻量级模块。它通过在视觉编码器和语言解码器之间进行隐式布局分析，聚合多层视觉表示来压缩冗余token，同时保留OCR关键细节。实验表明该方法能有效提升效率而不损失精度。",
+      "llm_tldr": "针对端到端OCR系统中视觉token过多导致效率低下的问题，本文提出LayoutLite轻量级模块。它通过在视觉编码器和语言解码器之间进行隐式布局分析，聚合多层视觉表示来压缩冗余token，同时保留OCR关键细节。实验表明该方法能有效提升效率而不损失精度。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.19911v1",
+      "source": "arxiv",
+      "title": "LoRFT: Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras",
+      "abstract": "Long-range vehicle trajectories provide important spatio-temporal evidence for traffic safety analysis, autonomous driving evaluation, and data-driven traffic management, yet continuously recovering them from fixed highway cameras remains difficult. As vehicles recede into distant road regions, perspective compression and scale decay often fragment or prematurely terminate automatic tracklets, even when their continuation remains identifiable from motion consistency across neighboring frames. We formulate this problem as recovering the far-range continuation of a vehicle trajectory from a reliable near-field tracklet. We introduce LoRFT, to our knowledge the first open benchmark dedicated to long-range vehicle trajectory reconstruction from fixed highway cameras. LoRFT comprises 22 expressway surveillance scenes, 366,109 video frames, 6,601 manually verified trajectories, 2,694,889 bounding boxes, road-geometry annotations, scene-level splits, and evaluation scripts. We further propose Map-RSTNet, a map-aware residual sequence-to-sequence model that reconstructs distant trajectories in a road-geometry-aligned state space and dynamically refreshes local road geometry during decoding. On LoRFT, Map-RSTNet reduces ADE, FDE, and 5-second RMSE by 11.0%, 15.4%, and 10.5%, respectively, relative to the strongest baseline. These results demonstrate that road-geometry-aware reconstruction can extend usable trajectory records from existing fixed-camera infrastructure. LoRFT provides a reproducible testbed for long-range vehicle trajectory reconstruction.",
+      "authors": [
+        "Yufan Zhu",
+        "Kefu Yi",
+        "Xueju Zhang",
+        "Yunyang Tian",
+        "Long Chen",
+        "Zixuan Xiao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-22T08:42:58+00:00",
+      "link": "https://arxiv.org/pdf/2607.19911v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "vehicle trajectory reconstruction from highway cameras for traffic scene understanding",
+      "llm_evidence_cn": "基于公路摄像头进行车辆轨迹重建以支持交通场景理解",
+      "llm_evidence": "基于公路摄像头进行车辆轨迹重建以支持交通场景理解",
+      "canonical_evidence": "基于公路摄像头进行车辆轨迹重建以支持交通场景理解",
+      "llm_tldr_en": "LoRFT benchmark addresses long-range vehicle trajectory reconstruction from fixed highway cameras, providing spatio-temporal evidence for traffic safety analysis, autonomous driving, and traffic management.",
+      "llm_tldr_cn": "LoRFT基准数据集针对固定公路摄像头拍摄的长距离车辆轨迹重建难题，通过从可靠近场轨迹延续到远场，解决了透视压缩和尺度衰减导致的轨迹断裂问题。该基准为交通安全分析、自动驾驶评估和数据驱动的交通管理提供了重要的时空证据，是首个专注于长距离车辆轨迹重建的公开基准。",
+      "llm_tldr": "LoRFT基准数据集针对固定公路摄像头拍摄的长距离车辆轨迹重建难题，通过从可靠近场轨迹延续到远场，解决了透视压缩和尺度衰减导致的轨迹断裂问题。该基准为交通安全分析、自动驾驶评估和数据驱动的交通管理提供了重要的时空证据，是首个专注于长距离车辆轨迹重建的公开基准。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.21281v1",
+      "source": "arxiv",
+      "title": "HGeo-TopoMap: Boosting Topological Mapping with Hierarchical Geometric Priors",
+      "abstract": "Topological maps are key outputs of autonomous driving perception systems, delivering essential road information for path planning. They identify instances such as centerlines and traffic signs, along with their connectivity relationships. Due to the lack of explicit markings for centerlines in real-world environments, the detection of centerline instances remains a significant challenge. To tackle this problem, we propose HGeo-TopoMap, which leverages an explicit prior map and implicit spatial relations to hierarchically boost topological mapping. First, a geometric adaptive learning module is designed for the road structure map obtained via inverse perspective mapping. This module discretely encodes semantic and spatial features from the map, followed by a prior-mask attention mechanism that selectively focuses on informative regions. Then, a geometric consistency learning module is devised, which leverages the geometric properties and spatial relationships of centerlines. Built on the geometry-aware decoder, it enforces spatial consistency by aligning features of centerline instances with identical geometric orientations. The proposed method is evaluated on the OpenLane-V2 dataset across the centerline, lane segment, and robustness benchmarks. Beyond substantial improvements in topological mapping accuracy, the proposed method offers the benefit of enhanced robustness, consistently outperforming baselines under both standard and challenging conditions. The source code and model weights will be made publicly available at https://github.com/lynn-yu/HGeo-TopoMap.",
+      "authors": [
+        "Siyu Li",
+        "Kunyu Peng",
+        "Di Wen",
+        "Beiping Hou",
+        "Zhiyong Li",
+        "Kailun Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO",
+        "eess.IV"
+      ],
+      "published": "2026-07-23T13:02:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.21281v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "autonomous driving topological mapping for traffic scene understanding",
+      "llm_evidence_cn": "自动驾驶拓扑地图构建用于交通场景理解",
+      "llm_evidence": "自动驾驶拓扑地图构建用于交通场景理解",
+      "canonical_evidence": "自动驾驶拓扑地图构建用于交通场景理解",
+      "llm_tldr_en": "HGeo-TopoMap boosts topological mapping for autonomous driving by leveraging explicit prior maps and implicit spatial relations.",
+      "llm_tldr_cn": "针对自动驾驶中拓扑地图构建的中心线检测因缺乏显式标注而困难的问题，提出HGeo-TopoMap，利用逆透视变换获得道路结构图，设计几何自适应学习模块编码语义和空间特征，层次化提升拓扑映射。在多个自动驾驶数据集上实验表明，该方法显著提高了中心线和交通标志检测及连接关系的准确性。",
+      "llm_tldr": "针对自动驾驶中拓扑地图构建的中心线检测因缺乏显式标注而困难的问题，提出HGeo-TopoMap，利用逆透视变换获得道路结构图，设计几何自适应学习模块编码语义和空间特征，层次化提升拓扑映射。在多个自动驾驶数据集上实验表明，该方法显著提高了中心线和交通标志检测及连接关系的准确性。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22078v1",
+      "source": "arxiv",
+      "title": "CommandLM: Data driven behavior level descriptor for ego vehicles",
+      "abstract": "As autonomous driving systems move toward real-world deployment, interpretable, behavior-level decision-making is essential for safety, trust, and regulation. We introduce CommandLM, a multimodal large language model that generates concise, human-readable behavior descriptions for ego vehicles from fused multi-sensor data. Our model processes temporally fused bird's-eye view representations from LiDAR and multi-camera inputs via a Q-Former adapter connected to a quantized, LoRA-fine-tuned large language model. Trained on our CommandLM-nuScenes dataset, CommandLM produces intent-aware, interpretable captions suitable for planner supervision and safety auditing. Experiments demonstrate strong linguistic and behavioral alignment, achieving CIDEr 0.67, and BERT-F1 0.88, substantially outperforming the BLIP-2 baseline (CIDEr 0.52, BERT-F1 0.86). In human evaluation, 58% of the generated descriptions were rated accurate, efficient and rule-compliant, confirming their real-world plausibility. While the remaining descriptions may not always select the most efficient, goal-oriented behavior, CommandLM's interpretable outputs enable downstream validation systems to identify and correct such cases, making it an effective tool for transparent behavior auditing. These results show that integrating multimodal fusion with language reasoning yields efficient and transparent behavior-level understanding for autonomous driving. We release our code and dataset at: https://github.com/b-tok/CommandLM",
+      "authors": [
+        "Boris Tokic",
+        "Constantin Selzer",
+        "Fabian B. Flohr"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-24T08:23:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.22078v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multimodal LLM for ego vehicle behavior description in autonomous driving",
+      "llm_evidence_cn": "用于自动驾驶自车行为描述的多模态大语言模型",
+      "llm_evidence": "用于自动驾驶自车行为描述的多模态大语言模型",
+      "canonical_evidence": "用于自动驾驶自车行为描述的多模态大语言模型",
+      "llm_tldr_en": "CommandLM uses a multimodal LLM with Q-Former and LoRA fine-tuning to generate interpretable behavior descriptions from LiDAR and camera data, achieving strong linguistic alignment.",
+      "llm_tldr_cn": "为实现自动驾驶中可解释的行为级决策，提出CommandLM多模态大语言模型。该模型通过Q-Former适配器融合LiDAR和相机的时域鸟瞰图表示，结合量化和LoRA微调的大语言模型，生成意图感知的、人类可读的自车行为描述。在CommandLM-nuScenes数据集上训练，实验表明CIDEr达0.67，BERTScore优异，有力支持规划监督和安全审计。",
+      "llm_tldr": "为实现自动驾驶中可解释的行为级决策，提出CommandLM多模态大语言模型。该模型通过Q-Former适配器融合LiDAR和相机的时域鸟瞰图表示，结合量化和LoRA微调的大语言模型，生成意图感知的、人类可读的自车行为描述。在CommandLM-nuScenes数据集上训练，实验表明CIDEr达0.67，BERTScore优异，有力支持规划监督和安全审计。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.22494v1",
+      "source": "arxiv",
+      "title": "CARA: Concept-Aware Risk Attention for Interpretable Collision Anticipation",
+      "abstract": "Collision anticipation in autonomous driving requires not only accurate early warnings but also interpretable reasoning about what risk factors are being tracked and how risk evolves over time. Existing methods fall short in this regard: feature-driven models are opaque, post-hoc explanations often lack fidelity, and concept-based methods are mostly designed for static recognition rather than dynamic driving scenes. We propose CARA (Concept-Aware Risk Attention), an intrinsically interpretable spatio-temporal framework for collision anticipation. CARA derives domain-grounded risk concepts from accident narratives, aligns them with video frames via vision-language similarity, and organizes them into evolving concept trajectories. These trajectories provide explicit risk evidence that guides spatial attention, temporal attention, and anticipation, allowing semantic concepts to directly influence both where the model attends and how it predicts risk over time. By treating semantic risk factors as dynamic intermediate evidence rather than auxiliary post-hoc explanations, CARA tightly couples interpretability with the predictive process. Extensive experiments on three benchmarks show that CARA consistently improves anticipation accuracy and warning earliness over strong baselines, while providing sparse and semantically grounded concept evidence.",
+      "authors": [
+        "Zhishan Tao",
+        "Ruoyu Wang",
+        "Yucheng Wu",
+        "Enjun Du",
+        "Yilei Yuan",
+        "Sherwin Ho",
+        "Yue Su",
+        "Jinbo Su",
+        "Yi Hong"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM",
+        "cs.CV"
+      ],
+      "published": "2026-07-24T17:06:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.22494v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "collision anticipation autonomous driving vision-language",
+      "llm_evidence_cn": "自动驾驶碰撞预警 视觉语言模型",
+      "llm_evidence": "自动驾驶碰撞预警 视觉语言模型",
+      "canonical_evidence": "自动驾驶碰撞预警 视觉语言模型",
+      "llm_tldr_en": "Proposes CARA, an interpretable spatio-temporal framework for collision anticipation using vision-language similarity to align risk concepts with video frames, providing evolving concept trajectories for transparent reasoning.",
+      "llm_tldr_cn": "针对现有碰撞预测方法缺乏可解释性的问题，提出CARA框架，从事故叙述中提取领域风险概念，通过视觉语言相似性对齐视频帧，形成动态概念轨迹，实现内在可解释的时空碰撞预测。在公开数据集上展示了优于黑盒模型的预警准确率，并提供了可追溯的风险演变过程，为自动驾驶安全决策提供了透明依据。",
+      "llm_tldr": "针对现有碰撞预测方法缺乏可解释性的问题，提出CARA框架，从事故叙述中提取领域风险概念，通过视觉语言相似性对齐视频帧，形成动态概念轨迹，实现内在可解释的时空碰撞预测。在公开数据集上展示了优于黑盒模型的预警准确率，并提供了可追溯的风险演变过程，为自动驾驶安全决策提供了透明依据。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.22013v1",
+      "source": "arxiv",
+      "title": "Visual Saliency Steering Distillation for Multimodal Chain-of-Thought Reasoning",
+      "abstract": "Multimodal chain-of-thought (CoT) reasoning integrates visual and textual cues through step-by-step inference. In small models with limited token budgets, modality-interaction fusion often suppresses tiny cross-modal differences. In particular, multimodal CoT often struggles when different images pair with identical text or different texts pair with an identical image, making such inputs nearly indistinguishable after fusion. This study proposes Visual Saliency Steering Distillation (VSSD). VSSD leverages the attention maps of multimodal large language models to generate perturbed images that capture task-sensitive feature directions, and then applies singular value decomposition to extract dominant steering vectors to guide inter-layer distillation. Experiments on ScienceQA and M$^3$CoT demonstrate that VSSD improves rationale generation and answer inference. The code is available at https://github.com/BGWH123/VSSD.",
+      "authors": [
+        "Hao Yang",
+        "Jin Wang",
+        "Xuejie Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-24T06:22:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.22013v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multimodal CoT reasoning with limited token budgets; uses attention maps for efficiency.",
+      "llm_evidence_cn": "针对多模态链式推理中标记预算有限的问题，利用注意力图提升模型效率。",
+      "llm_evidence": "针对多模态链式推理中标记预算有限的问题，利用注意力图提升模型效率。",
+      "canonical_evidence": "针对多模态链式推理中标记预算有限的问题，利用注意力图提升模型效率。",
+      "llm_tldr_en": "Proposes Visual Saliency Steering Distillation (VSSD) that leverages attention maps of MLLMs to generate perturbed images and uses SVD for steering vectors, improving multimodal CoT reasoning efficiency.",
+      "llm_tldr_cn": "该文提出视觉显著性引导蒸馏方法（VSSD），针对小模型在有限标记预算下多模态链式推理中跨模态差异被抑制的问题，利用多模态大语言模型的注意力图生成扰动图像，通过奇异值分解提取主导引导向量进行层间蒸馏。实验表明该方法在保持推理质量的同时提升了效率，适用于资源受限场景。",
+      "llm_tldr": "该文提出视觉显著性引导蒸馏方法（VSSD），针对小模型在有限标记预算下多模态链式推理中跨模态差异被抑制的问题，利用多模态大语言模型的注意力图生成扰动图像，通过奇异值分解提取主导引导向量进行层间蒸馏。实验表明该方法在保持推理质量的同时提升了效率，适用于资源受限场景。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.22172v1",
+      "source": "arxiv",
+      "title": "JustDepth: Real-Time Radar-Camera Depth Estimation with Single-Scan LiDAR Supervision",
+      "abstract": "Accurate yet low-latency depth is essential for radar-camera perception in autonomous systems. Cameras provide rich appearance but lack metric scale, whereas automotive radar offers metric range but is sparse and noisy. Many pipelines are multi-stage or depend on auxiliary annotations, increasing latency and limiting portability. We introduce JustDepth, a single-stage radar-camera depth estimator trained only with radar, camera, and single-scan LiDAR. All radar returns are aggregated into a fixed-width 1D representation, decoupling runtime from point count. A Height Fusion Block fuses modalities, a lightweight GNN propagates depth globally, and a training-only confidence decoder stabilizes learning with zero test-time cost. We mitigate stripe artifacts via simple augmentations and quantify them using the Vertical-Horizontal Gradient Ratio (VHGR). On nuScenes, compared to recent state-of-the-art methods, JustDepth maintains accuracy while reducing inference time by 39.7x and stripe artifacts by 66% as measured by VHGR.",
+      "authors": [
+        "Wooyung Yun",
+        "Dongwook Kim",
+        "Soomok Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-07-24T10:20:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.22172v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "radar-camera depth estimation for autonomous driving perception",
+      "llm_evidence_cn": "用于自动驾驶感知的雷达-相机深度估计",
+      "llm_evidence": "用于自动驾驶感知的雷达-相机深度估计",
+      "canonical_evidence": "用于自动驾驶感知的雷达-相机深度估计",
+      "llm_tldr_en": "JustDepth is a single-stage radar-camera depth estimator trained only with radar, camera, and single-scan LiDAR, achieving real-time depth for autonomous systems.",
+      "llm_tldr_cn": "针对自动驾驶中雷达-相机深度估计准确性和延迟问题，本文提出JustDepth单阶段估计器。它使用雷达、相机和单扫LiDAR进行训练，通过聚合雷达回波为一维表示、高度融合块和轻量GNN，实现低延迟高精度深度输出。",
+      "llm_tldr": "针对自动驾驶中雷达-相机深度估计准确性和延迟问题，本文提出JustDepth单阶段估计器。它使用雷达、相机和单扫LiDAR进行训练，通过聚合雷达回波为一维表示、高度融合块和轻量GNN，实现低延迟高精度深度输出。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

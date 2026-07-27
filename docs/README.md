@@ -6,32 +6,52 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-26
-- 运行时间：2026-07-26 19:53:49 UTC
+- 最新运行日期：2026-07-27
+- 运行时间：2026-07-27 21:37:49 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：3
-- 速读区：1
+- 本次总论文数：10
+- 精读区：8
+- 速读区：2
 
 ### 今日简报（AI）
-今日推荐4篇论文，精读3篇，重点关注长上下文压缩与可解释性缩放。最值得关注的是《SALT》提出的显著性感知词干树实现高效压缩（9.0分），以及《Scaling Interpretable Transformers》利用奇偶瓶颈层提升模型可解释性（8.0分）。建议优先阅读这两篇，理解如何平衡性能与可解释性。
-- 详情：[/202607/26/README](/202607/26/README)
+今日精读8篇论文，其中两篇获9分高分，分别聚焦多轮LLM服务的混合内存KV缓存与神经形态非正交多址接入。
+最值得看的方向：HyMCache框架利用CXL混合内存优化多轮对话服务，以及基于向量符号架构的并行远程推理。
+建议优先精读这两篇高分工作，把握LLM缓存和存算一体架构的最新突破。
+- 详情：[/202607/27/README](/202607/27/README)
 
 ### 精读区论文标签
-1. [SALT: Salience-Aware Lexical Trie for Long-Context Compression](/202607/26/2607.17486v1-salt-salience-aware-lexical-trie-for-long-context-compression)  
+1. [HyMCache: A KV Cache Framework for Multi-Turn LLM Serving with CXL-Hybrid Memory](/202607/27/2607.18141v1-hymcache-a-kv-cache-framework-for-multi-turn-llm-serving-with-cxl-hybrid-memory)  
    标签：评分：9.0/10、query:evlm
-   evidence：通过词汇树保持主题覆盖的长上下文输入压缩
-2. [Scaling Interpretable Transformers with Parity Bottleneck Layers](/202607/26/2607.20652v1-scaling-interpretable-transformers-with-parity-bottleneck-layers)  
+   evidence：长上下文LLM服务中的KV缓存压缩与管理
+2. [Neuromorphic Non-Orthogonal Multiple Access for Parallel Remote Inference via Vector Symbolic Architecture](/202607/27/2607.22155v1-neuromorphic-non-orthogonal-multiple-access-for-parallel-remote-inference-via-vector-symbolic-architecture)  
+   标签：评分：9.0/10、query:ev-cam
+   evidence：神经形态感知和事件驱动处理用于远程推理
+3. [HiKV: Hierarchical Importance-Aware KV Cache with Hardware Acceleration for LLM Decoding](/202607/27/2607.22389v1-hikv-hierarchical-importance-aware-kv-cache-with-hardware-acceleration-for-llm-decoding)  
+   标签：评分：9.0/10、query:evlm
+   evidence：KV缓存压缩技术，直接应对长上下文大模型的显存瓶颈
+4. [LoRFT: Benchmarking Long-Range Vehicle Trajectory Reconstruction from Fixed Highway Cameras](/202607/27/2607.19911v1-lorft-benchmarking-long-range-vehicle-trajectory-reconstruction-from-fixed-highway-cameras)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：基于公路摄像头进行车辆轨迹重建以支持交通场景理解
+5. [HGeo-TopoMap: Boosting Topological Mapping with Hierarchical Geometric Priors](/202607/27/2607.21281v1-hgeo-topomap-boosting-topological-mapping-with-hierarchical-geometric-priors)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：自动驾驶拓扑地图构建用于交通场景理解
+6. [CommandLM: Data driven behavior level descriptor for ego vehicles](/202607/27/2607.22078v1-commandlm-data-driven-behavior-level-descriptor-for-ego-vehicles)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：用于自动驾驶自车行为描述的多模态大语言模型
+7. [LayoutLite: Token-Level Implicit Layout Analysis for Efficient Document OCR](/202607/27/2607.22200v1-layoutlite-token-level-implicit-layout-analysis-for-efficient-document-ocr)  
    标签：评分：8.0/10、query:evlm
-   evidence：奇偶瓶颈层实现变换器的稀疏高效表示
-3. [Adaptive Depth Sparse Framework: Similarity-Driven Resource Allocation for Pre-Trained LLMs](/202607/26/2607.21291v1-adaptive-depth-sparse-framework-similarity-driven-resource-allocation-for-pre-trained-llms)  
-   标签：评分：8.0/10、query:evlm
-   evidence：通过标记保留分配实现LLM深度稀疏推理加速
+   evidence：文档OCR中视觉语言模型的token级压缩
+8. [CARA: Concept-Aware Risk Attention for Interpretable Collision Anticipation](/202607/27/2607.22494v1-cara-concept-aware-risk-attention-for-interpretable-collision-anticipation)  
+   标签：评分：8.0/10、query:mm-trf
+   evidence：自动驾驶碰撞预警 视觉语言模型
 
 ### 速读区论文标签
-1. [Lean-SAM2: Target-Anchored Memory and Encoder Acceleration for SAM2](/202607/26/2607.19811v1-lean-sam2-target-anchored-memory-and-encoder-acceleration-for-sam2)  
-   标签：评分：6.0/10、query:evlm
-   evidence：针对SAM2的锚定内存剪枝与编码器加速
+1. [Visual Saliency Steering Distillation for Multimodal Chain-of-Thought Reasoning](/202607/27/2607.22013v1-visual-saliency-steering-distillation-for-multimodal-chain-of-thought-reasoning)  
+   标签：评分：7.0/10、query:evlm
+   evidence：针对多模态链式推理中标记预算有限的问题，利用注意力图提升模型效率。
+2. [JustDepth: Real-Time Radar-Camera Depth Estimation with Single-Scan LiDAR Supervision](/202607/27/2607.22172v1-justdepth-real-time-radar-camera-depth-estimation-with-single-scan-lidar-supervision)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：用于自动驾驶感知的雷达-相机深度估计
 
 
 <div class="dpr-home-promo-card">
