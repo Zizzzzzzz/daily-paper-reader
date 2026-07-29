@@ -1,0 +1,658 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-29T21:48:27.302920+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 6,
+    "deep_cap": 8,
+    "deep_selected": 6,
+    "quick_candidates": 8,
+    "quick_skim_target": 13,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2607.24904v1",
+      "source": "arxiv",
+      "title": "Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model",
+      "abstract": "Standard vision-language models (VLMs) suffer from Moravec's paradox: they excel at complex offline visual reasoning but struggle with simple streaming perception tasks and process them inefficiently. We present Mage-VL, an efficient codec-native streaming foundation model for real-time multimodal understanding and interaction. At its core, our custom tokenizer, Mage-ViT, replaces uniform frame sampling by selectively encoding dynamic, entropy-rich regions using motion vectors and residual energy across sparse anchor (I) and predicted (P) frames. Operating at a 16 x 16 patch level, this reduces visual token consumption by over 75% while preserving spatiotemporal context. Trained from scratch on approximately 560M unlabeled images and 100M unlabeled video frames, Mage-ViT matches or outperforms flagship encoders trained on billions of image-text pairs. We establish AI4AI data pipelines encompassing prompt-code joint optimization for multimodal captioning and AI-driven performance diagnosis to guide training recipes. Furthermore, through a bio-inspired dual-system architecture - a lightweight System 1 event gate and a causal System 2 decoder - Mage-VL enables proactive streaming perception. Extensive evaluations show that Mage-VL-4B matches Qwen3-VL-4B on static tasks while achieving strong gains in video understanding and 2D/3D spatial reasoning, with up to a 3.5x wall-clock inference speedup, and comprehensively surpasses the 15B Phi-4-reasoning-vision baseline. Beyond model artifacts, we deliver seven key empirical findings covering pre-training data efficiency, variable-resolution scaling, codec system acceleration, VideoQA SFT redundancy, motion-spatial synergy, AI4AI data pipelines, and Zero-Vision SFT for multimodal RL.",
+      "authors": [
+        "Senqiao Yang",
+        "Kaichen Zhang",
+        "Zhaoyang Jia",
+        "Jinghao Guo",
+        "Yifei Shen",
+        "Xinjie Zhang",
+        "Xiaoyi Zhang",
+        "Haoqing Wang",
+        "Xiao Li",
+        "Peng Zhang",
+        "Xiang An",
+        "Yin Xie",
+        "Zhening Liu",
+        "Xun Guo",
+        "Jiahao Li",
+        "Shicheng Zheng",
+        "Jinglu Wang",
+        "Zongyu Guo",
+        "Wenxuan Xie",
+        "Zihan Zheng",
+        "Yuxuan Luo",
+        "Bin Li",
+        "Yan Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-07-27T17:59:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.24904v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "selectively encodes dynamic regions to reduce visual token consumption by over 75%",
+      "llm_evidence_cn": "选择性编码动态区域，减少超过75%的视觉token消耗",
+      "llm_evidence": "选择性编码动态区域，减少超过75%的视觉token消耗",
+      "canonical_evidence": "选择性编码动态区域，减少超过75%的视觉token消耗",
+      "llm_tldr_en": "Introduces Mage-VL, a streaming multimodal foundation model with a custom tokenizer that uses motion vectors to select entropy-rich regions, reducing visual token consumption by over 75% while preserving spatiotemporal context.",
+      "llm_tldr_cn": "现有视觉语言模型在流式感知任务中效率低下，且处理大量视觉token导致计算开销。本文提出Mage-VL高效流式多模态基础模型，其核心Mage-ViT分词器通过运动向量和残差能量选择性编码熵丰富的动态区域，减少了超过75%的视觉token消耗，同时保留时空上下文。在大规模数据上训练的模型在实时理解任务中达到了最先进的性能。",
+      "llm_tldr": "现有视觉语言模型在流式感知任务中效率低下，且处理大量视觉token导致计算开销。本文提出Mage-VL高效流式多模态基础模型，其核心Mage-ViT分词器通过运动向量和残差能量选择性编码熵丰富的动态区域，减少了超过75%的视觉token消耗，同时保留时空上下文。在大规模数据上训练的模型在实时理解任务中达到了最先进的性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25516v1",
+      "source": "arxiv",
+      "title": "A Causality-aware Infer-diagnose-refine Framework for Test-time Modality Adaptation in VLA Models",
+      "abstract": "Vision-language-action (VLA) models predict sequential actions to execute tasks specified by language instructions, conditioned on visual observations and proprioceptive states. However, how to fuse modalities in VLA models remains an open problem, since robot manipulation involves dynamic phases, such as long-distance movements and close-range interactions, in which the importance of visual observations may vary over time. In this paper, we propose an infer-diagnose-refine (IDR) framework, a model-agnostic framework that can be integrated with diverse VLA architectures for refining action predictions at test time. IDR first infers actions under factual and counterfactual scenarios of visual observations, and then diagnoses the causal effects of visual observations as the estimated dynamic importance, which is finally used to refine the action predictions in a training-free manner. We further design a causality-aware action refiner to realize the IDR framework, including zero-padding interventions for inferring counterfactual actions, norm-based quantification for diagnosing causal effects, and gated residual fusion for refining actions. Extensive experiments on both simulation benchmarks and real-world tasks show improvements in overall performance across multiple VLA backbones, demonstrating the efficacy of dynamically adjusting visual importance at test time.",
+      "authors": [
+        "Haoyu Zhang",
+        "Yuwei Wu",
+        "Jin Chen",
+        "Gao Zhi",
+        "Zhenxin Diao",
+        "Mingyang Gao",
+        "Kun Wu",
+        "Yongchun Liu",
+        "Fan Li"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-28T09:56:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.25516v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "test-time modality adaptation for VLA models with causality-aware framework",
+      "llm_evidence_cn": "基于因果感知的VLA模型测试时模态适应框架",
+      "llm_evidence": "基于因果感知的VLA模型测试时模态适应框架",
+      "canonical_evidence": "基于因果感知的VLA模型测试时模态适应框架",
+      "llm_tldr_en": "IDR framework adapts VLA models at test time by inferring with counterfactual visual observations and diagnosing inconsistencies.",
+      "llm_tldr_cn": "视觉语言动作模型在机器人操作中面临动态阶段模态重要性变化。本文提出推断-诊断-修正框架，通过事实与反事实视觉观测推断动作，诊断差异并修正预测。该框架是模型无关的，可集成至多种VLA架构中，在测试时提升动作精度，无需重新训练。",
+      "llm_tldr": "视觉语言动作模型在机器人操作中面临动态阶段模态重要性变化。本文提出推断-诊断-修正框架，通过事实与反事实视觉观测推断动作，诊断差异并修正预测。该框架是模型无关的，可集成至多种VLA架构中，在测试时提升动作精度，无需重新训练。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25669v1",
+      "source": "arxiv",
+      "title": "OmniDelta: Skill-Driven Budget Allocation for Token Compression in OmniLLMs",
+      "abstract": "Emerging Omni-modal Large Language Models (OmniLLMs) enable unified understanding of text, audio, and video, but their long audio-video token sequences introduce substantial memory and inference costs. Existing compression methods mainly focus on selecting important tokens under fixed budgets, leaving the preceding budget-allocation problem underexplored. We show that direct query-to-audio/video similarity is unreliable for inter-modal budget allocation, and that uniform intra-modal budgets can miss key evidence while retaining redundant content. To address these limitations, we propose OmniDelta, a training-free, skill-driven framework that couples intent-aware inter-modal allocation with content-aware intra-modal allocation. OmniDelta first constructs audio and video skill pools to shift the fixed retained-token budget according to query demand, then reallocates modality budgets over audio segments and video frames using local complexity and temporal redundancy. The resulting local budgets can be combined with existing pruning strategies, preserving the total retained-token ratio while changing where the budget is spent. Experiments on four audio-video benchmarks with two Qwen2.5-Omni models show that OmniDelta establishes a new accuracy-efficiency Pareto frontier across pruning ratios. At 25% token retention on Qwen2.5-Omni-7B, OmniDelta reduces GPU memory by 22.0% and achieves a 1.64x end-to-end speedup over full-token inference.",
+      "authors": [
+        "Haoyang Huang",
+        "Wenjie Huang",
+        "Tianqi Xu",
+        "Hongyaoxing Gu",
+        "Kang Tan",
+        "Yikai Fu",
+        "Yuhao Shen",
+        "Tianyu Liu",
+        "Baolin Zhang",
+        "Jun Zhang",
+        "Xinyi Hu",
+        "Jun Dai",
+        "Shuang Ge",
+        "Lei Chen",
+        "Yue Li",
+        "Mingchen Wang",
+        "Meng Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-28T12:50:31+00:00",
+      "link": "https://arxiv.org/pdf/2607.25669v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token compression budget allocation for OmniLLMs",
+      "llm_evidence_cn": "全模态大模型的令牌压缩预算分配",
+      "llm_evidence": "全模态大模型的令牌压缩预算分配",
+      "canonical_evidence": "全模态大模型的令牌压缩预算分配",
+      "llm_tldr_en": "OmniDelta proposes a training-free skill-driven budget allocation for token compression in OmniLLMs, improving inter- and intra-modal allocation.",
+      "llm_tldr_cn": "该论文提出OmniDelta，一种无需训练的技能驱动预算分配方法，用于全模态大语言模型的令牌压缩。它通过意图感知的模态间分配和内容感知的模态内分配，解决了固定预算下音频和视频令牌冗余问题，显著降低了推理成本。",
+      "llm_tldr": "该论文提出OmniDelta，一种无需训练的技能驱动预算分配方法，用于全模态大语言模型的令牌压缩。它通过意图感知的模态间分配和内容感知的模态内分配，解决了固定预算下音频和视频令牌冗余问题，显著降低了推理成本。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25818v1",
+      "source": "arxiv",
+      "title": "SepPrune:A Separator-based Pruning Framework for Efficient Multimodal Large Language Models",
+      "abstract": "Recent multimodal large language models (MLLMs), such as Qwen2.5-VL and InternVL3, generate large numbers of vision tokens for high-resolution inputs, leading to substantial computational cost. Existing vision token pruning methods either depend on cross-modal attention and cannot prune before the prefill stage, or rely on diversity estimation with high computational overhead. We observe that attention scores from both vision and text tokens peak at modality separator tokens, suggesting that these separators bridge the two modalities. Based on this observation, we propose SepPrune, an efficient, training-free, plug-and-play pruning method that uses the separator token as a unified query to rank and select informative vision tokens. SepPrune reuses the LLM's built-in projection parameters and requires no architectural changes. Experiments on Qwen2.5-VL-7B show that SepPrune achieves state-of-the-art performance, retaining 96.3% of the original accuracy while removing 80.2% of vision tokens.",
+      "authors": [
+        "Yuchen Wang",
+        "Qihui Zhu",
+        "Yang Liu",
+        "Xiaoyan Sun",
+        "Siying Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-28T15:01:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.25818v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token pruning for multimodal LLMs",
+      "llm_evidence_cn": "多模态大语言模型令牌剪枝",
+      "llm_evidence": "多模态大语言模型令牌剪枝",
+      "canonical_evidence": "多模态大语言模型令牌剪枝",
+      "llm_tldr_en": "SepPrune proposes a training-free token pruning method using separator tokens as queries to select informative vision tokens for efficient MLLMs.",
+      "llm_tldr_cn": "该论文针对多模态大语言模型视觉令牌过多导致计算成本高的问题，观察到注意力在模态分隔符上集中，提出SepPrune方法，利用分隔符token作为统一查询来排序和选择信息量大的视觉令牌。该方法无需训练、即插即用，可显著减少视觉令牌数量，降低计算开销，同时保持模型性能。",
+      "llm_tldr": "该论文针对多模态大语言模型视觉令牌过多导致计算成本高的问题，观察到注意力在模态分隔符上集中，提出SepPrune方法，利用分隔符token作为统一查询来排序和选择信息量大的视觉令牌。该方法无需训练、即插即用，可显著减少视觉令牌数量，降低计算开销，同时保持模型性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25912v1",
+      "source": "arxiv",
+      "title": "SAM3D-Guided Object-Centric Representation Alignment for Vision-Language-Action Models",
+      "abstract": "Vision-Language-Action (VLA) models have shown strong potential for general robot manipulation, but most existing models rely on 2D visual-language backbones and lack fine-grained 3D understanding of target objects, especially under occlusion, pose variation, scale changes, and precise spatial interaction. We propose an object-centric 3D representation alignment framework built upon $π_0$, using SAM3D as a frozen 3D teacher to provide target-object 3D priors during training. Specifically, we localize task-relevant objects with object recognition models, generate corresponding object masks, and use SAM3D to extract dense object-level 3D representations, which are aligned with intermediate visual features of $π_0$. This enables the policy to internalize target-object 3D information while preserving the original RGB-language-to-action inference pipeline without requiring depth, point clouds, masks, SAM3D, or additional 3D modules at test time. Simulation experiments show consistent improvements, achieving 99.1\\% on LIBERO and an average length of 4.11 on CALVIN. Real-world experiments further demonstrate that our method is particularly effective in long-horizon manipulation scenarios where the robot must focus on different target objects across multiple subtasks.",
+      "authors": [
+        "Zonghe Liu",
+        "Shanyuan Jie",
+        "Xiaoquan Sun",
+        "Chen Cao",
+        "Zetian Xu",
+        "Zongsheng Liu",
+        "Jiayu Chen"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T16:05:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.25912v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Object-centric 3D representation alignment for Vision-Language-Action models",
+      "llm_evidence_cn": "面向VLA模型的3D表示对齐方法",
+      "llm_evidence": "面向VLA模型的3D表示对齐方法",
+      "canonical_evidence": "面向VLA模型的3D表示对齐方法",
+      "llm_tldr_en": "Proposes SAM3D-guided object-centric representation alignment for VLA models, improving 3D understanding of target objects under occlusion and pose variation.",
+      "llm_tldr_cn": "针对现有VLA模型缺乏精细3D理解的问题，提出基于SAM3D的面向对象表示对齐框架。通过冻结的SAM3D教师模型提取目标对象3D先验，与pi0中间视觉特征对齐。实验证明该方法提升了机器人在遮挡、姿态变化等条件下的操作性能，增强了VLA模型的3D场景理解能力。",
+      "llm_tldr": "针对现有VLA模型缺乏精细3D理解的问题，提出基于SAM3D的面向对象表示对齐框架。通过冻结的SAM3D教师模型提取目标对象3D先验，与pi0中间视觉特征对齐。实验证明该方法提升了机器人在遮挡、姿态变化等条件下的操作性能，增强了VLA模型的3D场景理解能力。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.25918v1",
+      "source": "arxiv",
+      "title": "DC-WAM: Dynamic-Centric Visual Supervision and Reasoning for World-Action Models",
+      "abstract": "World-Action Models (WAMs) augment robot policies with future visual prediction, but it remains unclear what the visual modality should learn for control. While photorealistic future prediction provides dense supervision, it also incurs substantial computation and can allocate capacity to texture, illumination, and background variations that are only weakly related to action selection. Recent efficient WAM variants suggest that the main benefit of the video branch may not lie in the rendered future itself, but in the control-relevant visual representations induced during training. In this work, we revisit future video prediction from a dynamic-centric perspective and ask whether an existing RGB-based WAM can be redirected from appearance-dominated reconstruction toward interaction-induced visual dynamics without introducing additional modality-specific predictions or online inputs at deployment. We propose DC-WAM, a dynamic-centric WAM framework that redistributes supervision and computation in the RGB video branch. At the supervision level, DC-WAM combines temporal-difference flow matching with trajectory-guided weighting, emphasizing dense temporal changes and localized regions where the gripper, manipulated objects, and contact areas move. At the reasoning level, DynaRoute predicts token-wise dynamic relevance and converts it into an attention bias, guiding the model toward control-relevant future tokens. Experiments in simulation and on real-world manipulation tasks show that DC-WAM consistently improves policy performance, especially under out-of-distribution perturbations in lighting, object appearance, and background texture.",
+      "authors": [
+        "Haoyuan Ji",
+        "Lingxiang Fan",
+        "Shang Su",
+        "Yinqiao Lu",
+        "Mengkai Shi",
+        "Jun Gao",
+        "Shuo Feng"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-07-28T16:08:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.25918v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Dynamic-centric visual supervision for World-Action Models, related to efficient VLA",
+      "llm_evidence_cn": "面向世界动作模型的动态中心视觉监督，与高效VLA相关",
+      "llm_evidence": "面向世界动作模型的动态中心视觉监督，与高效VLA相关",
+      "canonical_evidence": "面向世界动作模型的动态中心视觉监督，与高效VLA相关",
+      "llm_tldr_en": "Proposes DC-WAM that redirects RGB-based WAM from appearance-dominant prediction to dynamic-centric visual supervision, improving efficiency and control relevance.",
+      "llm_tldr_cn": "针对世界动作模型中视觉预测计算量大且关注外观无关信息的问题，提出动态中心视觉监督框架DC-WAM。通过将现有RGB基础模型重定向至控制相关的动态特征，减少不必要的纹理和光照建模。实验表明在保持预测质量的同时降低了计算开销，为高效VLA模型提供了新视角。",
+      "llm_tldr": "针对世界动作模型中视觉预测计算量大且关注外观无关信息的问题，提出动态中心视觉监督框架DC-WAM。通过将现有RGB基础模型重定向至控制相关的动态特征，减少不必要的纹理和光照建模。实验表明在保持预测质量的同时降低了计算开销，为高效VLA模型提供了新视角。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.21576v1",
+      "source": "arxiv",
+      "title": "Self-Supervised Learning of Structured Dynamics from Videos",
+      "abstract": "Understanding motion in video is a fundamental challenge for visual learning, as frame-to-frame change entangles two sources of dynamics: camera motion and object motion. This decomposition has remained underexplored in representation learning, partly because these factors are tightly coupled in natural videos and difficult to supervise separately. Yet recovering it is important for learning robust motion representations that separate meaningful object dynamics from camera-induced variation. We study whether such structured motion representations can be recovered from frozen features of a pretrained image vision transformer. We propose the Structured Dynamics Model (SDM), which explicitly separates the dominant source of temporal change from residual dynamics through future-feature prediction, rather than representing video change with a single entangled latent or with unstructured, spatially dense transition tokens. Training combines self-supervised learning on real video with weak supervision of scene dynamics on synthetic Kubric data. We evaluate SDM on ProbeMotion, a new evaluation suite spanning synthetic and real videos with camera motion, object motion, and combined dynamics. SDM outperforms backbone baselines using global CLS or average-pooled features, and compares favorably to strongly supervised representations such as VGGT on several probes, despite using substantially weaker supervision. These results suggest that pretrained image models can be readily repurposed into structured video-dynamics representations, providing a useful inductive bias for learning and analyzing latent video dynamics.",
+      "authors": [
+        "Lukas Knobel",
+        "Andrew Zisserman",
+        "Yuki M. Asano"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T17:55:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.21576v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "learning structured motion decomposition from videos, aligning with event-based vision principles",
+      "llm_evidence_cn": "从视频中学习结构化运动分解，与事件视觉原理一致",
+      "llm_evidence": "从视频中学习结构化运动分解，与事件视觉原理一致",
+      "canonical_evidence": "从视频中学习结构化运动分解，与事件视觉原理一致",
+      "llm_tldr_en": "Proposes SDM that separates camera and object motion from videos using frozen ViT features, enabling robust motion representations without supervision.",
+      "llm_tldr_cn": "针对视频中相机运动与物体运动纠缠难以分离的问题，提出结构化动力学模型（SDM）。利用冻结的ViT特征，显式分离主导时变源和残差动力学，在无监督条件下学习鲁棒的运动表示。在多个运动相关任务上验证了分解的有效性，为理解动态场景提供了新视角。",
+      "llm_tldr": "针对视频中相机运动与物体运动纠缠难以分离的问题，提出结构化动力学模型（SDM）。利用冻结的ViT特征，显式分离主导时变源和残差动力学，在无监督条件下学习鲁棒的运动表示。在多个运动相关任务上验证了分解的有效性，为理解动态场景提供了新视角。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based vision",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23530v1",
+      "source": "arxiv",
+      "title": "Geometry Meets Semantics: Fractional Gradient Stabilization for Semantic-Driven Bounding Box Optimization in Visual Detection Tasks",
+      "abstract": "Bounding boxes are fundamental for object localization in visual detection tasks. Among them, oriented bounding boxes are widely used in visual detection tasks, which provide a more precise directional representation. Generally, IoU-based losses are widely adopted to optimize box regression. However, we observed that IoU-driven box optimization suffers from two key issues: (1) it relies solely on geometric properties while ignoring semantic cues; (2) orientation optimization suffers from unstable gradients, causing oscillations in orientation convergence. In this paper, we propose a Fractional Semantic IoU loss to achieve unified semantic-geometric learning with gradient stabilization. First, we design a semantic similarity metric to guide IoU optimization, building a Semantic IoU loss (SIoU loss) with an adaptive gradient gating mechanism. Then, we revisit the gradient instability issue in oriented box optimization and extend the SIoU loss to a fractional-order formulation to build the \\textbf{Fr}actional \\textbf{S}emantic \\textbf{IoU} \\textbf{loss} (FrSIoU loss). The FrSIoU loss accumulates historical IoU states to regularize abnormal gradients during bounding box optimization process. Extensive experiments demonstrate that our approach achieves stable performance gains across different bounding box formulations and diverse visual detection tasks. The code will be available on GitHub.",
+      "authors": [
+        "Qi Ming",
+        "Haitian Yang",
+        "Xudong Zhao",
+        "Mingjing Zhao",
+        "Liuqian Wang",
+        "Nanqing Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-26T08:01:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.23530v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "semantic-geometric bounding box optimization for detection",
+      "llm_evidence_cn": "语义几何联合的边界框优化用于检测",
+      "llm_evidence": "语义几何联合的边界框优化用于检测",
+      "canonical_evidence": "语义几何联合的边界框优化用于检测",
+      "llm_tldr_en": "Proposes Fractional Semantic IoU loss that integrates semantic cues with geometric IoU for stable oriented box regression.",
+      "llm_tldr_cn": "基于IoU的边界框回归仅利用几何信息且方向优化梯度不稳定。本文提出分数阶语义IoU损失，融合语义概率与几何IoU，并通过分数阶梯度稳定方向收敛。在多个定向目标检测数据集上，该方法显著提升检测精度，尤其对遮挡和小目标更鲁棒。",
+      "llm_tldr": "基于IoU的边界框回归仅利用几何信息且方向优化梯度不稳定。本文提出分数阶语义IoU损失，融合语义概率与几何IoU，并通过分数阶梯度稳定方向收敛。在多个定向目标检测数据集上，该方法显著提升检测精度，尤其对遮挡和小目标更鲁棒。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.22043v1",
+      "source": "arxiv",
+      "title": "Scaling Native Multimodal Pre-Training From Scratch",
+      "abstract": "Although large language models (LLMs) exhibit remarkable reasoning capabilities, their reliance on text-only pre-training restricts the perception of the multimodal physical world. Native multimodal pre-training avoids this limitation by training models from scratch on multimodal inputs, thereby achieving deep cross-modal integration and mitigating optimization asymmetries inherent to traditional late-fusion architectures. Despite these advantages, the scaling properties of this paradigm remain systematically uncharacterized. To address this gap, we investigate the optimal model size and token count for training a transformer-based vision-language model under a fixed computational budget. We demonstrate that minimal objective loss adheres to a predictable compute law, whereas compute-optimal model sizes and token counts scale as power laws. Notably, language and multimodal objectives manifest distinct scaling behaviors. The language allocation law is largely invariant to the composition of the data, indicating stable language learning regardless of the multimodal data ratio. Conversely, the multimodal allocation law is highly sensitive to this composition. Specifically, text-heavy mixtures become compute-efficient only at larger model scales, shifting the optimal resource allocation toward greater model capacity. Additionally, by modeling the influence of data composition on compute laws and allocation exponents, we derive an efficiency frontier specifying precise configurations of model size, token count, and data mixture. Downstream evaluations further reveal that native multimodal pre-training induces positive cross-modal transfer, thereby enhancing pure-text spatial reasoning and enabling robust multimodal in-context learning. In summary, this empirical research establishes the essential groundwork for predictably scaling multimodal foundation models.",
+      "authors": [
+        "Haoyuan Wu",
+        "Aoqi Wu",
+        "Hai Wang",
+        "Jiajia Wu",
+        "Jinxiang Ou",
+        "Bei Yu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.CV"
+      ],
+      "published": "2026-07-24T07:13:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.22043v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "optimal model size and token count under fixed compute budget for VLM pre-training",
+      "llm_evidence_cn": "在固定计算预算下研究VLM预训练的最优模型规模与token数",
+      "llm_evidence": "在固定计算预算下研究VLM预训练的最优模型规模与token数",
+      "canonical_evidence": "在固定计算预算下研究VLM预训练的最优模型规模与token数",
+      "llm_tldr_en": "This work characterizes scaling properties of native multimodal pre-training, showing compute-optimal allocation.",
+      "llm_tldr_cn": "原生多模态预训练能实现深度跨模态集成，但其缩放规律尚未系统研究。本文在固定计算预算下探索视觉语言模型的最佳模型大小与token数，发现损失遵循可预测的计算法则。该结果为高效多模态预训练提供了理论指导，有助于资源受限场景下的模型设计。",
+      "llm_tldr": "原生多模态预训练能实现深度跨模态集成，但其缩放规律尚未系统研究。本文在固定计算预算下探索视觉语言模型的最佳模型大小与token数，发现损失遵循可预测的计算法则。该结果为高效多模态预训练提供了理论指导，有助于资源受限场景下的模型设计。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24981v1",
+      "source": "arxiv",
+      "title": "Enabling Fully Integer-Only Inference for Lightweight Detection Transformers",
+      "abstract": "Vision Transformer detectors now approach the accuracy of CNNs but remain difficult to deploy on NPUs and microcontrollers because key components, including deformable attention, feature fusion, and nonlinear activation functions, are not natively compatible with integer arithmetic. Existing quantized detectors either retain operators such as Softmax, GELU, and LayerNorm or focus on heavyweight backbones, leaving lightweight detection transformers without an end-to-end integer implementation. We address this gap with I-LW-DETR, the first fully integer-only lightweight DETR, in which every operation in the forward pass, including transformer nonlinearities, is executed in integer arithmetic. I-LW-DETR is built upon three key components: a scale-preserving split convolution that assigns independent activation scale to each branch of the multi-scale projector; SD-ShiftGELU, a sign-dependent GELU approximation that preserves element-wise behavior while avoiding the accuracy degradation; and a constrained Shiftmax that maintains stable Softmax normalization. Experimental results demonstrate that the proposed quantization pipeline consistently produces efficient fully integer-only models across different model scales. Across all model scales, the proposed pipeline incurs only a moderate accuracy degradation while reducing the model size by approximately $3.6\\times$ and the computational cost by more than one order of magnitude.",
+      "authors": [
+        "Thanh Cong Le",
+        "Michal Szczepanski",
+        "Martyna Poreba"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T18:33:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.24981v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "fully integer-only inference for lightweight detection transformers",
+      "llm_evidence_cn": "面向轻量检测变压器的全整数推理",
+      "llm_evidence": "面向轻量检测变压器的全整数推理",
+      "canonical_evidence": "面向轻量检测变压器的全整数推理",
+      "llm_tldr_en": "I-LW-DETR enables fully integer-only inference for lightweight detection transformers, removing floating-point operations.",
+      "llm_tldr_cn": "视觉变压器检测器在NPU和微控制器上部署困难，因其关键组件不支持整数运算。I-LW-DETR提出了首个完全整数化的轻量级DETR，通过尺度优先积分等三个关键组件，使前向传播中所有操作（包括非线性函数）均使用整数算术。该方法在不牺牲精度条件下显著提升了部署效率，适用于资源受限设备。",
+      "llm_tldr": "视觉变压器检测器在NPU和微控制器上部署困难，因其关键组件不支持整数运算。I-LW-DETR提出了首个完全整数化的轻量级DETR，通过尺度优先积分等三个关键组件，使前向传播中所有操作（包括非线性函数）均使用整数算术。该方法在不牺牲精度条件下显著提升了部署效率，适用于资源受限设备。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25234v1",
+      "source": "arxiv",
+      "title": "WHTMix: Efficient Stereo Depth Estimation via Walsh-Hadamard Token Mixing",
+      "abstract": "Stereo depth estimation for driving, robotics and augmented reality must run at high resolution under tight latency budgets, yet in transformer-based matchers the global self-attention that aggregates scene context grows quadratically with the number of pixels and comes to dominate runtime. We show that the joint self-attention stage of a stereo transformer, whose role is to spread context across both views, can be replaced by a data-independent Walsh-Hadamard token mixer that mixes tokens globally in the transform domain at log-linear cost, while the data-dependent cross-attention that performs left-right correspondence is retained. On synthetic driving data the mixer matches the attention baseline in end-point error while reducing model compute by a factor of 2.46 and single-image inference latency by a factor of 2.65. A complexity analysis shows the benefit is governed by the ratio of sequence length to channel width, which explains why high-resolution stereo matching is a particularly favorable setting and why classification transformers are not; we confirm this token-to-channel scaling on non-stereo long-sequence benchmarks. Furthermore, we introduce a hybrid log-disparity loss function designed to up-weight small-disparity pixels corresponding to long-range objects. This approach reduces the error on distant objects without incurring any additional computational overhead.",
+      "authors": [
+        "Prathyush Sajith",
+        "Emadeldeen Hamdan",
+        "Ahmet Enis Cetin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.IV",
+        "eess.SP"
+      ],
+      "published": "2026-07-28T03:22:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.25234v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "efficient token mixing for depth estimation",
+      "llm_evidence_cn": "高效令牌混合用于深度估计",
+      "llm_evidence": "高效令牌混合用于深度估计",
+      "canonical_evidence": "高效令牌混合用于深度估计",
+      "llm_tldr_en": "WHTMix replaces quadratic self-attention with Walsh-Hadamard token mixer for efficient stereo depth estimation, achieving log-linear cost.",
+      "llm_tldr_cn": "针对立体深度估计中自注意力二次复杂度问题，提出WHTMix，用Walsh-Hadamard变换替代全局自注意力进行令牌混合，在保持精度的同时将计算降低到对数线性。实验表明在合成驾驶数据上端点误差与注意力基线持平，计算量显著减少。该方法可推广至其他视觉任务中的令牌混合。",
+      "llm_tldr": "针对立体深度估计中自注意力二次复杂度问题，提出WHTMix，用Walsh-Hadamard变换替代全局自注意力进行令牌混合，在保持精度的同时将计算降低到对数线性。实验表明在合成驾驶数据上端点误差与注意力基线持平，计算量显著减少。该方法可推广至其他视觉任务中的令牌混合。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.25215v1",
+      "source": "arxiv",
+      "title": "Leveraging Semantic Maps for City-Scale Cross-View Localization",
+      "abstract": "We want robots to localize in previously untraversed environments against commonly available prior data. Rich semantic data available from OpenStreetMap can be useful in this task. However, existing methods either ignore this semantic information, directly matching panoramas and overhead imagery, or dramatically compress the semantic information, working with a small set of fixed classes. To leverage this rich semantic information, two challenges need to be overcome. First, useful semantic information needs to be extracted from the robot's egocentric observations. Second, the observed information must be quickly associated with the large prior semantic map (e.g., up to 628 km^2). We show that VLMs are effective at both extracting relevant landmarks from panoramas, and identifying feasible correspondences between these landmarks and prior overhead landmarks. However, using VLMs to propose all correspondences scales poorly as the number of mapped landmarks increases. Instead, we propose distilling a lightweight matcher from a VLM which computes correspondences for all entities in a map. We use this output to form an observation likelihood which is fused over time with a Bayes filter to create a time series of pose estimates. To support further investigation into generalizable cross-view methods that leverage semantic information, we release a dataset of extracted semantics and evaluation trajectories spanning eleven environments, including panoramas we collected in a snowstorm and at night in Boston. We demonstrate our method, trained on a single city's fair-weather data, generalizes across location, lighting, weather, and other challenges. Code and datasets are available at https://efahnestock.github.io/loci/.",
+      "authors": [
+        "Ethan Fahnestock",
+        "Erick Fuentes",
+        "Philip R Osteen",
+        "Nicholas Roy"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-07-28T02:44:56+00:00",
+      "link": "https://arxiv.org/pdf/2607.25215v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLM-based cross-view localization for city-scale semantic maps",
+      "llm_evidence_cn": "基于VLM的跨视图定位用于城市级语义地图",
+      "llm_evidence": "基于VLM的跨视图定位用于城市级语义地图",
+      "canonical_evidence": "基于VLM的跨视图定位用于城市级语义地图",
+      "llm_tldr_en": "Leverages VLMs to extract landmarks from panoramas for city-scale cross-view localization against OpenStreetMap.",
+      "llm_tldr_cn": "针对机器人在未遍历环境中利用公开语义地图定位的问题，证明VLM能从全景图中有效提取路标并与OpenStreetMap关联。方法解决了语义信息压缩过度的缺陷，在最大628km²区域实现高效定位。该工作展示了VLM在自动驾驶定位中的潜力。",
+      "llm_tldr": "针对机器人在未遍历环境中利用公开语义地图定位的问题，证明VLM能从全景图中有效提取路标并与OpenStreetMap关联。方法解决了语义信息压缩过度的缺陷，在最大628km²区域实现高效定位。该工作展示了VLM在自动驾驶定位中的潜力。",
+      "llm_tags": [
+        "query:mm-trf:composite"
+      ],
+      "matched_query_tag": "query:mm-trf:composite",
+      "matched_query_text": "Papers central to 基于多模态大模型的交通场景理解论文检索, especially work that connects or combines: Traffic Scene Understanding Based on Multimodal Large Language Models; Comprehensive traffic scene understanding and perception; Semantic analysis of road scenes with multimodal models; State of the art multimodal large language models for traffic scene understanding; Survey of vision language models in autonomous driving and road safety; Applications of multimodal LLMs in complex traffic environment perception.",
+      "matched_requirement_id": "req-composite-mm-trf",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25527v1",
+      "source": "arxiv",
+      "title": "Argus-Unified: Towards A Compact and Economical Unified Model for Image Understanding and Generation",
+      "abstract": "Unifying visual understanding and generation in one model holds immense promise, but remains challenging and expensive due to heavy compute and data demands and conflicts between the visual features needed for these two capabilities. To address these challenges, we present Argus-Unified, a compact, effective and unified multimodal model built with low demand on computation and data. Instead of aligning modalities from scratch, Argus-Unified effectively leverages pretrained vision-language models (VLMs) that provide strong multimodal priors. Specifically, we introduce hybrid visual tokens that preserve continuous tokens for understanding while learning discrete tokens for generation from a frozen unified vision encoder. Our training pipeline includes two stages: the first stage learns a quantizer and image decoder on top of the frozen vision encoder, the second stage trains the LLM initialized from a pretrained VLM for the unified multimodal modeling. Using by far the least amount of data (15.6M) and the lowest cost (~$2,000), we demonstrate that unified multimodal models can be trained economically while achieving strong performance in both understanding and generation. Notably, our model attains state-of-the-art multimodal understanding on GQA, POPE, and VQAv2, and competitive generation quality compared to models with dedicated vision encoders (e.g., Janus, Janus-Pro), all at ~10x lower cost and with ~5x less data. We envision Argus-Unified as a useful baseline that lowers the development barrier for unified models.",
+      "authors": [
+        "Weiming Zhuang",
+        "Jiabo Huang",
+        "Jingtao Li",
+        "Zhizhong Li",
+        "Chen Chen",
+        "Sina Sajadmanesh",
+        "Lingjuan Lyu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T10:12:06+00:00",
+      "link": "https://arxiv.org/pdf/2607.25527v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "compact unified multimodal model with hybrid visual tokens",
+      "llm_evidence_cn": "紧凑统一的多模态模型及混合视觉令牌",
+      "llm_evidence": "紧凑统一的多模态模型及混合视觉令牌",
+      "canonical_evidence": "紧凑统一的多模态模型及混合视觉令牌",
+      "llm_tldr_en": "Argus-Unified presents a compact multimodal model for image understanding and generation using hybrid visual tokens.",
+      "llm_tldr_cn": "统一视觉理解和生成在单一模型中面临计算和数据需求大的挑战。Argus-Unified利用预训练的视觉语言模型，引入混合视觉令牌（连续令牌用于理解，离散令牌用于生成），构建了紧凑高效的多模态模型。该方法在较低计算和数据需求下实现了优秀的理解和生成性能，为高效多模态模型设计提供了新方向。",
+      "llm_tldr": "统一视觉理解和生成在单一模型中面临计算和数据需求大的挑战。Argus-Unified利用预训练的视觉语言模型，引入混合视觉令牌（连续令牌用于理解，离散令牌用于生成），构建了紧凑高效的多模态模型。该方法在较低计算和数据需求下实现了优秀的理解和生成性能，为高效多模态模型设计提供了新方向。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.25570v1",
+      "source": "arxiv",
+      "title": "The LAIA Dataset: Labelled Attention for Intelligent Automobiles",
+      "abstract": "The development of autonomous vehicles (AVs) usually relies heavily on data-driven artificial intelligence (AI) models that require large volumes of sensor data with ground-truth annotations. While modular architectures are widely used, end-to-end driving paradigms offer a promising alternative by directly mapping sensor inputs to control actions. However, their adoption is limited by challenges in interpretability and explainability. To address this, we present LAIA (Labelled Attention for Intelligent Automobiles), a novel synthetic dataset designed to enrich end-to-end driving research with human attention data. Collected using the CARLA simulator in closed-loop environments, LAIA comprises over 15 hours of driving from 44 participants across carefully crafted scenarios designed to evoke natural responses. Each sequence includes RGB images under six weather conditions, semantic and instance segmentation, depth, optical flow, CAN bus signals, and synchronized eye-tracking data. LAIA enables applications including training attention-aware end-to-end AI drivers, predicting driver behavior, developing methods to detect anomalous driver-attention patterns, and improving model explainability. In this work, we use LAIA to compare human attention with the perceptual attention emerging in our end-to-end driving models, thereby providing insight into their behavior.",
+      "authors": [
+        "A. Contreras",
+        "D. Porres",
+        "R. Abad",
+        "P. Cano",
+        "G. Villalonga",
+        "A. M. López",
+        "A. Hernández-Sabaté"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.SE"
+      ],
+      "published": "2026-07-28T10:57:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.25570v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "synthetic dataset for end-to-end driving with human attention data",
+      "llm_evidence_cn": "包含人类注意力数据的端到端驾驶合成数据集",
+      "llm_evidence": "包含人类注意力数据的端到端驾驶合成数据集",
+      "canonical_evidence": "包含人类注意力数据的端到端驾驶合成数据集",
+      "llm_tldr_en": "Presents LAIA, a synthetic dataset for end-to-end autonomous driving research, including human attention data collected with CARLA simulator, to improve interpretability and explainability.",
+      "llm_tldr_cn": "端到端自动驾驶模型面临可解释性挑战。本文提出LAIA合成数据集，包含44名参与者在CARLA模拟器中超过15小时的驾驶数据，并标注了人类注意力。该数据集可用于训练和评估关注可解释性的驾驶模型，促进端到端驾驶的可解释性研究。",
+      "llm_tldr": "端到端自动驾驶模型面临可解释性挑战。本文提出LAIA合成数据集，包含44名参与者在CARLA模拟器中超过15小时的驾驶数据，并标注了人类注意力。该数据集可用于训练和评估关注可解释性的驾驶模型，促进端到端驾驶的可解释性研究。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

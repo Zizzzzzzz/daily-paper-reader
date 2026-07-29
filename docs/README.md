@@ -6,92 +6,64 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-28
-- 运行时间：2026-07-28 22:01:32 UTC
+- 最新运行日期：2026-07-29
+- 运行时间：2026-07-29 21:54:36 UTC
 - 运行状态：成功
-- 本次总论文数：24
-- 精读区：12
-- 速读区：12
+- 本次总论文数：14
+- 精读区：6
+- 速读区：8
 
 ### 今日简报（AI）
-今日聚焦多模态大模型的Token压缩与冗余建模，同时涉及视觉语言导航和端到端自动驾驶。最值得关注的两篇高分精读：结构化冗余建模实现高效视觉Token剪枝（9.0），以及OmniScope的跨模态解耦压缩策略（9.0）。建议优先精读这两篇掌握主流压缩方案，再根据兴趣速读室外导航与自动驾驶应用。
-- 详情：[/202607/28/README](/202607/28/README)
+今日处理14篇论文，精读6篇，重点聚焦多模态基础模型与VLA模型适应。
+最值得关注Mage-VL的编解码流式架构与因果推断驱动的测试时模态适应框架。
+建议普通读者优先精读这两篇高分论文，并延伸关注多模态预训练及自监督结构化动力学建模。
+- 详情：[/202607/29/README](/202607/29/README)
 
 ### 精读区论文标签
-1. [Structured Redundancy Modeling for Efficient Visual Token Pruning in High-Resolution MLLMs](/202607/28/2607.23046v1-structured-redundancy-modeling-for-efficient-visual-token-pruning-in-high-resolution-mllms)  
+1. [Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model](/202607/29/2607.24904v1-mage-vl-an-efficient-codec-native-streaming-multimodal-foundation-model)  
+   标签：评分：10.0/10、query:evlm
+   evidence：选择性编码动态区域，减少超过75%的视觉token消耗
+2. [A Causality-aware Infer-diagnose-refine Framework for Test-time Modality Adaptation in VLA Models](/202607/29/2607.25516v1-a-causality-aware-infer-diagnose-refine-framework-for-test-time-modality-adaptation-in-vla-models)  
    标签：评分：9.0/10、query:evlm
-   evidence：高分辨率MLLM的视觉Token剪枝
-2. [OmniScope: Modality-Decoupled Token Compression for Omnimodal Large Language Models](/202607/28/2607.23193v1-omniscope-modality-decoupled-token-compression-for-omnimodal-large-language-models)  
+   evidence：基于因果感知的VLA模型测试时模态适应框架
+3. [OmniDelta: Skill-Driven Budget Allocation for Token Compression in OmniLLMs](/202607/29/2607.25669v1-omnidelta-skill-driven-budget-allocation-for-token-compression-in-omnillms)  
    标签：评分：9.0/10、query:evlm
-   evidence：针对全模态大语言模型的无训练令牌压缩方法
-3. [WaveZip: Wavelet-Driven Space-Time Decoupling for Video Token Condensation](/202607/28/2607.23265v1-wavezip-wavelet-driven-space-time-decoupling-for-video-token-condensation)  
+   evidence：全模态大模型的令牌压缩预算分配
+4. [SepPrune:A Separator-based Pruning Framework for Efficient Multimodal Large Language Models](/202607/29/2607.25818v1-sepprunea-separator-based-pruning-framework-for-efficient-multimodal-large-language-models)  
    标签：评分：9.0/10、query:evlm
-   evidence：基于小波的视频Token压缩方法
-4. [UltraViT: Latency-Optimized On-device Vision Encoder for Large Vision-Language Models](/202607/28/2607.23373v1-ultravit-latency-optimized-on-device-vision-encoder-for-large-vision-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向大视觉语言模型的延迟优化视觉编码器
-5. [Omni-Prune: Query-Aware Unified Token Pruning for Efficient Omnimodal Large Language Models](/202607/28/2607.23445v1-omni-prune-query-aware-unified-token-pruning-for-efficient-omnimodal-large-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向高效全模态大语言模型的查询感知令牌剪枝框架
-6. [Neuromorphic Object Detection: An In-Depth Study and Future Directions](/202607/28/2607.23576v1-neuromorphic-object-detection-an-in-depth-study-and-future-directions)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：神经形态目标检测综述与基准
-7. [PathSelect: Sequential Token Selection for Whole Slide Pathology](/202607/28/2607.23631v1-pathselect-sequential-token-selection-for-whole-slide-pathology)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向全切片病理图像的序列化Token选择（剪枝）
-8. [Towards Ultrafast Depth Sensing Via Active Event-based Stereo Vision](/202607/28/2607.23684v1-towards-ultrafast-depth-sensing-via-active-event-based-stereo-vision)  
-   标签：评分：9.0/10、query:ev-cam
-   evidence：主动事件立体视觉用于超快深度感知
-9. [GOTS: Greedy Orthogonal Token Selection for High-Resolution Vision-Language Models](/202607/28/2607.23913v1-gots-greedy-orthogonal-token-selection-for-high-resolution-vision-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：用于减少视觉语言模型中视觉令牌的贪婪正交令牌选择方法
-10. [A Motion-Aware Vector Quantization Framework with Centroid Reuse for Efficient VLA Inference](/202607/28/2607.24148v1-a-motion-aware-vector-quantization-framework-with-centroid-reuse-for-efficient-vla-inference)  
-   标签：评分：9.0/10、query:evlm
-   evidence：高效VLA推理，运动感知向量量化
-11. [DynaCalKV: Key-Value Cache Compression via Head Grouping and Adaptive Rank Allocation](/202607/28/2607.24331v1-dynacalkv-key-value-cache-compression-via-head-grouping-and-adaptive-rank-allocation)  
-   标签：评分：9.0/10、query:evlm
-   evidence：通过头分组和自适应秩分配进行KV缓存压缩
-12. [MAViE: A Multi-scale Adaptive Vision Encoder for Fine-grained Visual Perception and Efficient Multimodal Reasoning](/202607/28/2607.24424v1-mavie-a-multi-scale-adaptive-vision-encoder-for-fine-grained-visual-perception-and-efficient-multimodal-reasoning)  
-   标签：评分：9.0/10、query:evlm
-   evidence：面向高效多模态推理的提问条件token路由
+   evidence：多模态大语言模型令牌剪枝
+5. [SAM3D-Guided Object-Centric Representation Alignment for Vision-Language-Action Models](/202607/29/2607.25912v1-sam3d-guided-object-centric-representation-alignment-for-vision-language-action-models)  
+   标签：评分：8.0/10、query:evlm
+   evidence：面向VLA模型的3D表示对齐方法
+6. [DC-WAM: Dynamic-Centric Visual Supervision and Reasoning for World-Action Models](/202607/29/2607.25918v1-dc-wam-dynamic-centric-visual-supervision-and-reasoning-for-world-action-models)  
+   标签：评分：8.0/10、query:evlm
+   evidence：面向世界动作模型的动态中心视觉监督，与高效VLA相关
 
 ### 速读区论文标签
-1. [Offline Vision-Language Navigation with Geometric Goal Localization for Outdoor Environments](/202607/28/2607.22226v1-offline-vision-language-navigation-with-geometric-goal-localization-for-outdoor-environments)  
-   标签：评分：8.0/10、query:evlm
-   evidence：使用小语言模型的机器人高效视觉-语言-动作模型
-2. [Through the Bottleneck: How Multi-head Latent Attention Separates Content from Position in Language Models](/202607/28/2607.23054v1-through-the-bottleneck-how-multi-head-latent-attention-separates-content-from-position-in-language-models)  
-   标签：评分：8.0/10、query:evlm
-   evidence：通过多头潜在注意力实现KV缓存压缩
-3. [MOJITO: Modal Joint Learning for Unified End-to-End Autonomous Driving](/202607/28/2607.23511v1-mojito-modal-joint-learning-for-unified-end-to-end-autonomous-driving)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：统一端到端自动驾驶的模态联合学习
-4. [ObsDriveBench: Benchmarking Multimodal Understanding under Adverse Weather with Observability Awareness](/202607/28/2607.23537v1-obsdrivebench-benchmarking-multimodal-understanding-under-adverse-weather-with-observability-awareness)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：恶劣天气下的多模态交通场景理解基准
-5. [MATS: A novel multi-modality multi-task learning framework for 3D perception in autonomous driving](/202607/28/2607.24224v1-mats-a-novel-multi-modality-multi-task-learning-framework-for-3d-perception-in-autonomous-driving)  
-   标签：评分：8.0/10、query:mm-trf
-   evidence：面向自动驾驶3D感知的多模态多任务学习，与交通场景理解密切相关
-6. [Beyond Appearance: A Multi-cue Framework and Large-scale Benchmark for Pedestrian Association and Tracking on Mobile Aerial-Ground Platforms](/202607/28/2607.23803v1-beyond-appearance-a-multi-cue-framework-and-large-scale-benchmark-for-pedestrian-association-and-tracking-on-mobile-aerial-ground-platforms)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：面向空地平台的多线索行人关联与跟踪，与交通场景理解相关
-7. [UniGen-AR: Unifying Visual Generation with Auto-Regressive Modeling](/202607/28/2607.24157v1-unigen-ar-unifying-visual-generation-with-auto-regressive-modeling)  
+1. [Self-Supervised Learning of Structured Dynamics from Videos](/202607/29/2607.21576v1-self-supervised-learning-of-structured-dynamics-from-videos)  
+   标签：评分：7.0/10、query:ev-cam
+   evidence：从视频中学习结构化运动分解，与事件视觉原理一致
+2. [Scaling Native Multimodal Pre-Training From Scratch](/202607/29/2607.22043v1-scaling-native-multimodal-pre-training-from-scratch)  
    标签：评分：7.0/10、query:evlm
-   evidence：多模态语言模型与高效自回归解码器降低推理延迟
-8. [Reasoning to Regulate: Chain-of-Thought for Traffic Rule Understanding](/202607/28/2607.24199v1-reasoning-to-regulate-chain-of-thought-for-traffic-rule-understanding)  
+   evidence：在固定计算预算下研究VLM预训练的最优模型规模与token数
+3. [WHTMix: Efficient Stereo Depth Estimation via Walsh-Hadamard Token Mixing](/202607/29/2607.25234v1-whtmix-efficient-stereo-depth-estimation-via-walsh-hadamard-token-mixing)  
+   标签：评分：7.0/10、query:evlm
+   evidence：高效令牌混合用于深度估计
+4. [Argus-Unified: Towards A Compact and Economical Unified Model for Image Understanding and Generation](/202607/29/2607.25527v1-argus-unified-towards-a-compact-and-economical-unified-model-for-image-understanding-and-generation)  
+   标签：评分：7.0/10、query:evlm
+   evidence：紧凑统一的多模态模型及混合视觉令牌
+5. [The LAIA Dataset: Labelled Attention for Intelligent Automobiles](/202607/29/2607.25570v1-the-laia-dataset-labelled-attention-for-intelligent-automobiles)  
    标签：评分：7.0/10、query:mm-trf
-   evidence：链式推理用于自动驾驶交通规则理解
-9. [SceneActBench: Can Agents Act on the 3D Scenes They See?](/202607/28/2607.22393v1-sceneactbench-can-agents-act-on-the-3d-scenes-they-see)  
-   标签：评分：6.0/10、query:evlm
-   evidence：用于智能体在3D场景中执行的基准测试，与视觉-语言-动作模型相关
-10. [Real-Time Semantic Segmentation with Optimized RetinaNet Architectures for Embedded Automotive Systems](/202607/28/2607.22714v1-real-time-semantic-segmentation-with-optimized-retinanet-architectures-for-embedded-automotive-systems)  
+   evidence：包含人类注意力数据的端到端驾驶合成数据集
+6. [Geometry Meets Semantics: Fractional Gradient Stabilization for Semantic-Driven Bounding Box Optimization in Visual Detection Tasks](/202607/29/2607.23530v1-geometry-meets-semantics-fractional-gradient-stabilization-for-semantic-driven-bounding-box-optimization-in-visual-detection-tasks)  
    标签：评分：6.0/10、query:mm-trf
-   evidence：面向嵌入式汽车系统的实时语义分割
-11. [A Few Words Go a Long Way: Language Guided Robot Policy Synthesis](/202607/28/2607.23784v1-a-few-words-go-a-long-way-language-guided-robot-policy-synthesis)  
+   evidence：语义几何联合的边界框优化用于检测
+7. [Enabling Fully Integer-Only Inference for Lightweight Detection Transformers](/202607/29/2607.24981v1-enabling-fully-integer-only-inference-for-lightweight-detection-transformers)  
    标签：评分：6.0/10、query:evlm
-   evidence：利用VLA进行模块化机器人程序合成
-12. [τ: Learning Touch-Augmented Vision-Language-Action Models from Future Visual Supervision](/202607/28/2607.24485v1--learning-touch-augmented-vision-language-action-models-from-future-visual-supervision)  
-   标签：评分：6.0/10、query:evlm
-   evidence：从未来视觉监督中学习触觉增强的视觉-语言-动作模型
+   evidence：面向轻量检测变压器的全整数推理
+8. [Leveraging Semantic Maps for City-Scale Cross-View Localization](/202607/29/2607.25215v1-leveraging-semantic-maps-for-city-scale-cross-view-localization)  
+   标签：评分：6.0/10、query:mm-trf
+   evidence：基于VLM的跨视图定位用于城市级语义地图
 
 
 <div class="dpr-home-promo-card">
