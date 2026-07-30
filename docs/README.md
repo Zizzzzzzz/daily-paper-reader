@@ -1,75 +1,106 @@
-<div class="dpr-home-notice-card">
-  <h3 class="dpr-home-notice-title">🚀 Start Here</h3>
-  <ul class="dpr-home-notice-list">
-    <li><a href="#/tutorial/README">使用教程</a></li>
-  </ul>
+<div class="dpr-home-notice-card dpr-home-panel">
+  <div class="dpr-home-notice-header dpr-home-panel-header">
+    <h3 class="dpr-home-notice-title">公告与更新</h3>
+    <a class="dpr-home-notice-tutorial" href="#/tutorial/README">使用教程 <span aria-hidden="true">›</span></a>
+  </div>
+  <div class="dpr-home-notice-entry">
+    <time class="dpr-home-notice-date" datetime="2026-07-20">07.20</time>
+    <div>
+      <strong class="dpr-home-notice-entry-title">反馈功能上线</strong>
+      <span class="dpr-home-notice-entry-summary">新增反馈功能，欢迎大家踊跃反馈各种建议，我们会第一时间查看并协调处理。</span>
+    </div>
+  </div>
+  <div class="dpr-home-notice-entry">
+    <time class="dpr-home-notice-date" datetime="2026-07-19">07.19</time>
+    <div>
+      <strong class="dpr-home-notice-entry-title">首页新增社区统计</strong>
+      <span class="dpr-home-notice-entry-summary">现在可以看到今天看论文的人数和项目加入人数。</span>
+    </div>
+  </div>
+  <div class="dpr-home-site-stats" data-dpr-site-stats hidden aria-live="polite">
+    <span>今天有 <strong class="dpr-home-site-stat-value" data-dpr-daily-readers>--</strong> 人在看论文</span>
+    <span class="dpr-home-site-stat-separator" aria-hidden="true">·</span>
+    <span>昨天有 <strong class="dpr-home-site-stat-value" data-dpr-yesterday-readers>--</strong> 人在看论文</span>
+    <span class="dpr-home-site-stat-separator" aria-hidden="true">·</span>
+    <span>已有 <strong class="dpr-home-site-stat-value" data-dpr-fork-count>--</strong> 人加入 Daily Paper Reader</span>
+    <span class="dpr-home-history">
+      <button type="button" class="dpr-home-history-trigger" data-dpr-history-trigger aria-label="查看最近 14 天阅读趋势"><span aria-hidden="true">🔍</span></button>
+      <span class="dpr-home-history-popover" data-dpr-history-popover role="tooltip">
+        <span class="dpr-home-history-header">近 14 天阅读趋势</span>
+        <span class="dpr-home-history-meta">
+          <span data-dpr-history-range>--</span>
+          <span>峰值 <strong data-dpr-history-peak>--</strong></span>
+        </span>
+        <span class="dpr-home-history-chart" data-dpr-history-chart></span>
+      </span>
+    </span>
+  </div>
 </div>
 
-## 每次日报
-- 最新运行日期：2026-07-29
-- 运行时间：2026-07-29 21:54:36 UTC
-- 运行状态：成功
-- 本次总论文数：14
-- 精读区：6
-- 速读区：8
+<div class="dpr-home-dashboard-grid">
+<section class="dpr-home-dashboard-card dpr-home-report-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">2026-07-30</span>
+      <h3 class="dpr-home-dashboard-title">今日汇总</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
+  </div>
+  <dl class="dpr-home-dashboard-stats">
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+  </dl>
+  <p class="dpr-home-dashboard-body">最近更新：2026-07-30 21:23:16 UTC<br>状态：成功</p>
+</section>
+<section class="dpr-home-dashboard-card dpr-home-brief-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">合并后生成</span>
+      <h3 class="dpr-home-dashboard-title">今日简报</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">AI</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<p>今日精读7篇速读3篇，重点突破实时VLA模型和显式运动引导方向。最值得关注的是TurboVLA在RTX 4090上实现32Hz实时推理且显存小于1GB，以及《Explicit Kinematic Guidance from Analytic Concepts》提出的运动引导新思路。建议优先阅读这两篇论文，关注轻量化VLA部署与可解释运动控制结合。</p>
+  </div>
+</section>
+<section class="dpr-home-dashboard-card dpr-home-deep-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">今日累计</span>
+      <h3 class="dpr-home-dashboard-title">精读推荐</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">7 篇</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with &lt;1 GB VRAM">TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with &lt;1 GB VRAM</span></li><li><span class="dpr-home-dashboard-paper-title" title="Explicit Kinematic Guidance from Analytic Concepts for Vision-Language-Action Models">Explicit Kinematic Guidance from Analytic Concepts for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Sequence-SOD: Bio-inspired Sequence-aware Spiking ObjectDetection for Event Cameras">Sequence-SOD: Bio-inspired Sequence-aware Spiking ObjectDetection for Event Cameras</span></li></ul>
+  </div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+</section>
+<section class="dpr-home-dashboard-card dpr-home-skim-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">今日累计</span>
+      <h3 class="dpr-home-dashboard-title">速读推荐</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">3 篇</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Towards Dual-Brain Minimal Sufficient Representation for Vision-Language Navigation">Towards Dual-Brain Minimal Sufficient Representation for Vision-Language Navigation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Vision-TL-Action: Neuro-Symbolic Trajectory Generation from Visual Observations and Temporal Logic">Vision-TL-Action: Neuro-Symbolic Trajectory Generation from Visual Observations and Temporal Logic</span></li><li><span class="dpr-home-dashboard-paper-title" title="IMPRINT: Image-Conditioned Query Enrichment for Long-Tail Object Goal Navigation">IMPRINT: Image-Conditioned Query Enrichment for Long-Tail Object Goal Navigation</span></li></ul>
+  </div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
+</section>
+</div>
 
-### 今日简报（AI）
-今日处理14篇论文，精读6篇，重点聚焦多模态基础模型与VLA模型适应。
-最值得关注Mage-VL的编解码流式架构与因果推断驱动的测试时模态适应框架。
-建议普通读者优先精读这两篇高分论文，并延伸关注多模态预训练及自监督结构化动力学建模。
-- 详情：[/202607/29/README](/202607/29/README)
-
-### 精读区论文标签
-1. [Mage-VL: An Efficient Codec-Native Streaming Multimodal Foundation Model](/202607/29/2607.24904v1-mage-vl-an-efficient-codec-native-streaming-multimodal-foundation-model)  
-   标签：评分：10.0/10、query:evlm
-   evidence：选择性编码动态区域，减少超过75%的视觉token消耗
-2. [A Causality-aware Infer-diagnose-refine Framework for Test-time Modality Adaptation in VLA Models](/202607/29/2607.25516v1-a-causality-aware-infer-diagnose-refine-framework-for-test-time-modality-adaptation-in-vla-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：基于因果感知的VLA模型测试时模态适应框架
-3. [OmniDelta: Skill-Driven Budget Allocation for Token Compression in OmniLLMs](/202607/29/2607.25669v1-omnidelta-skill-driven-budget-allocation-for-token-compression-in-omnillms)  
-   标签：评分：9.0/10、query:evlm
-   evidence：全模态大模型的令牌压缩预算分配
-4. [SepPrune:A Separator-based Pruning Framework for Efficient Multimodal Large Language Models](/202607/29/2607.25818v1-sepprunea-separator-based-pruning-framework-for-efficient-multimodal-large-language-models)  
-   标签：评分：9.0/10、query:evlm
-   evidence：多模态大语言模型令牌剪枝
-5. [SAM3D-Guided Object-Centric Representation Alignment for Vision-Language-Action Models](/202607/29/2607.25912v1-sam3d-guided-object-centric-representation-alignment-for-vision-language-action-models)  
-   标签：评分：8.0/10、query:evlm
-   evidence：面向VLA模型的3D表示对齐方法
-6. [DC-WAM: Dynamic-Centric Visual Supervision and Reasoning for World-Action Models](/202607/29/2607.25918v1-dc-wam-dynamic-centric-visual-supervision-and-reasoning-for-world-action-models)  
-   标签：评分：8.0/10、query:evlm
-   evidence：面向世界动作模型的动态中心视觉监督，与高效VLA相关
-
-### 速读区论文标签
-1. [Self-Supervised Learning of Structured Dynamics from Videos](/202607/29/2607.21576v1-self-supervised-learning-of-structured-dynamics-from-videos)  
-   标签：评分：7.0/10、query:ev-cam
-   evidence：从视频中学习结构化运动分解，与事件视觉原理一致
-2. [Scaling Native Multimodal Pre-Training From Scratch](/202607/29/2607.22043v1-scaling-native-multimodal-pre-training-from-scratch)  
-   标签：评分：7.0/10、query:evlm
-   evidence：在固定计算预算下研究VLM预训练的最优模型规模与token数
-3. [WHTMix: Efficient Stereo Depth Estimation via Walsh-Hadamard Token Mixing](/202607/29/2607.25234v1-whtmix-efficient-stereo-depth-estimation-via-walsh-hadamard-token-mixing)  
-   标签：评分：7.0/10、query:evlm
-   evidence：高效令牌混合用于深度估计
-4. [Argus-Unified: Towards A Compact and Economical Unified Model for Image Understanding and Generation](/202607/29/2607.25527v1-argus-unified-towards-a-compact-and-economical-unified-model-for-image-understanding-and-generation)  
-   标签：评分：7.0/10、query:evlm
-   evidence：紧凑统一的多模态模型及混合视觉令牌
-5. [The LAIA Dataset: Labelled Attention for Intelligent Automobiles](/202607/29/2607.25570v1-the-laia-dataset-labelled-attention-for-intelligent-automobiles)  
-   标签：评分：7.0/10、query:mm-trf
-   evidence：包含人类注意力数据的端到端驾驶合成数据集
-6. [Geometry Meets Semantics: Fractional Gradient Stabilization for Semantic-Driven Bounding Box Optimization in Visual Detection Tasks](/202607/29/2607.23530v1-geometry-meets-semantics-fractional-gradient-stabilization-for-semantic-driven-bounding-box-optimization-in-visual-detection-tasks)  
-   标签：评分：6.0/10、query:mm-trf
-   evidence：语义几何联合的边界框优化用于检测
-7. [Enabling Fully Integer-Only Inference for Lightweight Detection Transformers](/202607/29/2607.24981v1-enabling-fully-integer-only-inference-for-lightweight-detection-transformers)  
-   标签：评分：6.0/10、query:evlm
-   evidence：面向轻量检测变压器的全整数推理
-8. [Leveraging Semantic Maps for City-Scale Cross-View Localization](/202607/29/2607.25215v1-leveraging-semantic-maps-for-city-scale-cross-view-localization)  
-   标签：评分：6.0/10、query:mm-trf
-   evidence：基于VLM的跨视图定位用于城市级语义地图
-
-
-<div class="dpr-home-promo-card">
-  <h3 class="dpr-home-promo-title">💬 社区与支持</h3>
-  <ul class="dpr-home-promo-list">
-    <li>欢迎 Star / Fork / Issue / PR</li>
-    <li>QQ群：583867967（欢迎交流，已有：1151人）</li>
-  </ul>
+<div class="dpr-home-promo-card dpr-home-panel">
+  <div class="dpr-home-panel-header">
+    <h3 class="dpr-home-promo-title">社区与支持</h3>
+  </div>
+  <p class="dpr-home-promo-copy">欢迎通过 Star、Fork、Issue 或 PR 一起完善 Daily Paper Reader。</p>
+  <div class="dpr-home-promo-meta">
+    <span>QQ群 <strong>583867967</strong></span>
+    <span class="dpr-home-promo-separator" aria-hidden="true">·</span>
+    <span>已有 <strong>1,491</strong> 人参与交流</span>
+  </div>
 </div>
