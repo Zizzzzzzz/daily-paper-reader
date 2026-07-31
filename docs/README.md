@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-07-30</span>
+      <span class="dpr-home-dashboard-kicker">2026-07-31</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 15 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-07-30 21:23:16 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-07-31 21:31:32 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读7篇速读3篇，重点突破实时VLA模型和显式运动引导方向。最值得关注的是TurboVLA在RTX 4090上实现32Hz实时推理且显存小于1GB，以及《Explicit Kinematic Guidance from Analytic Concepts》提出的运动引导新思路。建议优先阅读这两篇论文，关注轻量化VLA部署与可解释运动控制结合。</p>
+<p>今日精读聚焦自动驾驶深度感知视频全景分割与视觉语言模型Token缩减抗漂移两项高impact工作。</p>
+<p>最值得关注：DVPSFormer实现高效的在线深度感知分割，Calibrate Before Reason则通过校准抑制语义漂移，双双拿下9.0分。</p>
+<p>普通读者可进一步留意速读中的农村场景目标检测及LLM深度分工研究，二者与精读主题形成方法互补。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +73,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with &lt;1 GB VRAM">TurboVLA: Real-Time Vision-Language-Action Model at 32 Hz on an RTX 4090 with &lt;1 GB VRAM</span></li><li><span class="dpr-home-dashboard-paper-title" title="Explicit Kinematic Guidance from Analytic Concepts for Vision-Language-Action Models">Explicit Kinematic Guidance from Analytic Concepts for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Sequence-SOD: Bio-inspired Sequence-aware Spiking ObjectDetection for Event Cameras">Sequence-SOD: Bio-inspired Sequence-aware Spiking ObjectDetection for Event Cameras</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="DVPSFormer: Efficient Online Depth-aware Video Panoptic Segmentation for Autonomous Driving">DVPSFormer: Efficient Online Depth-aware Video Panoptic Segmentation for Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="Calibrate Before Reason: Robust Visual Token Reduction against Semantic Drift in VLMs">Calibrate Before Reason: Robust Visual Token Reduction against Semantic Drift in VLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="SemPIC: Learning Semantic Position-Independent KV Caches">SemPIC: Learning Semantic Position-Independent KV Caches</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +86,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Towards Dual-Brain Minimal Sufficient Representation for Vision-Language Navigation">Towards Dual-Brain Minimal Sufficient Representation for Vision-Language Navigation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Vision-TL-Action: Neuro-Symbolic Trajectory Generation from Visual Observations and Temporal Logic">Vision-TL-Action: Neuro-Symbolic Trajectory Generation from Visual Observations and Temporal Logic</span></li><li><span class="dpr-home-dashboard-paper-title" title="IMPRINT: Image-Conditioned Query Enrichment for Long-Tail Object Goal Navigation">IMPRINT: Image-Conditioned Query Enrichment for Long-Tail Object Goal Navigation</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="One Patch Is Enough: Reinforcement-Optimized Visual Token Grounding for MLLM-Based Scene Text Spotting">One Patch Is Enough: Reinforcement-Optimized Visual Token Grounding for MLLM-Based Scene Text Spotting</span></li><li><span class="dpr-home-dashboard-paper-title" title="Object Detection for Autonomous Driving in Chinese Rural Scenes: An Experimental Study on Real-Synthetic Data Mixing and Model Evaluation">Object Detection for Autonomous Driving in Chinese Rural Scenes: An Experimental Study on Real-Synthetic Data Mixing and Model Evaluation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Understanding Is Done Early: A Depth Division of Labor in Large Language Models and Its Use for Unbounded-Context Memory">Understanding Is Done Early: A Depth Division of Labor in Large Language Models and Its Use for Unbounded-Context Memory</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span></div>
 </section>
 </div>
 

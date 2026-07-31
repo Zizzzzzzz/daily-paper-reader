@@ -1,0 +1,681 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-31T21:21:52.835327+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 9,
+    "deep_cap": 8,
+    "deep_selected": 8,
+    "quick_candidates": 7,
+    "quick_skim_target": 13,
+    "quick_selected": 7
+  },
+  "deep_dive": [
+    {
+      "id": "2607.26165v1",
+      "source": "arxiv",
+      "title": "DVPSFormer: Efficient Online Depth-aware Video Panoptic Segmentation for Autonomous Driving",
+      "abstract": "Safe autonomous navigation requires a holistic understanding of dynamic environments, necessitating the simultaneous estimation of metric depth, semantic segmentation, and instance trajectories. While depth-aware video panoptic segmentation (DVPS) unifies these tasks, existing approaches often rely on computationally expensive, multi-stage pipelines or offline tracking, rendering them unsuitable for real-time decision-making. To address this, we propose DVPSFormer, a unified online architecture designed for efficient 4D scene understanding. Central to our approach is explicit scene discretization (ESD), a novel mechanism that leverages segmentation queries to represent foreground and background regions, enabling a discrete-to-continuous (D2C) depth head to decode metric depth in a single pass. This tightly couples semantic and geometric learning while significantly reducing latency. Furthermore, we propose an online majority voting (OMV) mechanism that exploits temporal consistency to refine classification during instance tracking. DVPSFormer establishes a new state-of-the-art on the Cityscapes-DVPS and SemKITTI-DVPS benchmarks, offering a streamlined solution for online robotic perception. Code and models are available at https://royyang0714.github.io/DVPSFormer.",
+      "authors": [
+        "Yung-Hsu Yang",
+        "Luigi Piccinelli",
+        "Siyuan Li",
+        "Mattia Segu",
+        "Lei Ke",
+        "Martin Danelljan",
+        "Yuqian Fu",
+        "Zuria Bauer",
+        "Fisher Yu",
+        "Hermann Blum",
+        "Marc Pollefeys"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-28T18:16:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.26165v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Unified efficient online 4D scene understanding for autonomous driving, directly covering comprehensive traffic scene perception",
+      "llm_evidence_cn": "面向自动驾驶的统一高效在线4D场景理解，直接契合交通场景综合感知需求",
+      "llm_evidence": "面向自动驾驶的统一高效在线4D场景理解，直接契合交通场景综合感知需求",
+      "canonical_evidence": "面向自动驾驶的统一高效在线4D场景理解，直接契合交通场景综合感知需求",
+      "llm_tldr_en": "DVPSFormer unifies depth, semantic segmentation, and instance tracking in an online 4D scene understanding architecture for autonomous driving, enabling real-time holistic traffic perception.",
+      "llm_tldr_cn": "现有深度感知视频全景分割方法常依赖多阶段或离线跟踪流水线，计算昂贵，难以用于实时自动驾驶决策。该文提出DVPSFormer，一种统一的在线网络，通过显式场景离散化（ESD）机制将前景与背景区域表示为分割查询，实现高效4D场景理解。实验表明，该方法在保持高质量深度、语义与实例预测的同时显著提升在线效率。这项工作为自动驾驶实时交通场景感知提供了一体化解决方案。",
+      "llm_tldr": "现有深度感知视频全景分割方法常依赖多阶段或离线跟踪流水线，计算昂贵，难以用于实时自动驾驶决策。该文提出DVPSFormer，一种统一的在线网络，通过显式场景离散化（ESD）机制将前景与背景区域表示为分割查询，实现高效4D场景理解。实验表明，该方法在保持高质量深度、语义与实例预测的同时显著提升在线效率。这项工作为自动驾驶实时交通场景感知提供了一体化解决方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.27700v1",
+      "source": "arxiv",
+      "title": "Calibrate Before Reason: Robust Visual Token Reduction against Semantic Drift in VLMs",
+      "abstract": "Large Vision-Language Models (VLMs) suffer from prohibitive inference overhead due to long sequences of visual tokens. However, existing visual token reduction methods mainly improve efficiency by pruning or compressing redundant tokens without examining whether the resulting representation remains semantically consistent with the original representation. Mapping the original N-token visual sequence to K tokens may discard, dilute, or misassign critical visual cues, triggering severe semantic drift that deviates the VLM's understanding. In this paper, we first introduce the principle of 'Calibrate Before Reason' to visual token reduction and propose CaRe, a training-free robust framework that calibrates compact visual representations before reasoning to preserve semantic fidelity in VLMs. CaRe consists of two mutually complementary modules: 1) Perturbation-Robust Calibration Anchoring, which identifies calibration anchors with stable model-side influence under multi-directional perturbations; 2) Confidence-Gated Token Calibration, which extracts reliable calibration signals from unselected tokens and injects them into anchors. Extensive evaluations across diverse VLM architectures and benchmarks verify that CaRe outperforms state-of-the-art token reduction baselines. While pruning 94.4% of visual tokens, our method retains 96.4% of the original full-token performance, delivering up to 2.30 times faster end-to-end inference speed relative to unpruned vanilla models.",
+      "authors": [
+        "Jiasheng Li",
+        "Zhong Ji",
+        "Yan Zhang",
+        "Huihui Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T05:36:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.27700v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Visual token reduction robust to semantic drift in VLMs",
+      "llm_evidence_cn": "视觉语言模型中对抗语义漂移的视觉标记缩减",
+      "llm_evidence": "视觉语言模型中对抗语义漂移的视觉标记缩减",
+      "canonical_evidence": "视觉语言模型中对抗语义漂移的视觉标记缩减",
+      "llm_tldr_en": "Introduces the principle of Calibrate Before Reason and proposes CaRe, a training-free framework that calibrates compact visual representations before feeding to the LLM to prevent semantic drift from token reduction in VLMs.",
+      "llm_tldr_cn": "针对大视觉语言模型推理开销大而现有视觉标记缩减方法忽略表示语义一致性问题，本文提出'推理前校准'原则及免训练框架CaRe。该方法在对原始视觉标记降维到K个标记后、送入语言模型前，先对紧凑视觉表示进行校准，避免关键视觉线索被丢弃或错配导致的语义漂移。实验表明CaRe在显著提升推理效率的同时保持甚至改善模型理解准确性，为视觉标记缩减提供了稳健保障。",
+      "llm_tldr": "针对大视觉语言模型推理开销大而现有视觉标记缩减方法忽略表示语义一致性问题，本文提出'推理前校准'原则及免训练框架CaRe。该方法在对原始视觉标记降维到K个标记后、送入语言模型前，先对紧凑视觉表示进行校准，避免关键视觉线索被丢弃或错配导致的语义漂移。实验表明CaRe在显著提升推理效率的同时保持甚至改善模型理解准确性，为视觉标记缩减提供了稳健保障。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28069v1",
+      "source": "arxiv",
+      "title": "SemPIC: Learning Semantic Position-Independent KV Caches",
+      "abstract": "Long-context retrieval and agentic workloads repeatedly reuse the same documents under changing instructions, histories, and document orders. Prefix caching cannot exploit this reuse, while position-independent caching (PIC) remains unreliable because independently compiled KV states lack the future context in which they will be consumed. Our diagnostics show that a learned boundary-conditioned baseline sharply reduces attention deviation near reusable-block boundaries but leaves interior and task-level residuals, motivating adaptation of the document representation itself. We present \\emph{SemPIC}, which trains a LoRA-enabled Writer to compile native per-layer document KVs through behavioral distillation while retaining the pretrained decoder as an unchanged Reader. Adaptation is confined to offline cache construction, preserving the standard KV interface and cache-hit decoding path. We further introduce KV Gradient Checkpointing, which reduces peak training memory without severing gradients through cached KVs. Across three models and four tasks, SemPIC raises mean micro-F1 over KV Packet from 0.53 to 0.60, approaching Full Recompute at 0.62.",
+      "authors": [
+        "Hui Xie",
+        "Peng Xiao",
+        "Yutong Deng\\textsuperscript",
+        "Shuoran Dou",
+        "Jian Yang",
+        "Jinyang Guo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-30T11:45:24+00:00",
+      "link": "https://arxiv.org/pdf/2607.28069v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Learning semantic position-independent KV caches for long-context reuse and compression",
+      "llm_evidence_cn": "面向长上下文复用与压缩的学习式语义位置无关KV缓存",
+      "llm_evidence": "面向长上下文复用与压缩的学习式语义位置无关KV缓存",
+      "canonical_evidence": "面向长上下文复用与压缩的学习式语义位置无关KV缓存",
+      "llm_tldr_en": "Presents SemPIC, training a LoRA-enabled Writer to compile native per-layer document KVs via behavioral distillation while retaining the decoder, enabling reliable deep cache reuse.",
+      "llm_tldr_cn": "长上下文检索与智能体任务会重复使用相同文档，前缀缓存无法利用这种复用，而位置无关缓存的独立KV状态缺乏未来上下文导致不可靠。论文提出SemPIC，通过行为蒸馏训练带LoRA的Writer为每层文档编译原生KV表示，同时保持预训练解码器不变，按需读取缓存，从而在不牺牲任务质量的前提下实现更可靠的KV缓存复用与压缩，为长上下文KV管理提供了新的学习式方案。",
+      "llm_tldr": "长上下文检索与智能体任务会重复使用相同文档，前缀缓存无法利用这种复用，而位置无关缓存的独立KV状态缺乏未来上下文导致不可靠。论文提出SemPIC，通过行为蒸馏训练带LoRA的Writer为每层文档编译原生KV表示，同时保持预训练解码器不变，按需读取缓存，从而在不牺牲任务质量的前提下实现更可靠的KV缓存复用与压缩，为长上下文KV管理提供了新的学习式方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28341v1",
+      "source": "arxiv",
+      "title": "Capturing Token Tendencies for Training-Free Token Pruning in Multimodal Large Language Models",
+      "abstract": "While visual token pruning is essential for efficient Multimodal Large Language Models (MLLMs), existing training-free methods suffer from a critical limitation: they rely on static, instantaneous heuristics to perform irreversible filtering. This approach ignores the hierarchical nature of MLLMs, where token importance often evolves dynamically rather than remaining fixed across layers. Consequently, tokens essential for deep-layer reasoning are often prematurely discarded by shallow-layer estimates. To address this, we propose Trend-aware Pruning, a novel framework that elevates pruning from a local snapshot decision to a temporal trajectory modeling problem. Instead of relying on isolated scores, our method captures the momentum of attention flow. This enables a dynamic rectification mechanism that selectively reactivates \"late-blooming\" tokens, those initially undervalued but exhibiting rising semantic importance, thereby preventing the loss of critical visual cues. Extensive experiments demonstrate that our approach achieves a superior efficiency-performance trade-off across diverse multimodal tasks. Notably, it reduces visual tokens by over 77.8%, retaining only approximately 23 tokens in the final layer while maintaining competitive performance, offering a robust and reversible solution for high-efficiency multimodal inference.",
+      "authors": [
+        "Jie Ma",
+        "Zhike Qiu",
+        "Jie Gao",
+        "Jiayi Ji",
+        "Qian Chen",
+        "Xiaoshuai Sun",
+        "Rongrong Ji"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T15:07:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.28341v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free token pruning via token tendency modeling in MLLMs",
+      "llm_evidence_cn": "基于token趋势建模的免训练剪枝",
+      "llm_evidence": "基于token趋势建模的免训练剪枝",
+      "canonical_evidence": "基于token趋势建模的免训练剪枝",
+      "llm_tldr_en": "Trend-aware Pruning captures temporal trajectories of token importance across layers, replacing static heuristics for training-free visual token pruning in MLLMs and improving deep-layer token retention.",
+      "llm_tldr_cn": "针对现有免训练视觉token剪枝依赖静态瞬时启发式、容易过早丢弃深层关键token的问题，本文提出趋势感知剪枝框架，将剪枝从局部快照决策上升为时间轨迹建模问题。方法捕捉token跨层重要性的动态变化，而非依赖孤立分数做不可逆过滤。实验表明该框架显著提升剪枝可靠性，在保持多模态大模型性能的同时实现高效推理。",
+      "llm_tldr": "针对现有免训练视觉token剪枝依赖静态瞬时启发式、容易过早丢弃深层关键token的问题，本文提出趋势感知剪枝框架，将剪枝从局部快照决策上升为时间轨迹建模问题。方法捕捉token跨层重要性的动态变化，而非依赖孤立分数做不可逆过滤。实验表明该框架显著提升剪枝可靠性，在保持多模态大模型性能的同时实现高效推理。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28463v1",
+      "source": "arxiv",
+      "title": "VisualRouter: Query-Grounded Visual Sampling for Long Video Understanding",
+      "abstract": "Large vision-language models (LVLMs) have achieved significant progress in video understanding, yet understanding long videos remains challenging due to the large number of visual tokens and limited context windows. Visual sampling provides a practical solution by selecting an informative subset of frames. However, existing methods typically either rely on relevance-aware sampling, leading to redundant frame selection and insufficient temporal coverage, or adopt a fixed sampling strategy regardless of query type. In this paper, we propose VisualRouter, a training-free and plug-and-play framework for query-grounded visual sampling. VisualRouter first classifies each query as either global or local and then applies the corresponding sampling strategy. For global queries, it employs a relevance-coverage hybrid strategy that preserves temporal coverage while retaining query-relevant visual evidence. For local queries, it adopts an event-aware frame selection strategy that performs event partitioning, segment-level frame allocation, and intra-event frame selection, jointly balancing relevance, coverage, and diversity with a limited number of input frames. Experiments show that VisualRouter consistently improves multiple LVLMs over uniform sampling, achieving gains of 5.2%, 7.7%, and 11.6% on Video-MME, LongVideoBench, and MLVU with Qwen2.5-VL-7B, and outperforming existing training-free visual sampling methods under the same setting.",
+      "authors": [
+        "Haiyue Zhang",
+        "Yi Bin",
+        "Xun Jiang",
+        "Zeyu Ma",
+        "Duo Peng",
+        "Guoqing Wang",
+        "Yang Yang",
+        "Heng Tao Shen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T16:23:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.28463v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "query-grounded visual token sampling for long video LVLM",
+      "llm_evidence_cn": "查询引导的视觉token采样，压缩长视频LVLM输入",
+      "llm_evidence": "查询引导的视觉token采样，压缩长视频LVLM输入",
+      "canonical_evidence": "查询引导的视觉token采样，压缩长视频LVLM输入",
+      "llm_tldr_en": "VisualRouter is a training-free query-grounded visual sampling framework for long video understanding; it classifies each query as global or local and selects informative frames to reduce visual token load and improve temporal coverage.",
+      "llm_tldr_cn": "长视频理解受限于大量视觉 token 和有限上下文窗口，现有采样方法要么产生冗余帧、要么缺乏查询敏感性。VisualRouter 提出训练免费且即插即用的查询引导采样框架，先判断查询是全局型还是局部型，再采用相应策略挑选关键帧，以降低 token 开销并增强时间覆盖。实验显示该方法能更有效地支持 LVLM 对长视频的理解，可作为现有模型的高效增强组件。",
+      "llm_tldr": "长视频理解受限于大量视觉 token 和有限上下文窗口，现有采样方法要么产生冗余帧、要么缺乏查询敏感性。VisualRouter 提出训练免费且即插即用的查询引导采样框架，先判断查询是全局型还是局部型，再采用相应策略挑选关键帧，以降低 token 开销并增强时间覆盖。实验显示该方法能更有效地支持 LVLM 对长视频的理解，可作为现有模型的高效增强组件。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28627v1",
+      "source": "arxiv",
+      "title": "ReToken: One Token to Improve Vision-Language Models for Visual Retrieval",
+      "abstract": "Long visual context poses a challenge for vision-language models: performance degrades as the number of distractors grows, and processing all tokens at once is computationally infeasible under GPU memory constraints. We present ReToken, a single learnable embedding trained as an explicit retrieval target that selects a sparse set of query-relevant visual tokens from a pre-filled visual KV cache. Trained on only a small image-QA dataset, ReToken yields consistent gains across image and video benchmarks: on Visual Haystacks it improves Qwen3VL-8B by 13.4 points and InternVL3.5 by 12.4 points (>20% relative), and on LVBench it transfers zero-shot to long video for an 8.0-point gain with Qwen3VL-8B. Thanks to its lightweight design, both training and long-video inference fit on a single H100. Code is available at: https://github.com/avaxiao/ReToken",
+      "authors": [
+        "Yao Xiao",
+        "Reuben Tan",
+        "Zhen Zhu",
+        "Yuqun Wu",
+        "Jianfeng Gao",
+        "Derek Hoiem"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-30T17:59:56+00:00",
+      "link": "https://arxiv.org/pdf/2607.28627v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "sparse query-relevant visual token selection from pre-filled visual KV cache to reduce long visual context",
+      "llm_evidence_cn": "从预填充视觉KV缓存中选择少量查询相关token，压缩长视觉上下文",
+      "llm_evidence": "从预填充视觉KV缓存中选择少量查询相关token，压缩长视觉上下文",
+      "canonical_evidence": "从预填充视觉KV缓存中选择少量查询相关token，压缩长视觉上下文",
+      "llm_tldr_en": "ReToken trains a single learnable retrieval token to select a sparse subset of query-relevant visual tokens from a pre-filled KV cache, improving VLM visual retrieval accuracy and enabling long-context processing under memory limits.",
+      "llm_tldr_cn": "长视觉上下文会降低VLM性能并带来显存压力。ReToken提出一个可学习的检索token，从预填充的视觉KV缓存中挑选与查询相关的稀疏视觉token，仅需少量图像问答数据训练即可在图像和视频基准上显著提升Qwen3VL等模型的检索效果，同时保持轻量高效。",
+      "llm_tldr": "长视觉上下文会降低VLM性能并带来显存压力。ReToken提出一个可学习的检索token，从预填充的视觉KV缓存中挑选与查询相关的稀疏视觉token，仅需少量图像问答数据训练即可在图像和视频基准上显著提升Qwen3VL等模型的检索效果，同时保持轻量高效。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.28020v1",
+      "source": "arxiv",
+      "title": "ENCORE: Event-Assisted Complementary Motion Refinement for Learned Video Compression",
+      "abstract": "Learned video compression relies on accurate temporal modeling to remove redundancy between adjacent frames. However, most existing codecs infer motion solely from discretely sampled RGB frames, making their estimates vulnerable to fast motion, blur, occlusion, weak texture, low illumination, and abrupt brightness changes. Event cameras asynchronously capture fine-grained intensity changes between RGB timestamps and therefore provide complementary evidence about inter-frame dynamics. We propose ENCORE, an Event-Assisted Complementary Motion Refinement framework for learned video compression. ENCORE first employs Complementary Motion Representation (CMR) to decompose aligned RGB-event features into common and modality-specific motion representations. Spatial Energy and Redundancy-Informed Calibration (SERIC) then identifies event-specific responses that are active and novel relative to RGB, suppresses weak or redundant evidence, and predicts a candidate flow correction. Finally, Energy-Aware Routing (EAR) determines where and how strongly the correction should refine the RGB flow. Events serve solely as an auxiliary modality for motion modeling, while RGB remains the only coding and reconstruction target. Experiments on BS-ERGB, HQ-EVFI, and CED demonstrate consistent gains across datasets and GOP lengths. On BS-ERGB, ENCORE achieves up to 20.80% PSNR-RGB and 22.14% MS-SSIM-RGB BD-rate savings, while retaining clear improvements on the other two datasets.",
+      "authors": [
+        "Shuhan Ye",
+        "Hongbin Yu",
+        "Chenqi Kong",
+        "Pingchuan Ma",
+        "Chong Wang",
+        "Jun Wan",
+        "Qixin Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T11:10:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.28020v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Event cameras complement RGB motion estimation for video compression",
+      "llm_evidence_cn": "事件相机补充RGB运动估计用于视频压缩",
+      "llm_evidence": "事件相机补充RGB运动估计用于视频压缩",
+      "canonical_evidence": "事件相机补充RGB运动估计用于视频压缩",
+      "llm_tldr_en": "ENCORE uses event cameras to provide complementary motion evidence for learned video compression, refining motion under fast motion, blur, and low illumination.",
+      "llm_tldr_cn": "学习型视频压缩依赖从RGB帧估计运动，在快速运动、模糊、弱纹理等场景下易失效。事件相机异步捕获像素亮度精细变化，能提供帧间动态的互补证据。本文提出ENCORE框架，通过互补运动表征分解RGB-事件特征并细化运动估计，显著提升困难场景下的视频压缩性能。",
+      "llm_tldr": "学习型视频压缩依赖从RGB帧估计运动，在快速运动、模糊、弱纹理等场景下易失效。事件相机异步捕获像素亮度精细变化，能提供帧间动态的互补证据。本文提出ENCORE框架，通过互补运动表征分解RGB-事件特征并细化运动估计，显著提升困难场景下的视频压缩性能。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23504v1",
+      "source": "arxiv",
+      "title": "MemVLN: Episodic and Procedural Memory for Vision-and-Language Navigation",
+      "abstract": "Vision-and-Language Navigation in Continuous Environments (VLN-CE) requires agents to maintain long-horizon visual history for trajectory consistency while executing actions with low latency. Existing video-based VLN approaches typically struggle to satisfy both demands simultaneously. To address these challenges, we propose MemVLN, a novel VLN framework that achieves state-of-the-art performance with real-time inference efficiency (14 FPS). MemVLN utilizes a visual encoder to process continuous observations and a Large Language Model (LLM) to interpret instructions and generate actions. Central to our approach is an Episodic Memory management that applies pyramidal resolutions. This mechanism concentrates computation on immediate percepts while retaining compressed long-term history. Complementing to this design, we introduce Procedural Memory for fast action with a compact vocabulary of atomic mid-level actions to bypass auto-regressive decoding latency. Experiments on VLN-CE show that MemVLN-4B surpasses the baseline Qwen3-VL-4B architecture by 5.8\\% SR in R2R and 9.7\\% SR in RxR, while achieving a 7$\\times$ speedup in inference latency.",
+      "authors": [
+        "Yuqi Liu",
+        "Shengju Qian",
+        "Tianyuan Qu",
+        "Mingxian Lin",
+        "Zixuan Wang",
+        "Xin Wang",
+        "Bei Yu",
+        "Jiaya Jia"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-26T07:08:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.23504v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Real-time inference efficiency for vision-language-action navigation model",
+      "llm_evidence_cn": "面向视觉语言导航动作模型的实时推理效率优化",
+      "llm_evidence": "面向视觉语言导航动作模型的实时推理效率优化",
+      "canonical_evidence": "面向视觉语言导航动作模型的实时推理效率优化",
+      "llm_tldr_en": "MemVLN achieves state-of-the-art VLN-CE performance at 14 FPS using episodic memory with pyramidal resolutions and LLM-based action generation.",
+      "llm_tldr_cn": "连续环境视觉语言导航要求同时保持长时间视觉历史与低延迟动作执行，现有视频方法难以兼顾。MemVLN提出基于金字塔分辨率的情景记忆管理，利用大语言模型解释指令并生成动作，在保持轨迹一致性的同时实现14 FPS的实时推理速度，刷新了性能与效率的平衡。",
+      "llm_tldr": "连续环境视觉语言导航要求同时保持长时间视觉历史与低延迟动作执行，现有视频方法难以兼顾。MemVLN提出基于金字塔分辨率的情景记忆管理，利用大语言模型解释指令并生成动作，在保持轨迹一致性的同时实现14 FPS的实时推理速度，刷新了性能与效率的平衡。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.27902v1",
+      "source": "arxiv",
+      "title": "One Patch Is Enough: Reinforcement-Optimized Visual Token Grounding for MLLM-Based Scene Text Spotting",
+      "abstract": "Scene text spotting requires high-precision alignment between textual recognition and spatial localization. While visual-token grounding has emerged as a promising formulation for Multimodal Large Language Models (MLLMs), the previous multi-patch paradigm often introduces redundant noise and localization ambiguity, particularly for dense or small text instances. To address this, we propose Single-Patch Text Spotting (SPaTS), a vision-centric framework that routes each text instance through a single anchor visual token and then recovers geometry via full-image refinement. To accurately identify this anchor without oracle labels, we introduce Single-Patch Selective Optimization (SPaSO), a reinforcement learning framework that optimizes discrete visual-token selection using patch-level rewards. To further improve representation robustness and localization precision, we introduce Directional Embedding Alignment (DEA) to suppress unstable norm bias by decoupling feature magnitude and direction, and Patch-Enhanced Decoding (PED) to fuse the routed anchor with language semantics and cross-attend over the full-image feature map for geometry-aware boundary regression beyond coordinate-space surrogates. Extensive experiments demonstrate that SPaTS consistently and significantly outperforms both frontier closed-source MLLMs and OCR MLLMs. Code will be released soon.",
+      "authors": [
+        "Rui Tang",
+        "Wentao Yang",
+        "Peirong Zhang",
+        "Yongxin Shi",
+        "Shun Zhang",
+        "Huiguo He",
+        "Lianwen Jin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T09:17:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.27902v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Reduces visual tokens to a single anchor token per instance, addressing token redundancy in MLLM-based spotting",
+      "llm_evidence_cn": "提出单Patch框架将每个文本实例路由到一个锚点视觉token，减少多Patch带来的冗余",
+      "llm_evidence": "提出单Patch框架将每个文本实例路由到一个锚点视觉token，减少多Patch带来的冗余",
+      "canonical_evidence": "提出单Patch框架将每个文本实例路由到一个锚点视觉token，减少多Patch带来的冗余",
+      "llm_tldr_en": "SPaTS uses a single anchor visual token per text instance with reinforcement-optimized selection, reducing redundancy and improving MLLM scene text spotting efficiency.",
+      "llm_tldr_cn": "基于MLLM的视觉令牌定位在场景文字检测中常因多Patch范式引入冗余噪声和定位歧义。本文提出单Patch文本识别SPaTS，将每个文本实例仅通过一个锚点视觉令牌路由，再利用全图精修恢复几何信息。为无需神标签地挑选锚点，引入强化学习框架SPaSO进行选择性优化，显著提升密集小文字场景下的定位与识别性能。",
+      "llm_tldr": "基于MLLM的视觉令牌定位在场景文字检测中常因多Patch范式引入冗余噪声和定位歧义。本文提出单Patch文本识别SPaTS，将每个文本实例仅通过一个锚点视觉令牌路由，再利用全图精修恢复几何信息。为无需神标签地挑选锚点，引入强化学习框架SPaSO进行选择性优化，显著提升密集小文字场景下的定位与识别性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2607.27058v1",
+      "source": "arxiv",
+      "title": "Object Detection for Autonomous Driving in Chinese Rural Scenes: An Experimental Study on Real-Synthetic Data Mixing and Model Evaluation",
+      "abstract": "Currently, autonomous driving object detection models face significant data scarcity and generalization challenges when navigating complex Chinese rural traffic scenarios. To address these limitations, we propose a novel real-synthetic mixed object detection dataset tailored specifically for Chinese rural roads and systematically evaluate the performance of 13 mainstream detectors under different real-to-synthetic data ratios, thereby providing empirical evidence for model selection and data strategy design in rural autonomous driving scenarios. Our dataset combines real-world images captured in Weishi County, Henan Province, with parameterized virtual scenes generated via Unreal Engine. To accurately reflect the unique realities of rural traffic, we define a comprehensive 14-category object system encompassing region-specific elements such as electric tricycles, low-speed vehicles (LSVs), and roadside stalls. Under a unified training protocol, we systematically evaluate 13 mainstream detectors -- spanning the YOLOv5, YOLOv8, YOLO11, and YOLO26 series, as well as RT-DETR-L -- across three data configurations: an all-real baseline, a 1:0.5 real-to-virtual mix, and a 1:1 mix. Experimental results demonstrate that a moderate injection of synthetic data (1:0.5 ratio) effectively enhances detection performance, with YOLO11m achieving the highest mAP@0.5 of 0.758. However, a higher proportion of synthetic data (1:1) introduces domain shifts that offset the benefits of data scaling. While most models reliably identify distinct local vehicles, significant perceptual bottlenecks remain for long-tail, non-standard objects like stalls and railings. This research provides crucial empirical evidence and novel insights for model selection and synthetic data strategies, facilitating the practical deployment of autonomous driving perception systems in rural areas.",
+      "authors": [
+        "Danning Zhu",
+        "Ziyan Lin",
+        "Jing Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-29T15:49:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.27058v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Object detection dataset and evaluation for autonomous driving in rural traffic scenes",
+      "llm_evidence_cn": "面向农村交通场景的自动驾驶目标检测与数据策略研究",
+      "llm_evidence": "面向农村交通场景的自动驾驶目标检测与数据策略研究",
+      "canonical_evidence": "面向农村交通场景的自动驾驶目标检测与数据策略研究",
+      "llm_tldr_en": "Creates a real-synthetic mixed object detection dataset for Chinese rural roads and evaluates 13 mainstream detectors across varying real-to-synthetic ratios, providing empirical evidence for model selection and data strategy.",
+      "llm_tldr_cn": "针对中国农村复杂交通场景中目标检测数据稀缺和泛化难的问题，构建了专用于农村道路的真实-合成混合检测数据集。在河南威氏县采集真实图像，并用虚幻引擎生成参数化虚拟场景。系统评估13种主流检测器在不同真实与合成数据比例下的表现，为农村自动驾驶场景的模型选择和数据策略设计提供了实证依据。该工作有助于缓解数据稀缺并提升复杂乡村交通环境下的检测泛化能力。",
+      "llm_tldr": "针对中国农村复杂交通场景中目标检测数据稀缺和泛化难的问题，构建了专用于农村道路的真实-合成混合检测数据集。在河南威氏县采集真实图像，并用虚幻引擎生成参数化虚拟场景。系统评估13种主流检测器在不同真实与合成数据比例下的表现，为农村自动驾驶场景的模型选择和数据策略设计提供了实证依据。该工作有助于缓解数据稀缺并提升复杂乡村交通环境下的检测泛化能力。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.21371v1",
+      "source": "arxiv",
+      "title": "DINOde: Continuous Vision-Text Alignment for Open-Vocabulary Semantic Segmentation",
+      "abstract": "Open-vocabulary semantic segmentation (OVSS) leverages textual semantics to segment objects beyond predefined categories. While the self-supervised model DINOv3 provides strong structured visual representations, its lack of native textual alignment hinders its direct application to OVSS. To bridge this gap, we propose DINOde, an ODE-based framework that continuously aligns CLIP text embeddings with the DINO visual manifold. Our approach employs two complementary components: (i) Semantic Text Flow (STF), which evolves text embeddings toward the DINO manifold through a continuous ODE trajectory, and (ii) Global Context Flow (GCF), which progressively refines the holistic image representation carried by DINO's CLS token. To preserve the hyperspherical geometry of the feature space during this evolution, we further introduce Velocity Tangent Projection, which constrains the learned velocity field to the tangent space. By modeling alignment as a continuous trajectory, DINOde avoids the manifold entanglement inherent in discrete MLP projections and yields more robust cross-modal alignment. Extensive experiments demonstrate that DINOde consistently outperforms existing methods and achieves state-of-the-art performance across multiple OVSS benchmarks. The code is available at https://github.com/yoon307/DINOde.",
+      "authors": [
+        "Sung-Hoon Yoon",
+        "Hoyong Kwon",
+        "Changgyoon Oh",
+        "Kuk-Jin Yoon"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-23T14:37:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.21371v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Continuous vision-text alignment for open-vocabulary semantic segmentation, applicable to scene understanding",
+      "llm_evidence_cn": "通过连续视觉-文本对齐实现开放词汇语义分割，可用于场景理解",
+      "llm_evidence": "通过连续视觉-文本对齐实现开放词汇语义分割，可用于场景理解",
+      "canonical_evidence": "通过连续视觉-文本对齐实现开放词汇语义分割，可用于场景理解",
+      "llm_tldr_en": "DINOde uses an ODE framework to continuously align CLIP text embeddings with DINO visual manifolds, enabling open-vocabulary segmentation that can transfer to road scene semantics.",
+      "llm_tldr_cn": "开放词汇语义分割需要将文本语义与视觉特征对齐，而DINOv3缺少原生文本对齐能力。本文提出DINOde，用ODE连续对齐框架将CLIP文本嵌入沿轨迹演化至DINO视觉流形，并引入全局上下文流细化整体图像表示。该方法在保持特征分布的同时实现了跨模态语义对齐，为包括交通场景在内的开放词汇分割提供了通用且连续的对齐范式。",
+      "llm_tldr": "开放词汇语义分割需要将文本语义与视觉特征对齐，而DINOv3缺少原生文本对齐能力。本文提出DINOde，用ODE连续对齐框架将CLIP文本嵌入沿轨迹演化至DINO视觉流形，并引入全局上下文流细化整体图像表示。该方法在保持特征分布的同时实现了跨模态语义对齐，为包括交通场景在内的开放词汇分割提供了通用且连续的对齐范式。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28263v1",
+      "source": "arxiv",
+      "title": "Understanding Is Done Early: A Depth Division of Labor in Large Language Models and Its Use for Unbounded-Context Memory",
+      "abstract": "Transformer depth is not used uniformly: lower and middle layers build semantic representations, while upper layers increasingly specialize them for prediction. We turn this division of labor into CoMem (Comprehension Memory), which writes each context chunk only through an intermediate layer, retrieves a fixed number of cached residual states, and recomputes the query-conditioned upper layers over the resulting pack. For a fixed retrieval budget, model-side read compute and memory are independent of stored-context length. We evaluate a continued-trained Qwen3-8B base LM under a unified chat-template-free protocol. The backbone is frozen; the flagship trains only a rank-32 self-distillation LoRA on plain PG19, and we report an adapter-free arm separately. CoMem reaches 97.05 on RULER and 38.27 on LoCoMo versus 34.59 for full-context KV-Direct; the dialogue-memory advantage survives conversation-cluster resampling and an independent judge. Results on additional long-context and long-document tasks expose both the benefits of bounded retrieval and its in-window compression tax. Controlled depth sweeps show that deeper caching lowers per-query recomputation but incurs a fidelity loss that self-distillation substantially repairs. In a separate adapter-free efficiency control on an NVIDIA H20 at 128k, CoMem uses 18.26 GB rather than 89.36 GB and achieves a 7.83x prefill speedup. These results show that long-context memory can be organized along the layer axis, not only the token axis.",
+      "authors": [
+        "Hanzuo Liu",
+        "Xuan Qi",
+        "Chunyu Liu",
+        "Haotian Zhong",
+        "Yulong Wang",
+        "Rayying",
+        "Key",
+        "Alex Lamb",
+        "Mingyu Gao"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-07-30T14:19:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.28263v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Long-context memory with fixed retrieval budget independent of stored-context length",
+      "llm_evidence_cn": "面向超长上下文的记忆机制，检索开销与存储上下文长度解耦",
+      "llm_evidence": "面向超长上下文的记忆机制，检索开销与存储上下文长度解耦",
+      "canonical_evidence": "面向超长上下文的记忆机制，检索开销与存储上下文长度解耦",
+      "llm_tldr_en": "CoMem exploits early semantic understanding, writing context chunks via intermediate layers and recomputing only upper layers, making memory and compute independent of stored-context length.",
+      "llm_tldr_cn": "大语言模型的深度存在分工：低中层构建语义表示，高层负责预测。基于该观察提出CoMem记忆机制，仅通过中间层写入上下文分块，检索固定数量的残差状态并重算上层的查询条件部分，从而使模型侧读取计算与存储上下文长度无关。在Qwen3-8B上的实验表明，该方法在固定检索预算下实现了与上下文长度无关的高效长上下文记忆。",
+      "llm_tldr": "大语言模型的深度存在分工：低中层构建语义表示，高层负责预测。基于该观察提出CoMem记忆机制，仅通过中间层写入上下文分块，检索固定数量的残差状态并重算上层的查询条件部分，从而使模型侧读取计算与存储上下文长度无关。在Qwen3-8B上的实验表明，该方法在固定检索预算下实现了与上下文长度无关的高效长上下文记忆。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.26107v1",
+      "source": "arxiv",
+      "title": "TraceCLIP: Recovering Local Semantics from Patch-to-CLS Contributions",
+      "abstract": "Dense vision-language understanding, including object localization, region recognition, and open-vocabulary semantic segmentation, requires associating language concepts with spatially grounded visual regions. CLIP provides a strong foundation for these tasks by learning a shared image-text embedding space from large-scale contrastive pre-training. However, its image-level objective aligns text with a CLS-derived global representation, leaving local vision-language correspondence only indirectly constrained. Existing methods either introduce additional supervision, external models, or task-specific adaptation, while training-free approaches mainly recover dense responses from existing patch features without examining where local semantics become most accessible within CLIP. We introduce TraceCLIP, a training-free framework that recovers latent patch-level semantic evidence by isolating the patch-specific terms written into the CLS attention output. TraceCLIP further converts contribution-derived semantic responses into a semantic-geodesic topology gate that calibrates final-layer patch affinity for dense feature reconstruction. Diagnostic experiments show that these contribution features exhibit strong local semantic discrimination and text-conditioned spatial alignment. On eight zero-shot semantic segmentation benchmarks, TraceCLIP achieves gains of 1.3 to 4.5 points in average mIoU over the strongest prior training-free methods across both backbones and background settings, without additional training, external vision foundation models, or region-level supervision. More broadly, these findings suggest that spatially localized semantics may remain accessible within the internal construction of globally aligned representations.",
+      "authors": [
+        "Xinran Liu",
+        "Shouqian Shi",
+        "Yutong Chen",
+        "Ge Wang",
+        "Xin-Wei Yao",
+        "Sheng Zhong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-28T11:25:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.26107v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Training-free recovery of local semantics from CLIP, enabling dense multimodal semantic analysis",
+      "llm_evidence_cn": "无训练恢复CLIP局部语义，支持密集场景语义分析",
+      "llm_evidence": "无训练恢复CLIP局部语义，支持密集场景语义分析",
+      "canonical_evidence": "无训练恢复CLIP局部语义，支持密集场景语义分析",
+      "llm_tldr_en": "TraceCLIP recovers dense local vision-language semantics from CLIP patch-to-CLS contributions without extra supervision, enabling open-vocabulary segmentation and grounding.",
+      "llm_tldr_cn": "CLIP的全局表示难以约束局部视觉语言对应关系。现有方法需要额外监督或任务特定适配，而无训练方法往往未充分利用补丁贡献。TraceCLIP通过分析补丁到CLS的贡献路径，恢复局部语义对应，无需训练即可支持开放词汇分割和区域定位，为密集视觉语言理解提供了一种轻量级通用工具。",
+      "llm_tldr": "CLIP的全局表示难以约束局部视觉语言对应关系。现有方法需要额外监督或任务特定适配，而无训练方法往往未充分利用补丁贡献。TraceCLIP通过分析补丁到CLS的贡献路径，恢复局部语义对应，无需训练即可支持开放词汇分割和区域定位，为密集视觉语言理解提供了一种轻量级通用工具。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28312v1",
+      "source": "arxiv",
+      "title": "ObjectStream: Latent Objects as Memory Anchors for Streaming Video Understanding",
+      "abstract": "Streaming video understanding requires models to continuously retain useful visual evidence before future questions are known. Existing approaches primarily manage the growing visual context according to token importance, temporal redundancy, or segment-level relevance, but rarely organize evidence around objects that persist and evolve over time. Thus, in this paper, we introduce ObjectStream, a training-free framework that treats latent objects as memory anchors for streaming video understanding. ObjectStream induces spatially coherent latent objects directly from frozen Video-LLM representations, links them across frames into persistent anchors, and maintains their histories under a bounded memory budget, without requiring external object detectors or segmentation models. Built on these anchors, ObjectStream preserves three complementary forms of evidence: persistent object histories, transient object changes, and recent visual context. This design enables existing Video Large Language Models (Video-LLMs) to reason over object identities, interactions, and state changes while leaving the underlying model unchanged. Extensive experiments on online streaming and offline long-video benchmarks demonstrate both effectiveness and efficiency. In online streaming evaluation, ObjectStream improves Qwen2.5-VL-7B by 10.0 points on OVO-Bench Real-Time Visual Perception, while reducing peak GPU mem-ory and TTFT by approximately 50%. On offline long-video benchmarks, it surpasses the full-token baseline while discarding 82.5% of visual tokens. These results highlight latent objects as a practical and effective organizing principle for compact streaming video memory.",
+      "authors": [
+        "Mingkang Dong",
+        "Muxin Pu",
+        "Jie Li",
+        "Bohan Guo",
+        "Songruo Chen",
+        "Bin Ren",
+        "Xu Zheng",
+        "Chen Zhao",
+        "Tianwen Qian",
+        "Mohamed Elhoseiny",
+        "Yuqian Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-30T14:47:00+00:00",
+      "link": "https://arxiv.org/pdf/2607.28312v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "latent object memory anchors for streaming video understanding",
+      "llm_evidence_cn": "面向流式视频理解的潜在对象记忆锚点",
+      "llm_evidence": "面向流式视频理解的潜在对象记忆锚点",
+      "canonical_evidence": "面向流式视频理解的潜在对象记忆锚点",
+      "llm_tldr_en": "ObjectStream is a training-free framework using latent objects as memory anchors for streaming video understanding, linking objects across frames under bounded memory and improving video LLM context management.",
+      "llm_tldr_cn": "流式视频理解需要不断保留证据，现有方法多按token重要度或冗余管理上下文，很少围绕持续演化的对象组织记忆。本文提出ObjectStream，一种无需训练的方法，从冻结的Video-LLM表征中归纳空间连贯的潜在对象，并跨帧链接为持久锚点，在有限内存预算下维护对象历史。实验显示其在流式视频问答中实现高效记忆管理和有效理解，为长视频上下文压缩提供了对象级新思路。",
+      "llm_tldr": "流式视频理解需要不断保留证据，现有方法多按token重要度或冗余管理上下文，很少围绕持续演化的对象组织记忆。本文提出ObjectStream，一种无需训练的方法，从冻结的Video-LLM表征中归纳空间连贯的潜在对象，并跨帧链接为持久锚点，在有限内存预算下维护对象历史。实验显示其在流式视频问答中实现高效记忆管理和有效理解，为长视频上下文压缩提供了对象级新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28589v1",
+      "source": "arxiv",
+      "title": "MixFrag: Fragility-Guided Mixed-Precision Post-Training Quantization for Vision Transformers",
+      "abstract": "Post-training quantization (PTQ) has emerged as an effective solution for deploying Vision Transformers (ViTs) on resource-constrained devices. However, existing PTQ methods typically employ uniform bit-widths across transformer components, overlooking their heterogeneous sensitivity to quantization and leading to inefficient precision allocation. In this paper, we propose {MixFrag, a fragility-guided mixed-precision PTQ framework for Vision Transformers. MixFrag first estimates component-level quantization fragility by measuring the Kullback--Leibler (KL) divergence between full-precision and isolated quantized output distributions using a small calibration set. It then formulates bit allocation as a Multiple-Choice Knapsack Problem (MCKP), enabling adaptive layer-wise precision assignment under a target bit budget. Extensive experiments on ImageNet-1K across multiple Vision Transformer architectures demonstrate that MixFrag achieves competitive classification performance under practical mixed-precision settings. Furthermore, evaluations on COCO object detection and instance segmentation show that MixFrag achieves state-of-the-art performance among existing mixed-precision PTQ methods, improving the previous best method by up to 9.6 AP under the challenging MP3/MP3 setting. Additional analyses validate the proposed fragility metric and demonstrate its strong correlation with the learned bit allocation. These results establish MixFrag as an effective framework for mixed-precision post-training quantization of Vision Transformers.",
+      "authors": [
+        "Md. Mehrab Hossain Opi",
+        "Robiul Islam Ryad",
+        "Md. Umar Faruk"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-07-30T17:43:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.28589v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Mixed-precision post-training quantization for Vision Transformers is an enabling efficiency technique for vision-language model components",
+      "llm_evidence_cn": "面向视觉Transformer的混合精度量化可提升视觉编码器部署效率，间接支持多模态大模型的高效优化",
+      "llm_evidence": "面向视觉Transformer的混合精度量化可提升视觉编码器部署效率，间接支持多模态大模型的高效优化",
+      "canonical_evidence": "面向视觉Transformer的混合精度量化可提升视觉编码器部署效率，间接支持多模态大模型的高效优化",
+      "llm_tldr_en": "MixFrag estimates component-level quantization fragility via KL divergence and allocates bit-widths as a knapsack problem, enabling efficient mixed-precision PTQ for Vision Transformers on resource-constrained devices.",
+      "llm_tldr_cn": "现有后训练量化方法常对Transformer各组件采用统一比特宽度，忽略其量化敏感度差异，导致精度分配效率低下。该文提出MixFrag，利用KL散度在小校准集上估计各组件量化脆弱性，并将比特分配建模为多选背包问题，实现面向视觉Transformer的混合精度后训练量化。实验表明，相比统一量化方案，MixFrag在相近压缩率下获得更好的部署精度。该方法可望作为高效视觉语言模型的一种基础优化组件。",
+      "llm_tldr": "现有后训练量化方法常对Transformer各组件采用统一比特宽度，忽略其量化敏感度差异，导致精度分配效率低下。该文提出MixFrag，利用KL散度在小校准集上估计各组件量化脆弱性，并将比特分配建模为多选背包问题，实现面向视觉Transformer的混合精度后训练量化。实验表明，相比统一量化方案，MixFrag在相近压缩率下获得更好的部署精度。该方法可望作为高效视觉语言模型的一种基础优化组件。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
