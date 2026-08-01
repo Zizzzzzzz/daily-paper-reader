@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-07-31</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-01</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 15 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 2 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>1</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-07-31 21:31:32 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-01 20:49:23 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读聚焦自动驾驶深度感知视频全景分割与视觉语言模型Token缩减抗漂移两项高impact工作。</p>
-<p>最值得关注：DVPSFormer实现高效的在线深度感知分割，Calibrate Before Reason则通过校准抑制语义漂移，双双拿下9.0分。</p>
-<p>普通读者可进一步留意速读中的农村场景目标检测及LLM深度分工研究，二者与精读主题形成方法互补。</p>
+<p>今日精读1篇、速读1篇，共2篇论文，聚焦多模态大语言模型与视觉扩散架构。</p>
+<p>最值得看的是精读的《RP-OPSD》，提出分辨率特权在线自蒸馏方法（8.0/10），可优化多模态模型的高分辨率处理能力；速读的《Chimera》探索混合视觉扩散Transformer的缩放设计（7.0/10）。</p>
+<p>下一步建议：优先细读RP-OPSD，若对高效视觉生成感兴趣，可再速览Chimera的架构设计。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -73,12 +73,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">8 篇</strong>
+    <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="DVPSFormer: Efficient Online Depth-aware Video Panoptic Segmentation for Autonomous Driving">DVPSFormer: Efficient Online Depth-aware Video Panoptic Segmentation for Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="Calibrate Before Reason: Robust Visual Token Reduction against Semantic Drift in VLMs">Calibrate Before Reason: Robust Visual Token Reduction against Semantic Drift in VLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="SemPIC: Learning Semantic Position-Independent KV Caches">SemPIC: Learning Semantic Position-Independent KV Caches</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="RP-OPSD: Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models">RP-OPSD: Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -86,12 +86,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="One Patch Is Enough: Reinforcement-Optimized Visual Token Grounding for MLLM-Based Scene Text Spotting">One Patch Is Enough: Reinforcement-Optimized Visual Token Grounding for MLLM-Based Scene Text Spotting</span></li><li><span class="dpr-home-dashboard-paper-title" title="Object Detection for Autonomous Driving in Chinese Rural Scenes: An Experimental Study on Real-Synthetic Data Mixing and Model Evaluation">Object Detection for Autonomous Driving in Chinese Rural Scenes: An Experimental Study on Real-Synthetic Data Mixing and Model Evaluation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Understanding Is Done Early: A Depth Division of Labor in Large Language Models and Its Use for Unbounded-Context Memory">Understanding Is Done Early: A Depth Division of Labor in Large Language Models and Its Use for Unbounded-Context Memory</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Chimera: Designing and Chinchilla-Scaling Hybrid Visual Diffusion Transformers">Chimera: Designing and Chinchilla-Scaling Hybrid Visual Diffusion Transformers</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
 </section>
 </div>
 
