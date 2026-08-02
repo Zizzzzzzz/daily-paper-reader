@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-01</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-02</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 2 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 6 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>1</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-01 20:49:23 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-02 21:11:17 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读1篇、速读1篇，共2篇论文，聚焦多模态大语言模型与视觉扩散架构。</p>
-<p>最值得看的是精读的《RP-OPSD》，提出分辨率特权在线自蒸馏方法（8.0/10），可优化多模态模型的高分辨率处理能力；速读的《Chimera》探索混合视觉扩散Transformer的缩放设计（7.0/10）。</p>
-<p>下一步建议：优先细读RP-OPSD，若对高效视觉生成感兴趣，可再速览Chimera的架构设计。</p>
+<p>今日共读6篇论文，精读3篇、速读3篇。最值得关注的是《LAST》提出的视觉token剪枝技术（9.0分），可高效支持边缘-云协同多模态推理；同时《DeVA》以物理引导解耦视频-动作模型（8.0分）为机器人策略学习带来新思路。下一步建议关注高效推理与具身智能的交叉应用，优先精读高分论文并复现核心实验。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -73,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">1 篇</strong>
+    <strong class="dpr-home-dashboard-count">3 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="RP-OPSD: Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models">RP-OPSD: Resolution-Privileged On-Policy Self-Distillation for Multimodal Large Language Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LAST: The Last Query Token Guides Visual Token Pruning for Edge-Cloud Collaborative MLLM Inference">LAST: The Last Query Token Guides Visual Token Pruning for Edge-Cloud Collaborative MLLM Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="DeVA: Decoupled Video-Action Model with physical guidance for robot policy learning">DeVA: Decoupled Video-Action Model with physical guidance for robot policy learning</span></li><li><span class="dpr-home-dashboard-paper-title" title="LENS: Adaptive Spatio-Temporal Zooming for Keyframe Sampling in Long-Form Videos">LENS: Adaptive Spatio-Temporal Zooming for Keyframe Sampling in Long-Form Videos</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -86,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">1 篇</strong>
+    <strong class="dpr-home-dashboard-count">3 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Chimera: Designing and Chinchilla-Scaling Hybrid Visual Diffusion Transformers">Chimera: Designing and Chinchilla-Scaling Hybrid Visual Diffusion Transformers</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Disentangling Semantic Attention from Structural Bias in the Attention Manifold">Disentangling Semantic Attention from Structural Bias in the Attention Manifold</span></li><li><span class="dpr-home-dashboard-paper-title" title="Leveraging Semantic Maps for City-Scale Cross-View Localization">Leveraging Semantic Maps for City-Scale Cross-View Localization</span></li><li><span class="dpr-home-dashboard-paper-title" title="ViewMind3D: Modular View-Aware Inference for Training-Free 3D-QA">ViewMind3D: Modular View-Aware Inference for Training-Free 3D-QA</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 
