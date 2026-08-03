@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-02</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-03</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 6 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>3</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>2</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-02 21:11:17 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-03 20:26:26 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日共读6篇论文，精读3篇、速读3篇。最值得关注的是《LAST》提出的视觉token剪枝技术（9.0分），可高效支持边缘-云协同多模态推理；同时《DeVA》以物理引导解耦视频-动作模型（8.0分）为机器人策略学习带来新思路。下一步建议关注高效推理与具身智能的交叉应用，优先精读高分论文并复现核心实验。</p>
+<p>今日精读10篇中聚焦仿生视觉与自动驾驶推理，重点解读两篇高分论文。最值得关注方向为光学流方向选择性视网膜设计（9.0分）与结果引导蒸馏提升VLM驾驶推理（9.0分）。建议普通读者优先浏览这两篇精读内容，速读部分可作4D占用预测与VLA安全机制的延伸补充。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LAST: The Last Query Token Guides Visual Token Pruning for Edge-Cloud Collaborative MLLM Inference">LAST: The Last Query Token Guides Visual Token Pruning for Edge-Cloud Collaborative MLLM Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="DeVA: Decoupled Video-Action Model with physical guidance for robot policy learning">DeVA: Decoupled Video-Action Model with physical guidance for robot policy learning</span></li><li><span class="dpr-home-dashboard-paper-title" title="LENS: Adaptive Spatio-Temporal Zooming for Keyframe Sampling in Long-Form Videos">LENS: Adaptive Spatio-Temporal Zooming for Keyframe Sampling in Long-Form Videos</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Optical Flow Sensor: A Direction-Selective Bionic Retina Design">Optical Flow Sensor: A Direction-Selective Bionic Retina Design</span></li><li><span class="dpr-home-dashboard-paper-title" title="Outcome-Guided Distillation: A Teacher-Student Framework to Advance VLM Reasoning in Autonomous Driving">Outcome-Guided Distillation: A Teacher-Student Framework to Advance VLM Reasoning in Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="Event-Based Upper-Body Humanoid Teleoperation Under Challenging Illumination">Event-Based Upper-Body Humanoid Teleoperation Under Challenging Illumination</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>2</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">2 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Disentangling Semantic Attention from Structural Bias in the Attention Manifold">Disentangling Semantic Attention from Structural Bias in the Attention Manifold</span></li><li><span class="dpr-home-dashboard-paper-title" title="Leveraging Semantic Maps for City-Scale Cross-View Localization">Leveraging Semantic Maps for City-Scale Cross-View Localization</span></li><li><span class="dpr-home-dashboard-paper-title" title="ViewMind3D: Modular View-Aware Inference for Training-Free 3D-QA">ViewMind3D: Modular View-Aware Inference for Training-Free 3D-QA</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="InterOCF: Spatio-Temporal 2D-3D Interaction for Camera-Only 4D Occupancy Forecasting">InterOCF: Spatio-Temporal 2D-3D Interaction for Camera-Only 4D Occupancy Forecasting</span></li><li><span class="dpr-home-dashboard-paper-title" title="ActFovea: Runtime Safeguarding for VLA Policies via Spatiotemporal Visual-Action Consistency">ActFovea: Runtime Safeguarding for VLA Policies via Spatiotemporal Visual-Action Consistency</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 
