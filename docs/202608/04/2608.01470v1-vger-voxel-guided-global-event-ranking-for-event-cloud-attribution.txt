@@ -1,0 +1,382 @@
+Title: VGER: Voxel-Guided Global Event Ranking for Event Cloud Attribution
+
+URL Source: https://arxiv.org/pdf/2608.01470v1
+
+Published Time: Tue, 04 Aug 2026 01:56:38 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# VGER: Voxel-Guided Global Event Ranking for Event Cloud Attribution 
+
+## Youxin Jiang, Baoheng Fu, Hongwei Ren *, Xiangqian Wu 
+
+Harbin Institute of Technology 
+
+> *
+
+Corresponding author 
+
+Abstract 
+
+Event cameras produce sparse and asynchronous event streams that provide rich spatio-temporal information for effi-cient perception. Recent advances in event-based models have demonstrated strong performance by directly modeling asyn-chronous events without dense frame reconstruction. How-ever, identifying the event-level evidence behind their predic-tions is crucial for improving model transparency and reliabil-ity. Directly adapting point-level saliency methods from point clouds provides fine-grained attribution but overlooks event-specific spatio-temporal structures. To address this limitation, we propose Voxel-Guided Global Event Ranking (VGER), a training-free attribution framework for point-based event cloud networks. VGER combines event-level gradient evi-dence with task-aware voxel perturbation evidence, transfer-ring regional contribution into event-level attribution scores while preserving fine-grained resolution. Furthermore, VGER introduces a unified event ranking strategy, where high-ranked events are expected to be prediction-critical and low-ranked events are expected to have limited influence on predictions. We evaluate VGER on three event-based benchmarks with PointNet, PointNet++, and EventMamba. Across nine dataset-backbone settings, VGER consistently improves both high-tail and low-tail deletion performance over point-level saliency baselines. 
+
+## Introduction 
+
+Event cameras capture sparse and asynchronous event streams, providing high temporal resolution, low latency, and high dynamic range perception (Gallego et al. 2022). Un-like conventional cameras that rely on dense frame represen-tations, event-based methods directly exploit asynchronous changes to preserve fine-grained temporal dynamics while reducing redundant computation (Gehrig et al. 2019; Sironi et al. 2018). Recently, point-based event cloud networks have emerged as an effective paradigm for event-based recogni-tion by representing raw events as spatio-temporal point sets and processing them with point-based architectures (Qi et al. 2017a,b; Ren et al. 2025). These methods have demonstrated promising performance across various event-based bench-marks (Amir et al. 2017; Orchard et al. 2015; Li et al. 2017), benefiting from their ability to preserve the intrinsic sparsity and temporal characteristics of event streams. However, as event cloud networks become increasingly powerful, their predictions are still largely determined by complex interac-
+
+Figure 1: Event-level saliency maps produced by VGER on representative streams from the three evaluation datasets. Colors encode normalized saliency (red: high, blue: low). High-ranked events follow compact spatio-temporal struc-tures that contribute to the corresponding predictions. tions among massive asynchronous events, making it diffi-cult to understand which events provide critical evidence for model decisions (Ribeiro, Singh, and Guestrin 2016; Lund-berg and Lee 2017). Attribution methods for point-based models provide a natural starting point for interpreting event cloud net-works (Zheng et al. 2019). By assigning importance scores to individual points, point-level saliency approaches can identify prediction-related inputs with fine-grained spatial resolution (Simonyan, Vedaldi, and Zisserman 2013). How-ever, directly transferring these methods from conventional point clouds to event streams overlooks the unique charac-teristics of events. Unlike static 3D points, events are asyn-chronously generated, and their semantic information often emerges from local spatio-temporal structures formed by cor-related event groups (Gallego et al. 2022). For example, motion patterns and object boundaries are represented by groups of temporally correlated events rather than isolated observations. Therefore, event attribution requires not only identifying individual important events but also capturing regional structural evidence that contributes collectively to model predictions (Fong and Vedaldi 2017; Petsiuk, Das, and Saenko 2018). This motivates a new attribution paradigm that bridges event-level precision and spatio-temporal structural reasoning. A straightforward solution is to introduce regional pertur-bation analysis, where groups of events are removed or mod-ified to measure their influence on model predictions (Fong and Vedaldi 2017; Petsiuk, Das, and Saenko 2018). Voxel-arXiv:2608.01470v1 [cs.CV] 2 Aug 2026 based perturbation methods provide task-aware regional evi-dence by evaluating prediction changes caused by perturbing local spatio-temporal regions (Deng et al. 2022). However, assigning a single importance score to all events within the same voxel inevitably sacrifices event-level discrimination. Conversely, point-level saliency preserves individual event resolution but lacks awareness of collective regional contri-butions. These observations reveal a fundamental granularity dilemma in event attribution: fine-grained event importance and regional structural evidence are complementary but dif-ficult to obtain simultaneously. To address this challenge, we propose Voxel-Guided Global Event Ranking (VGER), which combines voxel-level task evidence with event-level attribution signals to gener-ate a more faithful global ranking of asynchronous events. VGER is a training-free attribution framework designed for point-based event cloud networks. It first derives task-aware regional evidence through voxel perturbation and transfers this evidence back to individual events. Meanwhile, event-level gradient attribution provides fine-grained sensitivity in-formation (Simonyan, Vedaldi, and Zisserman 2013; Zheng et al. 2019). By integrating these two complementary sig-nals, VGER produces a unified event ranking that preserves both regional structural awareness and individual event reso-lution. Beyond conventional attribution evaluation that only examines whether important events affect predictions, we in-troduce a two-tail ranking perspective: highly ranked events should be prediction-critical, while low-ranked events should have limited influence (Petsiuk, Das, and Saenko 2018; Hooker et al. 2019). We evaluate VGER on three event-based benchmarks with multiple point-based architectures, including PointNet, PointNet++, and EventMamba (Qi et al. 2017a,b; Ren et al. 2025, 2024a). Extensive experiments demonstrate that VGER consistently improves attribution faithfulness over point-level saliency baselines across di-verse dataset-backbone settings. The main contributions of this work are summarized as follows: 
+
+• We introduce VGER, the first attribution framework for point-based event cloud networks, enabling fine-grained interpretation of asynchronous event streams. 
+
+• We propose a voxel-guided evidence fusion strategy that combines task-aware regional perturbation evidence with event-level gradient attribution to preserve both structural context and event-level resolution. 
+
+• We develop a global event ranking evaluation strategy with complementary high-tail and low-tail assessments, providing a more comprehensive evaluation of event at-tribution faithfulness. 
+
+## Related Work 
+
+Event representations and recognition. Event represen-tations range from dense time surfaces, learned grids, and re-current surfaces to sparse recursive, graph-based, and voxel-based forms (Sironi et al. 2018; Gehrig et al. 2019; Can-nici et al. 2020; Sekikawa, Hara, and Saito 2019; Schae-fer, Gehrig, and Scaramuzza 2022; Deng et al. 2022; Ren et al. 2026a). EvT exploits sparsity by retaining activated event-derived patches, while GET groups events by times-tamp and polarity (Sabater, Montesano, and Murillo 2022; Peng et al. 2023). E2PNet, PEPNet, EventMamba, and SEC-Net develop task-specific spatial and temporal processing for event data (Lin et al. 2023; Ren et al. 2024b, 2025, 2026b). General point-based architectures such as PointNet, Point-Net++, DGCNN, and Point Transformer provide operations that can be applied to spatio-temporal event points (Qi et al. 2017a,b; Wang et al. 2019; Zhao et al. 2021). These de-velopments expand how event structure is processed across event-based tasks; VGER complements them by identifying the event-level evidence behind a trained model’s prediction. 
+
+Fine-grained and regional attribution. Gradient Saliency, Integrated Gradients, LRP, Grad-CAM, and SmoothGrad derive attribution from input derivatives or internal activations (Simonyan, Vedaldi, and Zisserman 2013; Sundararajan, Taly, and Yan 2017; Bach et al. 2015; Selvaraju et al. 2017; Chattopadhay et al. 2018; Smilkov et al. 2017). LIME fits a local interpretable surrogate, while Kernel SHAP uses a weighted linear explanation model (Ribeiro, Singh, and Guestrin 2016; Lundberg and Lee 2017). Perturbation methods measure prediction changes under controlled input interventions (Zeiler and Fergus 2014; Fong and Vedaldi 2017; Petsiuk, Das, and Saenko 2018). For point clouds, PCS uses a differentiable center-shifting surrogate to score individual points (Zheng et al. 2019); later work explores features, local surrogates, semantic groups, interpretable architectures, and factorized attribution maps (Levi and Gilboa 2024; Ahmadi et al. 2024; Mulawade, Garth, and Wiebel 2025; Feng et al. 2024; Liu et al. 2024). EventPoint detects event keypoints for matching and registration (Huang et al. 2023), and gradient attribution has also been studied for spiking-network inputs (Bitar, Rosales, and Paulitsch 2023). The attribution methods in this group span fine-grained input evidence, group-level perturbation, feature-based explanations, and inherently interpretable architectures. In contrast, VGER transfers regional task evidence to individual events before globally ranking them, directly connecting the two granularities identified in the Introduction. 
+
+Evaluation of explanations. Deletion and insertion curves evaluate an attribution ordering by tracking model behav-ior as inputs are removed or restored (Petsiuk, Das, and Saenko 2018). Their interpretation depends on a controlled perturbation protocol (Hooker et al. 2019; Tomsett et al. 2020; Gomez, Fréour, and Mouchère 2022), while san-ity checks, input-invariance and robustness tests, and infi-delity/sensitivity metrics assess complementary properties of explanations (Adebayo et al. 2018; Kindermans et al. 2019; Alvarez-Melis and Jaakkola 2018; Yeh et al. 2019). We hold deletion cardinality and backbone-specific operators fixed across attribution methods and evaluate both ends of the same global ordering. This two-tail design tests whether high-ranked events are prediction-critical and low-ranked events have limited influence under one consistent protocol. Figure 2: Overview of VGER . Event-level gradient evidence and task-aware voxel perturbation evidence are transferred, normalized, and fused into one global event ordering. The same ordering is evaluated at the high and low tails to distinguish prediction-critical events from events with limited influence. 
+
+## Problem Formulation 
+
+We consider the attribution problem for point-based event cloud networks. An event stream is represented as a set of asynchronous events: 
+
+E = {ei}Ni=1 , ei = ( xi, y i, t i, p i), (1) where (xi, y i, t i) denotes the spatio-temporal coordinate and 
+
+pi denotes the event polarity. A frozen event cloud model 
+
+fθ takes E as input and produces prediction logits, with 
+
+L(fθ (E), y ) denoting the task loss. Given an event stream 
+
+E and its label y, the objective is to assign an importance score S(ei) to each event while keeping θ unchanged. Un-like conventional point attribution, event attribution should capture not only individual event importance but also the contribution of local spatio-temporal structures. For a deletion ratio r and K = ⌊rN ⌋, the top- and bottom-ranked event subsets are defined as: 
+
+Dhigh (r) = {ei | S(ei) ∈ TopK( S, K )},Dlow (r) = {ei | S(ei) ∈ BottomK( S, K )}, (2) where TopK and BottomK denote the sets of events with the largest and smallest attribution scores, respectively. Given a unified event ranking, Eq. (2) provides two complemen-tary evaluation perspectives. Removing Dhigh is expected to cause larger prediction degradation, while removing Dlow 
+
+should have limited impact on recognition. The deletion op-erator D removes the selected events with a fixed cardinality and follows the input representation requirements of each backbone. For fair comparison, the same deletion procedure is applied to all attribution methods under each backbone. 
+
+## Voxel-Guided Global Event Ranking 
+
+VGER addresses the attribution challenge through four stages. It first derives fine-grained sensitivity from event-level gradients and then measures the task contribution of lo-cal spatio-temporal voxels. The voxel evidence is transferred back to individual events and combined with a structural term that organizes their relative ranks. Finally, the fused event scores define one global ordering for both high-tail and low-tail evaluation. 
+
+Event-Level Gradient Evidence 
+
+Event-level gradients provide the fine-grained component of 
+
+VGER . Because spatial coordinates and timestamps have dif-ferent units and ranges, we normalize each zi = ( xi, y i, t i)⊤
+
+using a robust stream center c = ( cx, c y , c t)⊤ and a positive coordinate-wise scale s = ( sx, s y , s t)⊤:
+
+¯zi =
+
+ xi − cx
+
+sx
+
+, yi − cy
+
+sy
+
+, ti − ct
+
+st
+
+⊤
+
+. (3) This normalization prevents the temporal coordinate from dominating the score solely through its numerical range. We adapt PCS to the spatio-temporal event domain by measuring task-loss sensitivity along a differentiable center-contraction path. To distinguish temporal displacement from spatial displacement, we introduce the anisotropic metric 
+
+Aρ = diag(1 , 1, ρ ), ρ = ωt
+
+ωs
+
+, (4) where ρ controls the relative weight of temporal displace-ment. The corresponding anisotropic radius is 
+
+rρi =
+
+q
+
+¯z⊤ 
+
+> i
+
+Aρ ¯zi. (5) We define the anisotropic center-contraction path as 
+
+¯zi(τ ) = exp( −τ A ρ)¯ zi, τ ≥ 0. (6) Its instantaneous displacement direction is 
+
+∂ ¯zi(τ )
+
+∂τ τ =0 
+
+= −Aρ ¯zi. (7) Therefore, the anisotropic event-level PCS score is defined as 
+
+Sρ
+
+> pcs
+
+(ei) = −
+
+
+
+∇¯zi L, Aρ ¯zi
+
+rρi + ϵ
+
+
+
+(rρi )1+ α, (8) where L is the task loss, ϵ is a small constant, and α controls the radial scaling. Eq. (8) reduces to the original isotropic PCS formulation when ρ = 1 .The score in Eq. (8) measures the first-order increase in task loss when an event is suppressed along the anisotropic spatio-temporal contraction direction. Adjusting ρ balances temporal and spatial displacement while preserving a sepa-rate score for every event. 
+
+Task-Aware Voxel Evidence 
+
+Event-level gradients distinguish individual events but do not explicitly measure the finite task effect of a complete local spatio-temporal region. To obtain this complementary regional evidence, we partition the normalized event domain into Gs × Gs × Gt voxels. Equivalently, voxelization can be performed in the anisotropically transformed coordinates 
+
+ui = A1/2 
+
+> ρ
+
+¯zi, (9) so that the spatial and temporal extent of each voxel follows the metric in Eq. (4). Let Vj denote an occupied voxel. We construct eE(j) by moving the events in Vj toward the robust stream center while preserving the number, polarity, and temporal order of events. The task-aware evidence of Vj is 
+
+∆L(Vj ) = L(fθ ( eE(j)), y ) − L (fθ (E), y ), (10) where fθ is the frozen task network and y is the ground-truth label. This voxel-level loss change is broadcast to each constituent event: 
+
+Svox (ei) = ∆ L(V (ei)) . (11) Eq. (11) performs the transfer described in the Introduc-tion. Rather than treating a voxel as the final attribution unit, 
+
+VGER assigns its measured task contribution to each con-stituent event. The subsequent fusion therefore retains event-level resolution while incorporating evidence about the local structure surrounding each event. 
+
+Structural Ranking Term 
+
+The event-level gradient and voxel perturbation terms address the two sides of the granularity dilemma. The former distin-guishes individual events within a local region, whereas the latter captures the finite task effect of the region as a whole. We first combine these complementary signals into a base event score: 
+
+Sbase (ei) = βp Norm  Sρ
+
+> pcs
+
+(ei) + βv Norm( Svox (ei)) ,
+
+(12) where Norm( ·) denotes stream-wise score normalization, and βp and βv control the contributions of event-level gradi-ent evidence and voxel-level task evidence, respectively. We then organize the base scores according to their local and temporal contexts. Let 
+
+EV (ei) = {ek ∈ E : V (ek) = V (ei)} ,
+
+ET (ei) = {ek ∈ E : T (ek) = T (ei)} , (13) where V (ei) denotes the voxel containing ei, and T (ei)
+
+denotes its temporal-bin index. Thus, EV (ei) contains the events in the same spatio-temporal voxel as ei, while ET (ei)
+
+contains the events assigned to the same temporal bin. For an event subset Q containing ei, let rQ(ei) be the rank of Sbase (ei) among the events in Q, with larger base scores receiving larger ranks. We define the normalized within-set rank as 
+
+ρQ(ei) = 
+
+
+
+rQ(ei) − 1
+
+|Q| − 1 , |Q| > 1,
+
+12 , |Q| = 1 .
+
+(14) The singleton case is assigned the neutral value 1/2. The voxel-wise and temporal ranks are consequently given by 
+
+ρV (ei) = ρEV (ei)(ei), ρT (ei) = ρET (ei)(ei). (15) Both quantities lie in [0 , 1] and preserve the relative position of an event within its corresponding local context. We additionally characterize the occupancy of each voxel. Let Vocc denote the set of occupied voxels and let n(Vj ) be the number of events assigned to voxel Vj . We define 
+
+n(Vj ) = 
+
+> N
+
+X
+
+> k=1
+
+I[V (ek) = Vj ] ,D(Vj ) = n(Vj )max 
+
+> Vℓ∈V occ
+
+n(Vℓ) .
+
+(16) Accordingly, D(Vj ) ∈ (0 , 1] for every occupied voxel. A larger value indicates a region containing more events, whereas 1 − D(Vj ) represents its relative sparsity within the current event stream. Using these contextual quantities, we define the structural ranking score as 
+
+Sstruct (ei) = wbSbase (ei) + wcρV (ei) + wtρT (ei)+ wr
+
+ 1 − D(V (ei))  − wdD(V (ei)) . (17) Here, wb retains the underlying attribution evidence, wc and 
+
+wt control the voxel-wise and temporal rank contributions, and wr and wd calibrate the relative sparsity and occupancy of the event’s voxel. The two occupancy components are written separately to expose their structural interpretations, while their combined ranking effect is governed by wr + wd.The structural term therefore refines the global event or-dering without replacing the gradient and voxel attribution signals. The within-voxel rank preserves fine-grained com-parisons among events receiving the same regional evidence, the temporal rank incorporates their relative temporal con-text, and the occupancy terms account for how events are distributed across spatio-temporal regions. 
+
+Voxel-Guided Global Event Ranking 
+
+The final VGER score fuses regional, event-level, and struc-tural evidence into one scalar for every event: 
+
+SVGER (ei) = λv Norm( Svox (ei)) + λp Norm( Sρ
+
+> pcs
+
+(ei)) + λr Norm( Sstruct (ei)) . (18) Here, Norm( ·) denotes stream-wise score normalization, and λv , λp, and λr control the contributions of voxel-level, Method High AUC ↓ Low AUC ↑
+
+Random 0.4977 0.4977 
+
+PCS-xyt 0.4368 0.4934 
+
+VGER 0.3836 0.5404 
+
+Table 1: VGER improves both macro AUC tails over PCS-xyt . Values are unweighted averages over nine archived set-tings. gradient-level, and structural evidence, respectively. VGER 
+
+then performs a stable global ranking over the complete stream: 
+
+π = argsort ei∈E SVGER (ei). (19) 
+
+## Experiments 
+
+Datasets, Backbones, and Baselines 
+
+We evaluate DVS Gesture (Amir et al. 2017), N-MNIST, and N-Caltech101 (Orchard et al. 2015), the standard event-classification benchmarks alongside CIFAR10-DVS (Li et al. 2017). The backbones are PointNet (Qi et al. 2017a), Point-Net++ (Qi et al. 2017b), and EventMamba (Ren et al. 2025). The verified baselines shared by the archived 3×3 matrix are Random and PCS-xyt . A separate PointNet study compares Basic Voxel with PCS-xyt on all three datasets. Random uses the archived event permutations and pro-vides a task-agnostic deletion reference. PCS-xyt applies Eq. (8) when ρ = 1 without voxel evidence. Basic Voxel assigns the same task-loss change to all events in one voxel; its ties are resolved at event level while respecting the exact deletion budget. We restrict the quantitative comparison to these baselines because they are the methods represented by verified, common-format curves in the supplied archive. The PointNet, PointNet++ and EventMamba results use the full archived test counts: 6,623 for DVS Gesture, 10,000 for N-MNIST, and 17,869 for N-Caltech101. 
+
+Two-Tail Protocol 
+
+All settings are compared over 
+
+R = {0, 0.05 , . . . , 1.00 }.
+
+At each ratio, exactly ⌊rN ⌋ events are deleted. Accuracy curves are summarized by trapezoidal AUC; lower is better for the high tail and higher is better for the low tail: 
+
+AUC( A) = 
+
+> 20
+
+X
+
+> k=1
+
+A(rk) + A(rk+1 )2 (rk+1 − rk).
+
+We report exact ratio-wise wins for every setting. The two summaries answer different questions: AUC weights the magnitude of the curve difference at each ratio, whereas a win count gives every sampled ratio one vote, so a method cannot dominate either summary through a single strong region of the protocol.                                                             
+
+> Backbone Dataset nVGER-H ↓PCS-H ↓VGER-L ↑PCS-L ↑
+> PointNet DVS Gesture 6,623 0.5532 0.6351 0.8121 0.7781 PointNet N-MNIST 10,000 0.5959 0.6422 0.7339 0.6971 PointNet N-Caltech101 17,869 0.0576 0.0756 0.2665 0.2180 PointNet++ DVS Gesture 6,623 0.4665 0.5311 0.6035 0.5315 PointNet++ N-MNIST 10,000 0.2655 0.2740 0.3811 0.3489 PointNet++ N-Caltech101 17,869 0.0799 0.0817 0.0981 0.0918 EventMamba DVS Gesture 6,623 0.4429 0.5765 0.7369 0.6290 EventMamba N-MNIST 10,000 0.7729 0.8616 0.8935 0.8491 EventMamba N-Caltech101 17,869 0.2180 0.2533 0.3381 0.2972
+
+Table 2: VGER wins both AUC tails in all nine settings. H is high-tail deletion and L is low-tail deletion; bold indicates the better AUC within each pair. 
+
+Main Two-Tail Fidelity 
+
+Table 1 reports the macro comparison across the archived matrix.The macro comparison shows that VGER reduces high-tail AUC by 0.0532 and increases low-tail AUC by 0.0470 relative to PCS-xyt . Its macro two-tail gap, low AUC minus high AUC, is 0.1568 compared with 0.0566 for PCS-xyt . These averages weight each dataset–backbone setting equally. The rows behind them are uniformly direc-tional and are all produced by frozen archived configurations, so the macro gains are not carried by any single backbone or dataset.Table 2 gives the corresponding setting-level AUCs. Figure 3 presents the main experiment of this paper: the complete two-tail deletion curves behind these counts. In most settings and deletion ratios, removing VGER ’s top-ranked events damages accuracy earlier and deeper than removing PCS-xyt ’s or Random’s, whereas removing its bottom-ranked events preserves accuracy longer than PCS-xyt ’s. The appendix further averages the two-tail curves over all nine settings and condenses each setting into its two-tail separation, which VGER widens over PCS-xyt in all nine settings, showing that one global ordering simultaneously isolates decision-critical and decision-irrelevant events. Additional implementation details and supporting evi-dence are provided in the appendix, including the setting-specific fusion weights used in part of the experiments, the full numerical data underlying Figure 3, and the auxiliary results from hyperparameter search and related diagnostic studies. These materials are included to make the reported two-tail fidelity results traceable beyond the summarized AUC values and to facilitate independent verification of the experimental protocol. 
+
+Results on PointNet 
+
+PointNet uses single max-pooling, making predictions de-pend on a compact critical event subset. High-tail deletion therefore tests whether VGER ’s top-ranked events are truly decisive. VGER lowers high-tail AUC from 0.6351 to 0.5532 on DVS Gesture and from 0.0756 to 0.0576 on N-Caltech101. Low-tail AUC also improves over PCS-xyt on all datasets, with gains of 0.0340, 0.0368, and 0.0485. This consistent two-tail behavior shows reliable importance estimates for globally pooled representations. 20                               
+
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100
+> Accuracy (%)
+> PointNet DVS Gesture
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100 PointNet N-MNIST
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> PointNet N-Caltech101
+> 20
+> 40
+> 60
+> 80
+> 100
+> Accuracy (%)
+> PointNet++ DVS Gesture
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> PointNet++ N-MNIST
+> 6
+> 7
+> 8
+> 9
+> 10
+> 11
+> PointNet++ N-Caltech101
+> 520 40 60 80 90
+> Deletion ratio (%)
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> Accuracy (%)
+> EventMamba DVS Gesture
+> 520 40 60 80 90
+> Deletion ratio (%)
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> 100
+> EventMamba N-MNIST
+> 520 40 60 80 90
+> Deletion ratio (%)
+> 10
+> 15
+> 20
+> 25
+> 30
+> 35
+> 40 EventMamba N-Caltech101
+> VGER-H (ours) PCS-xyt-H Random PCS-xyt-L VGER-L (ours)
+
+Figure 3: Two-tail deletion curves for the 3 × 3 matrix of backbones and datasets. Each panel deletes 5% –90% of events in score order and reports accuracy. VGER ’s high tail (VGER-H) drops below PCS-xyt -H and Random in most settings and ratios, and its low tail (VGER-L) stays above PCS-xyt -L in most settings and ratios, so the two VGER tails separate decision-critical from decision-irrelevant events across the whole protocol. 
+
+Results on PointNet++ 
+
+PointNet++ learns hierarchical features from nested spatial neighborhoods, so attribution depends on both local geome-try and global structure. Although PCS-xyt already has low high-tail AUCs, VGER improves both tails on every dataset. On DVS Gesture, high-tail AUC drops from 0.5311 to 0.4665, while low-tail AUC rises from 0.5315 to 0.6035. Figure 3 further shows that top-ranked deletion disrupts recognition faster, whereas bottom-ranked deletion preserves accuracy longer. The smaller gains on N-MNIST and N-Caltech101 remain consistent. 
+
+Results on EventMamba 
+
+EventMamba models long-range temporal dependencies through selective state updates, making event-level attribu-tion less direct than in point-wise networks. Still, VGER im-proves both tails in all three archived runs. The largest gain appears on DVS Gesture, where high-tail AUC decreases from 0.5765 to 0.4429 and low-tail AUC increases from 0.6290 to 0.7369. N-MNIST and N-Caltech101 show the same pattern: removing highly ranked events causes sharper degradation, while removing low-ranked events better pre-serves accuracy. 
+
+Ablation Study 
+
+We ablate the key evidence channels on the deterministic PointNet++/N-MNIST development subset using the same 5%–90% deletion protocol. Figure 4 compares four repre-sentative rankings: PCS-xyt , PCS-xyt with voxel evidence, the full voxel-structural fusion, and Random. The top panel reports high-tail deletion, where lower accuracy indicates Figure 4: Component ablation on the PointNet++/N-MNIST development subset. Top: high-tail deletion AUC (lower is better). Bottom: low-tail deletion AUC (higher is better). that the removed events are more decision-critical. The bot-tom panel reports low-tail deletion, where higher accuracy indicates that the removed events are less important. The high-tail results show that voxel evidence is the main source of decision-critical localization. Compared with PCS-xyt , adding the voxel channel causes accuracy to drop earlier across most deletion ratios. The full fusion, which further in-corporates structural ranking, remains among the strongest high-tail curves and stays well below Random, indicating that it preserves the ability to identify influential events. The low-tail results reveal the complementary role of the structural component. While voxel evidence alone improves high-tail deletion, the full voxel-structural fusion gives the best low-tail preservation over most ratios, keeping accuracy higher than PCS-xyt , voxel-only, and Random before the curves converge at large deletion ratios. Together, the two panels show that voxel perturbation sharpens the head of the rank-ing, while structural fusion improves the tail. This supports the design of VGER : combining regional task evidence with global structural ordering yields a ranking that is effective for both explanation and safe event removal. 
+
+Representative Prediction Changes 
+
+Figure 5 shows representative prediction changes caused by deleting events selected by VGER . Each row contains the original event cloud, the deleted events highlighted in red, and the retained event cloud after deletion. Green labels in-dicate correct predictions, while red labels indicate incorrect predictions. The first two rows show failure-inducing high-tail dele-
+
+Figure 5: Representative prediction changes after delet-ing ranked events under VGER . Red points denote deleted events; green/red text marks correct/incorrect predictions. tions. Removing a small set of highly ranked events changes originally correct predictions into incorrect ones, from digit 5 to digit 9 and from face to lamp. These cases suggest that the removed events contain decision-critical evidence for the original class. The last two rows show the complementary behavior. For samples that are initially misclassified, deleting ranked events suppresses misleading evidence and recovers the cor-rect class, changing digit 3 to digit 2 and stop sign to face. Overall, these examples connect the aggregate two-tail dele-tion curves with concrete event-level behavior: the ranking identifies influential events whose removal can alter or even correct the model decision. 
+
+## Conclusion 
+
+We presented VGER , a training-free method that fuses event-level gradient evidence with task-aware voxel perturbations to produce a global event ranking for two-tail deletion. Across nine archived dataset–backbone settings, VGER improves both tails over PCS-xyt in every case. Its head identifies decision-critical events, while its tail identifies removable events that preserve accuracy, so one ranking supports both explanation and compression. The two-tail deletion protocol is architecture-agnostic and reproducible from the archived evidence trail. Beyond individual model interpretation, event cloud attribution provides a general tool for analyzing how asynchronous event streams contribute to perception deci-sions. Such event-level evidence may further support future research in architecture design, adversarial robustness, event selection, and efficient event processing. References 
+
+Adebayo, J.; Gilmer, J.; Muelly, M.; Goodfellow, I.; Hardt, M.; and Kim, B. 2018. Sanity checks for saliency maps. Advances in neural information processing systems , 31. Ahmadi, S. M.; Aslansefat, K.; Valcarce-Diñeiro, R.; and Barnfa-ther, J. 2024. Explainability of point cloud neural networks using smile: Statistical model-agnostic interpretability with local expla-nations. arXiv preprint arXiv:2410.15374 .Alvarez-Melis, D.; and Jaakkola, T. S. 2018. On the robustness of interpretability methods. arXiv preprint arXiv:1806.08049 .Amir, A.; Taba, B.; Berg, D.; Melano, T.; McKinstry, J.; Di Nolfo, C.; Nayak, T.; Andreopoulos, A.; Garreau, G.; Mendoza, M.; et al. 2017. A low power, fully event-based gesture recognition system. In Proceedings of the IEEE conference on computer vision and pattern recognition , 7243–7252. Bach, S.; Binder, A.; Montavon, G.; Klauschen, F.; Müller, K.-R.; and Samek, W. 2015. On pixel-wise explanations for non-linear classifier decisions by layer-wise relevance propagation. PloS one ,10(7): e0130140. Bitar, A.; Rosales, R.; and Paulitsch, M. 2023. Gradient-based feature-attribution explainability methods for spiking neural net-works. Frontiers in Neuroscience , 17: 1153999. Cannici, M.; Ciccone, M.; Romanoni, A.; and Matteucci, M. 2020. A differentiable recurrent surface for asynchronous event-based data. In European Conference on Computer Vision , 136–152. Springer. Chattopadhay, A.; Sarkar, A.; Howlader, P.; and Balasubramanian, V. N. 2018. Grad-cam++: Generalized gradient-based visual ex-planations for deep convolutional networks. In 2018 IEEE winter conference on applications of computer vision (WACV) , 839–847. IEEE. Deng, Y.; Chen, H.; Liu, H.; and Li, Y. 2022. A voxel graph cnn for object classification with event cameras. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recogni-tion , 1172–1181. Feng, T.; Quan, R.; Wang, X.; Wang, W.; and Yang, Y. 2024. Inter-pretable3d: An ad-hoc interpretable classifier for 3d point clouds. In Proceedings of the AAAI Conference on Artificial Intelligence ,volume 38, 1761–1769. Fong, R. C.; and Vedaldi, A. 2017. Interpretable explanations of black boxes by meaningful perturbation. In Proceedings of the IEEE international conference on computer vision , 3429–3437. Gallego, G.; Delbrück, T.; Orchard, G. M.; Bartolozzi, C.; Taba, B.; Censi, A.; Leutenegger, S.; Davison, A. J.; Conradt, J.; Daniilidis, K.; et al. 2022. Event-based vision: A survey. IEEE transactions on pattern analysis and machine intelligence , 44(1): 154–180. Gehrig, D.; Loquercio, A.; Derpanis, K. G.; and Scaramuzza, D. 2019. End-to-end learning of representations for asynchronous event-based data. In Proceedings of the IEEE/CVF international conference on computer vision , 5633–5643. Gomez, T.; Fréour, T.; and Mouchère, H. 2022. Metrics for saliency map evaluation of deep learning explanation methods. In Inter-national Conference on Pattern Recognition and Artificial Intelli-gence , 84–95. Springer. Hooker, S.; Erhan, D.; Kindermans, P.-J.; and Kim, B. 2019. Abenchmark for interpretability methods in deep neural networks. 
+
+Advances in neural information processing systems , 32. Huang, Z.; Sun, L.; Zhao, C.; Li, S.; and Su, S. 2023. Eventpoint: Self-supervised interest point detection and description for event-based camera. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision , 5396–5405. Kindermans, P.-J.; Hooker, S.; Adebayo, J.; Alber, M.; Schütt, K. T.; Dähne, S.; Erhan, D.; and Kim, B. 2019. The (un) reliability of saliency methods. In Explainable AI: Interpreting, explaining and visualizing deep learning , 267–280. Springer. Levi, M. Y.; and Gilboa, G. 2024. Fast and simple explainability for point cloud networks. arXiv preprint arXiv:2403.07706 .Li, H.; Liu, H.; Ji, X.; Li, G.; and Shi, L. 2017. Cifar10-dvs: an event-stream dataset for object classification. Frontiers in neuroscience ,11: 244131. Lin, X.; Qiu, C.; Shen, S.; Zang, Y.; Liu, W.; Bian, X.; Müller, M.; Wang, C.; et al. 2023. E2pnet: event to point cloud registration with spatio-temporal representation learning. Advances in Neural Information Processing Systems , 36: 18076–18089. Liu, S.; Li, B.; Fang, Z.; Cui, M.; and Huang, K. 2024. FFAM: feature factorization activation map for explanation of 3d detectors. 
+
+Advances in Neural Information Processing Systems , 37: 80363– 80382. Lundberg, S. M.; and Lee, S.-I. 2017. A unified approach to in-terpreting model predictions. Advances in neural information pro-cessing systems , 30. Mulawade, R. N.; Garth, C.; and Wiebel, A. 2025. XAI for Point Cloud Data Using Perturbations Based on Meaningful Segmenta-tion. IEEE Access .Orchard, G.; Jayawant, A.; Cohen, G. K.; and Thakor, N. 2015. Converting static image datasets to spiking neuromorphic datasets using saccades. Frontiers in neuroscience , 9: 437. Peng, Y.; Zhang, Y.; Xiong, Z.; Sun, X.; and Wu, F. 2023. Get: Group event transformer for event-based vision. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,6038–6048. Petsiuk, V.; Das, A.; and Saenko, K. 2018. Rise: Randomized input sampling for explanation of black-box models. arXiv preprint arXiv:1806.07421 .Qi, C. R.; Su, H.; Mo, K.; and Guibas, L. J. 2017a. Pointnet: Deep learning on point sets for 3d classification and segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition , 652–660. Qi, C. R.; Yi, L.; Su, H.; and Guibas, L. J. 2017b. Pointnet++: Deep hierarchical feature learning on point sets in a metric space. 
+
+Advances in neural information processing systems , 30. Ren, H.; Jiang, Y.; Huang, T.; and Wu, X. 2026a. A Systematic Survey on Event Camera Representation Learning. arXiv preprint arXiv:2606.23078 .Ren, H.; Ma, F.; Fang, Y.; Huang, H.; Zhou, Y.; Huang, Y.; FU, H.; Yang, Z.; Jiang, Y.; Wu, X.; et al. 2026b. Scalable Event Cloud Net-work for Event-based Classification. In Forty-third International Conference on Machine Learning .Ren, H.; Zhou, Y.; Lin, X.; Huang, Y.; Fu, H.; Song, J.; and Cheng, B. 2024a. Spikepoint: An efficient point-based spiking neural net-work for event cameras action recognition. In International Con-ference on Learning Representations , volume 2024, 27827–27846. Ren, H.; Zhou, Y.; Zhu, J.; Lin, X.; Fu, H.; Huang, Y.; Fang, Y.; Ma, F.; Yu, H.; and Cheng, B. 2025. Rethinking efficient and effective point-based networks for event camera classification and regression. 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence .Ren, H.; Zhu, J.; Zhou, Y.; Fu, H.; Huang, Y.; and Cheng, B. 2024b. A simple and effective point-based network for event camera 6-dofs pose relocalization. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 18112–18121. Ribeiro, M. T.; Singh, S.; and Guestrin, C. 2016. " Why should i trust you?" Explaining the predictions of any classifier. In Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining , 1135–1144. Sabater, A.; Montesano, L.; and Murillo, A. C. 2022. Event trans-former. a sparse-aware solution for efficient event data processing. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2677–2686. Schaefer, S.; Gehrig, D.; and Scaramuzza, D. 2022. Aegnn: Asyn-chronous event-based graph neural networks. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,12371–12381. Sekikawa, Y.; Hara, K.; and Saito, H. 2019. Eventnet: Asynchronous recursive event processing. In Proceedings of the IEEE/CVF con-ference on computer vision and pattern recognition , 3887–3896. Selvaraju, R. R.; Cogswell, M.; Das, A.; Vedantam, R.; Parikh, D.; and Batra, D. 2017. Grad-cam: Visual explanations from deep networks via gradient-based localization. In Proceedings of the IEEE international conference on computer vision , 618–626. Simonyan, K.; Vedaldi, A.; and Zisserman, A. 2013. Deep inside convolutional networks: Visualising image classification models and saliency maps. arXiv preprint arXiv:1312.6034 .Sironi, A.; Brambilla, M.; Bourdis, N.; Lagorce, X.; and Benosman, R. 2018. HATS: Histograms of averaged time surfaces for robust event-based object classification. In Proceedings of the IEEE con-ference on computer vision and pattern recognition , 1731–1740. Smilkov, D.; Thorat, N.; Kim, B.; Viégas, F.; and Wattenberg, M. 2017. Smoothgrad: removing noise by adding noise. arXiv preprint arXiv:1706.03825 .Sundararajan, M.; Taly, A.; and Yan, Q. 2017. Axiomatic attribution for deep networks. In International conference on machine learning ,3319–3328. PMLR. Tomsett, R.; Harborne, D.; Chakraborty, S.; Gurram, P.; and Preece, A. 2020. Sanity checks for saliency metrics. In Proceedings of the AAAI conference on artificial intelligence , volume 34, 6021–6029. Wang, Y.; Sun, Y.; Liu, Z.; Sarma, S. E.; Bronstein, M. M.; and Solomon, J. M. 2019. Dynamic graph cnn for learning on point clouds. ACM Transactions on Graphics (tog) , 38(5): 1–12. Yeh, C.-K.; Hsieh, C.-Y.; Suggala, A.; Inouye, D. I.; and Ravikumar, P. K. 2019. On the (in) fidelity and sensitivity of explanations. 
+
+Advances in neural information processing systems , 32. Zeiler, M. D.; and Fergus, R. 2014. Visualizing and understand-ing convolutional networks. In European conference on computer vision , 818–833. Springer. Zhao, H.; Jiang, L.; Jia, J.; Torr, P. H.; and Koltun, V. 2021. Point transformer. In Proceedings of the IEEE/CVF international confer-ence on computer vision , 16259–16268. Zheng, T.; Chen, C.; Yuan, J.; Li, B.; and Ren, K. 2019. Pointcloud saliency maps. In Proceedings of the IEEE/CVF international con-ference on computer vision , 1598–1606.
