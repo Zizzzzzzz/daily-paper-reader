@@ -44,14 +44,14 @@
       <span class="dpr-home-dashboard-kicker">2026-08-07</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 17 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 19 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>11</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>8</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 02:21:15 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 21:30:04 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读17篇，聚焦烹饪场景立体事件相机数据集与4D雷达语言模型两大高星工作；速读覆盖视觉Token剪枝、航拍导航与扩散VLA风险检测。最值得关注的是《Cooking beyond Frames》的10分数据集和《Radar4D-VLM》的跨模态推理方案。普通读者可优先精读这两篇，并留意Token剪枝与导航任务中的效率设计。</p>
+<p>今日精读19篇，聚焦多模态效率提升，其中《Deltoris》与《DIVE》均获满分，主攻实时VLA推理与动态视觉证据构建。最值得关注的方向是“位级稀疏+投机推理”和“迭代视觉证据”，它们能显著降低视觉语言模型计算开销。若想快速入门，可从视觉token剪枝与高清视频识别两篇速读文章入手，理解冗余信息如何影响效率。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">9 篇</strong>
+    <strong class="dpr-home-dashboard-count">11 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen">Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen</span></li><li><span class="dpr-home-dashboard-paper-title" title="Radar4D-VLM: Proposal-Grounded Temporal 4D Radar Reasoning Across Frozen Language Models">Radar4D-VLM: Proposal-Grounded Temporal 4D Radar Reasoning Across Frozen Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference">Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference">Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="DIVE: Dynamic Iterative Visual Evidence Construction for Efficient Vision-Language Models">DIVE: Dynamic Iterative Visual Evidence Construction for Efficient Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen">Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>8</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -87,9 +87,9 @@
     <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles">Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles</span></li><li><span class="dpr-home-dashboard-paper-title" title="FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation">FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation</span></li><li><span class="dpr-home-dashboard-paper-title" title="GUARD: Grounding Uncertainty and Ablation-Based Risk Detection for Diffusion-Based VLAs">GUARD: Grounding Uncertainty and Ablation-Based Risk Detection for Diffusion-Based VLAs</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles">Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles</span></li><li><span class="dpr-home-dashboard-paper-title" title="HiResNets: Native Full-HD Video Recognition with Foveal Residual Streams">HiResNets: Native Full-HD Video Recognition with Foveal Residual Streams</span></li><li><span class="dpr-home-dashboard-paper-title" title="Accurate Localization of Road Traffic Objects on the Road Plane Using Surveillance Camera Imagery">Accurate Localization of Road Traffic Objects on the Road Plane Using Surveillance Camera Imagery</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>8</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 

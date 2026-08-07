@@ -1,107 +1,17 @@
 {
   "mode": "standard",
-  "generated_at": "2026-08-07T02:12:26.199198+00:00",
+  "generated_at": "2026-08-07T21:27:36.159036+00:00",
   "stats": {
     "mode": "standard",
     "tag_count": 3,
-    "deep_divecandidates": 10,
+    "deep_divecandidates": 8,
     "deep_cap": 8,
-    "deep_selected": 9,
-    "quick_candidates": 8,
+    "deep_selected": 8,
+    "quick_candidates": 3,
     "quick_skim_target": 13,
-    "quick_selected": 8
+    "quick_selected": 3
   },
   "deep_dive": [
-    {
-      "id": "2608.04865v1",
-      "source": "arxiv",
-      "title": "Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen",
-      "abstract": "Event cameras, also known as neuromorphic cameras, have gained significant attention in recent years due to their high temporal resolution, high dynamic range, and low power consumption. While many studies and datasets in neuromorphic vision have focused on automotive and drone applications, human-centric daily-life scenarios remain largely underrepresented, despite their importance for developing and benchmarking event-based perception systems. Moreover, the few existing event-based human activity datasets are typically recorded with scripted human actions, limiting their ability to capture natural human behaviors. In this paper, we introduce EventKitchen, a large-scale stereo event camera benchmark dataset of human cooking activities in the kitchen. EventKitchen is egocentrically collected from 10 participants in 13 diverse kitchens, where the participants wear a helmet with multiple sensors and naturally perform cooking activities, without any scripted actions. EventKitchen comprises 5.5 hours of stereo event recordings with synchronized RGB, depth, and IMU data. We provide human annotations for 10,762 action segments and 13,482 bounding boxes. We train baseline models on EventKitchen to perform multiple event-based tasks, including action recognition, object detection, and stereo depth estimation. By capturing natural, real-world human activities, EventKitchen establishes a challenging benchmark for neuromorphic vision beyond autonomous driving.",
-      "authors": [
-        "Chengming Feng",
-        "Hesam Araghi",
-        "Liming Zheng",
-        "Julien Dupeyroux",
-        "Xucong Zhang",
-        "Jan van Gemert",
-        "Nergis Tömen"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-05T13:59:01+00:00",
-      "link": "https://arxiv.org/pdf/2608.04865v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 10.0,
-      "llm_evidence_en": "Stereo event camera dataset; neuromorphic vision; human cooking activities",
-      "llm_evidence_cn": "立体事件相机数据集；神经形态视觉；人类烹饪活动",
-      "llm_evidence": "立体事件相机数据集；神经形态视觉；人类烹饪活动",
-      "canonical_evidence": "立体事件相机数据集；神经形态视觉；人类烹饪活动",
-      "llm_tldr_en": "EventKitchen is a large-scale stereo event camera benchmark captured during natural cooking activities in a kitchen. It fills the gap of human-centric daily-life event data, providing high temporal resolution and dynamic range for developing and benchmarking event-based perception systems.",
-      "llm_tldr_cn": "事件相机因其高时间分辨率、高动态范围和低功耗而备受关注，但现有数据集大多面向自动驾驶和无人机场景，缺少自然的人类日常活动数据。本文提出EventKitchen，一个大规模立体事件相机基准数据集，记录厨房中的自然烹饪行为。该数据集为事件相机感知系统的开发和评估提供了新的基准，填补了以人为中心的日常生活事件数据空白。",
-      "llm_tldr": "事件相机因其高时间分辨率、高动态范围和低功耗而备受关注，但现有数据集大多面向自动驾驶和无人机场景，缺少自然的人类日常活动数据。本文提出EventKitchen，一个大规模立体事件相机基准数据集，记录厨房中的自然烹饪行为。该数据集为事件相机感知系统的开发和评估提供了新的基准，填补了以人为中心的日常生活事件数据空白。",
-      "llm_tags": [
-        "query:ev-cam"
-      ],
-      "matched_query_tag": "query:ev-cam",
-      "matched_query_text": "event-based camera vision sensors and systems",
-      "matched_requirement_id": "req-5",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2608.04130v1",
-      "source": "arxiv",
-      "title": "Radar4D-VLM: Proposal-Grounded Temporal 4D Radar Reasoning Across Frozen Language Models",
-      "abstract": "Vision-language models for autonomous driving primarily rely on cameras and LiDAR, leaving 4D radar largely unexplored as a standalone perceptual modality despite its robustness to adverse visibility and direct measurement of radial velocity. We introduce Radar4D-VLM, a radar-only temporal vision-language model that reasons from ten consecutive 4D-radar point-cloud sweeps without camera or LiDAR input. Radar4D-VLM extracts geometrically grounded object proposals and organizes radar evidence into a compact hierarchy of object, scene, and kinematic tokens. A parameter-efficient projector maps these tokens into frozen language backbones, while auditable prediction heads jointly model object count, spatial distribution, motion state, collision risk, semantic category, and radial velocity. Radar4D-VLM combines proposal-grounded temporal object tokenization, global scene context, and explicit kinematic tokens within a unified frozen-backbone interface. On sequence-isolated K-Radar development validation, its Top-64 proposal recall reaches 98.13% at 4 m, exceeding fixed-lattice and uniform-random controls by 6.40 and 22.83 percentage points, respectively. We further evaluate 24 matched runs spanning eight frozen Qwen, Phi, Mistral, Llama, and Gemma backbones under an identical adaptation budget. The radar-token interface remains compatible across all five language-model families, while matched aligned, permuted, and no-language controls show sensor dependence but no stable direct-head gain from aligned language supervision. These results establish a reproducible foundation for radar-only multimodal scene and motion reasoning while separating interface compatibility from the benefit of language supervision.",
-      "authors": [
-        "Jiaju Han",
-        "Xuemeng Sun",
-        "Qike Zhang",
-        "Xiang Chen",
-        "Luwei Yang",
-        "Jiahuan Long",
-        "Yiwei Wei",
-        "Jiujiang Guo",
-        "Chengyin Hu"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-04T18:32:16+00:00",
-      "link": "https://arxiv.org/pdf/2608.04130v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "multimodal LLM for traffic scene understanding; radar-only perception; autonomous driving VLM",
-      "llm_evidence_cn": "多模态大模型用于交通场景理解；纯雷达感知；自动驾驶VLM",
-      "llm_evidence": "多模态大模型用于交通场景理解；纯雷达感知；自动驾驶VLM",
-      "canonical_evidence": "多模态大模型用于交通场景理解；纯雷达感知；自动驾驶VLM",
-      "llm_tldr_en": "Radar4D-VLM introduces a radar-only temporal vision-language model for autonomous driving that reasons from ten 4D radar sweeps without camera or LiDAR. It extracts geometrically grounded object proposals and organizes them into a hierarchical token structure, feeding a frozen language backbone with an efficient projector for auditable traffic scene reasoning.",
-      "llm_tldr_cn": "现有的自动驾驶视觉语言模型大多依赖相机和LiDAR，忽略了4D雷达的独立感知能力。本文提出Radar4D-VLM，一个仅使用雷达的时序视觉语言模型，可从连续十帧4D雷达点云中进行推理。它提取几何接地目标提议并组织为对象、场景和运动学标记的紧凑层级，通过参数高效投射器送入冻结语言模型。该方法在不依赖相机和LiDAR的情况下实现了可审计的交通场景推理，为恶劣可见条件下的多模态交通理解提供了新途径。",
-      "llm_tldr": "现有的自动驾驶视觉语言模型大多依赖相机和LiDAR，忽略了4D雷达的独立感知能力。本文提出Radar4D-VLM，一个仅使用雷达的时序视觉语言模型，可从连续十帧4D雷达点云中进行推理。它提取几何接地目标提议并组织为对象、场景和运动学标记的紧凑层级，通过参数高效投射器送入冻结语言模型。该方法在不依赖相机和LiDAR的情况下实现了可审计的交通场景推理，为恶劣可见条件下的多模态交通理解提供了新途径。",
-      "llm_tags": [
-        "query:mm-trf"
-      ],
-      "matched_query_tag": "query:mm-trf",
-      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
-      "matched_requirement_id": "req-20",
-      "selection_source": "fresh_fetch"
-    },
     {
       "id": "2608.04428v1",
       "source": "arxiv",
@@ -131,19 +41,18 @@
       "tags": [
         "keyword:EV-CAM",
         "keyword:EVLM",
-        "keyword:MM-TRF",
         "query:EV-CAM",
         "query:EVLM",
         "query:MM-TRF"
       ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "real-time VLA inference optimization",
-      "llm_evidence_cn": "实时VLA推理优化",
-      "llm_evidence": "实时VLA推理优化",
-      "canonical_evidence": "实时VLA推理优化",
-      "llm_tldr_en": "Presents Deltoris, a co-design framework for efficient diffusion-based VLA inference, using temporal bit-sparsity and speculative inference to meet real-time control frequency on edge devices.",
-      "llm_tldr_cn": "该论文针对扩散式视觉-语言-动作（VLA）模型在边缘设备上推理延迟高、能耗大的问题，提出算法-硬件协同设计框架Deltoris。方法利用连续输入间的时序相似性提出时序感知位稀疏算法，只计算相邻输入的差异，消除冗余的位级操作。实验表明该方法能在满足50-200Hz高频控制需求的同时显著降低计算开销，为实时VLA推理提供了可行方案。",
-      "llm_tldr": "该论文针对扩散式视觉-语言-动作（VLA）模型在边缘设备上推理延迟高、能耗大的问题，提出算法-硬件协同设计框架Deltoris。方法利用连续输入间的时序相似性提出时序感知位稀疏算法，只计算相邻输入的差异，消除冗余的位级操作。实验表明该方法能在满足50-200Hz高频控制需求的同时显著降低计算开销，为实时VLA推理提供了可行方案。",
+      "llm_score": 10.0,
+      "llm_evidence_en": "algorithm-hardware co-design for real-time diffusion-based VLA inference",
+      "llm_evidence_cn": "面向实时扩散型VLA推理的算法-硬件协同设计",
+      "llm_evidence": "面向实时扩散型VLA推理的算法-硬件协同设计",
+      "canonical_evidence": "面向实时扩散型VLA推理的算法-硬件协同设计",
+      "llm_tldr_en": "Deltoris is an algorithm-hardware co-design for diffusion-based VLA models, applying temporal-aware bit-sparsity to compute only input differences and speculative inference to cut redundant operations, achieving real-time control-rate inference on edge devices.",
+      "llm_tldr_cn": "该论文针对基于扩散的视觉-语言-动作（VLA）模型计算量大且需要50-200Hz高频控制、难以满足边缘设备延迟与能耗约束的问题，提出Deltoris算法-硬件协同设计框架。它利用输入在时间上的相似性提出时序感知位稀疏算法，仅计算连续输入的差异，并结合推测式推理减少冗余位级操作。实验表明该方法能在边缘设备上实现实时VLA推理，为具身AI中高效控制提供了关键支撑。",
+      "llm_tldr": "该论文针对基于扩散的视觉-语言-动作（VLA）模型计算量大且需要50-200Hz高频控制、难以满足边缘设备延迟与能耗约束的问题，提出Deltoris算法-硬件协同设计框架。它利用输入在时间上的相似性提出时序感知位稀疏算法，仅计算连续输入的差异，并结合推测式推理减少冗余位级操作。实验表明该方法能在边缘设备上实现实时VLA推理，为具身AI中高效控制提供了关键支撑。",
       "llm_tags": [
         "query:evlm"
       ],
@@ -180,20 +89,229 @@
         "query:EVLM",
         "query:MM-TRF"
       ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "Dynamic visual token pruning for efficient vision-language models",
-      "llm_evidence_cn": "面向高效视觉-语言模型的动态视觉token剪枝",
-      "llm_evidence": "面向高效视觉-语言模型的动态视觉token剪枝",
-      "canonical_evidence": "面向高效视觉-语言模型的动态视觉token剪枝",
-      "llm_tldr_en": "DIVE presents a training-free framework that recasts visual-token pruning as dynamic evidence construction, iteratively selecting the most residual-conditioned important tokens to reduce inference cost in VLMs while preserving accuracy.",
-      "llm_tldr_cn": "针对视觉-语言模型中视觉token序列过长导致的推理瓶颈，现有一次打分剪枝方法难以捕捉token间的依赖问题，本文提出DIVE框架。它将视觉token剪枝重新定义为动态证据构建，在每一步根据当前已保留的token更新打分，并迭代选择剩余token中残差条件得分最高的token。实验结果显示，该训练无关方法在显著降低视觉token数量的情况下保持了模型性能。这为高效VLM推理提供了一种即插即用的压缩手段。",
-      "llm_tldr": "针对视觉-语言模型中视觉token序列过长导致的推理瓶颈，现有一次打分剪枝方法难以捕捉token间的依赖问题，本文提出DIVE框架。它将视觉token剪枝重新定义为动态证据构建，在每一步根据当前已保留的token更新打分，并迭代选择剩余token中残差条件得分最高的token。实验结果显示，该训练无关方法在显著降低视觉token数量的情况下保持了模型性能。这为高效VLM推理提供了一种即插即用的压缩手段。",
+      "llm_score": 10.0,
+      "llm_evidence_en": "dynamic iterative visual token pruning for efficient VLM inference",
+      "llm_evidence_cn": "动态迭代式视觉token剪枝，构建残差条件证据以加速VLM推理",
+      "llm_evidence": "动态迭代式视觉token剪枝，构建残差条件证据以加速VLM推理",
+      "canonical_evidence": "动态迭代式视觉token剪枝，构建残差条件证据以加速VLM推理",
+      "llm_tldr_en": "DIVE recasts visual-token pruning as dynamic evidence construction, iteratively selecting residual-conditioned tokens for training-free efficient VLM inference in vision-language models.",
+      "llm_tldr_cn": "视觉token过长是视觉语言模型高效推理的主要瓶颈，而一次性token重要性打分忽略了token之间的动态依赖。DIVE将视觉token剪枝重构为动态证据构建，反复选择残余条件得分最高的token并更新视觉与提示上下文，实现免训练的高效剪枝。实验表明该方法在显著减少视觉token数量的同时保持性能，优于单次剪枝方法，为高效VLM推理提供了新思路。",
+      "llm_tldr": "视觉token过长是视觉语言模型高效推理的主要瓶颈，而一次性token重要性打分忽略了token之间的动态依赖。DIVE将视觉token剪枝重构为动态证据构建，反复选择残余条件得分最高的token并更新视觉与提示上下文，实现免训练的高效剪枝。实验表明该方法在显著减少视觉token数量的同时保持性能，优于单次剪枝方法，为高效VLM推理提供了新思路。",
       "llm_tags": [
         "query:evlm"
       ],
       "matched_query_tag": "query:evlm",
       "matched_query_text": "token pruning",
       "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.04130v1",
+      "source": "arxiv",
+      "title": "Radar4D-VLM: Proposal-Grounded Temporal 4D Radar Reasoning Across Frozen Language Models",
+      "abstract": "Vision-language models for autonomous driving primarily rely on cameras and LiDAR, leaving 4D radar largely unexplored as a standalone perceptual modality despite its robustness to adverse visibility and direct measurement of radial velocity. We introduce Radar4D-VLM, a radar-only temporal vision-language model that reasons from ten consecutive 4D-radar point-cloud sweeps without camera or LiDAR input. Radar4D-VLM extracts geometrically grounded object proposals and organizes radar evidence into a compact hierarchy of object, scene, and kinematic tokens. A parameter-efficient projector maps these tokens into frozen language backbones, while auditable prediction heads jointly model object count, spatial distribution, motion state, collision risk, semantic category, and radial velocity. Radar4D-VLM combines proposal-grounded temporal object tokenization, global scene context, and explicit kinematic tokens within a unified frozen-backbone interface. On sequence-isolated K-Radar development validation, its Top-64 proposal recall reaches 98.13% at 4 m, exceeding fixed-lattice and uniform-random controls by 6.40 and 22.83 percentage points, respectively. We further evaluate 24 matched runs spanning eight frozen Qwen, Phi, Mistral, Llama, and Gemma backbones under an identical adaptation budget. The radar-token interface remains compatible across all five language-model families, while matched aligned, permuted, and no-language controls show sensor dependence but no stable direct-head gain from aligned language supervision. These results establish a reproducible foundation for radar-only multimodal scene and motion reasoning while separating interface compatibility from the benefit of language supervision.",
+      "authors": [
+        "Jiaju Han",
+        "Xuemeng Sun",
+        "Qike Zhang",
+        "Xiang Chen",
+        "Luwei Yang",
+        "Jiahuan Long",
+        "Yiwei Wei",
+        "Jiujiang Guo",
+        "Chengyin Hu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T18:32:16+00:00",
+      "link": "https://arxiv.org/pdf/2608.04130v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Traffic scene understanding via radar-only temporal vision-language model",
+      "llm_evidence_cn": "基于雷达的时间视觉语言模型进行交通场景理解",
+      "llm_evidence": "基于雷达的时间视觉语言模型进行交通场景理解",
+      "canonical_evidence": "基于雷达的时间视觉语言模型进行交通场景理解",
+      "llm_tldr_en": "Radar4D-VLM is a radar-only temporal vision-language model that reasons from 4D radar sweeps for autonomous driving, organizing radar evidence into compact object, scene, and kinematic tokens and projecting them into frozen language backbones.",
+      "llm_tldr_cn": "该论文针对自动驾驶中4D雷达感知未被充分利用的问题，提出Radar4D-VLM，一种仅使用雷达的时间视觉语言模型。它从连续十帧4D雷达点云中提取地理上可解释的目标提议，并将雷达证据组织为紧凑的对象、场景和运动学令牌层级，通过参数高效投影器映射到冻结的语言骨干中，以统一建模目标数量、空间分布和运动状态。实验表明该方法在复杂交通场景理解上具有效性和可解释性，为自动驾驶提供了一种不依赖摄像头和激光雷达的感知方案。",
+      "llm_tldr": "该论文针对自动驾驶中4D雷达感知未被充分利用的问题，提出Radar4D-VLM，一种仅使用雷达的时间视觉语言模型。它从连续十帧4D雷达点云中提取地理上可解释的目标提议，并将雷达证据组织为紧凑的对象、场景和运动学令牌层级，通过参数高效投影器映射到冻结的语言骨干中，以统一建模目标数量、空间分布和运动状态。实验表明该方法在复杂交通场景理解上具有效性和可解释性，为自动驾驶提供了一种不依赖摄像头和激光雷达的感知方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.04866v1",
+      "source": "arxiv",
+      "title": "Persistent Object Narratives for Token-Efficient Video Language Models",
+      "abstract": "Video large language models (Video-LLMs) have made strong progress in open-ended video understanding. However, their visual interfaces remain token-intensive and provide limited explicit structure for linking recurring object evidence across time. We introduce SlotNarrative, a slot-based interface that organizes a video into persistent object narratives represented by compact object-state tokens. Rather than compressing frame-wise features before establishing temporal correspondence, SlotNarrative first groups visual features into object-like slots and then associates recurring observations with clip-level object entries through a lightweight, parameter-free memory that integrates multiple complementary matching cues. Each retained entry is serialized into two token types: an identity token that summarizes persistent object appearance and a set of state tokens that encode segment-level appearance, geometry, visibility, and trajectory information. This design yields an interface of only 144 allocated visual-token positions for a frozen Video-LLM, independent of the number of sampled frames. Across multiple datasets, SlotNarrative achieves a favorable trade-off between accuracy and visual-token count compared with prior compact Video-LLM interfaces. Experimental results establish persistent object narratives as a compact, structured, and temporally organized visual interface for Video-LLMs. Our code will be made publicly available.",
+      "authors": [
+        "Junzhe Chen",
+        "Siyuan Meng",
+        "Xiaojie Guo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T13:59:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.04866v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Slot-based interface with compact object-state tokens for token-efficient video language models",
+      "llm_evidence_cn": "基于槽位的紧凑目标状态令牌接口，用于令牌高效视频语言模型",
+      "llm_evidence": "基于槽位的紧凑目标状态令牌接口，用于令牌高效视频语言模型",
+      "canonical_evidence": "基于槽位的紧凑目标状态令牌接口，用于令牌高效视频语言模型",
+      "llm_tldr_en": "Introduces SlotNarrative, a slot-based interface that organizes video into persistent object narratives with compact object-state tokens, reducing token usage while retaining temporal object evidence.",
+      "llm_tldr_cn": "视频大模型在理解开放视频方面取得进展，但其视觉接口仍然令牌密集，且缺少跨时间关联重复物体证据的显式结构。本文提出SlotNarrative，先按物体槽分组视觉特征，再通过轻量无参记忆将重复出现的目标关联到片段的物体条目，最终序列化为紧凑的目标状态令牌。该方法避免在建立时序对应前压缩帧级特征，能以更少令牌保留持久物体叙事。实验表明它在降低令牌开销的同时提升了视频理解性能，为令牌高效视频语言模型提供了新思路。",
+      "llm_tldr": "视频大模型在理解开放视频方面取得进展，但其视觉接口仍然令牌密集，且缺少跨时间关联重复物体证据的显式结构。本文提出SlotNarrative，先按物体槽分组视觉特征，再通过轻量无参记忆将重复出现的目标关联到片段的物体条目，最终序列化为紧凑的目标状态令牌。该方法避免在建立时序对应前压缩帧级特征，能以更少令牌保留持久物体叙事。实验表明它在降低令牌开销的同时提升了视频理解性能，为令牌高效视频语言模型提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.04865v1",
+      "source": "arxiv",
+      "title": "Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen",
+      "abstract": "Event cameras, also known as neuromorphic cameras, have gained significant attention in recent years due to their high temporal resolution, high dynamic range, and low power consumption. While many studies and datasets in neuromorphic vision have focused on automotive and drone applications, human-centric daily-life scenarios remain largely underrepresented, despite their importance for developing and benchmarking event-based perception systems. Moreover, the few existing event-based human activity datasets are typically recorded with scripted human actions, limiting their ability to capture natural human behaviors. In this paper, we introduce EventKitchen, a large-scale stereo event camera benchmark dataset of human cooking activities in the kitchen. EventKitchen is egocentrically collected from 10 participants in 13 diverse kitchens, where the participants wear a helmet with multiple sensors and naturally perform cooking activities, without any scripted actions. EventKitchen comprises 5.5 hours of stereo event recordings with synchronized RGB, depth, and IMU data. We provide human annotations for 10,762 action segments and 13,482 bounding boxes. We train baseline models on EventKitchen to perform multiple event-based tasks, including action recognition, object detection, and stereo depth estimation. By capturing natural, real-world human activities, EventKitchen establishes a challenging benchmark for neuromorphic vision beyond autonomous driving.",
+      "authors": [
+        "Chengming Feng",
+        "Hesam Araghi",
+        "Liming Zheng",
+        "Julien Dupeyroux",
+        "Xucong Zhang",
+        "Jan van Gemert",
+        "Nergis Tömen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T13:59:01+00:00",
+      "link": "https://arxiv.org/pdf/2608.04865v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "stereo event camera dataset for human cooking activities",
+      "llm_evidence_cn": "用于人类烹饪活动的立体事件相机数据集",
+      "llm_evidence": "用于人类烹饪活动的立体事件相机数据集",
+      "canonical_evidence": "用于人类烹饪活动的立体事件相机数据集",
+      "llm_tldr_en": "Introduces EventKitchen, a large-scale stereo event camera benchmark of natural human cooking activities, expanding event-based perception to daily-life scenarios.",
+      "llm_tldr_cn": "事件相机虽在汽车和无人机领域已有大量研究，但人类日常生活中的场景仍缺乏代表性数据集，且现有动作数据集多为脚本化行为。为此本文介绍EventKitchen，一个大规模的双目事件相机基准数据集，记录厨房中自然发生的烹饪活动。该数据集为开发和评测事件感知系统提供了贴近真实人类行为的数据资源，填补了事件相机在日常生活场景中的空白。",
+      "llm_tldr": "事件相机虽在汽车和无人机领域已有大量研究，但人类日常生活中的场景仍缺乏代表性数据集，且现有动作数据集多为脚本化行为。为此本文介绍EventKitchen，一个大规模的双目事件相机基准数据集，记录厨房中自然发生的烹饪活动。该数据集为开发和评测事件感知系统提供了贴近真实人类行为的数据资源，填补了事件相机在日常生活场景中的空白。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event data",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02497v1",
+      "source": "arxiv",
+      "title": "Grounded Semantic Re-Binding for Robust Instruction Generalization in Vision-Language-Action Models",
+      "abstract": "Vision-Language-Action (VLA) models excel in robotic manipulation but suffer catastrophic performance drops when canonical instructions are simply paraphrased. Although this brittleness is typically addressed through costly data scaling, our probing reveals that the root cause is architectural rather than a lack of semantic understanding. Specifically, we demonstrate that current VLAs successfully retain the correct task identity internally. The failure actually stems from the joint encoding of dynamic visual observations and text, which introduces systematic feature shifts. Because the downstream action policy is highly vulnerable to these variations, it fails to translate the preserved semantics into correct control commands. To resolve this structural bottleneck, we propose Grounded Semantic Re-binding (GSR), an elegant intervention that bypasses unstable joint routing by explicitly fusing independently extracted task semantics with native visual features to train a completely re-initialized action expert from scratch. This targeted intervention dramatically restores paraphrastic invariance using only canonical demonstrations. On the LIBERO-Para benchmark, GSR improves success rates by up to 44.6 percent. It enables lightweight models to rival massively scaled baselines and pushes state-of-the-art models to a new record PRIDE score of 70.4, outperforming the recently introduced large-scale pretrained model Xiaomi-Robotics-0 in instruction generation capabilities. Building on these insights, we also introduce ParaVLA, a natively decoupled 0.33B-parameter model exhibiting near-perfect robustness to instruction rewording. Ultimately, our work proves that robust semantic grounding can be achieved through elegant structural design, bypassing the inefficient brute-force data scaling paradigm.",
+      "authors": [
+        "Zhaokai Yin",
+        "Zhipeng Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-03T17:02:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.02497v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLA models for robotics; robust instruction generalization via grounded semantic re-binding",
+      "llm_evidence_cn": "面向机器人的VLA模型，通过语义重绑定提升指令泛化鲁棒性",
+      "llm_evidence": "面向机器人的VLA模型，通过语义重绑定提升指令泛化鲁棒性",
+      "canonical_evidence": "面向机器人的VLA模型，通过语义重绑定提升指令泛化鲁棒性",
+      "llm_tldr_en": "Probes VLA instruction brittleness, finds root cause is joint visual-text encoding feature shifts, and proposes grounded semantic re-binding to preserve task semantics and improve paraphrased instruction generalization in robotic manipulation.",
+      "llm_tldr_cn": "视觉-语言-动作（VLA）模型在机器人操作中表现优异，但一旦规范指令被改写就会出现灾难性的性能下降。作者通过探测发现，模型内部仍正确保留任务身份，真正原因在于动态视觉观测与文本的联合编码引发系统性特征偏移，使下游动作策略无法正确利用保留的语义。为此提出基于语义重绑定的方法，将任务语义稳定地重绑定到视觉-文本表征，从而在不依赖大规模数据扩展的情况下显著提升VLA对改写指令的泛化鲁棒性。",
+      "llm_tldr": "视觉-语言-动作（VLA）模型在机器人操作中表现优异，但一旦规范指令被改写就会出现灾难性的性能下降。作者通过探测发现，模型内部仍正确保留任务身份，真正原因在于动态视觉观测与文本的联合编码引发系统性特征偏移，使下游动作策略无法正确利用保留的语义。为此提出基于语义重绑定的方法，将任务语义稳定地重绑定到视觉-文本表征，从而在不依赖大规模数据扩展的情况下显著提升VLA对改写指令的泛化鲁棒性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.05137v1",
+      "source": "arxiv",
+      "title": "SmartMage: Dynamic Modality Orchestration for 3D Scene Understanding",
+      "abstract": "Understanding 3D scenes is fundamental to embodied intelligence, requiring joint reasoning over heterogeneous information from multiple modalities, including visual and geometric cues. However, the relevance of these modalities often varies across queries. Existing Multimodal Large Language Models (MLLMs) typically rely on fixed modality combinations, overlooking query-dependent modality needs. Such a rigid design can introduce semantic noise from irrelevant modalities while underutilizing more informative ones, leading to wasted computation and diluted reasoning. To address these challenges, this paper proposes SmartMage, a unified MLLM that dynamically orchestrates heterogeneous modalities for semantic-aware 3D scene understanding. Specifically, SmartMage incorporates: (1) a Semantic-guided Modality Adaptive RouTng (SMART) module that selects task-relevant modalities using semantic priors, text-modality alignment, and modality quality; and (2) a Modality-Aware Gating Expert (MAGE) module that leverages modality priors to guide expert activation, fostering adaptive specialization in multimodal reasoning. Empirically, SmartMage achieves state-of-the-art performance across five 3D scene understanding benchmarks, and attains competitive results on RGB-only video understanding benchmarks. In our diagnostic benchmark ScanFacet, tasks are divided into fine-grained semantic categories, enabling analysis of modality combinations preferred by each semantic type. The observed modality-semantic patterns provide further evidence of SmartMage's effectiveness. Project page: https://yuecheong.github.io/SmartMage/.",
+      "authors": [
+        "Yue Zhang",
+        "Yingzhao Jian",
+        "Yunqiu Xu",
+        "Xiaoxiao Sun",
+        "Hehe Fan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T17:56:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.05137v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "dynamic modality orchestration to reduce wasted computation in MLLMs",
+      "llm_evidence_cn": "动态模态编排以减少多模态大模型中的无效计算",
+      "llm_evidence": "动态模态编排以减少多模态大模型中的无效计算",
+      "canonical_evidence": "动态模态编排以减少多模态大模型中的无效计算",
+      "llm_tldr_en": "SmartMage dynamically selects relevant modalities for each query in 3D scene understanding, reducing semantic noise and wasted computation while improving reasoning.",
+      "llm_tldr_cn": "该论文针对多模态大模型（MLLM）在3D场景理解中固定使用全部模态导致语义噪声和计算浪费的问题，提出SmartMage统一框架，通过查询相关的动态模态编排，按语义选择信息量最大的模态子集。该方法在减少冗余计算的同时增强推理质量，为多模态模型的效率优化提供了新思路。",
+      "llm_tldr": "该论文针对多模态大模型（MLLM）在3D场景理解中固定使用全部模态导致语义噪声和计算浪费的问题，提出SmartMage统一框架，通过查询相关的动态模态编排，按语义选择信息量最大的模态子集。该方法在减少冗余计算的同时增强推理质量，为多模态模型的效率优化提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
       "selection_source": "fresh_fetch"
     },
     {
@@ -229,368 +347,26 @@
         "query:EVLM",
         "query:MM-TRF"
       ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "Introduces a multi-sensor 3D visual grounding dataset for autonomous driving with language instructions, directly supporting traffic scene understanding.",
-      "llm_evidence_cn": "提出了面向自动驾驶的多传感器三维视觉定位数据集及方法，利用语言指令理解交通场景。",
-      "llm_evidence": "提出了面向自动驾驶的多传感器三维视觉定位数据集及方法，利用语言指令理解交通场景。",
-      "canonical_evidence": "提出了面向自动驾驶的多传感器三维视觉定位数据集及方法，利用语言指令理解交通场景。",
-      "llm_tldr_en": "Talk2Sensors is the first multi-sensor 3D visual grounding dataset built upon camera, LiDAR and 4D radar for autonomous driving, containing 8,682 language instructions and 20,558 referred objects, enabling query-adaptive grounding in real-world outdoor perception.",
-      "llm_tldr_cn": "户外三维视觉定位大多依赖单目图像，未充分利用相机、激光雷达和4D雷达等异构传感器的互补物理特性。本文提出Talk2Sensors，首个基于多传感器的自动驾驶三维视觉定位数据集，包含8,682条语言指令和20,558个目标。方法通过传感器自适应的物理线索匹配实现查询自适应的定位，为复杂交通场景下的多模态感知提供了新基准。",
-      "llm_tldr": "户外三维视觉定位大多依赖单目图像，未充分利用相机、激光雷达和4D雷达等异构传感器的互补物理特性。本文提出Talk2Sensors，首个基于多传感器的自动驾驶三维视觉定位数据集，包含8,682条语言指令和20,558个目标。方法通过传感器自适应的物理线索匹配实现查询自适应的定位，为复杂交通场景下的多模态感知提供了新基准。",
+      "llm_score": 8.0,
+      "llm_evidence_en": "3D visual grounding; autonomous driving; multi-sensor dataset",
+      "llm_evidence_cn": "三维视觉接地；自动驾驶；多传感器数据集",
+      "llm_evidence": "三维视觉接地；自动驾驶；多传感器数据集",
+      "canonical_evidence": "三维视觉接地；自动驾驶；多传感器数据集",
+      "llm_tldr_en": "Talk2Sensors introduces the first multi-sensor 3D visual grounding dataset for autonomous driving with camera, LiDAR, and 4D radar, leveraging sensor-adaptive physical cue matching for robust language-grounded scene understanding.",
+      "llm_tldr_cn": "现有三维视觉接地研究多集中于室内RGB-D或点云输入，室外扩展多依赖单目图像，难以利用异构传感器的互补物理属性。Talk2Sensors构建了首个基于相机、LiDAR和4D雷达的多传感器三维视觉接地数据集，包含8682条语言指令和20558个目标，并提出传感器自适应物理线索匹配方法，实现查询自适应的灵活鲁棒接地，推动自动驾驶多模态场景理解。",
+      "llm_tldr": "现有三维视觉接地研究多集中于室内RGB-D或点云输入，室外扩展多依赖单目图像，难以利用异构传感器的互补物理属性。Talk2Sensors构建了首个基于相机、LiDAR和4D雷达的多传感器三维视觉接地数据集，包含8682条语言指令和20558个目标，并提出传感器自适应物理线索匹配方法，实现查询自适应的灵活鲁棒接地，推动自动驾驶多模态场景理解。",
       "llm_tags": [
         "query:mm-trf"
       ],
       "matched_query_tag": "query:mm-trf",
-      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
-      "matched_requirement_id": "req-20",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2608.04610v1",
-      "source": "arxiv",
-      "title": "HiSC: Hierarchical Spatial Clustering Token Compression for Efficient 3D Scene Understanding",
-      "abstract": "3D vision-language models (3D VLMs) enable spatial reasoning over multi-view scenes but suffer from substantial token redundancy due to duplicated observations and large uninformative regions, leading to high computational cost. Although visual token compression has shown promise in accelerating 2D VLMs, it fails to capture the structured nature of 3D scenes and leads to incomplete spatial coverage and loss of fine-grained details. In this paper, we propose \\textbf{HiSC}, a training-free framework for hierarchical spatial clustering token compression in 3D VLMs. HiSC lifts token compression from token-level selection to cluster-level processing by organizing tokens into spatially grounded clusters using joint geometric and semantic cues. Specifically, we first introduce a \\textbf{spatial graph-based merging (SGraM) strategy} that models cross-view redundancy as spatial connectivity and consolidates physically consistent regions, effectively merging extremely similar redundant tokens prior to LLM inference. We then propose a \\textbf{spatial clustering-based pruning (SCluP) paradigm} within LLM inference, which performs hierarchical compression across clusters and within clusters, preserving object instance completeness while retaining fine-grained details for important regions. Extensive experiments on diverse 3D reasoning benchmarks show validate the effectiveness of HiSC, particularly under high visual token pruning ratios. Besides, HiSC achieves over 90\\% token reduction with minimal performance degradation. Code is accessible at https://github.com/elecreak/HiSC.",
-      "authors": [
-        "Jiuhe Qu",
-        "Yingping Liang",
-        "Ying Fu"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-05T09:15:43+00:00",
-      "link": "https://arxiv.org/pdf/2608.04610v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "Training-free hierarchical spatial clustering token compression for 3D scene understanding.",
-      "llm_evidence_cn": "面向3D场景理解的无训练分层空间聚类令牌压缩方法。",
-      "llm_evidence": "面向3D场景理解的无训练分层空间聚类令牌压缩方法。",
-      "canonical_evidence": "面向3D场景理解的无训练分层空间聚类令牌压缩方法。",
-      "llm_tldr_en": "HiSC proposes a training-free hierarchical spatial clustering framework for token compression in 3D VLMs, organizing tokens into spatially grounded clusters via joint geometric and semantic similarity to preserve coverage and details.",
-      "llm_tldr_cn": "3D视觉语言模型在多视角场景理解中面临令牌冗余和计算开销高的问题。虽然2D VLM的令牌压缩已见成效，但无法捕捉3D场景的结构特性。本文提出HiSC，通过联合几何与语义相似性将令牌组织成空间聚簇的簇，实现从令牌级选择到簇级处理的无训练压缩，保持了空间覆盖和细节，显著提升3D场景理解效率。",
-      "llm_tldr": "3D视觉语言模型在多视角场景理解中面临令牌冗余和计算开销高的问题。虽然2D VLM的令牌压缩已见成效，但无法捕捉3D场景的结构特性。本文提出HiSC，通过联合几何与语义相似性将令牌组织成空间聚簇的簇，实现从令牌级选择到簇级处理的无训练压缩，保持了空间覆盖和细节，显著提升3D场景理解效率。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "latest research on token compression in vision language models",
-      "matched_requirement_id": "req-17",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2608.04771v1",
-      "source": "arxiv",
-      "title": "Fewer Tokens, Smaller Cache: Reward-Coordinated Efficient Reasoning",
-      "abstract": "Large Reasoning Models (LRMs) excel on complex tasks through long chain-of-thought (CoT) reasoning, but their lengthy intermediate steps cause severe overthinking that inflates inference cost. KV-cache compression is a common solution, yet existing reasoning-oriented methods apply a uniform policy across the trajectory and judge compression only by what it removes from the cache. Two observations point the other way. First, a reasoning state's tolerance to context loss varies along the trajectory, and process reward tracks it: deleting tokens at high-reward steps preserves accuracy far better than deleting the same budget at random. Second, compression is not free on the generation side, since a smaller cache leads the model to generate more tokens, partly canceling the saving. Together these motivate coordinating both sides under a single process reward. We propose ReCo (Reward-Coordinated Compression), a step-wise framework in which a lightweight process-reward estimator scores each completed step and drives three components: (1) reward-adaptive KV-cache compression that shrinks the retained cache harder at high-reward steps and less at low-reward ones, (2) a reward-banded penalty on reflection tokens that curbs redundant generation, and (3) confidence-based early stopping that triggers when the reasoning is reliable. Across three reasoning models and six benchmarks, ReCo reduces generated tokens by 37%-65% and end-to-end latency by 2.08x-2.35x over Full CoT, all while largely preserving accuracy.",
-      "authors": [
-        "Qiyuan Zhu",
-        "Dezhi Li",
-        "Pengyu Cheng",
-        "Tianle Chen",
-        "Jiacheng Wang",
-        "Ruijie Shen",
-        "Hao Gu",
-        "Sida Lin",
-        "Zirui Liu",
-        "Jiacheng Liu",
-        "Sirui Han"
-      ],
-      "primary_category": "cs.AI",
-      "categories": [
-        "cs.AI"
-      ],
-      "published": "2026-08-05T12:36:28+00:00",
-      "link": "https://arxiv.org/pdf/2608.04771v1",
-      "tags": [
-        "keyword:EVLM",
-        "query:EVLM"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "reward-coordinated KV-cache compression for long reasoning trajectories",
-      "llm_evidence_cn": "奖励协调的KV缓存压缩用于长推理轨迹",
-      "llm_evidence": "奖励协调的KV缓存压缩用于长推理轨迹",
-      "canonical_evidence": "奖励协调的KV缓存压缩用于长推理轨迹",
-      "llm_tldr_en": "The paper introduces a reward-coordinated KV-cache compression policy that deletes tokens at high-reward steps during reasoning, reducing inference cost while mitigating extra token generation from smaller caches.",
-      "llm_tldr_cn": "大型推理模型通过长思维链取得优异成绩，但中间步骤冗长导致过思考并增加推理成本。现有KV缓存压缩策略在整条轨迹上统一处理，未考虑推理状态对上下文丢失的容忍度差异。本文提出奖励协调的高效推理方法，利用过程奖励识别高奖励步骤并优先在那些位置删除令牌，同时考虑压缩对生成侧的影响。实验表明该策略比随机删除保留更高精度，并有效控制因缓存变小带来的额外生成开销，为大模型长推理的效率优化提供了新方向。",
-      "llm_tldr": "大型推理模型通过长思维链取得优异成绩，但中间步骤冗长导致过思考并增加推理成本。现有KV缓存压缩策略在整条轨迹上统一处理，未考虑推理状态对上下文丢失的容忍度差异。本文提出奖励协调的高效推理方法，利用过程奖励识别高奖励步骤并优先在那些位置删除令牌，同时考虑压缩对生成侧的影响。实验表明该策略比随机删除保留更高精度，并有效控制因缓存变小带来的额外生成开销，为大模型长推理的效率优化提供了新方向。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "KV cache compression and management for long context",
-      "matched_requirement_id": "req-15",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2608.04866v1",
-      "source": "arxiv",
-      "title": "Persistent Object Narratives for Token-Efficient Video Language Models",
-      "abstract": "Video large language models (Video-LLMs) have made strong progress in open-ended video understanding. However, their visual interfaces remain token-intensive and provide limited explicit structure for linking recurring object evidence across time. We introduce SlotNarrative, a slot-based interface that organizes a video into persistent object narratives represented by compact object-state tokens. Rather than compressing frame-wise features before establishing temporal correspondence, SlotNarrative first groups visual features into object-like slots and then associates recurring observations with clip-level object entries through a lightweight, parameter-free memory that integrates multiple complementary matching cues. Each retained entry is serialized into two token types: an identity token that summarizes persistent object appearance and a set of state tokens that encode segment-level appearance, geometry, visibility, and trajectory information. This design yields an interface of only 144 allocated visual-token positions for a frozen Video-LLM, independent of the number of sampled frames. Across multiple datasets, SlotNarrative achieves a favorable trade-off between accuracy and visual-token count compared with prior compact Video-LLM interfaces. Experimental results establish persistent object narratives as a compact, structured, and temporally organized visual interface for Video-LLMs. Our code will be made publicly available.",
-      "authors": [
-        "Junzhe Chen",
-        "Siyuan Meng",
-        "Xiaojie Guo"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-05T13:59:04+00:00",
-      "link": "https://arxiv.org/pdf/2608.04866v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "slot-based token-efficient interface for video LLMs, compressing visual tokens into object narratives",
-      "llm_evidence_cn": "基于槽位的视频语言模型令牌高效接口，将视觉令牌压缩为对象叙事",
-      "llm_evidence": "基于槽位的视频语言模型令牌高效接口，将视觉令牌压缩为对象叙事",
-      "canonical_evidence": "基于槽位的视频语言模型令牌高效接口，将视觉令牌压缩为对象叙事",
-      "llm_tldr_en": "SlotNarrative presents a slot-based interface that organizes videos into persistent object narratives with compact object-state tokens, avoiding frame-wise compression and improving temporal coherence and token efficiency in video language models.",
-      "llm_tldr_cn": "视频大语言模型在开放式视频理解上进展显著，但视觉接口令牌密集且缺少跨时间对象关联的结构。SlotNarrative提出基于槽位的接口，将视频组织为持久化的对象叙事，用紧凑的对象状态令牌表示，并通过轻量无参记忆整合多种匹配线索。相比压缩帧级特征，它先分组对象槽再关联重复观察，从而在降低令牌开销的同时加强时序一致性。该方法为令牌高效视频理解提供了新的结构化范式。",
-      "llm_tldr": "视频大语言模型在开放式视频理解上进展显著，但视觉接口令牌密集且缺少跨时间对象关联的结构。SlotNarrative提出基于槽位的接口，将视频组织为持久化的对象叙事，用紧凑的对象状态令牌表示，并通过轻量无参记忆整合多种匹配线索。相比压缩帧级特征，它先分组对象槽再关联重复观察，从而在降低令牌开销的同时加强时序一致性。该方法为令牌高效视频理解提供了新的结构化范式。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "latest research on token compression in vision language models",
-      "matched_requirement_id": "req-17",
-      "selection_source": "fresh_fetch"
-    },
-    {
-      "id": "2608.05042v1",
-      "source": "arxiv",
-      "title": "BridgeVLA++: A Data-Efficient, Generalizable, and Memory-Augmented Vision-Language-Action Framework for 3D Manipulation",
-      "abstract": "Leveraging pre-trained vision-language models (VLMs) to construct vision-language-action (VLA) models has emerged as a promising paradigm for 3D robot manipulation. However, existing 3D VLA methods remain data-hungry, exhibit limited generalization under distribution shifts, and lack explicit memory of past observations. These limitations hinder their application to data-scarce, open-world, and memory-dependent manipulation scenarios. Our previous work, BridgeVLA, improves data efficiency and generalization by preserving the input--output alignment of a pre-trained VLM during 3D action learning: raw point clouds are projected into multi-view images, and intermediate heatmaps are predicted before generating robot actions. In this work, we develop BridgeVLA++ by equipping BridgeVLA with a unified spatio-temporal memory architecture that models persistent spatial context and temporal interaction history. The resulting memory-augmented framework can reason over observation histories while preserving BridgeVLA's data efficiency and generalization capabilities. Extensive experiments show that our framework achieves strong performance on spatial manipulation tasks while exhibiting robust generalization. BridgeVLA++ further achieves state-of-the-art performance on two challenging memory-dependent manipulation benchmarks without sacrificing the data efficiency and generalization of the original BridgeVLA. In addition, BridgeVLA++ performs effectively in bimanual manipulation settings and is validated on an additional real-world robotic platform, demonstrating its scalability across tasks, environments, and robotic platforms. These results establish BridgeVLA++ as a unified 3D vision-language-action framework that simultaneously supports data-efficient learning, robust generalization, and effective memory-aware robot manipulation. Project website: https://bridgevla-plus.github.io/.",
-      "authors": [
-        "Peiyan Li",
-        "Yuze Zhu",
-        "Yixiang Chen",
-        "Qisen Ma",
-        "Yuan Xu",
-        "Jiabing Yang",
-        "He Guan",
-        "Yan Huang",
-        "Hongtao Wu",
-        "Xiao Ma",
-        "Tao Kong",
-        "Liang Wang",
-        "Tieniu Tan"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO"
-      ],
-      "published": "2026-08-05T16:54:25+00:00",
-      "link": "https://arxiv.org/pdf/2608.05042v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 9.0,
-      "llm_evidence_en": "data-efficient generalizable vision-language-action framework for 3D manipulation",
-      "llm_evidence_cn": "面向3D操作的数据高效且可泛化的视觉-语言-动作框架",
-      "llm_evidence": "面向3D操作的数据高效且可泛化的视觉-语言-动作框架",
-      "canonical_evidence": "面向3D操作的数据高效且可泛化的视觉-语言-动作框架",
-      "llm_tldr_en": "This paper presents BridgeVLA++, a VLA framework that projects point clouds into multi-view images and uses intermediate heatmaps to preserve VLM input-output alignment, improving data efficiency and generalization with memory augmentation.",
-      "llm_tldr_cn": "现有3D视觉-语言-动作（VLA）模型数据需求大、分布偏移下泛化差且缺乏历史记忆，难以适应数据稀缺和开放世界操作任务。BridgeVLA++在保留预训练VLM输入输出对齐的前提下，将原始点云投影到多视图图像，并先预测中间热图再生成动作，从而显著提升数据效率和泛化能力；记忆增强模块则显式记录历史观测，支持记忆依赖型任务。在多个3D操作基准上的实验表明，该框架在少样本、跨分布及长时程任务上均优于强基线。该工作展示了借助VLM先验实现数据高效VLA建模的可行路径。",
-      "llm_tldr": "现有3D视觉-语言-动作（VLA）模型数据需求大、分布偏移下泛化差且缺乏历史记忆，难以适应数据稀缺和开放世界操作任务。BridgeVLA++在保留预训练VLM输入输出对齐的前提下，将原始点云投影到多视图图像，并先预测中间热图再生成动作，从而显著提升数据效率和泛化能力；记忆增强模块则显式记录历史观测，支持记忆依赖型任务。在多个3D操作基准上的实验表明，该框架在少样本、跨分布及长时程任务上均优于强基线。该工作展示了借助VLM先验实现数据高效VLA建模的可行路径。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient vision-language-action models for robotics",
-      "matched_requirement_id": "req-13",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
       "selection_source": "fresh_fetch"
     }
   ],
   "quick_skim": [
     {
-      "id": "2608.04483v1",
-      "source": "arxiv",
-      "title": "Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles",
-      "abstract": "Vision-language models (VLMs) process an image as a sequence of visual tokens, which creates a substantial computational bottleneck during inference. Recent visual token pruning methods address this issue by removing seemingly redundant tokens, yet it remains unclear how these pruning decisions relate to the functional roles of visual tokens. In this work, we analyze visual token pruning through the lens of token roles identified by EmbedLens. We first show that representative pruning methods exhibit distinct token-role biases, but these biases do not directly correlate with downstream performance. To better understand this behavior, we refine the token-role assignment procedure and evaluate role-protected pruning variants. Our results show that preserving non-alive tokens can sometimes maintain or improve performance, suggesting that tokens with weak direct semantic alignment may still affect model behavior under pruning. Our code is publicly available at https://github.com/jaykim9870/Not_All_Redundant_Tokens_Are_Alike.",
-      "authors": [
-        "Hyeonyu Kim",
-        "Sehwan Lim",
-        "Youngwon Choi",
-        "Taeyoun Kwon",
-        "Jaejin Kim"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-05T06:16:53+00:00",
-      "link": "https://arxiv.org/pdf/2608.04483v1",
-      "tags": [
-        "keyword:EVLM",
-        "query:EVLM"
-      ],
-      "llm_score": 8.0,
-      "llm_evidence_en": "Analyzes visual token pruning through token roles, providing insights and role-protected pruning variants.",
-      "llm_evidence_cn": "通过令牌角色分析视觉令牌剪枝行为，并评估角色保护剪枝变体。",
-      "llm_evidence": "通过令牌角色分析视觉令牌剪枝行为，并评估角色保护剪枝变体。",
-      "canonical_evidence": "通过令牌角色分析视觉令牌剪枝行为，并评估角色保护剪枝变体。",
-      "llm_tldr_en": "This paper analyzes visual token pruning methods through token-role biases identified by EmbedLens, refines role assignment, and evaluates role-protected pruning variants to explain downstream performance.",
-      "llm_tldr_cn": "视觉令牌剪枝在VLM推理时能移除冗余令牌，但不同剪枝方法与令牌功能角色之间的关系尚不清楚。本文基于EmbedLens识别的令牌角色，系统分析了代表性剪枝方法的角色偏差，发现这些偏差与下游性能不直接相关。作者进一步细化角色分配并评估角色保护剪枝变体，为理解剪枝决策提供了新视角。",
-      "llm_tldr": "视觉令牌剪枝在VLM推理时能移除冗余令牌，但不同剪枝方法与令牌功能角色之间的关系尚不清楚。本文基于EmbedLens识别的令牌角色，系统分析了代表性剪枝方法的角色偏差，发现这些偏差与下游性能不直接相关。作者进一步细化角色分配并评估角色保护剪枝变体，为理解剪枝决策提供了新视角。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "token pruning",
-      "matched_requirement_id": "req-11",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "8plus"
-    },
-    {
-      "id": "2608.00970v1",
-      "source": "arxiv",
-      "title": "FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation",
-      "abstract": "Object-oriented aerial vision-and-language navigation (VLN) requires searching for a described target and landing on it precisely, under long-horizon and closed-loop control. Guided by a target-descriptive instruction during navigation, perceptual priorities dynamically evolve: early-stage exploration prioritizes low-frequency spatial layout, and then shifts to high-frequency target details. Existing VLN methods model the varying perceptual requirements across navigation stages with identical visual tokens, leading to interference from irrelevant objects and background clutter. To this end, we therefore formulate long-horizon aerial navigation as a frequencypreference shift from spatial structure to local detail and propose FreqNav, a lightweight frequency-routing adaptive perception framework. Under a fixed computational budget, FreqNav dynamically reallocates visual tokens across frequency components according to the current navigation stage. A Frequency Token Router selects stage-relevant visual representations from dual-view observations, while a Phase-dependent Grounding Module anchors visual evidence through explicit supervision. A Diffusion Transformer then predicts smooth trajectories for continuous control. Experiments show that FreqNav outperforms strong baselines while achieving approximately 3x faster inference. Real-world deployment further demonstrates its effectiveness, efficiency, and practical potential for long-horizon aerial autonomy.",
-      "authors": [
-        "Yin Tang",
-        "Jiawei Ma",
-        "Jiahao Li",
-        "Hao Zhang",
-        "Zhemin Sun",
-        "Jianqiao Sun",
-        "Deyu Zhang"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO"
-      ],
-      "published": "2026-08-02T03:49:54+00:00",
-      "link": "https://arxiv.org/pdf/2608.00970v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 7.0,
-      "llm_evidence_en": "efficient VLM via stage-wise frequency routing",
-      "llm_evidence_cn": "通过分阶段频率路由实现高效视觉语言模型",
-      "llm_evidence": "通过分阶段频率路由实现高效视觉语言模型",
-      "canonical_evidence": "通过分阶段频率路由实现高效视觉语言模型",
-      "llm_tldr_en": "FreqNav models navigation-stage-dependent perceptual needs with frequency routing, using layout-focused tokens early and detail-focused tokens late, improving VLM navigation efficiency.",
-      "llm_tldr_cn": "论文提出FreqNav，面向面向目标的空中视觉语言导航任务，将长期导航建模为从空间结构到局部细节的频率偏好转移。现有方法在不同导航阶段使用相同的视觉token，导致无关物体和背景干扰，FreqNav通过阶段式频率路由动态调整视觉token的频带侧重，从而提升导航中的感知效率与准确率。",
-      "llm_tldr": "论文提出FreqNav，面向面向目标的空中视觉语言导航任务，将长期导航建模为从空间结构到局部细节的频率偏好转移。现有方法在不同导航阶段使用相同的视觉token，导致无关物体和背景干扰，FreqNav通过阶段式频率路由动态调整视觉token的频带侧重，从而提升导航中的感知效率与准确率。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient vision language models architecture and inference",
-      "matched_requirement_id": "req-12",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "7"
-    },
-    {
-      "id": "2608.01066v1",
-      "source": "arxiv",
-      "title": "OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation",
-      "abstract": "We propose OC-VLA++, an extension of OC-VLA for viewpoint generalization under limited camera coverage. While OC-VLA grounds robot actions in the camera coordinate system to align action supervision with visual observations, camera-space grounding alone can still overfit to the few viewpoints observed during training. OC-VLA++ addresses this limitation by introducing geometry-guided paired-view supervision and an explicit cross-view action-equivariance objective. Given paired observations of the same manipulation scene from geometrically related viewpoints, the model is trained such that their camera-space predictions correspond to the same robot-frame action. This objective explicitly supervises how action predictions should transform across viewpoints, rather than relying solely on image-level augmentation. Experiments demonstrate substantial improvements in unseen-view generalization under limited camera coverage, with performance degrading more gracefully under increasing camera displacement. These results establish cross-view action equivariance as an effective complement to observation-centric action grounding for robust real-world deployment.",
-      "authors": [
-        "Tianyi Zhang",
-        "Ziyang Gong",
-        "Zhenjie Yang",
-        "Zhe Qian",
-        "Haonan Duan"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO"
-      ],
-      "published": "2026-08-02T08:06:20+00:00",
-      "link": "https://arxiv.org/pdf/2608.01066v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 6.0,
-      "llm_evidence_en": "VLA model for viewpoint-robust robotic manipulation",
-      "llm_evidence_cn": "面向视角鲁棒机器人操作的VLA模型",
-      "llm_evidence": "面向视角鲁棒机器人操作的VLA模型",
-      "canonical_evidence": "面向视角鲁棒机器人操作的VLA模型",
-      "llm_tldr_en": "OC-VLA++ extends OC-VLA with monocular geometry-guided paired-view supervision and cross-view action-equivariance to improve viewpoint generalization under limited camera coverage.",
-      "llm_tldr_cn": "针对机器人操作中VLA模型在训练视角有限时容易过拟合的问题，本文提出OC-VLA++。它引入几何引导的成对视角监督和显式跨视角动作等变目标，使同一操作场景在不同视角下的预测对应到相同机器人坐标动作。实验表明该方法在有限相机覆盖下显著提升了视角泛化能力，增强了VLA模型的实用性。",
-      "llm_tldr": "针对机器人操作中VLA模型在训练视角有限时容易过拟合的问题，本文提出OC-VLA++。它引入几何引导的成对视角监督和显式跨视角动作等变目标，使同一操作场景在不同视角下的预测对应到相同机器人坐标动作。实验表明该方法在有限相机覆盖下显著提升了视角泛化能力，增强了VLA模型的实用性。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient vision-language-action models for robotics",
-      "matched_requirement_id": "req-13",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "6"
-    },
-    {
-      "id": "2608.04510v1",
-      "source": "arxiv",
-      "title": "GUARD: Grounding Uncertainty and Ablation-Based Risk Detection for Diffusion-Based VLAs",
-      "abstract": "Diffusion-based vision-language-action (VLA) policies can generate plausible actions even when their predictions are weakly grounded in the visual and language evidence defining the task. We introduce GUARD, a test-time failure detection method that measures this grounding without modifying the pretrained policy. GUARD estimates the influence of token-indexed entries in the final vision-language model key-value (KV) cache, constructs counterfactual caches by ablating salient KV entries, and compares their denoising responses with the original conditioning. Based on the comparison, we derive GUARD diagnostic stream including sensitivity, attention entropy, modality bias, and grounding efficiency, which are calibrated online and processed by a lightweight temporal classifier. We evaluate GUARD under task-held-out splits across five policy-benchmark settings, using Pi0, SmolVLA, and Alpamayo-1.5 on LIBERO, SimplerEnv, MetaWorld, and PhysicalAI-AV. GUARD achieves the best ROC-AUC on four of five unseen-task settings and ranks second on the remaining setting, improving the average unseen-task ROC-AUC by 5.73 percentage points over the strongest competing runtime monitor while remaining within 0.19 points of the best seen-task average. These results show that directly probing action-head dependence on multimodal evidence provides a transferable failure signal across policies, tasks, embodiments, and domains.",
-      "authors": [
-        "Suhas Hegde",
-        "Jitendra Yasaswi Bharadwaj Katta"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO",
-        "cs.AI"
-      ],
-      "published": "2026-08-05T06:48:15+00:00",
-      "link": "https://arxiv.org/pdf/2608.04510v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 7.0,
-      "llm_evidence_en": "token-indexed KV cache ablation for grounding and risk detection in diffusion-based VLAs",
-      "llm_evidence_cn": "基于token索引KV缓存消融的VLA接地与风险检测",
-      "llm_evidence": "基于token索引KV缓存消融的VLA接地与风险检测",
-      "canonical_evidence": "基于token索引KV缓存消融的VLA接地与风险检测",
-      "llm_tldr_en": "GUARD measures grounding in diffusion-based VLA policies by ablating salient token-indexed KV cache entries and comparing denoising responses, providing online-calibrated risk diagnostics without modifying the pretrained policy.",
-      "llm_tldr_cn": "扩散式视觉语言动作（VLA）策略即便预测与视觉语言证据关联薄弱，仍可能生成看似合理的动作。GUARD在无需修改预训练策略的情况下，通过消融关键KV缓存条目并比较去噪响应来量化接地置信度，并产出灵敏度、注意力熵、模态偏差等诊断指标。该方法为VLA模型的测试时失败检测与安全性评估提供了新工具，也可为KV缓存管理带来启发。",
-      "llm_tldr": "扩散式视觉语言动作（VLA）策略即便预测与视觉语言证据关联薄弱，仍可能生成看似合理的动作。GUARD在无需修改预训练策略的情况下，通过消融关键KV缓存条目并比较去噪响应来量化接地置信度，并产出灵敏度、注意力熵、模态偏差等诊断指标。该方法为VLA模型的测试时失败检测与安全性评估提供了新工具，也可为KV缓存管理带来启发。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "KV cache compression and management for long context",
-      "matched_requirement_id": "req-15",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "7"
-    },
-    {
-      "id": "2608.02140v2",
+      "id": "2608.02140v1",
       "source": "arxiv",
       "title": "HiResNets: Native Full-HD Video Recognition with Foveal Residual Streams",
       "abstract": "Much of the recent progress in image and video recognition has come at the cost of memory: larger models, increased resolution, and longer temporal contexts. An inevitable component is the quadratic (or larger) growth of memory and compute based on image resolution, which is a property of the grid sampling used in convolutional networks and vision transformers. In this work we study residual networks whose convolutional blocks have logarithmic-square growth instead, enabling them to process very high-resolution video quickly. The key insight is to use a residual architecture's residual stream as a high-resolution buffer, to which convolutional blocks only read and write via log-polar image warp operations. Layers adaptively focus on different parts of each frame, with very high resolution only near the focus point. A complete high-resolution representation is built up in the residual stream, analogous to eye saccades creating a complete picture in biological vision, and a theoretical construction is presented that eliminates the quadratic dependency of the residual stream resolution. Experiments demonstrate that our proposed HiResNets learn to foveate around scenes similarly to human vision, and have superior performance in difficult egocentric video recognition tasks, especially egocentric video with small objects and fine-grained recognition.",
@@ -605,50 +381,7 @@
         "cs.PF"
       ],
       "published": "2026-08-03T12:28:11+00:00",
-      "link": "https://arxiv.org/pdf/2608.02140v2",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "keyword:MM-TRF",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 6.0,
-      "llm_evidence_en": "Efficient high-res video architecture transferable to VLM visual encoding",
-      "llm_evidence_cn": "高效高分辨率视频架构，可迁移至VLM视觉编码",
-      "llm_evidence": "高效高分辨率视频架构，可迁移至VLM视觉编码",
-      "canonical_evidence": "高效高分辨率视频架构，可迁移至VLM视觉编码",
-      "llm_tldr_en": "HiResNets uses residual streams as high-resolution buffers with log-polar warping and adaptive foveal attention, achieving near-log-square compute growth for native Full-HD video recognition and greatly reducing memory usage.",
-      "llm_tldr_cn": "高分辨率视频识别面临算力和内存随分辨率二次方增长的问题，限制了原生全高清视频处理。本文提出HiResNets，利用残差网络的残差流作为高分辨率缓冲，卷积块通过对数极坐标图像变换读写，使计算量呈对数平方增长，并能自适应聚焦不同区域。该方法支持全高清视频的高效原生识别，显著降低内存占用。该架构可迁移到多模态模型的视觉编码端，为高分辨率视觉理解奠定基础。",
-      "llm_tldr": "高分辨率视频识别面临算力和内存随分辨率二次方增长的问题，限制了原生全高清视频处理。本文提出HiResNets，利用残差网络的残差流作为高分辨率缓冲，卷积块通过对数极坐标图像变换读写，使计算量呈对数平方增长，并能自适应聚焦不同区域。该方法支持全高清视频的高效原生识别，显著降低内存占用。该架构可迁移到多模态模型的视觉编码端，为高分辨率视觉理解奠定基础。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient vision language models architecture and inference",
-      "matched_requirement_id": "req-12",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "6"
-    },
-    {
-      "id": "2608.05137v1",
-      "source": "arxiv",
-      "title": "SmartMage: Dynamic Modality Orchestration for 3D Scene Understanding",
-      "abstract": "Understanding 3D scenes is fundamental to embodied intelligence, requiring joint reasoning over heterogeneous information from multiple modalities, including visual and geometric cues. However, the relevance of these modalities often varies across queries. Existing Multimodal Large Language Models (MLLMs) typically rely on fixed modality combinations, overlooking query-dependent modality needs. Such a rigid design can introduce semantic noise from irrelevant modalities while underutilizing more informative ones, leading to wasted computation and diluted reasoning. To address these challenges, this paper proposes SmartMage, a unified MLLM that dynamically orchestrates heterogeneous modalities for semantic-aware 3D scene understanding. Specifically, SmartMage incorporates: (1) a Semantic-guided Modality Adaptive RouTng (SMART) module that selects task-relevant modalities using semantic priors, text-modality alignment, and modality quality; and (2) a Modality-Aware Gating Expert (MAGE) module that leverages modality priors to guide expert activation, fostering adaptive specialization in multimodal reasoning. Empirically, SmartMage achieves state-of-the-art performance across five 3D scene understanding benchmarks, and attains competitive results on RGB-only video understanding benchmarks. In our diagnostic benchmark ScanFacet, tasks are divided into fine-grained semantic categories, enabling analysis of modality combinations preferred by each semantic type. The observed modality-semantic patterns provide further evidence of SmartMage's effectiveness. Project page: https://yuecheong.github.io/SmartMage/.",
-      "authors": [
-        "Yue Zhang",
-        "Yingzhao Jian",
-        "Yunqiu Xu",
-        "Xiaoxiao Sun",
-        "Hehe Fan"
-      ],
-      "primary_category": "cs.CV",
-      "categories": [
-        "cs.CV"
-      ],
-      "published": "2026-08-05T17:56:35+00:00",
-      "link": "https://arxiv.org/pdf/2608.05137v1",
+      "link": "https://arxiv.org/pdf/2608.02140v1",
       "tags": [
         "keyword:EV-CAM",
         "keyword:EVLM",
@@ -658,60 +391,21 @@
         "query:MM-TRF"
       ],
       "llm_score": 7.0,
-      "llm_evidence_en": "dynamic modality orchestration for MLLM efficiency",
-      "llm_evidence_cn": "多模态大模型的动态模态编排以减少计算浪费",
-      "llm_evidence": "多模态大模型的动态模态编排以减少计算浪费",
-      "canonical_evidence": "多模态大模型的动态模态编排以减少计算浪费",
-      "llm_tldr_en": "SmartMage dynamically selects relevant modalities per query in a unified MLLM to reduce semantic noise and wasted computation, improving 3D scene understanding efficiency and accuracy.",
-      "llm_tldr_cn": "论文提出SmartMage，一种统一多模态大模型，通过动态编排与当前查询相关的异质模态进行三维场景理解。现有MLLM使用固定模态组合，容易引入无关模态噪声并浪费计算，SmartMage根据查询自适应选择最有信息量的模态，从而减少计算开销并改善推理质量，为多模态LLM的效率优化提供了新思路。",
-      "llm_tldr": "论文提出SmartMage，一种统一多模态大模型，通过动态编排与当前查询相关的异质模态进行三维场景理解。现有MLLM使用固定模态组合，容易引入无关模态噪声并浪费计算，SmartMage根据查询自适应选择最有信息量的模态，从而减少计算开销并改善推理质量，为多模态LLM的效率优化提供了新思路。",
+      "llm_evidence_en": "Foveal residual streams for native full-HD video recognition with low memory",
+      "llm_evidence_cn": "使用中心凹残差流原生处理全高清视频并降低内存开销",
+      "llm_evidence": "使用中心凹残差流原生处理全高清视频并降低内存开销",
+      "canonical_evidence": "使用中心凹残差流原生处理全高清视频并降低内存开销",
+      "llm_tldr_en": "HiResNets introduces residual-stream-based foveal processing with log-polar warp convolutions to process full-HD video with logarithmic-square memory growth, enabling efficient high-resolution video recognition.",
+      "llm_tldr_cn": "针对图像分辨率增加导致计算和内存二次方增长的问题，提出了HiResNets网络。该网络利用残差流作为高分辨率缓冲区，卷积块通过对数极坐标图像扭曲读写，实现内存与计算近似对数平方增长，从而能够高效处理全高清视频。各层可自适应聚焦于不同区域，显著降低了高分辨率视频识别的资源开销，可作为视觉编码器支撑高效视觉语言模型的应用。",
+      "llm_tldr": "针对图像分辨率增加导致计算和内存二次方增长的问题，提出了HiResNets网络。该网络利用残差流作为高分辨率缓冲区，卷积块通过对数极坐标图像扭曲读写，实现内存与计算近似对数平方增长，从而能够高效处理全高清视频。各层可自适应聚焦于不同区域，显著降低了高分辨率视频识别的资源开销，可作为视觉编码器支撑高效视觉语言模型的应用。",
       "llm_tags": [
         "query:evlm"
       ],
       "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficiency optimization for multimodal large language models",
-      "matched_requirement_id": "req-14",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
       "selection_source": "fresh_fetch",
       "quick_tier": "7"
-    },
-    {
-      "id": "2608.02497v1",
-      "source": "arxiv",
-      "title": "Grounded Semantic Re-Binding for Robust Instruction Generalization in Vision-Language-Action Models",
-      "abstract": "Vision-Language-Action (VLA) models excel in robotic manipulation but suffer catastrophic performance drops when canonical instructions are simply paraphrased. Although this brittleness is typically addressed through costly data scaling, our probing reveals that the root cause is architectural rather than a lack of semantic understanding. Specifically, we demonstrate that current VLAs successfully retain the correct task identity internally. The failure actually stems from the joint encoding of dynamic visual observations and text, which introduces systematic feature shifts. Because the downstream action policy is highly vulnerable to these variations, it fails to translate the preserved semantics into correct control commands. To resolve this structural bottleneck, we propose Grounded Semantic Re-binding (GSR), an elegant intervention that bypasses unstable joint routing by explicitly fusing independently extracted task semantics with native visual features to train a completely re-initialized action expert from scratch. This targeted intervention dramatically restores paraphrastic invariance using only canonical demonstrations. On the LIBERO-Para benchmark, GSR improves success rates by up to 44.6 percent. It enables lightweight models to rival massively scaled baselines and pushes state-of-the-art models to a new record PRIDE score of 70.4, outperforming the recently introduced large-scale pretrained model Xiaomi-Robotics-0 in instruction generation capabilities. Building on these insights, we also introduce ParaVLA, a natively decoupled 0.33B-parameter model exhibiting near-perfect robustness to instruction rewording. Ultimately, our work proves that robust semantic grounding can be achieved through elegant structural design, bypassing the inefficient brute-force data scaling paradigm.",
-      "authors": [
-        "Zhaokai Yin",
-        "Zhipeng Zhang"
-      ],
-      "primary_category": "cs.RO",
-      "categories": [
-        "cs.RO"
-      ],
-      "published": "2026-08-03T17:02:04+00:00",
-      "link": "https://arxiv.org/pdf/2608.02497v1",
-      "tags": [
-        "keyword:EV-CAM",
-        "keyword:EVLM",
-        "query:EV-CAM",
-        "query:EVLM",
-        "query:MM-TRF"
-      ],
-      "llm_score": 6.0,
-      "llm_evidence_en": "VLA architectural fix; robust instruction generalization; avoids costly data scaling",
-      "llm_evidence_cn": "VLA模型架构修正；指令泛化鲁棒性；避免昂贵数据扩展",
-      "llm_evidence": "VLA模型架构修正；指令泛化鲁棒性；避免昂贵数据扩展",
-      "canonical_evidence": "VLA模型架构修正；指令泛化鲁棒性；避免昂贵数据扩展",
-      "llm_tldr_en": "The paper probes why VLA models fail on paraphrased instructions and finds the cause is joint visual-text encoding shifts rather than lost semantics. It proposes Grounded Semantic Re-Binding to fix this without costly data scaling, preserving task identity for robust control.",
-      "llm_tldr_cn": "本文针对VLA模型在指令改写后性能骤降的问题，通过探针分析发现根因并非语义理解缺失，而是动态视觉观测与文本联合编码导致的特征偏移。作者提出基于语义重绑定的架构修正方法，在避免大规模数据扩展的前提下恢复任务身份到下行动作的正确映射。实验表明该方法能显著提高指令泛化鲁棒性，为高效VLA模型开发提供了新思路。",
-      "llm_tldr": "本文针对VLA模型在指令改写后性能骤降的问题，通过探针分析发现根因并非语义理解缺失，而是动态视觉观测与文本联合编码导致的特征偏移。作者提出基于语义重绑定的架构修正方法，在避免大规模数据扩展的前提下恢复任务身份到下行动作的正确映射。实验表明该方法能显著提高指令泛化鲁棒性，为高效VLA模型开发提供了新思路。",
-      "llm_tags": [
-        "query:evlm"
-      ],
-      "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient architectures for vision language action models",
-      "matched_requirement_id": "req-18",
-      "selection_source": "fresh_fetch",
-      "quick_tier": "6"
     },
     {
       "id": "2608.04765v1",
@@ -740,21 +434,60 @@
         "query:MM-TRF"
       ],
       "llm_score": 6.0,
-      "llm_evidence_en": "VLA model architecture with explicit memory for long-horizon tasks",
-      "llm_evidence_cn": "带显式语言记忆的长时程任务VLA模型架构",
-      "llm_evidence": "带显式语言记忆的长时程任务VLA模型架构",
-      "canonical_evidence": "带显式语言记忆的长时程任务VLA模型架构",
-      "llm_tldr_en": "Proposes a hierarchical long-horizon VLA architecture with explicit language memory to improve cross-task compositionality, temporal consistency, and error correction.",
-      "llm_tldr_cn": "该论文针对现有VLA模型在长时程任务中泛化差、时序一致性弱和错误累积的问题，提出带显式语言记忆的分层VLA架构。作者将语言记忆与当前观测条件化，增强跨任务组合泛化和非马尔可夫决策的稳定性，并缓解端到端微调对VLM语义表征的弱化。实验验证了该方法在长时程规划任务上的有效性。",
-      "llm_tldr": "该论文针对现有VLA模型在长时程任务中泛化差、时序一致性弱和错误累积的问题，提出带显式语言记忆的分层VLA架构。作者将语言记忆与当前观测条件化，增强跨任务组合泛化和非马尔可夫决策的稳定性，并缓解端到端微调对VLM语义表征的弱化。实验验证了该方法在长时程规划任务上的有效性。",
+      "llm_evidence_en": "Vision-language-action model architecture with explicit language memory for long-horizon planning",
+      "llm_evidence_cn": "面向长时程规划的视觉-语言-动作模型架构，引入显式语言记忆",
+      "llm_evidence": "面向长时程规划的视觉-语言-动作模型架构，引入显式语言记忆",
+      "canonical_evidence": "面向长时程规划的视觉-语言-动作模型架构，引入显式语言记忆",
+      "llm_tldr_en": "This paper proposes a hierarchical long-horizon VLA architecture with explicit language memory to address sparse demonstrations, non-Markovian tasks, and accumulated errors in long-horizon robotic planning.",
+      "llm_tldr_cn": "针对长时程任务中VLA模型面临的演示稀疏、非马尔可夫依赖和误差累积等问题，该论文提出带显式语言记忆的分层VLA架构。通过语言记忆保存高层语义与跨任务组合知识，缓解端到端动作微调对VLM骨干语义表示的削弱。实验结果表明该方法提升了长时程任务的跨任务组合泛化与时间一致性，为机器人长程规划提供了新思路。",
+      "llm_tldr": "针对长时程任务中VLA模型面临的演示稀疏、非马尔可夫依赖和误差累积等问题，该论文提出带显式语言记忆的分层VLA架构。通过语言记忆保存高层语义与跨任务组合知识，缓解端到端动作微调对VLM骨干语义表示的削弱。实验结果表明该方法提升了长时程任务的跨任务组合泛化与时间一致性，为机器人长程规划提供了新思路。",
       "llm_tags": [
         "query:evlm"
       ],
       "matched_query_tag": "query:evlm",
-      "matched_query_text": "efficient vision-language-action models for robotics",
-      "matched_requirement_id": "req-13",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
       "selection_source": "fresh_fetch",
       "quick_tier": "6"
+    },
+    {
+      "id": "2608.05840v1",
+      "source": "arxiv",
+      "title": "Accurate Localization of Road Traffic Objects on the Road Plane Using Surveillance Camera Imagery",
+      "abstract": "Accurate vehicle localization from monocular roadside surveillance cameras is important for intelligent transportation systems, traffic monitoring, and traffic conflict analysis. Standard approaches often estimate vehicle position from the center of the detector bounding box, which can produce large errors due to perspective distortion and parallax, especially for elevated cameras and large vehicles.   This paper proposes a two-stage geometry-aware localization pipeline that estimates the projection of the vehicle footprint onto the road plane. First, vehicles are detected using a YOLO26-based detector. Second, a dedicated ResNet34 regression network predicts four corner points corresponding to the projected vehicle base. The final position is computed as the geometric center of the predicted quadrilateral.   The method was trained on synthetic data generated in CARLA and fine-tuned on real-world roadside imagery from DAIR-V2X. Experiments on synthetic and real data showed clear improvements over naive bounding-box-center localization. On DAIR-V2X, the mean image-space localization error decreased from 31.77 px to 15.30 px, a 51.8% improvement, while the median error decreased to 4.29 px. Median ground-plane error for medium-range vehicles decreased from 5.52 m to 0.90 m, and for far-range vehicles from 8.67 m to 1.84 m.   The results also show that contextual information surrounding the detector bounding box is important for geometric localization. The largest gains were observed for distant vehicles and geometrically challenging cases affected by strong perspective distortion and parallax.",
+      "authors": [
+        "Jan Gawroński",
+        "Witold Czajewski"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.IV"
+      ],
+      "published": "2026-08-06T10:07:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.05840v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "road traffic object localization from surveillance camera for traffic scene perception",
+      "llm_evidence_cn": "基于监控相机的道路交通目标定位，支撑交通场景感知",
+      "llm_evidence": "基于监控相机的道路交通目标定位，支撑交通场景感知",
+      "canonical_evidence": "基于监控相机的道路交通目标定位，支撑交通场景感知",
+      "llm_tldr_en": "A two-stage geometry-aware pipeline for monocular roadside surveillance detects vehicles with YOLO26 and predicts footprint corner points with ResNet34, reducing perspective and parallax errors in road plane localization.",
+      "llm_tldr_cn": "单目路边监控摄像头的车辆定位对智能交通和冲突分析至关重要，但基于检测框中心的方法受透视畸变和视差影响误差较大。本文提出两阶段几何感知定位流程，先用YOLO26检测车辆，再用ResNet34回归预测投影到路面上的车辆基底四角点，从而准确估计车辆足迹投影，显著降低了高架相机和大车型下的定位误差，为交通监控提供更精准的感知基础。",
+      "llm_tldr": "单目路边监控摄像头的车辆定位对智能交通和冲突分析至关重要，但基于检测框中心的方法受透视畸变和视差影响误差较大。本文提出两阶段几何感知定位流程，先用YOLO26检测车辆，再用ResNet34回归预测投影到路面上的车辆基底四角点，从而准确估计车辆足迹投影，显著降低了高架相机和大车型下的定位误差，为交通监控提供更精准的感知基础。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
     }
   ]
 }
