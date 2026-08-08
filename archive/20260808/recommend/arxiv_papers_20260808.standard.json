@@ -1,0 +1,503 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-08T20:52:04.511565+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 5,
+    "deep_cap": 8,
+    "deep_selected": 5,
+    "quick_candidates": 6,
+    "quick_skim_target": 13,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2608.03083v1",
+      "source": "arxiv",
+      "title": "GSTEP: Global Spatio-Temporal Density-Driven Visual Token Pruning for Efficient Video Large Language Models",
+      "abstract": "Video large language models (VideoLLMs) achieve strong video understanding performance, but their inference remains expensive due to the large number of redundant spatio-temporal visual tokens in long videos. Existing token pruning methods alleviate this cost by reducing redundant tokens, yet most of them rely on segment-level local pruning, where videos are partitioned into isolated segments and tokens are selected independently within each segment. Such designs may under-preserve short but semantically dense segments and discard tokens that appear non-salient locally but remain critical from a global perspective. To address this issue, we propose GSTEP (Global Spatio-Temporal Density Pruning), a plug-and-play pruning framework that models video as a continuous spatio-temporal information flow. GSTEP constructs a token-level spatio-temporal density by combining a continuous temporal density, obtained from a smoothed centered frame-level change signal, with intra-frame spatial density, and then performs global token sampling by jointly balancing information density and coverage. Extensive experiments on multiple VideoLLMs and public benchmarks demonstrate that GSTEP consistently achieves strong accuracy-efficiency trade-offs and generalizes well across model architectures and evaluation settings. On LLaVA-OneVision-7B, GSTEP prunes 75% of visual tokens, preserves up to 100.2% of the original average performance across benchmarks, and achieves a 1.17 end-to-end speedup.",
+      "authors": [
+        "Mengjie Zhang",
+        "Qihui Zhu",
+        "Tao Zhang",
+        "Shuangwu Chen",
+        "Huihuang Qin",
+        "Yu Guo",
+        "Shenghao Ye",
+        "Zijian Wen",
+        "Yunpeng Hou",
+        "Dong Jin",
+        "Xiaobin Tan",
+        "Huasen He",
+        "Jian Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-08-04T03:51:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.03083v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Global spatio-temporal visual token pruning for efficient VideoLLM inference",
+      "llm_evidence_cn": "面向高效视频大语言模型推理的全局时空视觉令牌剪枝",
+      "llm_evidence": "面向高效视频大语言模型推理的全局时空视觉令牌剪枝",
+      "canonical_evidence": "面向高效视频大语言模型推理的全局时空视觉令牌剪枝",
+      "llm_tldr_en": "GSTEP introduces global spatio-temporal density-driven visual token pruning for VideoLLMs, addressing segment-local pruning that under-preserves short semantically dense clips. It retains globally critical tokens, cutting inference cost while maintaining or improving video understanding performance.",
+      "llm_tldr_cn": "视频大语言模型的推理因大量冗余时空视觉令牌而昂贵，现有剪枝方法多在局部片段内独立选令牌，容易忽略短而密集的关键语义并丢掉全局重要信息。GSTEP提出全局时空密度剪枝，在整体视频上按密度保留关键视觉令牌，作为一个即插即用的轻量模块。实验结果表明，该方法在降低推理开销的同时保持甚至提升视频理解效果，为高效视频大语言模型提供了一种更合理的令牌压缩思路。",
+      "llm_tldr": "视频大语言模型的推理因大量冗余时空视觉令牌而昂贵，现有剪枝方法多在局部片段内独立选令牌，容易忽略短而密集的关键语义并丢掉全局重要信息。GSTEP提出全局时空密度剪枝，在整体视频上按密度保留关键视觉令牌，作为一个即插即用的轻量模块。实验结果表明，该方法在降低推理开销的同时保持甚至提升视频理解效果，为高效视频大语言模型提供了一种更合理的令牌压缩思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.03296v1",
+      "source": "arxiv",
+      "title": "PLS-Calib: A Partial Least Squares Framework for Event Camera and Odometry Calibration under Ground Motion Constraints",
+      "abstract": "Accurate extrinsic rotation calibration between sensors is fundamental to the performance of robotic perception systems. However, most existing calibration techniques rely on full 6-DoF motion to excite all degrees of freedom, which is often infeasible for ground-constrained robots with limited motion capabilities. Recent approaches designed for such restricted settings, such as Canonical Correlation Analysis (CCA)-based methods, suffer from ill-conditioned covariance matrices that lead to numerical instability and suboptimal calibration accuracy. To overcome these limitations, we present a novel rotation calibration framework named PLS-Calib that, for the first time, leverages Partial Least Squares (PLS) regression to model the latent kinematic correlations between asynchronous, heterogeneous sensor streams. Specifically, we apply our method to the calibration of an event camera and an odometry onboard a ground robot. To improve event-based pattern detection, we introduce a polarity-aware event representation, which enhances spatiotemporal contrast in circular calibration targets. Our PLS-based formulation yields a closed-form, stable solution that avoids matrix singularities inherent in CCA-based approaches. Extensive experiments on both synthetic and real-world datasets validate the effectiveness of our approach, demonstrating significant improvements in calibration robustness and accuracy over state-of-the-art methods. This work offers a practical and theoretically grounded solution for rotation calibration in constrained robotic systems and opens up new directions for applying statistical learning techniques in neuromorphic vision.",
+      "authors": [
+        "Guangyu Li",
+        "Xiao Li",
+        "Yujie Wu",
+        "Changshuo Wang",
+        "Prayag Tiwari",
+        "Jiang Cai",
+        "Fangwen Yu",
+        "Mingkun Xu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-04T08:07:07+00:00",
+      "link": "https://arxiv.org/pdf/2608.03296v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "event camera and odometry calibration",
+      "llm_evidence_cn": "事件相机与里程计标定",
+      "llm_evidence": "事件相机与里程计标定",
+      "canonical_evidence": "事件相机与里程计标定",
+      "llm_tldr_en": "Proposes PLS-Calib, a partial least squares framework for event camera and odometry rotation calibration under ground motion constraints, overcoming ill-conditioning of CCA methods and improving accuracy in restricted settings.",
+      "llm_tldr_cn": "该文针对地面受限机器人难以实现六自由度运动激励的问题，提出基于偏最小二乘的旋转标定框架PLS-Calib，用于事件相机与里程计的外参标定。现有基于典型相关分析的方法因协方差矩阵病态而数值不稳定，PLS-Calib通过偏最小二乘有效缓解了这一问题。实验表明该框架在受限运动条件下提升了标定精度，为事件相机的实际部署提供了可靠的标定手段。",
+      "llm_tldr": "该文针对地面受限机器人难以实现六自由度运动激励的问题，提出基于偏最小二乘的旋转标定框架PLS-Calib，用于事件相机与里程计的外参标定。现有基于典型相关分析的方法因协方差矩阵病态而数值不稳定，PLS-Calib通过偏最小二乘有效缓解了这一问题。实验表明该框架在受限运动条件下提升了标定精度，为事件相机的实际部署提供了可靠的标定手段。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.04132v1",
+      "source": "arxiv",
+      "title": "RUTA: Principled Visual Token Allocation via Rate-Utility Optimization",
+      "abstract": "High-resolution images and long videos provide vision-language models with rich context for multimodal reasoning and fine-grained perception, but the resulting long visual token sequences make large language model-side computation and memory costly. Existing visual token reducers often operate at prescribed rates, while recent methods adapt token counts across inputs using method-specific learned thresholds or importance predictors. We introduce RUTA, a principled Rate-Utility Token Allocation method that performs pre-LLM reduction by jointly learning which tokens to retain and how many to allocate to each image-query pair. RUTA constructs query-conditioned candidate tokens and predicts a retention probability for each candidate. During training, these probabilities parameterize independent Bernoulli gates, while their sum provides a differentiable training-time estimate of the token count for each pair. Retained tokens serve as anchors that aggregate information from non-retained tokens according to semantic affinity and spatial proximity. RUTA is optimized with a penalized rate-utility objective that balances downstream task loss against expected token usage. Averaged across five benchmarks and measured relative to each backbone's full-token baseline, RUTA uses only $2.0\\%$ and $4.2\\%$ of visual tokens while preserving $88.2\\%$ and $94.4\\%$ of task performance on LLaVA-NeXT-7B and Qwen3-VL-8B, respectively.",
+      "authors": [
+        "Jian Zou",
+        "Xiaoyu Xu",
+        "Zhihua Wang",
+        "Yilin Wang",
+        "Balu Adsumilli",
+        "Kede Ma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T18:37:26+00:00",
+      "link": "https://arxiv.org/pdf/2608.04132v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token allocation and compression for vision-language models via rate-utility optimization",
+      "llm_evidence_cn": "通过率-效用优化对视觉语言模型的视觉令牌进行分配与压缩",
+      "llm_evidence": "通过率-效用优化对视觉语言模型的视觉令牌进行分配与压缩",
+      "canonical_evidence": "通过率-效用优化对视觉语言模型的视觉令牌进行分配与压缩",
+      "llm_tldr_en": "RUTA presents a rate-utility optimization method for pre-LLM visual token allocation, jointly learning which tokens to keep and how many to assign per image-query pair to reduce computation.",
+      "llm_tldr_cn": "针对高分辨率图像和长视频导致视觉语言模型计算与内存开销过大的问题，RUTA提出一种基于率-效用的令牌分配方法，在进入大语言模型之前同时学习保留哪些视觉令牌以及为每个图像-查询对分配多少令牌。它通过构建查询条件候选令牌并预测保留概率，实现对可变输入的自适应压缩。该方法在保持多模态推理质量的同时显著降低计算与内存成本，为视觉令牌压缩提供了原理性方案。",
+      "llm_tldr": "针对高分辨率图像和长视频导致视觉语言模型计算与内存开销过大的问题，RUTA提出一种基于率-效用的令牌分配方法，在进入大语言模型之前同时学习保留哪些视觉令牌以及为每个图像-查询对分配多少令牌。它通过构建查询条件候选令牌并预测保留概率，实现对可变输入的自适应压缩。该方法在保持多模态推理质量的同时显著降低计算与内存成本，为视觉令牌压缩提供了原理性方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.05780v1",
+      "source": "arxiv",
+      "title": "Evidence-Driven Dynamic Visual Selector for Efficient Long Video Understanding",
+      "abstract": "Recent advancements in MLLM-based long-form video understanding have mitigated inference-time computational cost and limited context lengths by selecting query-relevant frames. However, existing approaches predominantly rely on external proxy scorers and rigid heuristic rules, inevitably suffering from misalignment with the target MLLM's intrinsic evidence and failing to accommodate the non-uniform spatiotemporal information density. In this paper, we propose a fine-grained dynamic visual selection framework named EviSelect, grounded in the target MLLM internal attention evidence. Our method efficiently probes visual evidence via sparse prefilling as a structured prior to guide distribution-aware dynamic sampling. Specifically, we efficiently approximate attention maps of the target MLLM using highly compressed visual inputs and sparse attention, well-aligned to the full counterpart. Conditioned on three complementary attention components derived from this prior, we design a lightweight selector that not only precisely locates query-relevant timestamps but also adaptively adjusts the local sampling rate and spatial resolution. To enable evidence-conditioned spatiotemporal sampling, we formulate the selector as a stochastic policy and optimize it via GRPO under a joint accuracy--efficiency reward. By rewarding correct predictions under lower visual cost through group-relative comparisons, our method encourages the policy to allocate computation dynamically according to the information density of each video. Across three long video understanding benchmarks, EviSelect achieves superior performance compared to existing methods while reducing selected visual tokens by about 50\\% and achieving a 3.9x end-to-end speedup.",
+      "authors": [
+        "Bo Zhang",
+        "Wenxin Wang",
+        "Feng Chen",
+        "Zhihao Zhang",
+        "Zixuan Wang",
+        "Changsheng Li",
+        "Yinjie Lei"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T09:15:43+00:00",
+      "link": "https://arxiv.org/pdf/2608.05780v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Dynamic visual token selection via MLLM attention evidence for efficient video understanding",
+      "llm_evidence_cn": "基于MLLM内部注意证据的动态视觉令牌选择，实现高效视频理解",
+      "llm_evidence": "基于MLLM内部注意证据的动态视觉令牌选择，实现高效视频理解",
+      "canonical_evidence": "基于MLLM内部注意证据的动态视觉令牌选择，实现高效视频理解",
+      "llm_tldr_en": "Proposes EviSelect, a dynamic visual selection framework that uses the target MLLM's internal attention evidence to sample key frames, reducing computation while preserving relevant information.",
+      "llm_tldr_cn": "面向MLLM长视频理解的高计算成本与有限上下文问题，现有选择方法依赖外部代理评分和启发式规则，与模型内在证据不一致。提出EviSelect框架，基于目标MLLM内部注意力证据，通过稀疏预填充探测视觉证据并指导分布感知的动态采样。实验表明该方法能更高效地选择关键帧，降低推理成本并保持视频理解性能，为长视频理解提供新范式。",
+      "llm_tldr": "面向MLLM长视频理解的高计算成本与有限上下文问题，现有选择方法依赖外部代理评分和启发式规则，与模型内在证据不一致。提出EviSelect框架，基于目标MLLM内部注意力证据，通过稀疏预填充探测视觉证据并指导分布感知的动态采样。实验表明该方法能更高效地选择关键帧，降低推理成本并保持视频理解性能，为长视频理解提供新范式。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.00237v1",
+      "source": "arxiv",
+      "title": "Latent-Centroid Steering: Single-Pass Classifier-Free Guidance for Command-Aligned Autonomous Driving",
+      "abstract": "Vision-language models (VLMs) have recently emerged as a promising paradigm for end-to-end autonomous driving, enabling agents to map multimodal inputs and high-level navigation instructions directly to executable trajectories. However, in practice, these models exhibit a persistent command-following gap: predicted trajectories often show weak sensitivity to navigation commands, resulting in incorrect behavior at critical decision points. We identify this issue as a form of conditional policy collapse, where regression-based training under multimodal trajectory distributions encourages the model to rely on dominant visual priors while marginalizing the language-conditioned signal. To address this issue, we introduce a principled formulation of classifier-free guidance (CFG) for regression-based vision-language driving. We show that CFG can be interpreted as isolating the instruction-induced residual in the action space by contrasting conditional and unconditional predictions, thereby explicitly amplifying the effect of the navigation command at inference time. However, a standard two-pass CFG introduces prohibitive latency for real-time control and produces noisy instance-level guidance directions. Building on a mean-shift interpretation of CFG, we propose Latent-Centroid Steering (LCS), a single-pass guidance mechanism that replaces instance-level residuals with class-level latent shifts. By projecting conditional representations toward precomputed command-specific centroids, LCS performs class-level latent steering based on cluster geometry that is both more stable and computationally efficient. We demonstrate that LCS reduces inference latency by approximately 50% while achieving stronger command adherence and improved driving performance on both closed-loop (Bench2Drive) and open-loop (nuScenes) benchmarks. Code will be released.",
+      "authors": [
+        "Meibo Hu",
+        "Jiamian Wang",
+        "Pichao Wang",
+        "Zhiqiang Tao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-07-31T19:32:28+00:00",
+      "link": "https://arxiv.org/pdf/2608.00237v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Vision-language model for command-aligned autonomous driving",
+      "llm_evidence_cn": "面向指令对齐的自动驾驶视觉语言模型方法",
+      "llm_evidence": "面向指令对齐的自动驾驶视觉语言模型方法",
+      "canonical_evidence": "面向指令对齐的自动驾驶视觉语言模型方法",
+      "llm_tldr_en": "Latent-Centroid Steering introduces single-pass classifier-free guidance to improve navigation command following in VLM-based autonomous driving.",
+      "llm_tldr_cn": "基于视觉语言模型的端到端自动驾驶存在指令跟随差距，轨迹预测对导航指令敏感性弱，导致关键决策点行为错误。本文将问题识别为条件策略崩溃，即回归训练在多峰轨迹分布下主导视觉先验而弱化语言条件信号。为此提出潜在质心引导的单一前向无分类器指导方法，在推理时增强语言条件影响。实验表明该方法显著提升指令对齐能力，改善自动驾驶轨迹生成。",
+      "llm_tldr": "基于视觉语言模型的端到端自动驾驶存在指令跟随差距，轨迹预测对导航指令敏感性弱，导致关键决策点行为错误。本文将问题识别为条件策略崩溃，即回归训练在多峰轨迹分布下主导视觉先验而弱化语言条件信号。为此提出潜在质心引导的单一前向无分类器指导方法，在推理时增强语言条件影响。实验表明该方法显著提升指令对齐能力，改善自动驾驶轨迹生成。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.00726v1",
+      "source": "arxiv",
+      "title": "Foveated Probes Recover Localized Binding Information in Vision Foundation Models",
+      "abstract": "Frozen vision foundation models are commonly evaluated through a single global image embedding, but this interface can conflate missing information with information lost at readout time. We study this distinction by keeping a pretrained vision encoder frozen and varying only the readout applied to its final patch tokens. We compare standard global readouts against a lightweight foveated readout, which attention-pools patch tokens using a learned or question-conditioned query, and against an oracle readout with access to the annotated target region. We evaluate these interfaces on three localized binding problems: a controlled synthetic color--shape binding task under clutter, a color-free crowded shape-detection variant, and a GQA-derived natural-image task where paired questions ask for the colors of different same-category objects in the same image. Global readouts perform near perfectly when the synthetic target appears alone, but collapse under clutter and counterfactual target edits, whereas the foveated readout recovers most of the oracle-accessible signal. On the GQA-derived task, question-independent global image vectors improve only modestly over question-only priors, while question-conditioned foveation substantially improves paired localized color accuracy. A counterfactual nuisance-to-signal ratio explains the synthetic failures: global pooling dilutes localized label-changing evidence while exposing the probe to nuisance variation from irrelevant objects. These results indicate that apparent spatial blindness in frozen vision models can arise from the global embedding interface rather than from an absence of spatial information in the frozen patch tokens.",
+      "authors": [
+        "Mateusz Michalkiewicz",
+        "Mahsa Baktashmotlagh",
+        "Guha Balakrishnan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-01T15:47:52+00:00",
+      "link": "https://arxiv.org/pdf/2608.00726v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Foveated readout pools patch tokens into few probes; relevant to token compression in vision-language models",
+      "llm_evidence_cn": "中央凹读出将图像块令牌池化为少量探针，与视觉语言模型的令牌压缩相关",
+      "llm_evidence": "中央凹读出将图像块令牌池化为少量探针，与视觉语言模型的令牌压缩相关",
+      "canonical_evidence": "中央凹读出将图像块令牌池化为少量探针，与视觉语言模型的令牌压缩相关",
+      "llm_tldr_en": "Proposes lightweight foveated readout that attention-pools patch tokens via learned/question-conditioned queries, recovering localized binding info and compressing visual tokens.",
+      "llm_tldr_cn": "视觉基础模型通常用单一全局图像嵌入进行评测，但这会混淆缺失信息与读取时丢失的信息。该文冻结预训练视觉编码器，仅改变最终补丁令牌的读出方式，提出轻量级中央凹读出接口，通过学习查询或问题条件查询对补丁令牌进行注意力池化，并与有目标区域访问的oracle读出对比。在一系列局部绑定任务上，中央凹读出可恢复更多局部绑定信息并降低令牌数量。这表明灵活的令牌池化可在保持视觉信息的同时实现高效表征，为视觉语言模型的令牌压缩提供借鉴。",
+      "llm_tldr": "视觉基础模型通常用单一全局图像嵌入进行评测，但这会混淆缺失信息与读取时丢失的信息。该文冻结预训练视觉编码器，仅改变最终补丁令牌的读出方式，提出轻量级中央凹读出接口，通过学习查询或问题条件查询对补丁令牌进行注意力池化，并与有目标区域访问的oracle读出对比。在一系列局部绑定任务上，中央凹读出可恢复更多局部绑定信息并降低令牌数量。这表明灵活的令牌池化可在保持视觉信息的同时实现高效表征，为视觉语言模型的令牌压缩提供借鉴。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.29237v1",
+      "source": "arxiv",
+      "title": "CorrelationFlow: A Training-Free Geometric Approach for LiDAR Scene Flow Estimation",
+      "abstract": "LiDAR scene flow estimation has settled into a monoculture: nearly all recent methods share the same feed-forward architecture and the same family of self-supervised losses, inheriting each other's assumptions, and each other's blind spots. When those assumptions fail, as they do for sparse, distant, or fast-moving objects, every method built on them fails together, and adding parameters or simulated training data does not fix what the formulation itself gets wrong. This paper takes the opposite path. We present CorrelationFlow, a training-free geometric framework that reduces scene flow to two textbook operations: connected-component labeling and correlation maximization on bird's-eye-view occupancy images. Objects are isolated as spatio-temporal connected components, their motions recovered as correlation peaks, and the resulting velocities propagated to all member points. However, this dense correlation evaluates every candidate displacement of every cluster and requires a window of past sweeps; therefore, we develop a sparse counterpart that operates on a single sweep pair by matching lightweight occupancy descriptors at boundary key points. Because nothing is trained, nothing is inherited: on the multi-domain test set of the Argoverse 2 2026 Scene Flow Challenge, spanning five datasets with heterogeneous sensors and platforms, CorrelationFlow ranked second among unsupervised methods and degrades most gracefully at long range, where the shared assumptions of learned methods break down. Our results suggest that a substantial share of the scene flow problem is solvable by classical computer vision, and that progress may require questioning the formulation, not scaling it.",
+      "authors": [
+        "Minh-Quan Dao",
+        "Yancong Lin",
+        "Julie Stephany Berrio Perez",
+        "Holger Caesar"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-07-31T10:14:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.29237v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training-free geometric LiDAR scene flow estimation for sparse dynamic objects; supports traffic perception",
+      "llm_evidence_cn": "面向稀疏动态物体的无训练LiDAR场景流估计，可支撑交通环境感知",
+      "llm_evidence": "面向稀疏动态物体的无训练LiDAR场景流估计，可支撑交通环境感知",
+      "canonical_evidence": "面向稀疏动态物体的无训练LiDAR场景流估计，可支撑交通环境感知",
+      "llm_tldr_en": "Training-free geometric scene flow estimation via connected-component labeling and correlation on BEV occupancy; robust for sparse traffic objects.",
+      "llm_tldr_cn": "现有LiDAR场景流估计方法依赖同一前馈架构与自监督损失，在稀疏、远距或快速运动物体上会集体失效。本文提出CorrelationFlow，一种无训练几何框架，将场景流估计简化为在鸟瞰占用图上进行连通域标记与相关性最大化两个经典操作，逐物体地分离并匹配空间-时间特征。该方法无需参数或仿真训练数据，即可在困难场景中表现出更强的鲁棒性。它为动态交通环境的感知提供了轻量且可解释的替代方案。",
+      "llm_tldr": "现有LiDAR场景流估计方法依赖同一前馈架构与自监督损失，在稀疏、远距或快速运动物体上会集体失效。本文提出CorrelationFlow，一种无训练几何框架，将场景流估计简化为在鸟瞰占用图上进行连通域标记与相关性最大化两个经典操作，逐物体地分离并匹配空间-时间特征。该方法无需参数或仿真训练数据，即可在困难场景中表现出更强的鲁棒性。它为动态交通环境的感知提供了轻量且可解释的替代方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.03991v2",
+      "source": "arxiv",
+      "title": "Perceptual Anchoring: Prototype-Guided Text Calibration for Training-free Open-Vocabulary Semantic Segmentation",
+      "abstract": "Training-free open-vocabulary semantic segmentation (OVSS) partitions an image into semantically distinct regions based on arbitrary text descriptions, without learning any additional parameters. However, existing methods typically focus on improving visual representations while treating text embeddings that encode only generic category concepts as fixed classification references. The resulting semantic gap between these generic concepts and the visual representations that capture the specific appearances of target instances often causes incomplete masks and erroneous predictions in non-target regions. Inspired by the symbol-percept correspondence underlying perceptual anchoring, we propose Prototype-Guided Text Calibration (PTC) for training-free OVSS. In the Perceiving stage, PTC selects reliable visual evidence based on initial matching scores to construct category-specific visual prototypes. In the Anchoring stage, PTC uses these prototypes to calibrate their corresponding text embeddings, with the calibration strength adaptively adjusted based on the amount of visual evidence. Consequently, the calibrated text embeddings align more accurately with instance-specific visual representations while preserving generic category semantics and open-vocabulary generalization. Moreover, PTC requires neither additional training nor external models and can serve as a plug-and-play module for existing methods. Extensive experiments across eight benchmarks show that PTC significantly enhances the performance of six representative methods and yields more complete and accurate segmentation results. These results validate PTC as a simple and effective approach to improving visual-text alignment.",
+      "authors": [
+        "Wanli Ma",
+        "Jiangwen Lu",
+        "Qinmu Peng",
+        "Xinge You"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T17:52:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.03991v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Open-vocabulary semantic segmentation using multimodal text calibration, transferable to road scene semantic analysis",
+      "llm_evidence_cn": "利用多模态文本校准的开放词汇语义分割，可迁移至道路场景语义分析",
+      "llm_evidence": "利用多模态文本校准的开放词汇语义分割，可迁移至道路场景语义分析",
+      "canonical_evidence": "利用多模态文本校准的开放词汇语义分割，可迁移至道路场景语义分析",
+      "llm_tldr_en": "Perceptual Anchoring calibrates text embeddings with visual prototypes for training-free open-vocabulary semantic segmentation, closing the semantic gap and improving mask completeness.",
+      "llm_tldr_cn": "针对免训练开放词汇语义分割中文本嵌入与具体视觉实例之间存在语义差距、导致掩码不完整和误分割的问题，本文提出原型引导的文本校准方法，利用感知锚定思想将视觉原型信息融入文本表示，使分类参考更贴合目标实例外观。在多个分割基准上，该方法有效提升掩码质量并减少非目标区域错误预测。该方法可直接服务于道路场景的语义分析等细粒度视觉理解任务。",
+      "llm_tldr": "针对免训练开放词汇语义分割中文本嵌入与具体视觉实例之间存在语义差距、导致掩码不完整和误分割的问题，本文提出原型引导的文本校准方法，利用感知锚定思想将视觉原型信息融入文本表示，使分类参考更贴合目标实例外观。在多个分割基准上，该方法有效提升掩码质量并减少非目标区域错误预测。该方法可直接服务于道路场景的语义分析等细粒度视觉理解任务。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.02792v1",
+      "source": "arxiv",
+      "title": "PixelUp: Zero-Shot Semantic Feature Upsampling for Fine-Grained Vision Tasks",
+      "abstract": "Self-supervised Vision Foundation Models (VFMs) have become essential backbones for downstream tasks due to their strong and transferable visual representations. However, their patch-token-level features are often too coarse for dense prediction tasks such as semantic segmentation and depth estimation when accurate fine-grained predictions are required. Feature upsampling methods have been developed to recover pixel-level detail but still face limitations. Learnable upsamplers are often designed for a specific encoders and must be retrained for different encoders. Image-guided methods that use shallow pixel encoders often introduce textural artifacts and lack the semantic guidance needed for accurate downstream predictions. We introduce PixelUp, a zero-shot VFM-agnostic upsampler achieving semantic awareness through a coarse-to-fine chain of windowed cross-attention architecture guided by multi-scale semantic features. We demonstrate that PixelUp outperforms both VFM-specific and VFM-agnostic upsamplers, achieving state-of-the-art performance on dense prediction tasks with an average improvement of +1.2 mIoU on semantic segmentation and +0.25 $δ_1$, on NYUv2 depth estimation across VFMs. PixelUp further improves training-free open-vocabulary and unsupervised semantic segmentation by an average of +1.3 mIoU and +0.5 mIoU, respectively. Code available at https://pixelup-project.vercel.app/",
+      "authors": [
+        "Deepank Singh",
+        "Anurag Nihal",
+        "Vedhus Hoskere"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T18:42:22+00:00",
+      "link": "https://arxiv.org/pdf/2608.02792v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Feature upsampling for dense prediction tasks useful for traffic scene perception",
+      "llm_evidence_cn": "面向密集预测任务的特征上采样方法，可支持交通场景感知",
+      "llm_evidence": "面向密集预测任务的特征上采样方法，可支持交通场景感知",
+      "canonical_evidence": "面向密集预测任务的特征上采样方法，可支持交通场景感知",
+      "llm_tldr_en": "PixelUp introduces a zero-shot semantic feature upsampling method that recovers fine-grained details for dense prediction tasks without retraining per encoder.",
+      "llm_tldr_cn": "针对自监督视觉基础模型补丁级特征过粗、难以支撑语义分割和深度估计等密集预测任务的问题，本文提出PixelUp零样本语义特征上采样方法，在不针对特定编码器重新训练的情况下恢复像素级细节，并通过语义引导避免纹理伪影。在多个密集预测基准上验证了其有效性和泛化性。该方法可提升交通场景中对道路、车辆等目标的细粒度感知精度。",
+      "llm_tldr": "针对自监督视觉基础模型补丁级特征过粗、难以支撑语义分割和深度估计等密集预测任务的问题，本文提出PixelUp零样本语义特征上采样方法，在不针对特定编码器重新训练的情况下恢复像素级细节，并通过语义引导避免纹理伪影。在多个密集预测基准上验证了其有效性和泛化性。该方法可提升交通场景中对道路、车辆等目标的细粒度感知精度。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05393v1",
+      "source": "arxiv",
+      "title": "Adapting Vision Foundation Models with Cascaded Semantics",
+      "abstract": "Prompt tuning, a leading parameter-efficient adaptation paradigm in NLP, has recently been extended to computer vision. Visual prompt tuning (VPT) adapts pre-trained vision transformers (ViTs) by updating a small set of additional prompt parameters. However, existing visual prompts are randomly initialized and do not exploit prior knowledge, such as instructions in NLP. We address this gap by injecting two complementary semantic priors into VPT. Fundamental image priors, including color, texture, and shape, are extracted with classical hand-crafted operators and injected into the input space, while self-attention maps provide instance-aware semantics in the feature space. We further propose a cascaded scheme that integrates both priors throughout ViT adaptation. Experiments on 34 challenging image classification datasets demonstrate superior downstream adaptation while tuning only 0.74% of ViT parameters. Project page: https://xixiaouab.github.io/Cascaded-Semantics/.",
+      "authors": [
+        "Xi Xiao",
+        "Xingjian Li",
+        "Cheng Han",
+        "Tianyang Wang",
+        "Lin Zhao",
+        "Yunbei Zhang",
+        "Guosheng Hu",
+        "Runmin Jiang",
+        "Xi Li",
+        "Xiao Wang",
+        "Min Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T20:23:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.05393v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "parameter-efficient visual prompt tuning with semantic priors for adapting vision foundation models",
+      "llm_evidence_cn": "通过注入语义先验的视觉提示调优，参数高效地适配视觉基础模型，助力高效视觉语言模型",
+      "llm_evidence": "通过注入语义先验的视觉提示调优，参数高效地适配视觉基础模型，助力高效视觉语言模型",
+      "canonical_evidence": "通过注入语义先验的视觉提示调优，参数高效地适配视觉基础模型，助力高效视觉语言模型",
+      "llm_tldr_en": "This paper enhances visual prompt tuning by injecting cascaded semantic priors (low-level image operators and self-attention maps) into ViT adaptation, improving efficiency and performance.",
+      "llm_tldr_cn": "针对现有视觉提示调优参数随机初始化、未利用先验知识的问题，提出向输入空间注入颜色、纹理、形状等低级图像先验、向特征空间注入自注意力图实例语义的级联语义方法。通过在ViT适配过程中整合两类先验，该方案在保持参数高效的同时提升了适配效果，为高效视觉模型适配提供了新思路。",
+      "llm_tldr": "针对现有视觉提示调优参数随机初始化、未利用先验知识的问题，提出向输入空间注入颜色、纹理、形状等低级图像先验、向特征空间注入自注意力图实例语义的级联语义方法。通过在ViT适配过程中整合两类先验，该方案在保持参数高效的同时提升了适配效果，为高效视觉模型适配提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.05631v1",
+      "source": "arxiv",
+      "title": "ChronoVision: Temporal Reasoning via Latent State Reconstruction",
+      "abstract": "Multimodal large language models excel at passive perception but struggle with complex visual cognitive tasks requiring multi-step temporal reasoning. This degradation largely stems from the inherent ambiguity of language-based reasoning, which often fails to accurately articulate continuous visual transformations. To address this, we propose ChronoVision, a multimodal framework designed to align visual logic with latent imagery. During supervised fine-tuning, a Reconstructive Visual Head predicts the latent representation of the final transformed state, while an ROI Attention Locating module focuses the model on key visual evidence via semantic span queries. In post-training, we apply reinforcement learning with an implicit process grounding mechanism, guided by a composite reward function that evaluates outcome correctness, latent process alignment, and unsupervised visual focus. Furthermore, we introduce Vbvr-VQA, a novel dataset that evaluates temporal tracking by reformulating video reasoning into a strict image-ordering task. Experiments demonstrate that ChronoVision achieves state-of-the-art performance on Vbvr-VQA with 74.8% in-domain and 71.6% out-of-domain accuracy, alongside a strong 55.0% accuracy on IntPhys2, a highly challenging cross-domain benchmark.",
+      "authors": [
+        "Yifan Shen",
+        "Jian Xu",
+        "Boyi Li",
+        "Yuner Zhang",
+        "Tianjiao Yu",
+        "Bingxuan Li",
+        "Houze Yang",
+        "Rushi Wang",
+        "Xu Cao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T05:58:22+00:00",
+      "link": "https://arxiv.org/pdf/2608.05631v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multimodal framework for temporal reasoning, applicable to dynamic traffic scene understanding",
+      "llm_evidence_cn": "面向时间推理的多模态框架，可应用于动态交通场景理解",
+      "llm_evidence": "面向时间推理的多模态框架，可应用于动态交通场景理解",
+      "canonical_evidence": "面向时间推理的多模态框架，可应用于动态交通场景理解",
+      "llm_tldr_en": "ChronoVision improves multi-step temporal reasoning in MLLMs by reconstructing latent visual states and guiding attention to key evidence via reinforcement learning.",
+      "llm_tldr_cn": "针对多模态大模型在复杂视觉认知任务中多步时间推理能力不足的问题，ChronoVision提出潜状态重建的视觉头，在监督微调中预测最终变换状态的潜在表示，并结合ROI注意力定位模块与强化学习隐式过程对齐，使模型更准确地追踪连续视觉变化。实验显示该方法在时间推理基准上显著优于传统MLLM。该框架可迁移到交通场景中的车辆运动预测与事件演化理解。",
+      "llm_tldr": "针对多模态大模型在复杂视觉认知任务中多步时间推理能力不足的问题，ChronoVision提出潜状态重建的视觉头，在监督微调中预测最终变换状态的潜在表示，并结合ROI注意力定位模块与强化学习隐式过程对齐，使模型更准确地追踪连续视觉变化。实验显示该方法在时间推理基准上显著优于传统MLLM。该框架可迁移到交通场景中的车辆运动预测与事件演化理解。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

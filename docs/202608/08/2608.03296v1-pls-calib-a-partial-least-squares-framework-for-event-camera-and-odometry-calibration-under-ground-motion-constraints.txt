@@ -1,0 +1,454 @@
+Title: PLS-Calib: A Partial Least Squares Framework for Event Camera and Odometry Calibration under Ground Motion Constraints
+
+URL Source: https://arxiv.org/pdf/2608.03296v1
+
+Published Time: Wed, 05 Aug 2026 00:42:30 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# PLS-Calib: A Partial Least Squares Framework for Event Camera and Odometry Calibration under Ground Motion Constraints 
+
+Guangyu Li 1, Xiao Li 2, Yujie Wu 3, Changshuo Wang 4,Prayag Tiwari 5, Jiang Cai 1, Fangwen Yu 6,†, and Mingkun Xu 1,†
+
+Abstract — Accurate extrinsic rotation calibration between sensors is fundamental to the performance of robotic perception systems. However, most existing calibration techniques rely on full 6-DoF motion to excite all degrees of freedom, which is often infeasible for ground-constrained robots with limited motion capabilities. Recent approaches designed for such restricted settings, such as Canonical Correlation Analysis (CCA)-based methods, suffer from ill-conditioned covariance matrices that lead to numerical instability and suboptimal calibration accuracy. To overcome these limitations, we present a novel rotation calibration framework named PLS-Calib that, for the first time, leverages Partial Least Squares (PLS) regression to model the latent kinematic correlations between asynchronous, heterogeneous sensor streams. Specifically, we apply our method to the calibration of an event camera and an odometry onboard a ground robot. To improve event-based pattern detection, we introduce a polarity-aware event representation, which enhances spatiotemporal contrast in circular calibration targets. Our PLS-based formulation yields a closed-form, stable solution that avoids matrix singularities inherent in CCA-based approaches. Extensive experiments on both synthetic and real-world datasets validate the effectiveness of our approach, demonstrating significant improvements in calibration robustness and accuracy over state-of-the-art methods. This work offers a practical and theoretically grounded solution for rotation calibration in constrained robotic systems and opens up new directions for applying statistical learning techniques in neuromorphic vision. 
+
+> †
+
+Corresponding authors: Fangwen Yu and Mingkun Xu. This work was supported in part by the High-Level Talents Innovation Team Project of the Guangdong-Macao In-Depth Cooperation Zone in Hengqin under Grant No. 2630004018939, in part by the National Natural Science Foundation of China (NSFC) under Grant No. 62506084, in part by the Natural Science Foundation of Jiangsu Province under Grant No. BK20243064, and in part by the Beijing Natural Science Foundation under Grant No. 4262048. 
+
+> 1
+
+Guangyu Li, Jiang Cai, and Mingkun Xu are with the Guang-dong Institute of Intelligence Science and Technology, Zhuhai, China. 
+
+xumingkun@gdiist.cn 
+
+> 2
+
+Xiao Li is with the State Key Laboratory of Deep-Sea Science and Intelligent Technology,Institute of Deep-sea Science and Engineering, Chinese Academy of Sciences. 
+
+> 3
+
+Yujie Wu is with The Hong Kong Polytechnic University, Hong Kong SAR, China. 
+
+> 4
+
+Changshuo Wang is with University College London, London, United Kingdom. 
+
+> 5
+
+Prayag Tiwari is with Halmstad University, Halmstad, Sweden. 
+
+> 6
+
+Fangwen Yu is with Tsinghua University, Beijing, China. 
+
+yufangwen@tsinghua.edu.cn 
+
+Accepted at the 2026 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2026), Pittsburgh, PA, USA. © 2026 IEEE. Personal use of this material is permitted. Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in other works. 
+
+Fig. 1: Overview of the proposed extrinsic calibration configuration. I. INTRODUCTION A key prerequisite for effective multi-sensor fusion is rotation calibration, which estimates the spatial transformation between different sensing modalities. In systems that combine motion and vision sensors, such as event cameras and odometry, precise calibration is essential to ensure consistent spatial alignment, while misalignment can lead to degraded perception accuracy and unstable control behavior [1], [2]. Event cameras represent a paradigm shift in visual sensing. Inspired by the biological retina, they asynchronously capture per-pixel brightness changes and generate a sparse stream of events encoding location, time, and polarity [3]. Compared to conventional frame-based cameras, event cameras offer ultra-low latency, low redundancy, and high dynamic range (HDR), making them particularly suitable for real-time robotic perception in dynamic and challenging environments. How-ever, their fundamentally different data structure poses new challenges for computer vision and robotic calibration, where conventional feature-based pipelines are often inapplicable. In particular, classical calibration procedures relying on static checkerboard detection become unreliable, since event cameras only respond to brightness changes and do not directly capture absolute intensity patterns. As a result, stable corner extraction requires controlled motion excitation, and feature detection is highly sensitive to motion speed, contrast, and noise [4], [5]. Extrinsic calibration between event cameras and odometry sensors is especially non-trivial in ground-constrained settings, where robots move primarily on planar surfaces. Most prior calibration methods rely on full 6-DoF motion to ensure observability of the transformation, which is often infeasible arXiv:2608.03296v1 [cs.RO] 4 Aug 2026 for such planar robots. Moreover, CCA, which is commonly used for trajectory alignment based calibration, can suffer from numerical instability when the motion lacks sufficient diversity, leading to singular covariance matrices, which result in unreliable calibration or the need for external calibration rigs [6], [7]. While recent learning-based methods offer alternatives, they demand heavy supervision, computational resources, and may lack generalizability to unseen setups [8]. To overcome these limitations, we propose PLS-Calib, a novel rotation calibration framework based on PLS regression. Unlike CCA, PLS naturally handles rank-deficient data by projecting observations into a shared latent space, maximizing covariance rather than correlation. This enables robust, closed-form estimation of the transformation between event camera and odometry frames, even under restricted planar motion. Our method supports calibration under ground-constrained (planar) motion, making it ideal for practical deployment in ground-based robotic systems. We further introduce a polarity-aware event representation to enhance spatiotemporal encod-ing, enabling more stable pose estimation in the event-based vision pipeline [9]–[14]. Experiments on both synthetic and real-world datasets demonstrate that PLS-Calib outperforms CCA-based and neural calibration baselines in accuracy and robustness, especially under motion constraints. To the best of our knowledge, our work is the first to apply PLS in event camera calibration, replacing the ill-conditioned whitening step of CCA-based methods and providing a computationally efficient, biologically motivated solution for sensor fusion in modern robotics. Overall, our method capitalizes on the temporal and spatial characteristics of event-based vision to perform precise calibration under ground-constrained motion (Fig. 1). Specifically, we employ an event camera to detect circular calibration patterns and estimate time-synchronized robot poses. These are then paired with corresponding odometry data to construct a PLS regression model that estimates the optimal extrinsic rotation matrix while explicitly respecting kinematic constraints. This formulation mitigates the common issue of matrix singularities encountered in planar motion calibration scenarios. The key contributions of this work are summarized as follows:  
+
+> •
+
+We introduce PLS-Calib , a novel kinematics-aware spatio-temporal calibration framework that leverages PLS regres-sion to robustly estimate extrinsic rotation parameters from event camera and odometry data, addressing degeneracies arising from restricted ground-plane motion.  
+
+> •
+
+We propose a polarity-enhanced Time Surface represen-tation that improves feature detection stability in event data, facilitating accurate localization of circular calibration patterns under high-speed, low-light, or HDR conditions.  
+
+> •
+
+We extend pattern-based vision calibration to the domain of event-based sensor fusion, achieving accurate and target-based rotation calibration without requiring full 6-DoF excitation. Our approach demonstrates strong performance in both synthetic and real-world robotic platforms, offering a lightweight, generalizable solution for sensor alignment in constrained environments. II. RELATED WORK In a robot perception system with multiple fused sensors, extrinsic calibration of the sensors is required for the robot operation to accurately correspond to the input data of the sensors and to map the measured values to the coordinate space in which the robot is working; the main methods are the hand-eye calibration method, the learning-based calibration method, and the kinematic correlation-based method. Among them, the hand-eye calibration method is the early classical method, hand-eye calibration by solving the coordinate transformation relationship between two sensors: AX=XB, where A and B are the change matrices between the two sensor poses, respectively, and X is the pose transformation relation matrix to be solved. The optimal extrinsic calibration of the sensors is solved as the transformation relation X by corresponding the characteristics of the measured data to the sensor data. [15]–[17] Traditional hand-eye calibration methods rely on precision geometric calculations and algebraic solutions, which in practical applications require input sensors to maintain a high degree of spatio-temporal synchronisation and spatial consistency, and will lead to a decrease in calibration accuracy if noise or measurement errors exist in complex environments. With the development of deep learning, the above problems can also be solved by deep learning. For example, by applying convolutional neural network (CNN) and graph neural network (GNN) [8], an end-to-end calibration network model can be realised, which is able to maintain a certain degree of robustness in complex scenes and dynamic changes and can be a solution for the calibration problems of camera internal reference, external reference and aberration, and even the data calibration problems of multiple sensor fusion systems. For bio-inspired event cameras, using a spiking neural network (SNN) to process the time-series of event streams is also a good way to solve the problem, and it has been well applied in both velocity estimation problems [18]–[21]. However, learning-based methods for sensor calibration require good and applicable datasets and sensor schemes. The motion correlation-based method for calibrating external sensor parameters has low data requirements and high compu-tational efficiency, and can be used for a wide range of sensors to achieve sensor calibration. Qiu et al. [22] proposed a unified calibration framework based on 3D motion correlation that efficiently computes the temporal offset and extrinsic rotation between two heterogeneous sensors. Building on this line, Li et al. [7] presented a spatio-temporal calibration method for an omnidirectional-vehicle event camera, solving the ground-robot calibration with a CCA scheme. However, most of these motion-correlation methods rely on CCA, whose covariance matrix becomes singular under ground-constrained motion, biasing the estimated extrinsics. Usually, to avoid the result bias brought by the ground constraint, the researcher needs to fix the sensors to the holder for calibration, but this method may have the possibility of (a) Overview of the proposed PLS-Calib framework.  
+
+> (b) PLS-Calib robot platform. (c) Experimental robot setup.
+
+Fig. 2: Overview of the proposed PLS-Calib system and experimental platform. (a) Calibration framework. (b) Robot platform. (c) Experimental setup. some error during the calibration process. Li et al. estimate the temporal offset and then obtain the extrinsic rotation directly from the covariance matrices produced by the CCA process; however, this CCA-based formulation still relies on covariance whitening, which becomes ill-conditioned under planar motion. Kim et al. [23] proposed the GRIL-Calib method to fix the odometry and LiDAR sensors fixed on a moving trolley. GPM constraints are proposed and incorporated into the optimisation process to avoid the problem of the ground trolley not being able to acquire the complete 6-degree-of-freedom extrinsic calibration due to motion constraints. III. METHODOLOGY We propose PLS-Calib, a calibration framework specifically designed for ground-constrained robots as shown in Fig. 2. In our platform, a ground robot is equipped with an event camera and an odometry sensor to simultaneously capture trajectory data during motion. The primary objective of this framework is to estimate the optimal transformation between the two heterogeneous sensor modalities and recover their temporal offset. PLS-Calib addresses the challenge of calibrating robots under ground motion constraints, where full 6-degree-of-freedom movement is not possible. It effectively reduces the bias commonly observed in existing CCA-based calibration methods. 
+
+A. Trajectory from Event Data 
+
+Event cameras are bio-inspired visual sensors that differ from conventional RGB frame cameras in their imaging prin-ciple: each pixel operates independently and asynchronously triggers an event when the change in light intensity exceeds a threshold. Each event ek = ( xk, y k, p k, t k) encodes the pixel location, timestamp, and polarity, and is generated only when there is relative motion between the camera and the scene. Due to their asynchronous data generation mechanism, the visual information representation of event cameras signifi-cantly differs from that of standard RGB cameras [24]. A   
+
+> (a) (b) (c)
+
+Fig. 3: Representation of event data. (a) Asymmetric circle grid. (b) Time Surface representation. (c) Proposed represen-tation. common method to visualise event data is to accumulate events over a short time window and sum their polarities into a basic event frame. However, this approach discards the temporal resolution inherent in event streams. To address this limitation, the Time Surface (TS) representation was introduced, which records the timestamp of the most recent event at each pixel to preserve fine-grained motion dynamics. Time surface [25]–[27] is a common event data representa-tion method to convert events into an image. The core of the Time Surface Si is to map each event into a 2d-pixel position. Additionally, using a two-dimensional array to represent each event pixel Ti(u, p ), where the value of each pixel denotes the timestamp t difference since the last event occurred with polarity p at that pixel, can effectively preserve both the temporal and spatial information of the events. 
+
+Si(u, p ) = e− ti−Ti(u,p ) 
+
+> τ
+
+. (1) Here τ is the time constant for the values of Ti(u, p ) in this exponential decay kernel. With the representation of event data, we apply the calibration pattern to estimate the pose of the robot. For the event stream data acquired by the event camera, we need to represent the acquired event data as image frames in order to acquire the corresponding features for motion trajectory estimation. Due to the imaging characteristics of the event camera, the conventional checkerboard grid may lose a small amount of data in calibration when the trajectories are parallel to the edges of the grid. Based on previous studies, we use a circular calibration pattern (Fig. 3a) for imaging and pose estimation from the event camera, using Perspective-n-Point (PnP) to solve the pose estimation and obtain the motion trajectory. However, according to the Time Surface method above, we obtain the circular calibration pattern in event representation (Fig. 3b). However, the time-related decay mechanism in the Time Surface approach can lead to trailing artifacts in motion imagery. Therefore, we improved the decay mechanism of the Time Surface. Instead of updating each pixel based on the time difference, we modified the method to update based on the difference in event polarity p. After each update, we apply a Gaussian blur to the Time Surface to smooth it and reduce noise. This modification reduced the presence of event data trailing artifacts, as demonstrated in Fig. 3c, and enabled more accurate feature recognition of the calibration board in computer vision methods. We have, 
+
+Si(u, p ) = e− |pi−pi−1| 
+
+> α
+
+, (2) where α = 0 .1 is a dimensionless scaling constant controlling the sharpness of the polarity-based decay; unlike the time constant τ in Eq. (1), it does not carry units of seconds. A 
+
+5 × 5 Gaussian blur ( σ = 0 .7) is then applied to smooth the surface. In the previous Time Surface approach, motion and occlu-sion often caused the circular markers on the calibration plate to appear distorted or blurred. Leveraging the polarity-based event update mechanism, our method effectively reduces motion-induced blurring in the representation of event data. This improvement is critical for accurately detecting the circular features of the calibration pattern. Our approach mitigates these issues, even in the presence of temporal decay effects inherent to event-based sensing, thereby significantly enhancing the robustness of circle detection during robot movement. 
+
+B. Trajectory from Odometry 
+
+To obtain the velocity of motions, we leverage the wheel odometry available on the Jackal Clearpath robot for accurate motion tracking. In a differential-drive mobile robot, wheel odometry estimates the robot’s planar motion by computing its linear and angular velocities from the rotational displacements of the left and right wheels. 
+
+vL = r · ωL,vR = r · ωR. (3) Given the linear velocities of the left and right wheels, the robot’s translational and angular velocities can be computed as: 
+
+v = vR + vL
+
+2 , ω = vR − vL
+
+b , (4) where vR and vL denote the velocities of the right and left wheels, respectively, and b is the distance between the two wheels. Using these equations above, we derive the robot’s motion trajectory from the odometry data. This trajectory is later aligned with the motion trajectory estimated by the event camera in order to compute the rotation matrix between the two sensor frames during movement. There are numerous methods for robots to achieve motion velocity estimation, our method can also be generalized to other sensors capable of detecting motion velocity. In general, IMUs are widely used for estimating motion, velocity, and heading direction in mobile robotics applications [18], [28]–[30]. The gyroscope and accelerometer measurements provided by the IMU are used to compute angular velocity and linear acceleration, which assist in inferring the robot’s orientation and motion. 
+
+ˆωi = ωi + bg + εg ,
+
+ˆai = ai + RwIi · gw + ba + εa. (5) However, IMU measurements are prone to drift over time, which can lead to significant errors in long-term trajectory estimation. For this reason, we did not adopt an IMU-based estimation approach in our experimental setup. 
+
+C. Extrinsic Rotation 
+
+The goal of extrinsic rotation is to estimate the extrinsic ro-tation matrix Roe between the two sensors. Given the velocity measurements from the event camera and odometry, denoted as Ve and Vo, respectively, we aim to determine the rotational relationship that aligns the two motion representations. 
+
+Vo = Roe Ve. (6) Comparison of PLS regression methods for CCA In traditional sensor calibration work, the CCA method is mainly used to solve for the maximum correlation between the velocities measured by the two sensor data, so as to obtain the optimal sensor transformation relationship. However, in robots subject to ground constraints, solving with the CCA method can lead to deviations in the final results due to matrix singularities, yielding unstable calibration results. Therefore, we use the method of constructing a PLS regression equation to determine the time offset and extrinsic rotation between the two sensors to circumvent the problem of matrix singularity. 
+
+1) Calibration via Canonical Correlation Analysis: The Canonical Correlation Analysis (CCA) method is widely used in prior calibration studies. It is a statistical approach for evaluating the correlation between two data sets, such as sensor data streams X and Y , by finding their respective linear combinations aT X and bT Y that are maximally correlated. The correlation coefficient, commonly used as the metric, is defined as ρ = Cov (X,Y )
+
+√Var (X)√Var (Y ) , where Cov (X, Y ) denotes the covariance between X and Y , and Var (X) and Var (Y )
+
+represent their variances. In the actual solution process, the event data and odometry data we acquired need to be unified into one-dimensional data for the calculation of correlation coefficients. We have 
+
+U = Xa and V = Y b . The optimisation objective of the CCA method is to maximise the correlation coefficient, which is, 
+
+arg max 
+
+> a,b
+
+Cov (U, V )
+
+pVar (U )Var (V ) . (7) Let Z =
+
+XY
+
+
+
+. Then we have the expectation E(Z) = 
+
+E(X)
+
+E(Y )
+
+
+
+, and the covariance matrix Σ = Var (Z) =
+
+Σ11 Σ12 
+
+Σ21 Σ22 
+
+
+
+. The variances and covariance of the linear projections are given by Var (U ) = aT Cov (X)a = aT Σ11 a,Var (V ) = bT Cov (Y )b = bT Σ22 b, and Cov (U, V ) =
+
+aT Cov (X, Y )b = aT Σ12 b.When subjected to ground constraints, the z-axis of our acquired data becomes zero. Let 
+
+X = [ x1, x 2, 0] n×3, Y = [ y1, y 2, y 3]n×3,we define the combined data matrix as 
+
+Z = [ x1, x 2, 0, y 1, y 2, y 3]n×6.
+
+Therefore, the variance of Z is computed as Var (Z) = E[( Z − μz )T (Z − μz )] , (8) where μz denotes the mean of Z. Let ˆZ =[x1, x 2, 0, y 1, y 2, y 3]n×6 = Z − μz , We have, Var (Z) = 1
+
+n ˆZT ˆZ
+
+= 1
+
+n [x1, x 2, 0, y 1, y 2, y 3]T [x1, x 2, 0, y 1, y 2, y 3]= 1
+
+n
+
+
+
+xT 
+
+> 1
+
+x1 xT 
+
+> 1
+
+x2 0 xT 
+
+> 1
+
+y1 xT 
+
+> 1
+
+y2 xT 
+
+> 1
+
+y3
+
+xT 
+
+> 2
+
+x1 xT 
+
+> 2
+
+x2 0 xT 
+
+> 2
+
+y1 xT 
+
+> 2
+
+y2 xT 
+
+> 2
+
+y3
+
+0 0 0 0 0 0
+
+yT 
+
+> 1
+
+x1 yT 
+
+> 1
+
+x2 0 yT 
+
+> 1
+
+y1 yT 
+
+> 1
+
+y2 yT 
+
+> 1
+
+y3
+
+yT 
+
+> 2
+
+x1 yT 
+
+> 2
+
+x2 0 yT 
+
+> 2
+
+y1 yT 
+
+> 2
+
+y2 yT 
+
+> 2
+
+y3
+
+yT 
+
+> 3
+
+x1 yT 
+
+> 3
+
+x2 0 yT 
+
+> 3
+
+y1 yT 
+
+> 3
+
+y2 yT 
+
+> 3
+
+y3
+
+
+
+=
+
+Σ11 Σ12 
+
+Σ21 Σ22 
+
+
+
+.
+
+(9) Since the third channel of X is constant, Sxx becomes rank-deficient (i.e., rank( Sxx ) ≤ 2), making the whitening step S−1/2 
+
+> xx
+
+ill-conditioned and leading to unstable canonical directions. 
+
+2) Calibration via Partial Least Squares Regression: 
+
+To address the limitations of CCA under ground motion constraints, we adopt a Partial Least Squares (PLS) regres-sion strategy to calibrate the event camera and odometry sensor based on their observed velocity data. Unlike CCA, which seeks maximally correlated projections and requires covariance whitening (potentially ill-conditioned under planar motion), PLS constructs latent components by maximizing the covariance between projected variables and then performs regression in the latent space. Let X, Y ∈ Rn×3 denote the synchronized velocity mea-surements from the event camera and odometry, respectively, where each row stores one velocity sample as a row vector. We model their relationship as 
+
+Y = XR + E, (10) where R ∈ R3×3 is the regression coefficient matrix and E
+
+is the residual. Under this row-vector convention, the per-sample relation in Eq. (6) reads Y = XR ⊤ 
+
+> oe
+
++ E, i.e., the regression coefficient matrix corresponds to the transpose of the extrinsic rotation, R = R⊤
+
+> oe
+
+.
+
+a) Standardization.: Following the implementation, we standardize each channel of X and Y (column-wise) as 
+
+˜X = X − μX
+
+σX + ε , ˜Y = Y − μY
+
+σY + ε , (11) where μX , μ Y ∈ R1×3 are the column means, σX , σ Y ∈
+
+R1×3 are the column standard deviations, and ε is a small positive constant ( 10 −10 in our implementation) that prevents division by zero for degenerate channels, e.g., the z-axis velocity that remains constant under planar motion. 
+
+b) Latent direction estimation.: PLS seeks a direction 
+
+w ∈ R3 such that the score t = ˜Xw has maximum covariance with the multivariate response ˜Y . In our implementation, this is achieved by maximizing the squared covariance magnitude 
+
+w = arg max 
+
+> ∥w∥=1
+
+˜Y T ( ˜Xw ) 22
+
+= arg max  
+
+> ∥w∥=1
+
+wT   ˜XT ˜Y ˜Y T ˜Xw, (12) which leads to the eigenvalue problem 
+
+  ˜XT ˜Y ˜Y T ˜X w = λw. (13) The eigenvector corresponding to the largest eigenvalue is selected as the projection direction. The latent score is then computed as 
+
+t = ˜Xw. (14) 
+
+c) Deflation and multiple components.: To extract multi-ple components, we iteratively remove from the standardized input the part explained by the current score. Let E0 = ˜X.For the current score t, we compute the loading 
+
+p = ET ttT t , (15) and update 
+
+E ← E − tp T . (16) Repeating the procedure yields K components. Stacking the scores gives T = [ t1, . . . , t K ] ∈ Rn×K .
+
+d) Regression in the latent space.: Given the score matrix T , we estimate the regression from scores to the standardized response by least squares, 
+
+˜Y ≈ T C, C = T † ˜Y . (17) To map the regression back to the standardized input space, we use a corrected weight matrix W ⋆ ∈ R3×K , which is equivalent to W ⋆ = W (P T W )−1 with W = [ w1, . . . , w K ]
+
+and P = [ p1, . . . , p K ], and obtain 
+
+Rstd = W ⋆C. (18) The regression matrix R in the original (unstandardized) scale is then recovered from Rstd by undoing the column-wise standardization in Eq. (11). 
+
+e) Rotation construction.: The regression matrix R is not guaranteed to be orthogonal. In our implementation, instead of projecting R to the nearest element in SO (3) 
+
+via SVD, we construct a right-handed frame from the first two row vectors of R. Let rT 
+
+> 1
+
+= R1,: and rT 
+
+> 2
+
+= R2,:. We compute 
+
+ˆr1 = r1
+
+∥r1∥ , ˆr2 = r2
+
+∥r2∥ , ˆr3 = ˆr1 × ˆr2
+
+∥ˆr1 × ˆr2∥ , (19) and assemble 
+
+Rrot =  ˆr1 ˆr2 ˆr3
+
+. (20) Since the regression matrix satisfies R = R⊤
+
+> oe
+
+, its rows correspond to the columns of Roe ; normalizing the first two rows and completing the right-handed frame via the cross product in Eq. (20) therefore directly recovers the (a) Without ground constraints (b) With ground constraints 
+
+Fig. 4: Synthetic experiment results using PLS and CCA. (a) Full 6-DoF motion. (b) Ground-constrained planar motion. extrinsic rotation, i.e., Rrot is the final estimate of Roe in the convention of Eq. (6). As discussed above, while CCA identifies maximally cor-related projections, it can become numerically unstable under ground-constrained motion due to rank-deficient covariance matrices and ill-conditioned whitening. In contrast, the above PLS procedure constructs latent components by covariance maximization and performs regression via pseudoinverses in the latent space, making it more robust in planar-motion scenarios. This is particularly suitable for aligning the velocity measurements of an event camera and an odometry sensor for extrinsic rotation calibration. IV. EXPERIMENTS AND RESULTS The experiment is mainly composed of two parts. Firstly, we validate the calibration results of the PLS method under ground constraints in the synthesised data and compare the calibration results of the CCA method. Secondly, we built a physical ground robot to collect the data and complete the calibration validation in the real world using a robot with odometry and an event camera. 
+
+A. Synthetic Data Generation 
+
+In order to evaluate the effectiveness of our method under ground constraints, we generated synthetic datasets for two scenarios: one with full 6-DoF motion, and the other constrained to planar motion, simulating typical ground-based robot behavior. For each scenario, we created two sets of data representing the outputs of two sensors, with the second set generated using a known ground-truth rotation matrix Rgt . The goal is to recover the optimal rotation matrix R between the two sensors. We applied both the PLS and CCA methods for calibration and compared the estimated rotation matrices 
+
+Rpls and Rcca with Rgt to assess the calibration accuracy. As is shown in Fig. 4, we visualize the rotation relationship between the two sets of data by synthesizing the data, and the blue native data is curved from the real rotation matrix 
+
+Rgt to red. At the same time, the CCA method and the PLS method were used to solve the extrinsic rotation matrices for the two sets of data, respectively. In Fig. 4a, the sensor can move in a full 6-DoF space, and the new trajectory estimated using the CCA method and the PLS method has a small error with the real trajectory, which almost coincides in the figure. However, when the ground constraints are received, the motion of the Z-axis cannot be obtained, and the CCA method has a large error in the calculation of the calculated and solved rotation matrix. In Fig. 4b, the green trajectory obtained by Rcca is offset by the yellow trajectory and the true red trajectory obtained by 
+
+Rpls .TABLE I: Comparison of Error for Different Methods in Synthetic Data       
+
+> Method CCA [7] PLS(Ours)
+> Error(No Constraints) 0.16 0.21
+> Error(Ground Constraints) 26.56 0.26
+
+B. Robust Evaluation 
+
+To evaluate the robustness of the proposed extrinsic rotation calibration method, we designed four different planar motion trajectories (Fig. 5), namely Circle Route , V-shape Route ,
+
+Z-shape Route , and S-shape Route . These trajectories were used to simulate paired 3D motion data generated by two sensors rigidly mounted on a robot moving along different planar patterns. In each trial, a ground-truth rotation matrix Rgt ∈ SO (3) 
+
+was randomly generated using ZYX Euler angles sampled uniformly within [−90 ◦, 90 ◦]. The first sensor’s motion data 
+
+X were generated according to the predefined trajectory, with additive Gaussian noise to simulate measurement uncertainty. Consistently with the column-vector convention of Eq. (6), the second sensor’s data were constructed as 
+
+Y = XR ⊤ 
+
+> gt
+
++ ϵ, (21) where ϵ denotes zero-mean Gaussian noise with standard deviation σ = 0 .10 , identical to that applied to X. Unless otherwise stated, all synthetic results in Table II are reported at this noise level ( n = 200 trials, 100 samples each). Although the trajectories are spatially three-dimensional, the robot motion is predominantly constrained to planar movement, resulting in very limited excitation along the 
+
+z-axis. Consequently, the rotation components associated with out-of-plane tilt (i.e., rotations around the x- and y-axes) become weakly observable. Under such conditions, the sample covariance matrix approaches rank deficiency in the degenerate direction, significantly increasing the condition number. Methods that rely on covariance whitening, such as Canon-ical Correlation Analysis (CCA), are particularly sensitive to this degeneracy. When the covariance matrix becomes ill-conditioned, the whitening operation amplifies noise in poorly excited directions, leading to large rotation estimation errors. In contrast, the proposed method based on Partial Least Squares (PLS) does not require explicit whitening of degenerate covariance components. Instead, it directly TABLE II: Rotation Error Comparison Between PLS and CCA Across Different Routes (mean ± std, in degrees, n=200)                                  
+
+> Route CCA [7] PLS (Ours) Reduction (%)
+> Circle 48.94 ±0.10 0.23 ±0.10 99.53 V-shape 16.10 ±0.20 0.48 ±0.18 97.02 Z-shape 49.95 ±0.17 0.57 ±0.23 98.86 S-shape 20.33 ±0.06 1.05 ±0.47 94.83
+> (a) Circle (b) V-shape
+> (c) Z-shape (d) S-shape
+
+Fig. 5: Illustration of the four planar motion trajectories used in the robustness evaluation. maximizes cross-covariance alignment, thereby avoiding instability caused by near-singular covariance matrices. As summarized in Table II, PLS consistently achieves high calibration accuracy across all motion patterns. Specifically, the mean rotation error of PLS remains below 1◦ for the Circle, V-shape, and Z-shape trajectories, and approximately 
+
+1◦ (1.05 ◦) for the S-shape trajectory. Compared with CCA, PLS reduces the estimation error by more than 94% in all tested routes, with up to 99 .5% error reduction under the Circle trajectory. These results confirm that the proposed method maintains high estimation accuracy even under low-excitation planar motion, while whitening-based approaches suffer from severe degradation due to covariance degeneracy. 
+
+C. Real Data Collection 
+
+We built a ground mobile robot platform to collect real-world sensor data. The system is based on a Jackal Clearpath robot equipped with odometry sensors and a mounted DAVIS 346 event camera. Data collection is handled by an onboard NVIDIA Orin module, and the calibration algorithm (implemented in Python) is executed on a PC with an Intel Xeon Silver 4410Y CPU. Experiments were conducted in a flat environment. A circular calibration pattern was placed in front of the robot, which was manually controlled to approach the pattern from various angles. During motion, both event data and odometry readings were recorded. The collected data were then used to perform sensor calibration based on the trajectories from the two modalities. Since motion capture is unavailable in our setup, we obtain a reference rotation using the intensity (frame-based) output of the event camera. Specifically, we apply a standard checkerboard-based calibration pipeline to the APS frames to estimate the extrinsic rotation between the camera and the robot. This frame-based calibration is performed inde-pendently from the proposed event-based method and serves as a reference for quantitative evaluation. Since the APS frames and the event stream are produced by the same pixel array and share a common optical center [31], the extrinsic rotation calibrated from the APS frames applies equally to the event stream, making it a geometrically valid reference. Although not obtained from an external tracking system, such frame-based calibration is widely adopted for event cameras and, being independent of the event-based pipeline under evaluation, provides a stable reference for assessing rotation accuracy. In order to evaluate the performance of our method in the real world, we acquired event data and odometry data to compare the calibration errors in different methods, including Andreff solver [32], CCA method and PLS method. We compare the external parameter estimation errors of three methods, as shown in Table III. Both the Andreff and CCA methods exhibit varying degrees of deviation, while our proposed PLS method yields the smallest error. The estimated rotation matrices are visualized using Euler angles in Fig. 6, where the PLS method produces results closest to the reference. We measure rotation error by the geodesic distance on 
+
+SO(3) :
+
+eR = arccos Tr  Rest R⊤
+
+> gt
+
+ − 12
+
+!
+
+, (22) reported in degrees. TABLE III: Comparison of Error for Different Methods in Real Data       
+
+> Method Andreff [32] CCA [7] PLS(Ours)
+> Error 74.65 40.73 3.18
+
+(a) (b) (c) Fig. 6: The visualization of calibration errors in three methods, (a) is Andreff, (b) is CCA-based and (c) is PLS-based method. V. CONCLUSIONS In this paper, we propose a novel event data represen-tation and a more practical solution for sensor calibration in ground-constrained robotic systems. Conventional time-surface representations are heavily influenced by temporal decay dynamics, often leading to motion blur and reduced recognition accuracy in event-based vision. To address this, we introduce a polarity-based decay mechanism that mitigates temporal drag artifacts. This enhancement improves feature detection performance and provides a more reliable front-end for downstream sensor calibration. We also identify limitations in traditional CCA methods, where solving for 6-DoF motion under matrix singularities leads to inaccurate calibration results. To overcome this, we construct a PLS regression model that iteratively extracts latent components, enabling robust estimation of extrinsic rotation parameters while avoiding singularities. The proposed method is validated through experiments on both synthetic and real-world datasets. In the future, we hope that this method can provide some research inspiration for future sensor fusion systems based on event data and explore the possibilities of more topics. ACKNOWLEDGMENT An LLM was used solely for language polishing assistance, and a generative AI tool was used only to create a schematic illustration of the robot platform. All scientific content and results were developed by the authors. REFERENCES [1] Q. Zhang and R. Pless, “Extrinsic calibration of a camera and laser range finder (improves camera calibration),” in 2004 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) ,vol. 3. IEEE, 2004, pp. 2301–2306. [2] J. Beltr´ an, C. Guindel, A. De La Escalera, and F. Garc´ ıa, “Automatic extrinsic calibration method for lidar and camera sensor setups,” IEEE Transactions on Intelligent Transportation Systems , vol. 23, no. 10, pp. 17 677–17 689, 2022. [3] G. Gallego, T. Delbr¨ uck, G. Orchard, C. Bartolozzi, B. Taba, A. Censi, S. Leutenegger, A. J. Davison, J. Conradt, K. Daniilidis et al. , “Event-based vision: A survey,” IEEE transactions on pattern analysis and machine intelligence , vol. 44, no. 1, pp. 154–180, 2020. [4] M. Muglikar, M. Gehrig, D. Gehrig, and D. Scaramuzza, “How to calibrate your event camera,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 1403–1409. [5] K. Huang, Y. Wang, and L. Kneip, “Dynamic event camera calibration,” in 2021 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) . IEEE, 2021, pp. 7021–7028. [6] J. Yin, A. Li, T. Li, W. Yu, and D. Zou, “M2dgr: A multi-sensor and multi-scenario slam dataset for ground robots,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 2266–2273, 2021. [7] X. Li, Y. Zhou, R. Guo, X. Peng, Z. Zhou, and H. Lu, “Spatio-temporal calibration for omni-directional vehicle-mounted event cameras,” IEEE Robotics and Automation Letters , vol. 9, no. 3, pp. 2311–2318, 2024. [8] K. Liao, L. Nie, S. Huang, C. Lin, J. Zhang, Y. Zhao, M. Gabbouj, and D. Tao, “Deep learning for camera calibration and beyond: A survey,” 
+
+arXiv preprint arXiv:2303.10559 , 2023. [9] S. Wold, A. Ruhe, H. Wold, and W. J. Dunn, III, “The collinearity problem in linear regression. the partial least squares (pls) approach to generalized inverses,” SIAM Journal on Scientific and Statistical Computing , vol. 5, no. 3, pp. 735–743, 1984. [10] S. De Jong, “Simpls: an alternative approach to partial least squares regression,” Chemometrics and intelligent laboratory systems , vol. 18, no. 3, pp. 251–263, 1993. [11] J. F. MacGregor, C. Jaeckle, C. Kiparissides, and M. Koutoudi, “Process monitoring and diagnosis by multiblock pls methods,” AIChE Journal ,vol. 40, no. 5, pp. 826–838, 1994. [12] M. Blanco, J. Coello, H. Iturriaga, S. Maspoch, and J. Pages, “Nir calibration in non-linear systems: different pls approaches and artificial neural networks,” Chemometrics and Intelligent Laboratory Systems ,vol. 50, no. 1, pp. 75–82, 2000. [13] C. H. Spiegelman, M. J. McShane, M. J. Goetz, M. Motamedi, Q. L. Yue, and G. L. Cot´ e, “Theoretical justification of wavelength selection in pls calibration: development of a new algorithm,” Analytical chemistry ,vol. 70, no. 1, pp. 35–44, 1998. [14] R. Rosipal and N. Kr¨ amer, “Overview and recent advances in partial least squares,” in International Statistical and Optimization Perspec-tives Workshop” Subspace, Latent Structure and Feature Selection” .Springer, 2005, pp. 34–51. [15] R. Y. Tsai, R. K. Lenz et al. , “A new technique for fully autonomous and efficient 3 d robotics hand/eye calibration,” IEEE Transactions on robotics and automation , vol. 5, no. 3, pp. 345–358, 1989. [16] K. H. Strobl and G. Hirzinger, “Optimal hand-eye calibration,” in 2006 IEEE/RSJ international conference on intelligent robots and systems .IEEE, 2006, pp. 4647–4653. [17] R. Horaud and F. Dornaika, “Hand-eye calibration,” The international journal of robotics research , vol. 14, no. 3, pp. 195–210, 1995. [18] Z. Yang and S. Shen, “Monocular visual–inertial state estimation with online initialization and camera–imu extrinsic calibration,” IEEE Transactions on Automation Science and Engineering , vol. 14, no. 1, pp. 39–51, 2016. [19] X. Li, X. Chen, R. Guo, Y. Wu, Z. Zhou, F. Yu, and H. Lu, “Neurove: brain-inspired linear-angular velocity estimation with spiking neural networks,” IEEE Robotics and Automation Letters , vol. 10, no. 3, pp. 2375–2382, 2025. [20] Y. Tian and J. Andrade-Cetto, “Egomotion from event-based snn optical flow,” in Proceedings of the 2023 International Conference on Neuromorphic Systems , 2023, pp. 1–8. [21] G. Orchard, R. Benosman, R. Etienne-Cummings, and N. V. Thakor, “A spiking neural network architecture for visual motion estimation,” in 2013 IEEE Biomedical Circuits and Systems Conference (BioCAS) .IEEE, 2013, pp. 298–301. [22] K. Qiu, T. Qin, J. Pan, S. Liu, and S. Shen, “Real-time temporal and rotational calibration of heterogeneous sensors using motion correlation analysis,” IEEE Transactions on Robotics , vol. 37, no. 2, pp. 587–602, 2020. [23] T. Kim, G. Pak, and E. Kim, “Gril-calib: Targetless ground robot imu-lidar extrinsic calibration method using ground plane motion constraints,” IEEE Robotics and Automation Letters , vol. 9, no. 6, pp. 5409–5416, 2024. [24] Y. Zhou, G. Gallego, and S. Shen, “Event-based stereo visual odometry,” 
+
+IEEE Transactions on Robotics , vol. 37, no. 5, pp. 1433–1450, 2021. [25] J. Nagata, Y. Sekikawa, and Y. Aoki, “Optical flow estimation by matching time surface with event-based cameras,” Sensors , vol. 21, no. 4, p. 1150, 2021. [26] J. Manderscheid, A. Sironi, N. Bourdis, D. Migliore, and V. Lepetit, “Speed invariant time surface for learning to detect corner points with event-based cameras,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2019, pp. 10 245–10 254. [27] X. Lagorce, G. Orchard, F. Galluppi, B. E. Shi, and R. B. Benosman, “Hots: a hierarchy of event-based time-surfaces for pattern recognition,” 
+
+IEEE transactions on pattern analysis and machine intelligence , vol. 39, no. 7, pp. 1346–1359, 2016. [28] D. Feng, Y. Qi, S. Zhong, Z. Chen, Q. Chen, H. Chen, J. Wu, and J. Ma, “S3e: A multi-robot multimodal dataset for collaborative slam,” IEEE Robotics and Automation Letters , vol. 9, no. 12, pp. 11 401–11 408, 2024. [29] P. Chen, W. Guan, and P. Lu, “Esvio: Event-based stereo visual inertial odometry,” IEEE Robotics and Automation Letters , vol. 8, no. 6, pp. 3661–3668, 2023. [30] M. Helmberger, K. Morin, B. Berner, N. Kumar, G. Cioffi, and D. Scaramuzza, “The hilti slam challenge dataset,” IEEE Robotics and Automation Letters , vol. 7, no. 3, pp. 7518–7525, 2022. [31] C. Brandli, R. Berner, M. Yang, S.-C. Liu, and T. Delbruck, “A 240 ×180 130 db 3 μs latency global shutter spatiotemporal vision sensor,” IEEE Journal of Solid-State Circuits , vol. 49, no. 10, pp. 2333–2341, 2014. [32] E. Wise, M. Giamou, S. Khoubyarian, A. Grover, and J. Kelly, “Certifiably optimal monocular hand-eye calibration,” in 2020 IEEE International Conference on Multisensor Fusion and Integration for Intelligent Systems (MFI) . IEEE, 2020, pp. 271–278.

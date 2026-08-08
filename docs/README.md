@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-07</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-08</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 19 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 11 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>11</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>5</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 21:30:04 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-08 20:59:14 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读19篇，聚焦多模态效率提升，其中《Deltoris》与《DIVE》均获满分，主攻实时VLA推理与动态视觉证据构建。最值得关注的方向是“位级稀疏+投机推理”和“迭代视觉证据”，它们能显著降低视觉语言模型计算开销。若想快速入门，可从视觉token剪枝与高清视频识别两篇速读文章入手，理解冗余信息如何影响效率。</p>
+<p>今日精读5篇、速读6篇，聚焦视频理解与多模态模型效率。</p>
+<p>最值得看的是视频大语言模型的高效Token剪枝（GSTEP）和事件相机标定框架（PLS-Calib），均获9.0高分。</p>
+<p>下步可优先浏览速读中的视觉基础模型可解释性与开放词汇分割，从中挑选感兴趣的方向深入。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +73,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">11 篇</strong>
+    <strong class="dpr-home-dashboard-count">5 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference">Deltoris: Enabling Real-time VLA Inference in Embodied AI via Bit-level Sparsity and Speculative Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="DIVE: Dynamic Iterative Visual Evidence Construction for Efficient Vision-Language Models">DIVE: Dynamic Iterative Visual Evidence Construction for Efficient Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen">Cooking beyond Frames: A Stereo Event Camera Dataset in the Kitchen</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="GSTEP: Global Spatio-Temporal Density-Driven Visual Token Pruning for Efficient Video Large Language Models">GSTEP: Global Spatio-Temporal Density-Driven Visual Token Pruning for Efficient Video Large Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="PLS-Calib: A Partial Least Squares Framework for Event Camera and Odometry Calibration under Ground Motion Constraints">PLS-Calib: A Partial Least Squares Framework for Event Camera and Odometry Calibration under Ground Motion Constraints</span></li><li><span class="dpr-home-dashboard-paper-title" title="RUTA: Principled Visual Token Allocation via Rate-Utility Optimization">RUTA: Principled Visual Token Allocation via Rate-Utility Optimization</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>8</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +86,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">8 篇</strong>
+    <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles">Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles</span></li><li><span class="dpr-home-dashboard-paper-title" title="HiResNets: Native Full-HD Video Recognition with Foveal Residual Streams">HiResNets: Native Full-HD Video Recognition with Foveal Residual Streams</span></li><li><span class="dpr-home-dashboard-paper-title" title="Accurate Localization of Road Traffic Objects on the Road Plane Using Surveillance Camera Imagery">Accurate Localization of Road Traffic Objects on the Road Plane Using Surveillance Camera Imagery</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Foveated Probes Recover Localized Binding Information in Vision Foundation Models">Foveated Probes Recover Localized Binding Information in Vision Foundation Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Perceptual Anchoring: Prototype-Guided Text Calibration for Training-free Open-Vocabulary Semantic Segmentation">Perceptual Anchoring: Prototype-Guided Text Calibration for Training-free Open-Vocabulary Semantic Segmentation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Adapting Vision Foundation Models with Cascaded Semantics">Adapting Vision Foundation Models with Cascaded Semantics</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">mm-trf <strong>4</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
 </section>
 </div>
 
