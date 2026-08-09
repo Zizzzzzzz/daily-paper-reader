@@ -1,0 +1,186 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-09T20:43:52.336165+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 2,
+    "deep_cap": 8,
+    "deep_selected": 2,
+    "quick_candidates": 2,
+    "quick_skim_target": 13,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.02791v1",
+      "source": "arxiv",
+      "title": "Better, Stronger, Faster, and Broader: Structured All-Mask Prediction for MLLM-Based Segmentation",
+      "abstract": "MLLM-based segmentation faces a core segmentation trilemma: high segmentation performance, preserved dialogue ability, and fast inference. Embedding-prediction methods may disrupt language modeling through pixel-level objectives, whereas next-token generation is inefficient for dense masks. We propose All-Mask Prediction, decoupling autoregressive dialogue from non-autoregressive mask prediction. Its binary instantiation, STAMP (Simultaneous Textual All-Mask Prediction), emits an in-vocabulary <SEG> trigger, fuses image-aligned mask tokens with corresponding patch features, and uses hybrid attention to classify all tokens as foreground or background in one pass. It thereby combines strong referring and reasoning segmentation with preserved multimodal ability and efficient inference. However, binary masks cannot retain multiple semantic or instance identities without repeated target-specific predictions. We therefore propose Structured All-Mask Prediction and develop STAMPlus. It generates a target list with explicit IDs and optional boxes, binds these IDs to a shared multi-class mask space, and jointly predicts all targets in one non-autoregressive pass. A single unified checkpoint retains STAMP's referring and reasoning capabilities while extending to open-vocabulary semantic, instance-aware, and remote-sensing small-target segmentation, where high-resolution mask-token scaling preserves finer spatial evidence. Across these settings, STAMPlus achieves state-of-the-art segmentation performance, preserves general multimodal instruction following, and reduces 12-category latency from 13.50s for repeated STAMP inference to 5.16s. Further analyses show that accurate target cues improve segmentation and learned spatial grounding benefits look-twice reasoning. Overall, STAMPlus resolves the trilemma beyond single-target prediction.",
+      "authors": [
+        "Jiazhen Liu",
+        "Mingkuan Feng",
+        "Long Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T18:42:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.02791v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "decouples autoregressive dialogue from non-autoregressive mask prediction for fast MLLM-based segmentation",
+      "llm_evidence_cn": "将自回归对话与非自回归掩码预测解耦，实现快速MLLM分割",
+      "llm_evidence": "将自回归对话与非自回归掩码预测解耦，实现快速MLLM分割",
+      "canonical_evidence": "将自回归对话与非自回归掩码预测解耦，实现快速MLLM分割",
+      "llm_tldr_en": "MLLM-based segmentation faces a trilemma of segmentation quality, dialogue ability, and inference speed; All-Mask Prediction decouples autoregressive dialogue from non-autoregressive mask prediction, with STAMP classifying all tokens in one pass for fast high-quality segmentation.",
+      "llm_tldr_cn": "基于多模态大语言模型的图像分割面临精度、对话能力和推理速度三难问题，嵌入预测会干扰语言建模，而逐token生成对稠密掩码低效。本文提出全掩码预测(All-Mask Prediction)，将自回归对话与非自回归掩码预测解耦；其二值实例STAMP通过词表内触发token、融合掩码token与图像patch特征，并利用混合注意力一次完成所有token的前景/背景分类。该方案在保持对话能力的同时实现快速强分割，实际解决MLLM分割的效率瓶颈。",
+      "llm_tldr": "基于多模态大语言模型的图像分割面临精度、对话能力和推理速度三难问题，嵌入预测会干扰语言建模，而逐token生成对稠密掩码低效。本文提出全掩码预测(All-Mask Prediction)，将自回归对话与非自回归掩码预测解耦；其二值实例STAMP通过词表内触发token、融合掩码token与图像patch特征，并利用混合注意力一次完成所有token的前景/背景分类。该方案在保持对话能力的同时实现快速强分割，实际解决MLLM分割的效率瓶颈。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02560v1",
+      "source": "arxiv",
+      "title": "Structured Memory for Edge Language Models: Persistent Context and Corpus Retrieval via O(1) SSM State Injection",
+      "abstract": "Retrieval-augmented generation (RAG) imposes a prefill cost proportional to retrieved context length, and -- with Transformer backbones -- a KV-cache that grows with each generated token. State-Space Models (SSMs) avoid the second cost by construction; we eliminate the first, collapsing prefill from $O(L_{context})$ to $O(1)$ per query. We introduce PRECOG (Pre-Computed Context Injection), a retrieval mechanism that exploits a property unique to SSMs: the fixed-size, position-agnostic recurrent hidden state is a complete summary of everything the model has read. PRECOG pre-encodes document corpora offline as SSM hidden states and injects the best-matching state directly at query time, bypassing in-context re-ingestion entirely. The same state-injection mechanism enables SMC (Structured Memory Consolidation): a hierarchical persistent memory with cognitive-domain clustering, an adjustable fidelity-vs-storage dial, and $O(1)$ session initialization, which consolidates short-term episodic states into long-term semantic memory and fuses both with retrieved corpus states at query time. We demonstrate the system on TENNs-LLM, a 1.2B-parameter gated-SSM language model with a 192 KB hidden state. PRECOG matches in-context RAG answer quality, reducing prefill latency from $\\sim$27 s to $<$6 ms on edge hardware -- a $\\sim$4500$\\times$ speedup that crosses the threshold from unusable to interactive. The mechanism is architecturally impossible for Transformer KV-caches, which are position-entangled and grow linearly with context length.",
+      "authors": [
+        "Anusha Madan Gopal",
+        "Aras Pirbadian",
+        "Kristofor D. Carlson",
+        "M Anthony Lewis",
+        "Jonathan Tapson"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.IR"
+      ],
+      "published": "2026-08-03T17:43:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.02560v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Eliminates KV-cache growth and prefill cost for long-context via O(1) SSM state injection",
+      "llm_evidence_cn": "通过O(1) SSM状态注入消除KV缓存增长和长上下文预填充成本",
+      "llm_evidence": "通过O(1) SSM状态注入消除KV缓存增长和长上下文预填充成本",
+      "canonical_evidence": "通过O(1) SSM状态注入消除KV缓存增长和长上下文预填充成本",
+      "llm_tldr_en": "PRECOG pre-encodes corpora as SSM hidden states and injects the best-matching state at query time, cutting prefill from O(L) to O(1) and eliminating KV-cache growth for long-context edge LLMs.",
+      "llm_tldr_cn": "针对检索增强生成在长上下文下预填充和KV缓存开销高的问题，本文提出PRECOG，利用状态空间模型固定大小的隐状态离线封装文档语料，查询时直接注入最佳匹配状态，使每个查询的预填充成本降为O(1)，并从根本上消除生成阶段的KV缓存增长。实验显示该方法能在保持上下文质量的同时大幅降低边缘端的内存与计算负担，为长上下文语言模型的高效部署提供了新思路。",
+      "llm_tldr": "针对检索增强生成在长上下文下预填充和KV缓存开销高的问题，本文提出PRECOG，利用状态空间模型固定大小的隐状态离线封装文档语料，查询时直接注入最佳匹配状态，使每个查询的预填充成本降为O(1)，并从根本上消除生成阶段的KV缓存增长。实验显示该方法能在保持上下文质量的同时大幅降低边缘端的内存与计算负担，为长上下文语言模型的高效部署提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.02216v1",
+      "source": "arxiv",
+      "title": "Local Margin Restoration for Test-Time Adaptation of Vision-Language Models",
+      "abstract": "Vision-language models (VLMs) such as CLIP exhibit remarkable zero-shot capabilities, yet their performance frequently degrades sharply under unexpected test-time distribution shifts. While Test-Time Adaptation (TTA) offers a promising solution, continuously adapting VLMs over an unlabeled test stream presents fundamental challenges. Conventional top-1-centric updates often reinforce errors by corrupting the local semantic geometry among related classes, while iterative adaptation exacerbates progressive bias accumulation, ultimately driving the model toward mode collapse. To overcome these coupled vulnerabilities, we propose Local Margin Restoration (LMR), a lightweight, one-step TTA framework. At the sample level, our Protected Margin Restoration (PMR) objective recovers local semantic geometry by shielding plausible near-top candidates from external hard negatives. Concurrently, to combat stream-level degradation, we introduce a dual-stage stabilization mechanism, featuring an Adaptive Margin (AM) controller and Bias Correction (BC), to dynamically disrupt progressive bias accumulation and prevent mode collapse. Extensive experiments on CIFAR-C, ImageNet-C, and ImageNet variants demonstrate that LMR consistently outperforms state-of-the-art TTA baselines, proving exceptionally robust and efficient even in challenging low-batch test-time regimes. Our code is available at https://github.com/DennisHuangYan/LMR.",
+      "authors": [
+        "Yan Huang",
+        "Guowei Wang",
+        "Xu Wang",
+        "Kangjun Liu",
+        "Xin Lin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T13:38:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.02216v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Lightweight test-time adaptation for vision-language models preserving local semantic geometry",
+      "llm_evidence_cn": "轻量级视觉语言模型测试时自适应方法，保持局部语义几何结构",
+      "llm_evidence": "轻量级视觉语言模型测试时自适应方法，保持局部语义几何结构",
+      "canonical_evidence": "轻量级视觉语言模型测试时自适应方法，保持局部语义几何结构",
+      "llm_tldr_en": "Proposes Local Margin Restoration, a lightweight one-step TTA framework for VLMs that protects margin and semantic geometry, mitigating error accumulation and mode collapse.",
+      "llm_tldr_cn": "视觉语言模型在测试流上连续自适应会产生渐进偏差累积，最终导致模式崩塌。现有top-1更新还会破坏相关类别之间的局部语义几何。论文提出轻量级一步式测试时自适应框架LMR，通过保护边缘并恢复局部语义结构来缓解误差累积。实验表明LMR在保持低计算成本的同时，显著提升了分布偏移下的鲁棒性。该方法为VLM在线部署提供了稳定高效的适配策略。",
+      "llm_tldr": "视觉语言模型在测试流上连续自适应会产生渐进偏差累积，最终导致模式崩塌。现有top-1更新还会破坏相关类别之间的局部语义几何。论文提出轻量级一步式测试时自适应框架LMR，通过保护边缘并恢复局部语义结构来缓解误差累积。实验表明LMR在保持低计算成本的同时，显著提升了分布偏移下的鲁棒性。该方法为VLM在线部署提供了稳定高效的适配策略。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.00970v1",
+      "source": "arxiv",
+      "title": "FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation",
+      "abstract": "Object-oriented aerial vision-and-language navigation (VLN) requires searching for a described target and landing on it precisely, under long-horizon and closed-loop control. Guided by a target-descriptive instruction during navigation, perceptual priorities dynamically evolve: early-stage exploration prioritizes low-frequency spatial layout, and then shifts to high-frequency target details. Existing VLN methods model the varying perceptual requirements across navigation stages with identical visual tokens, leading to interference from irrelevant objects and background clutter. To this end, we therefore formulate long-horizon aerial navigation as a frequencypreference shift from spatial structure to local detail and propose FreqNav, a lightweight frequency-routing adaptive perception framework. Under a fixed computational budget, FreqNav dynamically reallocates visual tokens across frequency components according to the current navigation stage. A Frequency Token Router selects stage-relevant visual representations from dual-view observations, while a Phase-dependent Grounding Module anchors visual evidence through explicit supervision. A Diffusion Transformer then predicts smooth trajectories for continuous control. Experiments show that FreqNav outperforms strong baselines while achieving approximately 3x faster inference. Real-world deployment further demonstrates its effectiveness, efficiency, and practical potential for long-horizon aerial autonomy.",
+      "authors": [
+        "Yin Tang",
+        "Jiawei Ma",
+        "Jiahao Li",
+        "Hao Zhang",
+        "Zhemin Sun",
+        "Jianqiao Sun",
+        "Deyu Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-02T03:49:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.00970v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "stage-wise frequency routing on visual tokens for aerial VLN, related to token-level processing and pruning in vision-language models",
+      "llm_evidence_cn": "针对空中视觉-语言导航的视觉令牌进行分阶段频率路由，涉及视觉语言模型中的令牌级处理与约简",
+      "llm_evidence": "针对空中视觉-语言导航的视觉令牌进行分阶段频率路由，涉及视觉语言模型中的令牌级处理与约简",
+      "canonical_evidence": "针对空中视觉-语言导航的视觉令牌进行分阶段频率路由，涉及视觉语言模型中的令牌级处理与约简",
+      "llm_tldr_en": "FreqNav formulates long-horizon aerial VLN as a frequency preference shift from spatial structure to local detail, and applies stage-wise frequency routing to visual tokens, reducing interference from background and improving target search and landing accuracy.",
+      "llm_tldr_cn": "长距离空中视觉-语言导航中，现有方法对不同导航阶段使用相同视觉令牌，易受无关物体与背景干扰。本文提出FreqNav，将导航过程刻画为从低频空间结构到高频目标细节的频率偏好转移，并采用分阶段频率路由动态调整视觉令牌处理。实验结果表明该方法能有效压制干扰，提升目标搜索与着陆的准确率。该工作为长时程视觉-语言导航的视觉令牌高效利用提供了新思路。",
+      "llm_tldr": "长距离空中视觉-语言导航中，现有方法对不同导航阶段使用相同视觉令牌，易受无关物体与背景干扰。本文提出FreqNav，将导航过程刻画为从低频空间结构到高频目标细节的频率偏好转移，并采用分阶段频率路由动态调整视觉令牌处理。实验结果表明该方法能有效压制干扰，提升目标搜索与着陆的准确率。该工作为长时程视觉-语言导航的视觉令牌高效利用提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
