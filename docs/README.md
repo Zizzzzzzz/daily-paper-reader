@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-09</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-10</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 4 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 16 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>2</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>2</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>9</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-09 20:47:14 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-10 21:09:47 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读4篇论文，聚焦多模态分割与边缘模型记忆两大高价值方向，速读覆盖视觉语言适配与航拍导航。最值得关注的是《Better, Stronger, Faster, and Broader》提出的结构化全掩码预测（9.0分）和《Structured Memory》的O(1)状态注入记忆方案（8.0分），前者刷新MLLM分割效率，后者为边缘设备长上下文提供新思路。建议普通读者优先精读这两篇高分工作，并留意其代码与开源资源。</p>
+<p>今日处理16篇论文，精读7篇、速读9篇，最高分为视觉Token剪枝框架（10/10）。</p>
+<p>最值得关注：AI4AI视觉Token剪枝（10分）与LLM智能体KV Cache压缩实证（9分）。</p>
+<p>建议优先精读这两篇高分论文，关注推理效率优化方向。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +73,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">2 篇</strong>
+    <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Better, Stronger, Faster, and Broader: Structured All-Mask Prediction for MLLM-Based Segmentation">Better, Stronger, Faster, and Broader: Structured All-Mask Prediction for MLLM-Based Segmentation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Structured Memory for Edge Language Models: Persistent Context and Corpus Retrieval via O(1) SSM State Injection">Structured Memory for Edge Language Models: Persistent Context and Corpus Retrieval via O(1) SSM State Injection</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="An AI4AI Framework for Visual Token Pruning">An AI4AI Framework for Visual Token Pruning</span></li><li><span class="dpr-home-dashboard-paper-title" title="Practical Online KV Cache Compaction for LLM Agents: An Empirical Study">Practical Online KV Cache Compaction for LLM Agents: An Empirical Study</span></li><li><span class="dpr-home-dashboard-paper-title" title="Learning to Predict Middle-Layer Attention in MLLMs for Visual Token Prunin">Learning to Predict Middle-Layer Attention in MLLMs for Visual Token Prunin</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +86,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">2 篇</strong>
+    <strong class="dpr-home-dashboard-count">9 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Local Margin Restoration for Test-Time Adaptation of Vision-Language Models">Local Margin Restoration for Test-Time Adaptation of Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation">FreqNav: Stage-Wise Frequency Routing for Object-Oriented Aerial Vision-Language Navigation</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection">DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection</span></li><li><span class="dpr-home-dashboard-paper-title" title="OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation">OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation</span></li><li><span class="dpr-home-dashboard-paper-title" title="When Replanning Becomes the Bottleneck: Budgeted Replanning for Embodied Agents">When Replanning Becomes the Bottleneck: Budgeted Replanning for Embodied Agents</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>4</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
 </section>
 </div>
 

@@ -1,0 +1,866 @@
+Title: Token Communication for Multimodal Large Language Model
+
+URL Source: https://arxiv.org/pdf/2608.07279v1
+
+Published Time: Mon, 10 Aug 2026 00:59:38 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> 1
+
+# Token Communication for Multimodal Large Language Model 
+
+Jingkai Ying, Graduate Student Member, IEEE, Zhijin Qin, Senior Member, IEEE, 
+
+Yuan Shen, Senior Member, IEEE, and Khaled B. Letaief, Fellow, IEEE 
+
+Abstract —With the broad success of the Transformer architec-ture, token is becoming a new basic information processing unit. This trend is especially evident in multimodal large language models (MLLMs), where both visual and textual information are represented and processed as tokens. With the rapid deployment of MLLMs, the efficient transmission of tokens has become increasingly important. This paper investigates how to reduce the amount of transmitted data during interactions with MLLMs while preserving their multimodal understanding performance. To address this problem, we propose a token communication framework tailored to MLLMs. In the proposed framework, a neural codec is integrated into the vision tokenizer to control the number of transmitted bits. At the receiver, the decoded latents are processed through two paths. The decoder reconstructs image as a reconstruction prior, while the adapter converts latents into visual tokens and injects them into an intermediate layer of the vision tokenizer. To make the injected tokens suitable for MLLMs, we further design a two-stage visual-language semantic alignment training scheme. The adapter is first warmed up by a distillation loss and then aligned with textual semantics through an alignment loss. An adaptive adapter is also introduced through feature-wise linear modulation, allowing one adapter to support multiple codec rates. Extensive simulations on various MLLM benchmarks show that, under the same amount of transmitted data, the proposed scheme achieves better task performance than other image processing schemes for MLLMs. 
+
+Index Terms —Token communication, multimodal large lan-guage models, vision-language alignment, adaptive coding. 
+
+I. I NTRODUCTION 
+
+Since the release of ChatGPT in late 2022, large language models (LLMs) have achieved remarkable progress [1], [2]. These models have demonstrated strong capabilities in logical reasoning and language understanding, achieving strong per-formance in tasks such as translation, writing, and coding. The success of LLMs has further been extended to the multimodal field. Multimodal large language models (MLLMs) enable models to process visual information and perform multimodal understanding tasks [3], [4]. Both LLMs and MLLMs are built upon the Transformer [5] architecture and therefore use tokens as their basic information processing units. With the growing applications of these large artificial intelligence (AI) models, the daily token consumption has reached the trillion scale 
+
+Jingkai Ying, Zhijin Qin and Yuan Shen are with the Department of Electronic Engineering, Tsinghua University, Beijing 100084, China, and also with the State Key Laboratory of Space Network and Communica-tions, Beijing 100084, China (e-mail: yjk23@mails.tsinghua.edu.cn; qinzhi-jin@tsinghua.edu.cn; shenyuan ee@tsinghua.edu.cn). Khaled B. Letaief is with the Department of Electronic and Computer Engineering, The Hong Kong University of Science and Technology, Hong Kong (e-mail: eekhaled@ust.hk). (a) Human Vision-oriented Reconstruction Coding (b) Machine Vision-oriented Task Coding (c) Proposed Coding Scheme for MLLMs         
+
+> Encoder MLLM Decoder
+> Human Perception
+> Encoder MLLM Decoder
+> Trainable Frozen Backpropagation Path
+> Machine Tasks
+> Bitstream
+> Encoder Decoder MLLM
+> Adapter …Visual Tokens
+
+Fig. 1: Overview of frameworks when different coding schemes are applied to MLLMs. [6]. This trend further highlights the increasing importance of tokens. Focusing on token, a new type of information unit, re-searchers in the communication society have investigated the topic of token communication [7]–[10]. These pioneering works mainly study how to exploit token representations with rich semantics and powerful pre-trained models to achieve effective and reliable communication. They focus on tasks such as classification [8] and reconstruction [7], [9], [10]. Experimental results have shown the advantages of token communication under low-rate and severe channel conditions. However, for large AI models, which are the major consumers of tokens, targeted studies on token communication for corre-sponding tasks remain limited. In this paper, we design a token communication scheme for MLLMs. The goal is to reduce the transmitted data volume required for interacting with MLLMs while preserving their performance on diverse tasks. Image compression is a major approach for reducing the number of transmitted bits. Existing image compression methods can mainly be divided into human vision-oriented reconstruction coding and machine vision-oriented task coding. Directly applying these two types of methods to MLLM-oriented compression leads to the schemes shown in Fig. 1(a) and Fig. 1(b). For the human vision-oriented scheme, it follows the existing paradigm for interacting with arXiv:2608.07279v1 [eess.SP] 7 Aug 2026 2
+
+MLLMs. Images captured by edge devices are encoded into compact bitstreams and transmitted to the cloud server. The decoder at the server reconstructs images for human perception [11], [12]. The reconstructed images are then fed into the MLLM. This scheme optimizes the representation for human vision. However, a human-perception-oriented representation is not necessarily optimal for MLLMs [13], [14]. The machine-vision-oriented scheme, commonly called coding for machines [15], can achieve more compact compression for specific machine tasks, such as classification, object detection, and semantic segmentation. However, this scheme usually requires task-specific end-to-end training, which is difficult to satisfy when MLLMs are used for general multimodal understanding tasks. Therefore, we propose a coding scheme tailored for MLLMs, as shown in Fig. 1(c). Inspired by existing studies on token communication, our scheme fully exploits powerful vision tokenizers to provide more native token representations for MLLMs. By incorporating the encoder for compression into the vision tokenizer, our approach transmits intermediate visual tokens without compromising compression efficiency. Specifically, we propose a token-based coding scheme for MLLMs. To control the number of bits transmitted through the channel, we employ an entropy model-based neural codec for bit compression. To provide informative token representations for MLLMs, the receiver uses both a decoder and an adapter to transform compression-oriented latents into pixel-domain images and feature-domain visual tokens. The compressed image serves as a reconstruction prior for subsequent visual tokens. The visual tokens converted by the adapter are injected into an intermediate layer of the vision tokenizer. This design enables the MLLM to receive suitable visual token inputs. In this information processing flow, dedicated design of the adapter is required. Because the visual tokens injected by the adapter should be semantically aligned with the corresponding textual descriptions as much as possible. For visual tokenizers based on visual-language alignment in MLLMs [16]–[18], the combination of the reconstruction prior and the adapter output is meaningful only under such alignment. Otherwise, the in-jected adapter output can degrade the quality of the final visual tokens fed into the MLLM. Therefore, we design a visual-language semantic alignment training scheme. Through a two-stage training algorithm with distillation-based initialization and Sigmoid Language-Image Pre-training (SigLIP) loss [17], learnable parameters of the adapter can be optimized. This training scheme adapts outputs of the adapter for MLLMs. In addition, we design the adapter to be adaptive to the quantization parameter (QP) of the codec. The main contributions of this paper can be summarized as follows:  
+
+> •
+
+A token communication framework is developed to provide informative visual tokens for MLLMs. In this framework, the neural codec is integrated into the vi-sion tokenizer to control the number of bits required for token transmission. At the receiver, a decoder pro-vides the reconstruction prior, while an adapter converts compression-oriented features into visual tokens and in-jects them into the vision tokenizer.  
+
+> •
+
+To improve the effectiveness of visual token injection by adapter, a visual-language semantic alignment training scheme is proposed. Based on effective extraction of visual and textual semantic features, the adapter is first warmed up with a distillation loss and then semantically aligned with the SigLIP loss.  
+
+> •
+
+A QP-adaptive adapter is introduced so that neural codecs with different QPs can share the same adapter. To this end, feature-wise linear modulation (FiLM) [19] is uti-lized in the adapter to incorporate QP. By randomly sampling QP during training, the adapter can transform latents under various QPs into suitable visual tokens. The remainder of this paper is organized as follows. Section II reviews the related work. Section III presents the framework of the proposed token communication for MLLMs. Section IV details the approach for aligning compression-oriented visual features with textual semantics. Section V provides the simulation results. Section VI concludes the paper. 
+
+Notations : For a set X , |X | denotes its cardinality. For a vector, matrix, or tensor x, ∥x∥ denotes the Euclidean norm after vectorization. For a complex-valued scalar z, |z| and 
+
+z∗ denote its modulus and complex conjugate, respectively. The operators (·)T and (·)H denote transpose and Hermitian transpose, respectively. The expectation operator is denoted by 
+
+E[·]. The Hadamard product is denoted by ⊙. The indicator function is denoted by 1(·). The notation CN (μ, Σ) denotes a complex Gaussian distribution with mean vector μ and covariance matrix Σ. The spaces of real-valued and complex-valued arrays with dimensions d1 × · · · × dK are denoted by 
+
+Rd1×···× dK and Cd1×···× dK , respectively. II. R ELATED WORK 
+
+In this section, we review the related work on token com-munication and image neural codec. 
+
+A. Token Communication 
+
+Motivated by the strong performance of Transformers across different modalities, pioneering works on token communica-tion focused on using powerful tokenizers to obtain compact and semantically rich token representations [7]. Based on these token representations, Transformer-based models can also be used at the receiver to predict lost tokens and support cross-modal auxiliary reconstruction. These capabilities demonstrate the superiority of token communication. To further improve the robustness of token indices transmitted over channels, some works have investigated unequal error protection (UEP) [9], [20]–[22]. For tokens with different levels of importance, these works adjust the quantization precision, select suitable modulation and coding scheme (MCS) [9], [20], or apply UEP channel coding [21]. Other works have studied how to characterize token importance for specific tasks and pack tokens accordingly [22]. The tokenizers used in the above works are based on vector quantization (VQ), providing discrete tokens. The indices of these tokens naturally provide compact bit representations for digital communication. This property is consistent with VQ-based semantic communication systems [23], while token communication usually relies on more powerful pre-trained 3Transmitter Receiver        
+
+> Encoder
+> 𝐸𝑛𝑐(%) 𝒙 𝒚 Q
+> 𝑞
+> AE
+> 𝝁, 𝝈 𝒚 .
+> AD
+> 𝝁, 𝝈 𝒚 .𝐷𝑒𝑐(%)
+> Decoder
+> 𝒙 .
+> Adapter LLM MLLM
+> …
+> 𝑞
+> Text Tokenizer Image Inputs Text Inputs
+> Please describe this image.
+> Vision Tokenizer
+> Block n-1 …Block n+1 Block N Block n …+…
+> 𝑻 !"# $%&
+> Trainable Frozen Bitstream QQuantization AE/AD Arithmetic Encoding / Decoding
+
+Fig. 2: The proposed token communication framework for MLLMs. After compression at the transmitter, the image is processed by the decoder and the adapter at the receiver, and the resulting outputs are fed into the MLLM. tokenizers. As a core technique in semantic communication, joint semantic-channel coding (JSCC) has also been applied to token communication [8], [14], [24]. Since JSCC can directly map the tokenizer outputs to channel symbols, these works can adopt continuous tokenizers. For MLLMs, continuous tokenizers [16]–[18] are necessary to achieve stronger multi-modal understanding performance [25]. Two very recent works [14], [24] have investigated token communication for MLLMs. These works focus on robust joint semantic-channel coding (JSCC) design and require end-to-end training involving the LLM. By contrast, this paper focuses on reducing the number of transmitted bits and designs a lightweight adapter-based training scheme with semantic alignment. 
+
+B. Image Neural Codec 
+
+For human vision-oriented reconstruction, image neural codecs replace the manually designed modules in traditional image codecs with neural networks [11], [12]. With powerful nonlinear transforms and entropy models, they have outper-formed traditional codecs such as BPG [26] and VTM [27]. Current research on neural codecs is gradually shifting from pixel-level optimization to human-perception optimization at ultra-low bitrate ( e.g. < 0.05 bits per pixel) [28], [29]. Another class of image neural codecs is designed for machine vision [15]. Since these codecs are trained for specific tasks, they can achieve more aggressive compression [30]. However, human-perception-oriented representations are not necessarily optimal for MLLMs [13], [14]. As for machine-vision-oriented coding methods, they require task-specific end-to-end training [15]. This requirement is clearly unsuitable for MLLMs, which contain billions of parameters and are expected to perform diverse multimodal understanding tasks. Studies on neural codecs for MLLMs aim to obtain visual inputs that are more suitable for MLLMs from compressed latents. A token extractor and a pre-editing network have been introduced to reduce the impact of compression-induced dis-tortion on MLLMs [31]. To introduce fewer modifications to the codec, adapter-based schemes based on semantic alignment [32] and multi-level distillation [33] have also been proposed. III. O VERVIEW OF THE PROPOSED TOKEN 
+
+COMMUNICATION FRAMEWORK FOR MLLM S
+
+In this section, we introduce the proposed token communi-cation framework, including the entire information processing flow, the function of each model and their corresponding inputs and outputs. In addition, we present the focused problem of this framework. 
+
+A. Formulation of System Models 
+
+The overall illustration of the proposed framework is pro-vided in Fig. 2. During the interaction between an edge device and a cloud-based MLLM, the edge device sends both images and text to the MLLM. For image transmission, the encoder at the transmitter converts the pixel-domain image into compression-oriented latents. To reduce the number of transmitted bits through entropy coding, the continuous latents are first quantized. At the receiver, the quantized latents are losslessly reconstructed after arithmetic decoding. The reconstructed latents are then processed by the decoder to recover a pixel-domain image and by the adapter to produce vision tokens suitable for MLLM input. The reconstructed image is fed into the vision tokenizer from the beginning. After patchification and embedding projection,, it is converted into visual tokens. The vision tokens produced by the adapter are injected into the intermediate Transformer blocks of the vision tokenizer. They are fused with the visual tokens pro-duced from the reconstructed image through addition. For text transmission, the text is also encoded and decoded. At the receiver, the decoded text is tokenized and embedded before being fed into the large model. Since this paper focuses on image transmission for MLLMs, the text transmission part is simplified in Fig. 2. In the remainder of this paper, we only discuss the image processing part. Specifically, let x ∈ RC×H×W denote the input image, where C denotes the number of color channels, and H
+
+and W denote the image height and width, respectively. At the transmitter, a deep learning (DL)-based encoder Enc( ·)4
+
+with learnable parameters θenc performs a nonlinear analysis transform as 
+
+y = Enc ( x; q, θenc ) , (1) where y ∈ RC′×H′×W ′
+
+denotes the compression-oriented latent representation. Here, q ∈ Q = {0, 1, 2, · · · } denotes the quantization parameter (QP) that controls the compressed bitrate. The proposed framework can support different types of neural codecs. For a rate-adaptive neural codec [11], q
+
+corresponds to the index of a learnable channel-wise scaling vector. For a fixed rate neural codec [12], q indicates the index of the model weights trained for a specific rate point. Subsequently, the latent representation y is quantized and then entropy-coded into a bitstream for efficient transmission. At the receiver, the received bitstream is decoded to recover the quantized latent representation ˆy. This process can be formulated as 
+
+ˆy = AD (AE (Q ( y) ; μ, σ) ; μ, σ) , (2) where Q( ·) denotes quantization, and AE( ·) and AD( ·) denote arithmetic encoding and arithmetic decoding, respectively. The variables μ and σ are the Gaussian probability model parameters of ˆy estimated by the entropy model, which can be expressed as 
+
+(μ, σ) = Φ ( y; θentropy ) , (3) where Φ( ·) denotes the entropy model with learnable param-eters θentropy . More details about the above hyperprior-based entropy estimation in neural codecs can be found in [34]. For the reconstructed latent representation ˆy, two informa-tion paths are used at the receiver. In the first path, a decoder 
+
+Dec( ·) performs a nonlinear synthesis transform to reconstruct the compressed image ˆx in the pixel domain as 
+
+ˆx = Dec ( ˆ y; q, θdec ) , (4) where θdec denotes the learnable parameters of the decoder and q is the same as in the encoding process. This path provides pixel-level information as a strong reconstruction prior for the MLLM input. Such a prior helps the MLLM handle inputs that require detailed visual content, such as posters and optical character recognition (OCR) images. In the second path, a Transformer block-based adapter 
+
+Apt( ·) with learnable parameters θapt converts the compression-oriented latent representation into visual tokens as 
+
+T apt vis = Apt ( ˆ y; q, θapt ) , (5) where T apt vis ∈ RL×D denotes the visual tokens produced by the adapter. Here, L is the number of visual tokens, and D is the dimension of token embeddings. The reconstructed image ˆx is fed into the vision tokenizer from the beginning. After patchification and linear embedding projection, it is converted into reconstructed visual tokens as 
+
+T rec ,0vis = Embed (Patch ( ˆ x) ; θemb ) , (6) where Patch( ·) denotes the patchification operation, and 
+
+Embed( ·) denotes the linear embedding projection with pa-rameters θemb . Subsequently, the reconstructed visual tokens are processed by the first n − 1 Transformer blocks Vi(·) with parameters θVi of the vision tokenizer: 
+
+T rec ,i  
+
+> vis
+
+= Vi
+
+
+
+T rec ,i −1vis ; θVi
+
+
+
+, i = 1 , · · · , n − 1. (7) The adapter-produced visual tokens are injected into the inter-mediate layer and fused with the visual tokens produced from the reconstruction prior by addition: 
+
+Tvis = Vn:NV
+
+
+
+T rec ,n −1vis + αT apt vis ; θVn:NV
+
+
+
+, (8) where Vn:NV (·) denotes the remaining Transformer blocks from the n-th block to the final block and θVn:NV denotes their model parameters. The scalar α is a hyper-parameter that controls the strength of the adapter-based token injection. After proper semantic alignment during training, the adapter can provide semantically informative visual inputs for the MLLM. This design is especially useful in the low-rate region, where the reconstructed image has lost substantial visual information. Finally, the visual tokens Tvis and the text tokens Ttext are concatenated and processed by LLM for autoregressive next-token prediction: 
+
+p (s | Tvis , Ttext ) = 
+
+> T
+
+Y
+
+> t=1
+
+p (st | s<t , Tvis , Ttext ; θLLM ) , (9) where s = {st}Tt=1 denotes the output token sequence with length T . Here, p(·) denotes the conditional token distribution. In summary, the proposed token communication framework effectively combines an image neural codec with the vision tokenizer of an MLLM. In this framework, the original vision tokenizer, the codec, and the adapter can be viewed as an enlarged vision tokenizer. The channel separates this enlarged tokenizer into transmitter-side and receiver-side components. The transmitter outputs intermediate features of the vision tokenizer, while the codec controls the number of transmitted bits. Different from VQ-based token communication schemes, the proposed framework avoids deploying the entire large vision tokenizer for MLLMs on the edge device. 
+
+B. Task Description 
+
+Because MLLMs are trained with original images, the reconstructed images after compression do not necessarily provide the most suitable tokens for MLLMs. Therefore, the problem considered in this paper is how to obtain visual representations that are more suitable for MLLMs than recon-structed images under a limited number of bits or channel sym-bols. These representations are expected to support MLLMs in completing multimodal understanding tasks. The quality of the visual tokens provided to the MLLM is evaluated by the task performance of the MLLM under the same compression ratio. In general, the performance achieved by the original image input provides an upper bound for this evaluation. Under the assumption of perfect transmission, only source compression needs to be considered. The compression ratio can be measured by bits per pixel (bpp), which is defined as 
+
+bpp = BH × W , (10) 5
+
+where B denotes the length of the compressed bitstream, and 
+
+H × W denotes the number of pixels in the input image. When wireless transmission is considered, channel coding and modulation are further required. Let Rc = k/n denote the channel coding rate, where k is the number of information bits and n is the number of coded bits. For M -ary modulation, each modulation symbol carries log 2 M bits. Therefore, the number of channel symbols required for transmitting the compressed bitstream is given by 
+
+Nch = BRc × log 2 M . (11) The compression ratio can then be measured by the channel bandwidth ratio (CBR) [35], which is defined as 
+
+CBR = Nch 
+
+C × H × W = bpp 
+
+C × Rc × log 2 M . (12) For wireless transmission, we consider the Rayleigh fading channel. Let z ∈ CNch denote the modulated symbol vector after channel coding and modulation. The received symbols are given by 
+
+r = h · z + n, (13) where h denotes the channel gain of Rayleigh fading, and 
+
+n denotes the additive complex Gaussian noise. Here, the channel gain follows h ∼ CN (0 , 1) , and the noise follows 
+
+n ∼ CN (0, σ 2
+
+> n
+
+I). σ2 
+
+> n
+
+denotes the noise power and I denotes the identity matrix. The received signal power is calculated as 
+
+Psignal =
+
+E
+
+h
+
+∥h · z∥2i
+
+Nch 
+
+. (14) Therefore, the signal-to-noise ratio (SNR) in decibels can be defined as 
+
+SNR = 10 log 10 
+
+Psignal 
+
+σ2
+
+> n
+
+. (15) At the receiver, zero-forcing (ZF) equalization is applied to compensate for the channel fading: 
+
+ˆz = h∗
+
+|h|2 · r, (16) where ˆz denotes the equalized symbol vector. The equalized symbols are then demodulated and channel-decoded to recover the received bitstream. With the above definitions, the considered problem can be expressed as maximizing the MLLM task performance under a rate constraint: 
+
+max  
+
+> Θ
+
+PMLLM (Θ) , (17) 
+
+s. t. bpp ≤ R or CBR ≤ ρ, SNR = γ. (18) 
+
+Θ denotes parameters of the neural codec and adapter in proposed framework. PMLLM (·) denotes the task performance of the MLLM. R, ρ and γ are the specific bpp, CBR, and SNR constraints, respectively. It should be noted that the multimodal understanding tasks refer to tasks where MLLMs receive image-text inputs and generate textual answers according to the text prompt and the image content. The output of the MLLM is text only. Image generation tasks, where large AI models output images, are completed by image generation models [36], or unified MLLMs [25], rather than MLLMs. Such tasks are beyond the scope of this paper. IV. M ODEL DESIGN AND TRAINING SCHEME 
+
+This section presents the architecture design of the proposed adapter first. The training methods for the neural codec and the adapter are then introduced. The neural codec is trained independently based on the classical rate-distortion loss. The adapter is trained based on effective semantic feature extrac-tion for text and images, together with a two-staged semantic alignment loss. 
+
+A. Adapter Architecture Design 
+
+In this paper, the receiver needs to convert the compression-oriented latent representation ˆy ∈ RC′×H′×W ′
+
+into visual token representations T apt vis ∈ RL×D suitable for MLLMs. The proposed adapter performs this conversion through a patchification operation and a Vision Transformer block. To adapt the adapter to different QPs of the image neural codec, the FiLM module can be further introduced to incorporate the QP information. The architecture of the proposed adapter is shown in Fig. 3. The only difference between the QP-adaptive adapter and the QP-fixed adapter is whether the FiLM module is used. Therefore, the following description focuses on the QP-adaptive adapter. The patchification operation first converts the two-dimensional (2D) grid feature ˆy produced by the convolutional neural network (CNN)-based codec into a one-dimensional (1D) token sequence. Specifically, each spatial grid is treated as one patch and the patchified visual tokens are obtained by 
+
+T pat vis = Linear pat (Reshape ( ˆ y) ; θpat ) , (19) where Reshape( ·) converts ˆy ∈ RC′×H′×W ′
+
+into a latent sequence in RL×C′
+
+. Linear pat (·) maps the latent dimension 
+
+C′ to the hidden dimension D of the vision tokenizer. θpat 
+
+denotes the learnable parameters of this linear projection. The output T pat vis ∈ RL×D denotes the visual token sequence after patchification, where L = H′ × W ′ is the number of visual tokens corresponding to the input image. The FiLM module fuses the QP information with the patchified visual token sequence. For a given QP index q, the QP-dependent modulation parameters are generated as 
+
+[αq , βq ] = Linear qp (SiLU (Emb qp [q]) ; θqp ) , (20) where Emb qp [q] ∈ R1×D denotes the embedding vector indexed by q from the learnable QP embedding table. Here, 
+
+SiLU( ·) denotes the sigmoid linear unit (SiLU) activation. The operator Linear qp (·) maps the QP embedding to a 2D-dimensional vector, which is split into the QP-dependent scaling and shifting parameters αq , βq ∈ R1×D.Based on αq , βq , FiLM-modulated visual tokens can be obtained by 
+
+T FiLM vis = T pat vis ⊙ (1L (1D + αq )) + 1Lβq , (21) 6𝐻 ’       
+
+> 𝑊 ’𝐶 ’
+> (𝐿, 𝐷) 𝐷 𝐿
+> Patchification FiLM
+> 𝑞 PE
+> 𝐻, 𝑊
+> Layer Norm Multi-head Attention Feed Forward View( 𝐶 ’,-1) Permute(1,0) Linear
+> +
+> QP-adaptive Adapter
+> 𝒚 ,
+> Layer Norm Vision Transformer Block RoPE
+> ++𝑻 "#$ %&'
+> Patchification
+> (𝐶 ’, 𝐻 ’, 𝑊 ’)
+> FiLM
+> 012
+> 𝑞
+> … Linear [𝜶 (, 𝜷 (]𝑻 "#$ &%' 2 (1 + 𝜶) + 𝜷 𝑻 "#$ &%' 𝑻 "#$ )#*+
+> index
+> SiLU
+> 𝐷
+> …
+
+Fig. 3: The model architecture of proposed QP-adaptive adapter. It mainly consists of the patchification module, the FiLM module, and the Vision Transformer block. The dashed border of the FiLM block indicates that this module can be skipped. In this case, the adapter converts latents into visual tokens for a fixed QP. where T FiLM vis ∈ RL×D denotes the output of the FiLM module. Here, 1L ∈ RL×1 and 1D ∈ R1×D are the all-one vectors. With the FiLM module, the same adapter can be used for different QPs during inference. The receiver only needs to provide the current QP index to the adapter. For a QP-fixed adapter, the FiLM module is skipped, namely T FiLM vis = T pat vis .To improve the quality of the one-dimensional visual token sequence while controlling the model complexity, we use only one Vision Transformer block in the adapter. At the beginning of the block, positional encoding (PE) is added to the FiLM-modulated tokens: 
+
+T 0vis = T FiLM vis + EPE (H′, W ′) , (22) where EPE (H′, W ′) ∈ RL×D denotes the interpolated posi-tional embedding. Rotary position embedding (RoPE) [37] is further used in the multi-head attention module to encode 2D spatial positions. Different from the learnable PE, RoPE does not introduce additional learnable parameters. In the multi-head attention module, it is applied to the query and key vectors before computing the attention scores. Finally, the Vision Transformer block can be formulated as 
+
+¯Tvis = T 0vis + MHA  LN  T 0vis 
+
+ ; CRoPE , SRoPE , θattn 
+
+ ,
+
+(23) 
+
+T apt vis = ¯Tvis + FFN  LN   ¯Tvis 
+
+ ; θffn 
+
+ , (24) where LN( ·) denotes layer normalization, MHA( ·) denotes multi-head attention, and FFN( ·) denotes the feed-forward network based on multilayer perceptron. The parameters θattn 
+
+and θffn are learnable parameters. CRoPE and SRoPE denote the cosine and sine components used in RoPE. 
+
+B. Training Scheme for the Neural Codec 
+
+We now introduce the training scheme in this paper. For the framework presented in Section III, the trainable components include the image neural codec and the adapter. The image neural codec consists of the encoder at the transmitter, the decoder at the receiver, and the entropy model required for entropy coding. The image neural codec and the adapter are trained separately. In this subsection, we first introduce the training scheme for the image neural codec. For the image neural codec, we follow the widely used rate-distortion optimization strategy in neural image compression [11], [12], [34]. The training objective is defined as 
+
+Lcodec = R ( ˆ y) + λrd D (x, ˆx) , (25) where R( ˆ y) denotes the rate term. It measures the number of bits required to entropy-code the quantized latent symbols 
+
+ˆy. The distortion between the original image and the recon-structed image is denoted by D(x, ˆx). The coefficient λrd 
+
+controls the tradeoff between rate and distortion. In hyperprior-based entropy modeling, the rate term is commonly estimated as 
+
+R ( ˆ y) = Ex∼px
+
+− log 2 Pˆy| ˆz ( ˆ y | ˆz) − log 2 Pˆz ( ˆ z) , (26) where px denotes the distribution of training images. The variable ˆz denotes the quantized hyperprior. It is obtained by applying the hyper-analysis transform in the entropy model Φ( · ; θentropy ) to y and then performing quantization. The conditional probability pˆy| ˆz ( ˆ y | ˆz) and the hyperprior probability pˆz ( ˆ z) are estimated by the entropy model [34]. Therefore, the expected coding length of the quantized latents can be computed during training. The distortion term D(x, ˆx) can be implemented by the mean squared error (MSE), the absolute error, or other percep-tual losses based on reconstruction requirements. In this paper, we adopt the MSE loss. The reason is that the reconstructed image at the receiver is used as a reconstruction prior for the MLLM. Thus, it is expected to preserve texture and structural details from the original image. Such pixel-level information can better complement the visual tokens produced by the semantically aligned adapter. 
+
+C. Training Scheme for the Adapter 
+
+This subsection introduces the training scheme for the adapter. As shown in Fig. 4, the proposed scheme consists 7Adapter 𝐻 ’  
+
+> 𝑊 ’𝐶 ’
+> 𝐷 𝐿
+> Visual Tokens
+> Multi-head Attention
+> Key Value learnable query
+> (1, 𝐷)
+> Visual Semantics <Class Name> Index Class Labels
+
+{∙}                  
+
+> 'a bad photo of a {}.', 'a photo of many {}.', 'a photo of the {}.', …Text Encoder …Average Pooling
+> Text Embedding Table Preparation
+> Apply Text Templates
+> …
+> Utilize EOS Embedding Text Embedding <Class ID> 012Traverse Class ID
+> ……
+> Embedding Table
+> Training Phase for Adapter
+> 𝐷 𝐸𝑛𝑐(-)
+> Original Image
+> 𝐷𝑒𝑐(-)
+> Image Neural Codec
+> Vision Tokenizer
+> Reconstructed Image
+> 𝑞
+> (1, 𝐷)
+> Vision Tokenizer
+> ℒ"#$%#&&
+> Stage1:
+> <Class ID> 101 525 67 59 22 59 101 525 67 59 22 59 +1 +1 +1 +1 +1 +1 +1 +1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 012……
+> Embedding Table
+> (1, 𝐷)
+> Textual Semantics
+> ℒ$#'&#(
+> Stage2:
+> +1 Matched -1 Unmatched ID ID Visual Semantics Textual Semantics
+
+Fig. 4: The illustration of proposed training scheme for adapter. Before adapter training, a text embedding table is first prepared. This table allows the corresponding textual semantic feature to be indexed by the class ID of each image during training. The adapter is then trained in two stages. In the first stage, a distillation-based loss function is adopted. In the second stage, a SigLIP-based loss is used for semantic alignment. of a text embedding table preparation process and a two-stage adapter training process. Before training the adapter, a text embedding table is constructed to provide textual semantic features for different image classes. During adapter training, the first stage uses a distillation loss to align the intermediate output of the vision tokenizer. The second stage uses asemantic alignment loss based on SigLIP to align the visual semantics with the corresponding textual semantics. In the whole training process, the image neural codec, the vision tokenizer, and the text encoder are frozen, and only the adapter and the attention pooling head are optimized. For text embedding table preparation, we denote C =
+
+{0, 1, · · · , N cls − 1} as the set of class IDs in the training dataset. For the c-th class, its class name is inserted into M
+
+text templates to generate a set of textual descriptions for this class of images as 
+
+Sc = {smc = Temp m (Label( c)) }Mm=1 , (27) where Label( c) denotes the class name of class c, and 
+
+Temp m(·) denotes the m-th text template. These textual descriptions are fed into the text encoder paired with the continuous vision tokenizer used by the MLLM. For each description smc , the text encoder produces a sequence of text token embeddings: 
+
+Gmc = TextEnc ( smc ; θtext ) ∈ RLtext ×D , (28) where θtext denotes the parameters of the frozen text encoder, and Ltext denotes the text token sequence length. We use the embedding corresponding to the end-of-sequence (EOS) token as the semantic embedding of this description: 
+
+gmc = Norm ( Gmc [EOS]) ∈ R1×D , (29) where Norm( ·) denotes ℓ2 normalization. The text embedding of class c is obtained by average pooling over all template-based descriptions: 
+
+tc = Norm 1
+
+M
+
+> M
+
+X
+
+> m=1
+
+gmc
+
+!
+
+∈ R1×D . (30) By traversing all classes in the training dataset, the text embedding table is constructed as 
+
+Etext = tT 
+
+> 0
+
+, tT 
+
+> 1
+
+, · · · , tTNcls −1
+
+T ∈ RNcls ×D . (31) During adapter training, the textual semantic feature corre-sponding to an image with class ID ci can be directly obtained by indexing Etext [ci].For adapter training, in the first training stage, we use a distillation loss to warm up the adapter. For an input image xi,the frozen neural codec produces the quantized latent represen-tation ˆyi and the reconstructed image ˆxi. The reconstructed image is fed into the vision tokenizer and processed by the first n − 1 Transformer blocks to obtain 
+
+T rec ,n −1vis ,i = V1: n−1
+
+ Tok vis ( ˆ xi) ; θV1: n−1
+
+ , (32) where Tok vis (·) denotes the patchification and embedding projection of the vision tokenizer, and V1: n−1(·) denotes the first n−1 Transformer blocks. Meanwhile, the adapter converts 
+
+ˆyi into visual tokens T apt vis ,i . The two token sequences are fused by addition: 
+
+T fuse ,n −1vis ,i = T rec ,n −1vis ,i + αT apt vis ,i , (33) where α controls the injection strength of the adapter output. The original image is also processed by the same frozen vision tokenizer to provide the distillation target: 
+
+T ori ,n −1vis ,i = V1: n−1
+
+ Tok vis (xi) ; θV1: n−1
+
+ . (34) 8
+
+Algorithm 1 Training the Proposed Adapter  
+
+> 1:
+
+Input: Training dataset D = {(xi, c i)}, trained neural codec θ∗
+
+> enc
+
+, θ∗
+
+> dec
+
+, θ∗
+
+> entropy
+
+, text embedding table Etext ,QP index q, training steps Ndis and Nalign . 
+
+> 2:
+
+Output: Trained adapter parameters θ∗
+
+> apt
+
+(q). 
+
+> 3:
+
+Initialization: Initialize adapter θ∗
+
+> apt
+
+(q), pooling head 
+
+θ∗
+
+> pool
+
+(q), and SigLIP parameters τ ∗ and b∗. 
+
+> 4:
+
+Stage 1: Distillation Warm-up  
+
+> 5:
+
+for i ← 1 to Ndis do  
+
+> 6:
+
+Sample a mini-batch B from D. 
+
+> 7:
+
+Obtain ˆy, ˆx, T apt vis , T rec ,n −1vis , and T ori ,n −1vis under q. 
+
+> 8:
+
+Compute T fuse ,n −1vis by (33).  
+
+> 9:
+
+Compute Ldistill by (35).  
+
+> 10:
+
+Update θapt (q) based on Ldistill . 
+
+> 11:
+
+end for  
+
+> 12:
+
+Stage 2: Semantic Alignment  
+
+> 13:
+
+for i ← 1 to Nalign do  
+
+> 14:
+
+Compute Ldistill following Stage 1.  
+
+> 15:
+
+Extract visual semantic features vi by (37).  
+
+> 16:
+
+Index textual semantic features by (38).  
+
+> 17:
+
+Compute LSigLIP by (44).  
+
+> 18:
+
+Update θapt (q), θpool (q), τ , b based on Ldistill +
+
+λalign LSigLIP . 
+
+> 19:
+
+end for 
+
+The stage-one distillation loss is defined as 
+
+Ldistill = 1
+
+|B| LD 
+
+X
+
+> i∈B
+
+T fuse ,n −1vis ,i − sg 
+
+
+
+T ori ,n −1vis ,i 
+
+ 2
+
+, (35) where B denotes a mini-batch, |B| denotes the batch size, and 
+
+sg( ·) denotes the stop-gradient operation. This loss encourages the injected visual tokens to compensate for the information loss caused by compression at the intermediate layer of the vision tokenizer. In the second training stage, semantic alignment is per-formed between the visual semantics and the textual semantics. The fused intermediate tokens are further processed by the remaining Transformer blocks of the frozen vision tokenizer: 
+
+T out vis ,i = Vn:NV
+
+
+
+T fuse ,n −1vis ,i ; θVn:NV
+
+
+
+, (36) where Vn:NV (·) denotes the Transformer blocks from the n-th block to the final block of the vision tokenizer. A learnable query is then used to aggregate the visual token sequence into a visual semantic feature through attention pooling: 
+
+vi = Norm  MHA pool 
+
+ qpool , T out vis ,i , T out vis ,i ; θpool 
+
+ , (37) where qpool ∈ R1×D is a learnable query, and MHA pool (·)
+
+denotes the multi-head attention pooling module. Here, qpool 
+
+is the query of the attention pooling module, while T out vis ,i is used as both the key and value. The textual semantic feature of image xi with class ID ci is indexed from the prepared text embedding table: 
+
+ui = Etext [ci]. (38) Based on the above formulation, we build the proposed semantic alignment loss. For a pair of visual and textual semantic features, the goal is to increase the similarity of matched pairs and decrease the similarity of unmatched pairs. Let ℓij denote the similarity logit between the visual semantic feature vi and the textual semantic feature uj . For a binary matching label mij ∈ { 0, 1}, the standard binary cross-entropy loss can be written as 
+
+Lij  
+
+> BCE
+
+= −mij log σ (ℓij ) − (1 − mij ) log (1 − σ (ℓij )) ,
+
+(39) where σ(·) denotes the sigmoid function. To express matched and unmatched pairs in a unified form, we convert the binary label mij ∈ { 0, 1} into a signed label zij ∈ { +1 , −1}:
+
+zij = 2 mij − 1. (40) Here, zij = +1 denotes a matched image-text pair, and zij =
+
+−1 denotes an unmatched pair. With this signed label, the binary loss can be equivalently written as 
+
+Lij  
+
+> binary
+
+= − log σ (zij ℓij ) . (41) This form gives − log σ(ℓij ) for matched pairs and 
+
+− log σ(−ℓij ) for unmatched pairs. The equivalence for matched pairs is straightforward. For unmatched pairs, it can be proved that σ(−ℓij ) = 1 − σ(ℓij ).To step further, we calculate the similarity logit as 
+
+ℓij = τ viuTj + b, (42) where τ and b are learnable scale and bias, respectively. Different from the original pairwise setting that only treats diagonal image-text pairs as positives [17], images and text features with the same class ID are treated as positives in our implementation, which means 
+
+zij = 2 · 1 (ci = cj ) − 1. (43) Therefore, the proposed SigLIP loss over the mini-batch is formulated as 
+
+LSigLIP = − 1
+
+|B| 
+
+> |B|
+
+X
+
+> i=1
+> |B|
+
+X
+
+> j=1
+
+log σ  zij 
+
+ τ viuTj + b . (44) Although the second stage primarily targets semantic align-ment, its total objective still retains the distillation term to prevent undesired drift in the adapter parameters: 
+
+Lstage2 = Ldistill + λalign LSigLIP , (45) where λalign controls the strength of semantic alignment. For a fixed quantization QP, the above two-stage training scheme gives a QP-fixed adapter. That is, each QP of the neural codec corresponds to one fixed-QP adapter. The training process is concluded in Algorithm 1. For the QP-adaptive adapter, training from scratch is unnecessary. We initialize it with the fixed-QP adapter trained at a middle-rate point within the available QP range. During QP-adaptive training, one QP is randomly sampled for each image in the mini-batch. The sampled QP qi is used by both the neural codec and the FiLM-based adapter. It is worthy to note that the original image branch and the attention pooling head are only used during training. They are not required during inference. During inference, the receiver only needs the reconstructed image, the decoded latent representation, the current QP, and the trained adapter to produce visual tokens for the MLLM. 9
+
+V. S IMULATION RESULTS 
+
+This section presents the detailed simulation settings, in-cluding the adopted image neural codec, MLLMs, training dataset, and evaluation benchmarks. In addition, detailed per-formance curves, visualization results, and the corresponding analyses are provided. 
+
+A. Simulation Settings 1) Training Settings: For the image neural codec, we construct the training dataset by combining high-resolution images from ImageNet whose height and width are both larger than 500 pixels with the DIV2K and Flickr2K datasets. During training, each image is randomly cropped into a 256 × 256 
+
+patch. Two neural codecs, namely DCVC-RT [11] and ELIC [12] are trained. The batch size is set to 16 . The training process is divided into two stages. In the first stage, the straight-through estimator (STE) is used to approximate the quantization process, and the learning rate is set to 1 × 10 −5.After the loss converges, the second stage uses additive uniform noise to approximate the quantization process with learning rate 1 × 10 −6. Other training details follow the original settings [11], [12]. It is worth noting that the official checkpoint of DCVC-RT cannot be directly used because it is trained with images in the YUV format, which is incompatible with the vision tokenizers commonly used by MLLMs. For the adapter, we use the complete ImageNet training dataset. During training, we resize each image while preserv-ing its original aspect ratio so that the shorter side becomes 
+
+256 pixels. Then, the center 256 × 256 region of the resized image is cropped. To reduce the training time of each epoch, the whole training set is randomly divided into 12 subsets, and these subsets are used cyclically during training. The batch size is set to 256 , and the learning rate is set to 1 × 10 −4. The Adam optimizer is used with the weight decay set to 0. λalign 
+
+follows a ramp-up schedule. Specifically, it is set to 0 before the third epoch, linearly increased from 0 to 10 −3 between the third and tenth epochs, and fixed at 10 −3 afterward. The initial values of the learnable SigLIP parameters τ and b are set to 10 and −10 , respectively, following [17]. The visual tokens produced by the adapter are injected into the input of the third block of the vision tokenizer. The injection strength α
+
+is set to 0.1. As for the construction of text embedding table in adapter training, the text encoder is selected according to the MLLM used in the pipeline. When Qwen3-VL [4] is used as the MLLM, the text encoder corresponding to SigLIP2 [18] is used to extract textual semantic features. If LLaMA-Adapter [38] is used as the MLLM, the text encoder of Contrastive Language-Image Pretraining (CLIP) [16] is selected to extract textual semantic features. 
+
+2) Testing Settings: We evaluate the proposed scheme and the baseline methods on four MLLM benchmarks, including MME [39], POPE [40], SeedBench [41], and COCO Caption [42], to comprehensively assess the performance of MLLMs under different image processing schemes. For POPE, we use the COCO-POPE popular setting. For COCO Caption, we use the Karpathy test split for evaluation. For clarity in the following performance analysis, we briefly introduce different image processing schemes for MLLMs and define their notations as follows:  
+
+> •
+
+Uncompressed : The original images are directly fed into the MLLM. This scheme usually provides the upper bound of the performance achieved by different image processing schemes on various benchmarks.  
+
+> •
+
+A-ImageTC : The proposed Adapter-based Image Token Communication (A-ImageTC) scheme. It effectively in-jects visual tokens into the reconstruction prior through the adapter. Unless otherwise specified, the codec used by A-ImageTC is DCVC-RT. The variants of A-ImageTC are specified when they are discussed.  
+
+> •
+
+Recon : The reconstruction-based scheme, which is also the common paradigm used in current MLLM inter-actions. In this scheme, images are compressed at the transmitter and reconstructed at the receiver before being fed into the MLLM.  
+
+> •
+
+Bridge : An MLLM-oriented coding scheme that uses cross-entropy (CE) loss for semantic alignment and con-tains only the adapter branch at the receiver [32]. It should be noted that, when Qwen3-VL is used, our reproduction shows that its original training method cannot converge. Therefore, in the experiments related to Qwen3-VL, we keep its loss function, but adopt the proposed architecture with a reconstruction prior and use the attention pooling head to extract visual features. 
+
+B. Performance Analysis 1) Performance of Proposed Schemes: Fig. 5 shows the MLLM performance of different image processing schemes under different BPP. For Qwen3-VL-8B, the proposed A-ImageTC with DCVC-RT and its QP-adaptive variant achieve better performance than the reconstruction-based schemes and Bridge on most benchmarks and rate points. The advantage is especially clear in the low-BPP region. This demonstrates that directly optimizing the reconstructed image for human perception is not always sufficient for MLLM-oriented trans-mission. By injecting adapter-generated visual tokens into the vision tokenizer, A-ImageTC can provide more informative visual representations for MLLM inference. Fig. 5a also verifies the compatibility of the proposed framework with different neural codecs. When ELIC is used as the image neural codec, A-ImageTC still outperforms the corresponding reconstruction-based baselines. For SeedBench, A-ImageTC with ELIC shows a slight performance drop in the high-BPP region. This may be caused by the limited capacity of ELIC latent representation. Nevertheless, it still maintains a clear advantage in the low-BPP region. The results with Qwen3-VL-32B in Fig. 5b further validate the generality of the proposed scheme. With the same A-ImageTC framework, increasing the scale of the MLLM generally improves the performance on MME, POPE, and SeedBench. This indicates that the visual tokens produced by the proposed framework can be effectively used by stronger MLLMs. An exception is observed on COCO Caption, where 10 0.05 0.10 0.15 0.20 0.25 
+
+BPP 
+
+> 1700 1750 1800 1850 1900 1950 2000 2050
+> total_score ↑
+
+MME     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.74 0.76 0.78 0.80 0.82 0.84
+> accuracy ↑
+
+POPE     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74
+> accuracy ↑
+
+SeedBench     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.55 0.60 0.65 0.70 0.75
+> CIDEr ↑
+
+COCO Caption 
+
+Uncompressed A-ImageTC (Adaptive) A-ImageTC (DCVC-RT) A-ImageTC (ELIC) Bridge Recon (DCVC-RT) Recon (ELIC) 
+
+(a) Qwen3-VL-8B 0.05 0.10 0.15 0.20 0.25 
+
+BPP 
+
+> 1750 1800 1850 1900 1950 2000 2050 2100
+> total_score ↑
+
+MME     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.74 0.76 0.78 0.80 0.82 0.84
+> accuracy ↑
+
+POPE     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.68 0.70 0.72 0.74 0.76
+> accuracy ↑
+
+SeedBench     
+
+> 0.05 0.10 0.15 0.20 0.25
+
+BPP 
+
+> 0.44 0.46 0.48 0.50 0.52 0.54 0.56 0.58 0.60
+> CIDEr ↑
+
+COCO Caption 
+
+(b) Qwen3-VL-32B 
+
+Fig. 5: Performance of different image processing schemes versus BPP on various MLLM benchmarks. (a) The results with Qwen3-VL-8B. (b) The results with Qwen3-VL-32B. 8B Uncompressed 
+
+A well-stocked refrigerator filled with various food items and drinks. 
+
+32B Uncompressed 
+
+A refrigerator filled with dairy products, meats, and packaged foods stands open, revealing its contents. 
+
+GT 
+
+A clear refrigerator is stocked up with food. 
+
+32B A-ImageTC 
+
+A double-door refrigerator filled with various packaged foods and drinks stands in a store. 
+
+Fig. 6: Qualitative example explaining the COCO Caption results for the Qwen3-VL 32B and Qwen3-VL-8B models. Qwen3-VL-32B obtains lower CIDEr scores than Qwen3-VL-8B. This phenomenon is counter-intuitive. Moreover, A-ImageTC even surpasses the uncompressed image input on COCO Caption with Qwen3-VL-32B. To better understand this observation, we further visual-ize representative captioning outputs in Fig. 6. The caption generated by Qwen3-VL-32B with the uncompressed image contains more detailed descriptions than that generated by Qwen3-VL-8B. However, the ground-truth caption in COCO Caption is usually concise and focuses only on the most salient objects. Since CIDEr measures the similarity between generated captions and reference captions based on weighted n-gram matching, a more detailed caption does not necessarily obtain a higher score. In the shown example, the output of Qwen3-VL-32B with A-ImageTC is closer to the ground-truth caption than the output with the uncompressed image. There-fore, the higher CIDEr score of A-ImageTC does not imply 0.05 0.10 0.15 0.20 0.25             
+
+> BPP
+> 1750 1800 1850 1900 1950 2000 2050
+> total_score ↑
+> MME
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.74 0.76 0.78 0.80 0.82 0.84
+> accuracy ↑
+> POPE
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.66 0.67 0.68 0.69 0.70 0.71 0.72 0.73 0.74
+> accuracy ↑
+> SeedBench
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.57 0.60 0.63 0.66 0.69 0.72 0.75 0.78
+> CIDEr ↑
+> COCO Caption
+> Qwen3VL (Uncompressed) Train at QP=0 Adaptive adapter Train at QP=2 Train at test QP Train at QP=4
+
+Fig. 7: Performance comparison of QP-adaptive adapter and QP-fixed adapters on various MLLM benchmarks. that compression improves the intrinsic visual understanding ability of the MLLM. Fig. 7 evaluates the performance of the proposed QP-adaptive adapter. It can be observed that, after adaptive training with the FiLM module, a single adapter can effectively convert compression-oriented latents under different QPs into suitable visual tokens. The QP-adaptive adapter achieves performance comparable to QP-fixed adapters trained at the corresponding test QPs. It even shows a slight advantage on SeedBench, indicating that training across multiple QPs can improve the 11 0.05 0.10 0.15 0.20 0.25             
+
+> BPP
+> 1700 1750 1800 1850 1900 1950 2000 2050
+> total_score ↑
+> MME
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.74 0.76 0.78 0.80 0.82 0.84
+> accuracy ↑
+> POPE
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.66 0.68 0.70 0.72 0.74
+> accuracy ↑
+> SeedBench
+> 0.05 0.10 0.15 0.20 0.25
+> BPP
+> 0.55 0.60 0.65 0.70 0.75
+> CIDEr ↑
+> COCO Caption
+> Uncompressed Recon (VQ) A-ImageTC (VQ) Recon (UQ+EC) A-ImageTC (UQ+EC)
+
+Fig. 8: Performance comparison between the proposed scheme and VQ-based token communication methods. robustness of visual token adaptation. Fig. 7 also compares adapters trained at a fixed QP and tested under different QPs. When the test QP deviates from the training QP, clear performance degradation can be observed. This degradation is especially severe when the adapter trained at QP = 0 or QP = 4 is applied to other rates. This result indicates that the distribution of compression-oriented latents changes with QP, and a fixed-QP adapter cannot consistently handle such distri-bution shifts. By incorporating QP information through FiLM, the proposed QP-adaptive adapter alleviates this mismatch and enables one adapter to support multiple codec rates. Fig. 8 compares the proposed scheme with VQ-based coding methods. VQ has been widely adopted in token commu-nication because it produces discrete tokens whose indices naturally provide compact bit representations. It can generate images with strong perceptual quality at very low bitrates. In this experiment, we use a VQ-based scheme optimized for perceptual quality [29]. It can be observed that Recon (VQ) performs better than Recon (UQ+EC) and A-ImageTC (UQ+EC) on POPE and SeedBench. Here, the suffix UQ denotes uniform quantization, and EC denotes entropy cod-ing. This result indicates that perceptual-oriented optimization can benefit MLLM-oriented tasks when the reconstruction preserves task-relevant visual semantics. However, VQ can also be integrated into the proposed A-ImageTC framework as a neural codec. It is shown that A-ImageTC (VQ) further improves the performance of Recon (VQ). This verifies that the proposed adapter-based token injection is complementary to current VQ-based token communication schemes. 
+
+2) Validation on another MLLM: To further validate the generality of the proposed method, we conduct experiments with LLaMA-Adapter as the MLLM. LLaMA-Adapter differs from Qwen3-VL in both the vision tokenizer and the LLM backbone. Since LLaMA-Adapter is finetuned on specific MLLM visual understanding tasks, we only evaluate the COCO Caption performance in this experiment. As shown in Fig. 9, the proposed A-ImageTC still achieves 0.05 0.10 0.15 0.20 0.25 
+
+> BPP
+> 0.8 0.9 1.0 1.1 1.2
+> CIDEr ↑
+> COCO Caption
+> Uncompressed A-ImageTC Bridge (d1) Bridge (d2) Bridge (d3) Recon
+
+Fig. 9: Performance on the COCO Caption task when LLaMA-Adapter is used as the MLLM in the pipeline. 0.020 0.050 0.080 0.110 0.140 
+
+> CBR
+> 1700 1750 1800 1850 1900 1950 2000 2050
+> total_score ↑
+> MME
+> A-ImageTC, SNR=10dB Bridge, SNR=10dB Recon, SNR=10dB A-ImageTC, SNR=0dB Bridge, SNR=0dB Recon, SNR=0dB
+
+(a) CBR versus MME score 0 2 4 6 8 10  
+
+> SNR (dB)
+> 1700 1750 1800 1850 1900 1950 2000 2050
+> total_score ↑
+> MME
+> A-ImageTC Bridge Recon
+
+(b) SNR versus MME score 
+
+Fig. 10: MME score of different image processing schemes over Rayleigh fading channels. a clear advantage over the reconstruction-based scheme and achieves performance comparable to Bridge (d3) across differ-ent BPP values. This result indicates that the proposed adapter-based token injection is not limited to Qwen3-VL. 
+
+3) Simulation for Wireless Transmission: We further eval-uate the proposed scheme under wireless transmission. A Rayleigh fading channel is considered, and perfect channel state information (CSI) is assumed to be available for the equalizer. Since the image is compressed into a bitstream by the neural codec, a classical separated digital transmission pipeline can be adopted. Specifically, low-density parity-check (LDPC) coding and quadrature amplitude modulation (QAM) are used for channel coding and modulation, respectively. For different SNRs, MCS is selected based on 3GPP standards 1.In Fig. 10a, A-ImageTC consistently outperforms Bridge and Recon under the same CBR and SNR. This result shows that the adapter-generated visual tokens remain beneficial after practical channel coding and modulation. In Fig. 10b, we set CBR to 0.03 and compare different schemes under varying SNRs. As the SNR decreases, the performance of all schemes degrades. However, A-ImageTC maintains a clear advantage over the baselines across the whole SNR range. The performance loss becomes severe in the low-SNR regime. This indicates that the separated digital transmission pipeline still suffers from the cliff effect under poor channel conditions. 
+
+4) Visualized Examples: The qualitative examples are shown in Fig. 11. For the COCO Caption task, the proposed 
+
+> 1
+
+[Online]. Available: https://www.etsi.org/deliver/etsi ts/138200 138299/ 138214/16.02.00 60/ts 138214v160200p.pdf 12 A1: no A2: no                         
+
+> Two giraffes stand in tall grass near trees in a savanna.
+> Deer grazing in a forest with blurred background foliage.
+> Two deer graze in a forested area with trees and dappled sunlight.
+> Giraffe stretches neck to eat leaves from tree in dry grassy field.
+> A-ImageTC (UQ+EC) Recon (UQ+EC) Bridge Recon (VQ) COCO Caption MME
+> Q1: The image shows a python code. Will the number 3 appear in the output of the code? Please answer yes or no. Q2: The image shows a python code. Will the number 6 appear in the output of the code? Please answer yes or no.
+> A1: yes A2: no
+> 42314231
+> 1
+> 3
+> A1: no A2: no 2
+> A1: no A2: no 4
+> SeedBench Q: What is being worked on in the image? C. A pair of scissors D. A diamond pin
+> A. A diamond ring B. A piece of wire Answer: A
+> 421
+> Answer: B
+> 3
+> Answer: C
+> Answer: C
+> POPE
+> Q1: Is there a person in the image? Q2: Is there a dining table in the image?
+> A1: yes A2: yes A1: yes A2: yes 13
+> A1: yes A2: yes 2
+> A1: yes A2: yes 4
+
+Fig. 11: Qualitative comparison of different image processing schemes on COCO Caption, MME, SeedBench, and POPE. Both successful and failed cases are presented. TABLE I: Ablation results measured by BD-rate. 
+
+Model variant BD-rate (%) ↓
+
+MME POPE SeedBench COCO Caption 
+
+Recon (ELIC) 0.00 0.00 0.00 0.00 A-ImageTC -45.33 -31.91 -12.42 -46.75 A-ImageTC (w/o SigLIP) - - - -A-ImageTC (only SigLIP) -39.58 -30.10 -15.00 -49.56 
+
+A-ImageTC (CE) -31.07 -24.12 -7.19 -17.31 A-ImageTC (w/o Adapter) 0.18 -0.62 0.00 1.09 A-ImageTC (w/o Recon) 7.61 10.89 60.50 5.08 
+
+method correctly captures the main object giraffe , and also describes its number accurately. For the code understanding example in MME, the proposed method also gives the correct answers. By contrast, the VQ-based reconstruction scheme has difficulty reconstructing textual images, which makes it difficult to complete the MME task. For POPE, we further present a failure case where all meth-ods give the wrong answer. For the dominant object person ,all methods correctly answer Q1. However, the eating action of the person misleads all methods and causes hallucination about the existence of a dining table. This example shows that, although A-ImageTC can better preserve task-relevant visual semantics in many cases, object hallucination under ambiguous visual contexts remains challenging. 
+
+C. Ablation Studies and Complexity Analysis 
+
+We conduct ablation experiments on both the architecture and the loss design of the proposed framework. Recon (ELIC) is selected as the anchor, and the Bjøntegaard delta rate (BD-rate) is calculated for each variant. As shown in Table I, the model cannot converge properly when the SigLIP loss is removed. This result indicates that semantic alignment is essential for adapting compression-oriented latents to MLLM-oriented visual tokens. Replacing the proposed SigLIP-based alignment with the CLIP-style CE alternative leads to clear performance degradation on every benchmark. This demon-strates the effectiveness of the proposed semantic alignment loss. For the architectural ablation, removing either the adapter or the reconstruction prior significantly weakens the model. TABLE II: Complexity and runtime comparison.                      
+
+> Model variant Full Pipeline Adapter Tx Time (ms) Rx Time (ms) MACs (M/pixel) Params (M)
+> A-ImageTC (DCVC-RT) 20.12 194.78 0.063 18.19 A-ImageTC (adaptive) 20.57 190.93 0.063 20.85 Recon (DCVC-RT) 20.18 193.05 ––Uncompressed –170.25 ––
+
+We further evaluate the model complexity and runtime. The resolution of the test image is 256 ×256 , and the evalutation is conducted on an NVIDIA A100 80GB GPU. The results are compared with the existing MLLM interaction pipeline based on reconstruction, as shown in Table II. It can be observed that the adaptive adapter introduces about 2M additional parameters. However, the computational complexity remains almost unchanged. Compared with Recon, adding the adapter has little influence on the receiver-side processing time. These results indicate that the proposed adapter-based token injection brings only a small computational and storage overhead in the full MLLM interaction pipeline. VI. C ONCLUSION 
+
+In this paper, we investigate MLLM-oriented token com-munication to reduce the transmitted data required for MLLM interaction. By integrating a neural codec into the vision tokenizer, the number of transmitted bits is reduced. At the receiver, instead of only reconstructing a compressed image, the proposed framework uses decoded latents to construct visual tokens and merge them with reconstruction priors. To better fuse visual tokens with the reconstruction prior and pro-vide suitable visual inputs for the MLLM, a two-stage visual-language alignment scheme is proposed. The distillation stage stabilizes injected tokens by matching intermediate features of the original-image branch. The semantic alignment stage aligns final visual semantics with textual semantics through a SigLIP-based loss. To adapt to various codec rates, a QP-adaptive adapter based on FiLM is also designed. Simulation results on multiple MLLM benchmarks show that the proposed method outperforms reconstruction-based coding and other baselines under the same amount of transmitted data. 13 
+
+REFERENCES [1] J. Achiam, S. Adler, S. Agarwal, L. Ahmad, I. Akkaya, F. L. Aleman, D. Almeida, J. Altenschmidt, S. Altman, S. Anadkat et al. , “GPT-4 technical report,” arXiv preprint arXiv:2303.08774 , Mar. 2023. [2] D. Guo, D. Yang, H. Zhang, J. Song, P. Wang, Q. Zhu, R. Xu, R. Zhang, S. Ma, X. Bi et al. , “Deepseek-R1: Incentivizing reasoning capability in LLMs via reinforcement learning,” arXiv preprint arXiv:2501.12948 ,Jan. 2025. [3] G. Team, R. Anil, S. Borgeaud, J.-B. Alayrac, J. Yu, R. Soricut, J. Schalkwyk, A. M. Dai, A. Hauth, K. Millican et al. , “Gemini: A family of highly capable multimodal models,” arXiv preprint arXiv:2312.11805 ,Dec. 2023. [4] S. Bai, Y. Cai, R. Chen, K. Chen, X. Chen, Z. Cheng, L. Deng, W. Ding, C. Gao, C. Ge et al. , “Qwen3-VL technical report,” arXiv preprint arXiv:2511.21631 , Nov. 2025. [5] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” in Proc. Adv. Neural Inf. Process. Syst. (NeurIPS) , Long Beach, CA, USA, Dec. 2017, pp. 5998–6008. [6] M. Aubakirova, A. Atallah, C. Clark, J. Summerville, and A. Midha, “State of AI: An empirical 100 trillion token study with openrouter,” 
+
+arXiv preprint arXiv:2601.10088 , Jan. 2026. [7] L. Qiao, M. B. Mashhadi, Z. Gao, R. Tafazolli, M. Bennis, and D. Niyato, “Token communications: A large model-driven framework for cross-modal context-aware semantic communications,” IEEE Wireless Commun. Mag. , vol. 32, no. 5, pp. 80–88, Oct. 2025. [8] A. Devoto, J. Pomponi, M. Merluzzi, P. Di Lorenzo, and S. Scardapane, “Adaptive semantic token communication for Transformer-based edge inference,” IEEE Trans. Mach. Learn. Commun. Netw. , vol. 4, pp. 422– 437, Jan. 2026. [9] Z. Liu, Y. Ma, and R. Tafazolli, “ResiTok: A resilient tokenization-enabled framework for ultra-low-rate and robust image transmission,” in Proc. IEEE Int. Workshop Signal Process. Artif. Intell. Wireless Commun. (SPAWC) , Surrey, UK, Jul. 2025, pp. 1–5. [10] J. Ying, Z. Qin, Y. Feng, L. Wang, and X. Tao, “Joint semantic-channel coding and modulation for token communications,” IEEE Trans. Wireless Commun. , vol. 25, pp. 8179–8193, 2026. [11] Z. Jia, B. Li, J. Li, W. Xie, L. Qi, H. Li, and Y. Lu, “Towards practical real-time neural video compression,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. (CVPR) , Nashville, TN, USA, Jun. 2025, pp. 12 543– 12 552. [12] D. He, Z. Yang, W. Peng, R. Ma, H. Qin, and Y. Wang, “ELIC: Efficient learned image compression with unevenly grouped space-channel contextual adaptive coding,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. (CVPR) , New Orleans, LA, USA, Jun. 2022, pp. 5718– 5727. [13] T. Fu, Z. Min, H. Zhang, J. Yan, G. Dai, W. Ouyang, and Y. Wang, “Cache-to-cache: Direct semantic communication between large lan-guage models,” in Proc. Int. Conf. Learn. Represent. (ICLR) , Rio de Janeiro, Brazil, Apr. 2026. [14] Z. Xiao, C. Ye, Y. Feng, Y. Hu, T. Jiao, L. Cai, and G. Liu, “Transmission with machine language tokens: A paradigm for task-oriented agent communication,” arXiv preprint arXiv:2507.21454 , 2025. [15] W. Yang, H. Huang, Y. Hu, L.-Y. Duan, and J. Liu, “Video coding for machines: Compact visual representation compression for intelligent collaborative analytics,” IEEE Trans. Pattern Anal. Mach. Intell. , vol. 46, no. 7, pp. 5174–5191, Jul. 2024. [16] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in Proc. Int. Conf. Mach. Learn. (ICML) , Jul. 2021, pp. 8748–8763. [17] X. Zhai, B. Mustafa, A. Kolesnikov, and L. Beyer, “Sigmoid loss for language image pre-training,” in Proc. IEEE Int. Conf. Comput. Vis. (ICCV) , Paris, France, Oct. 2023, pp. 11 975–11 986. [18] M. Tschannen, A. Gritsenko, X. Wang, M. F. Naeem, I. Alabdul-mohsin, N. Parthasarathy, T. Evans, L. Beyer, Y. Xia, B. Mustafa 
+
+et al. , “SigLIP 2: Multilingual vision-language encoders with improved semantic understanding, localization, and dense features,” arXiv preprint arXiv:2502.14786 , Feb. 2025. [19] E. Perez, F. Strub, H. De Vries, V. Dumoulin, and A. Courville, “FiLM: Visual reasoning with a general conditioning layer,” in Proc. AAAI Conf. Artif. Intell. (AAAI) , New Orleans, LA, USA, Feb. 2018, pp. 3942–3951. [20] J. Men, M. B. Mashhadi, N. Wang, Y. Ma, M. Nilsson, and R. Tafazolli, “Video tokencom: Textual intent-guided multi-rate video token com-munications with UEP-based adaptive source-channel coding,” arXiv preprint arXiv:2603.02470 , Mar. 2026. [21] K. Zhang, Z. Jin, Y. Zhang, Z. Cheng, M. Zeng, L. Qiao, and Z. Fei, “Tokencom-UEP: Semantic importance-matched unequal error protec-tion for resilient image transmission,” IEEE Wireless Commun. Lett. ,vol. 15, pp. 2809–2813, 2026. [22] S. Lee, J. Park, J. Choi, and H. Park, “Semantic Packet Aggregation for Token Communication via genetic beam search,” in Proc. IEEE Int. Workshop Signal Process. Artif. Intell. Wireless Commun. (SPAWC) ,Surrey, UK, Jul. 2025, pp. 1–5. [23] Q. Fu, H. Xie, Z. Qin, G. Slabaugh, and X. Tao, “Vector quantized se-mantic communication system,” IEEE Wireless Commun. Lett. , vol. 12, no. 6, pp. 982–986, Jun. 2023. [24] F. Jiang, S. Tu, L. Dong, X. Li, K. Wang, C. Pan, Z. Han, and J. Wang, “TokenCom: Vision-Language Model for Multimodal and Multitask Token Communications,” arXiv preprint arXiv:2603.00482 , Feb. 2026. [25] Y. Wu, Z. Zhang, J. Chen, H. Tang, D. Li, Y. Fang, L. Zhu, E. Xie, H. Yin, L. Yi, S. Han, and Y. Lu, “VILA-U: A unified foundation model integrating visual understanding and generation,” in Proc. Int. Conf. Learn. Represent. (ICLR) , Singapore, Apr. 2025. [26] F. Bellard, “BPG Image Format,” [Online]. Available: http://bellard.org/ bpg/, accessed: May 7, 2026. [27] VTM, “VVC Test Model,” [Online]. Available: https://vcgit.hhi. fraunhofer.de/jvet/VVCSoftware VTM, accessed: May 7, 2026. [28] Z. Jia, J. Li, B. Li, H. Li, and Y. Lu, “Generative latent coding for ultra-low bitrate image compression,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. (CVPR) , Seattle, WA, USA, Jun. 2024, pp. 26 088– 26 098. [29] H. Cao, C. Liang, W. Guo, Z. Qin, and J. Han, “ProGIC: Progressive and lightweight generative image compression with residual vector quantization,” arXiv preprint arXiv:2603.02897 , Mar. 2026. [30] Y.-H. Chen, Y.-C. Weng, C.-H. Kao, C. Chien, W.-C. Chiu, and W.-H. Peng, “TransTIC: Transferring Transformer-based image compression from human perception to machine perception,” in Proc. IEEE Int. Conf. Comput. Vis. (ICCV) , Paris, France, Oct. 2023, pp. 23 297–23 307. [31] B. Li, S. Wang, S. Wang, and Y. Ye, “High efficiency image compression for large visual-language models,” IEEE Trans. Circuits Syst. Video Technol. , vol. 35, no. 3, pp. 2870–2880, Mar. 2025. [32] C.-H. Kao, C. Chien, Y.-J. Tseng, Y.-H. Chen, A. Gnutti, S.-Y. Lo, W.-H. Peng, and R. Leonardi, “Bridging compressed image latents and multimodal large language models,” in Proc. Int. Conf. Learn. Represent. (ICLR) , Singapore, Apr. 2025. [33] J. Liu, Z. Jia, J. Li, B. Li, X. Jin, W. Zeng, and Y. Lu, “When MLLMs meet compression distortion: A coding paradigm tailored to MLLMs,” in Proc. Int. Conf. Learn. Represent. (ICLR) , Rio de Janeiro, Brazil, Apr. 2026. [34] J. Ball´ e, D. Minnen, S. Singh, S. J. Hwang, and N. Johnston, “Variational image compression with a Scale Hyperprior,” in Proc. Int. Conf. Learn. Represent. (ICLR) , Vancouver, BC, Canada, Apr. 2018. [35] E. Bourtsoulatze, D. Burth Kurka, and D. G¨ und¨ uz, “Deep joint source-channel coding for wireless image transmission,” IEEE Trans. Cogn. Commun. Netw. , vol. 5, no. 3, pp. 567–579, Sep. 2019. [36] C. Wu, J. Li, J. Zhou, J. Lin, K. Gao, K. Yan, S.-m. Yin, S. Bai, X. Xu, Y. Chen et al. , “Qwen-Image technical report,” arXiv preprint arXiv:2508.02324 , Aug. 2025. [37] J. Su, A. Murtadha, Y. Lu, S. Pan, W. Bo, and Y. Liu, “RoFormer: En-hanced transformer with rotary position embedding,” Neurocomputing ,vol. 568, p. 127063, Feb. 2024. [38] R. Zhang, J. Han, C. Liu, A. Zhou, P. Lu, Y. Qiao, H. Li, and P. Gao, “LLaMA-Adapter: Efficient fine-tuning of large language models with zero-initialized attention,” in Proc. Int. Conf. Learn. Represent. (ICLR) ,Vienna, Austria, May 2024. [39] C. Fu, P. Chen, Y. Shen, Y. Qin, M. Zhang, X. Lin, J. Yang, X. Zheng, K. Li, X. Sun, Y. Wu, R. Ji, C. Shan, and R. He, “MME: A comprehen-sive evaluation benchmark for multimodal large language models,” in 
+
+Proc. Adv. Neural Inf. Process. Syst. (NeurIPS) , San Diego, CA, USA, Dec. 2025, datasets and Benchmarks Track, Spotlight. [40] Y. Li, Y. Du, K. Zhou, J. Wang, X. Zhao, and J.-R. Wen, “Evaluating object hallucination in large vision-language models,” in Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP) , Singapore, Dec. 2023, pp. 292–305. [41] B. Li, Y. Ge, Y. Ge, G. Wang, R. Wang, R. Zhang, and Y. Shan, “SEED-Bench: Benchmarking multimodal large language models,” in 
+
+Proc. IEEE Conf. Comput. Vis. Pattern Recog. (CVPR) , Seattle, WA, USA, Jun. 2024, pp. 13 299–13 308. [42] A. Karpathy and F.-F. Li, “Deep visual-semantic alignments for gen-erating image descriptions,” in Proc. IEEE Conf. Comput. Vis. Pattern Recog. (CVPR) , Boston, MA, USA, Jun. 2015, pp. 3128–3137.

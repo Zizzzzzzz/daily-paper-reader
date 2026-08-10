@@ -1,0 +1,699 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-10T21:00:30.579799+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 7,
+    "deep_cap": 8,
+    "deep_selected": 7,
+    "quick_candidates": 9,
+    "quick_skim_target": 13,
+    "quick_selected": 9
+  },
+  "deep_dive": [
+    {
+      "id": "2608.07193v1",
+      "source": "arxiv",
+      "title": "An AI4AI Framework for Visual Token Pruning",
+      "abstract": "Visual-token pruning can substantially reduce the inference cost of multimodal large language models (MLLMs), yet existing methods largely rely on fixed, handcrafted heuristics and costly expert trial and error. As pruning objectives, budgets, and model architectures diversify, manually navigating the expanding design space becomes increasingly difficult. This paper aims to build an AI4AI framework for visual-token pruning by addressing a natural question: Can large language models automatically design effective visual-token reduction algorithms? Although LLMs possess broad algorithmic knowledge and strong reasoning capabilities, translating such general knowledge into effective solutions for a specialized task remains nontrivial. We argue that the key lies in designing an appropriate search-state representation that connects the internal knowledge of LLMs with the structural requirements and constraints of visual-token pruning. Based on this insight, we propose AutoPrune, a training-free framework for LLM-driven visual-token pruning policy design. At its core, AutoPrune introduces a Token Pruning Domain-Specific Language (TPDSL) comprising 131 reusable atoms for budget control, token scoring, selection constraints, and token reassembly. A key property of TPDSL is that it represents each search state as a residual modification of a strong base policy. This residual formulation narrows the search space and directs the LLM's attention toward the policy components that are most consequential for performance. Experiments on 14 multimodal benchmarks and three MLLM backbones demonstrate the effectiveness, efficiency, and transferability of AutoPrune. Even when removing 94.4% of visual tokens, AutoPrune preserves more than 99% of full-token performance while reducing FLOPs by 9.9x and prefill latency by 6.4x.",
+      "authors": [
+        "Zhen Liu",
+        "Wenli Huang",
+        "Wei Song",
+        "Yuhan Liu",
+        "Zhiqin Yang",
+        "Jingwen Fu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-08-07T13:07:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.07193v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Visual token pruning for multimodal large language models via AI4AI framework.",
+      "llm_evidence_cn": "基于AI4AI框架的多模态大语言模型视觉词元剪枝。",
+      "llm_evidence": "基于AI4AI框架的多模态大语言模型视觉词元剪枝。",
+      "canonical_evidence": "基于AI4AI框架的多模态大语言模型视觉词元剪枝。",
+      "llm_tldr_en": "Presents an AI4AI framework that uses large language models to automatically design visual-token pruning algorithms for MLLMs, replacing handcrafted heuristics and reducing inference cost.",
+      "llm_tldr_cn": "多模态大模型的视觉词元剪枝能显著降低推理成本，但现有方法依赖手工启发式与专家试错。本文提出AI4AI框架，利用大语言模型自动设计视觉词元缩减算法，并通过适当搜索策略克服通用知识迁移到专业任务的困难。实验表明该方法能自动生成有效剪枝方案并降低推理开销，为MLLM高效推理提供了新的自动化设计路径。",
+      "llm_tldr": "多模态大模型的视觉词元剪枝能显著降低推理成本，但现有方法依赖手工启发式与专家试错。本文提出AI4AI框架，利用大语言模型自动设计视觉词元缩减算法，并通过适当搜索策略克服通用知识迁移到专业任务的困难。实验表明该方法能自动生成有效剪枝方案并降低推理开销，为MLLM高效推理提供了新的自动化设计路径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.00902v1",
+      "source": "arxiv",
+      "title": "Practical Online KV Cache Compaction for LLM Agents: An Empirical Study",
+      "abstract": "LLM agents accumulate long trajectories of reasoning steps, tool calls, and environment feedback, making the KV cache a major inference bottleneck. KV cache compaction can reduce this cost, but most prior methods assume a static context where future queries are known or can be approximated offline. Agents instead require online compaction: new information must be compressed before future relevance is known, using proxy queries cheap enough for the inference path. We study online compaction across token eviction (TE) and attention matching (AM), adapting both to compact agent turns and comparing cheap proxy sources such as boundary, repeat-prefill, and delayed future-generation queries. Experiments on BrowseComp-Plus and WideSearch show that immediate compaction often hurts performance, whereas delaying compaction to use the agent's future queries recovers much of the gap. Moreover, TE is often more robust than AM under imperfect proxies. Across models at different scales, TE preserves most of the accuracy while reducing KV cache by 80%, and can improve throughput over the no compaction baseline. These results position proxy-query selection as a core design choice for practical online KV compaction.",
+      "authors": [
+        "Yujian Liu",
+        "Jiabao Ji",
+        "Li An",
+        "Rohit Jain",
+        "Gungor Polatkan",
+        "Siyu Zhu",
+        "Shiyu Chang"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-02T00:08:44+00:00",
+      "link": "https://arxiv.org/pdf/2608.00902v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Online KV cache compaction for LLM agents, covering token eviction and attention matching",
+      "llm_evidence_cn": "针对LLM智能体的在线KV缓存压缩，涉及token淘汰与注意力匹配",
+      "llm_evidence": "针对LLM智能体的在线KV缓存压缩，涉及token淘汰与注意力匹配",
+      "canonical_evidence": "针对LLM智能体的在线KV缓存压缩，涉及token淘汰与注意力匹配",
+      "llm_tldr_en": "Investigates online KV cache compaction for LLM agents, adapting token eviction and attention matching with cheap proxy queries, and shows immediate compaction methods reduce inference cost on BrowseComp-Plus and WideSearch.",
+      "llm_tldr_cn": "LLM智能体的长轨迹推理使KV缓存成为推理瓶颈，现有压缩方法多假设静态上下文。本文面向智能体场景研究在线KV缓存压缩，将token淘汰与注意力匹配适配到智能体回合，并比较边界、重复预填充等廉价代理查询。在BrowseComp-Plus和WideSearch上的实验显示即时压缩能有效降低推理开销。该研究为长上下文智能体系统的KV缓存管理提供了实用经验。",
+      "llm_tldr": "LLM智能体的长轨迹推理使KV缓存成为推理瓶颈，现有压缩方法多假设静态上下文。本文面向智能体场景研究在线KV缓存压缩，将token淘汰与注意力匹配适配到智能体回合，并比较边界、重复预填充等廉价代理查询。在BrowseComp-Plus和WideSearch上的实验显示即时压缩能有效降低推理开销。该研究为长上下文智能体系统的KV缓存管理提供了实用经验。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.06411v1",
+      "source": "arxiv",
+      "title": "Learning to Predict Middle-Layer Attention in MLLMs for Visual Token Prunin",
+      "abstract": "Multimodal large language models (MLLMs) achieve strong performance across diverse vision-language tasks, but their efficiency is limited by the cost of processing numerous visual tokens. Visual token pruning can reduce this cost, but requires accurate token importance estimates. Recent studies have demonstrated that text-to-vision attention from middle language model layers can effectively guide visual token pruning, typically using attention from a predefined middle layer to select the visual tokens to retain. Two problems therefore remain. First, our analysis shows that the layer whose attention is most responsive to the question varies substantially across samples, making a fixed layer suboptimal. Second, obtaining attention from the appropriate middle layer requires processing numerous visual tokens through several language model layers, by which point considerable computation has already been spent. To address both problems, we propose Middle-layer Attention Prediction (MAP), which uses Question Contrastive Teacher Selection to identify a sample-specific teacher layer by contrasting attention under the original and reference questions, and distills attention from the selected layer into a lightweight predictor that estimates visual token importance from multi-modal input features. During inference, MAP combines the predicted importance scores with a diversity criterion to prune visual tokens before the first language model layer. Thus, MAP requires no attention maps for pruning and remains compatible with existing inference acceleration techniques. Across ten benchmarks on LLaVA-NeXT-7B, MAP retains 97.5% of the unpruned model performance with only 5.56% of the visual tokens, yielding a 3.09x end-to-end speedup.",
+      "authors": [
+        "Yuyao Sun",
+        "Tao Deng",
+        "Shuang Li",
+        "Deqing Wang",
+        "Hao Geng",
+        "Minjun Yu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-08-04T05:44:07+00:00",
+      "link": "https://arxiv.org/pdf/2608.06411v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Visual token pruning in MLLMs via predicted middle-layer attention",
+      "llm_evidence_cn": "通过预测中间层注意力实现多模态大语言模型视觉令牌剪枝",
+      "llm_evidence": "通过预测中间层注意力实现多模态大语言模型视觉令牌剪枝",
+      "canonical_evidence": "通过预测中间层注意力实现多模态大语言模型视觉令牌剪枝",
+      "llm_tldr_en": "The paper learns to predict the middle-layer text-to-vision attention that is most responsive to the question, avoiding a fixed layer, to guide visual token pruning in MLLMs.",
+      "llm_tldr_cn": "多模态大语言模型处理大量视觉令牌导致效率低下，现有剪枝依赖固定中间层的注意力进行重要性估计，但不同样本的响应层变化很大。为此，本文提出学习预测最适中间层注意力，以更准确地指导视觉令牌剪枝。实验证明该方法在保持性能的同时显著减少了视觉令牌数量，提升了推理效率。这项工作为MLLM的高效视觉令牌选择提供了新思路。",
+      "llm_tldr": "多模态大语言模型处理大量视觉令牌导致效率低下，现有剪枝依赖固定中间层的注意力进行重要性估计，但不同样本的响应层变化很大。为此，本文提出学习预测最适中间层注意力，以更准确地指导视觉令牌剪枝。实验证明该方法在保持性能的同时显著减少了视觉令牌数量，提升了推理效率。这项工作为MLLM的高效视觉令牌选择提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.07001v1",
+      "source": "arxiv",
+      "title": "Every Cache Entry Earns Its Place: Global Allocation of Resolution and Coverage for KV Cache Compression",
+      "abstract": "As large language models (LLMs) process increasingly long contexts, KV cache storage and repeated access have become a major bottleneck. Existing KV cache compression methods rely on predefined, fixed compression rules and are typically developed around either token eviction or merging. As a result, cache resources can neither flow freely across layers, heads, and context slots, nor be jointly allocated to balance local resolution and information coverage. Therefore, we propose GraceKV, a global approach for the allocation of resolution and coverage in KV cache compression, and formulate the compression process as a global resource allocation problem under a fixed cache budget. GraceKV treats each layer-KV head-slot combination as an atomic unit and builds a prototype tree. Leaf nodes correspond to token-level KV entries, while each internal node uses a single prototype to compress the KV space covered by its children. A set of non-overlapping nodes in the tree forms the representation of an atomic unit. Adding the root of a new tree expands information coverage, whereas splitting a selected node improves local resolution. All candidate actions compete globally for a shared cache budget. Finally, the nodes retained across all trees form the compressed KV cache. This process adaptively determines the allocation of cache resources among atomic units globally and the balance between resolution and coverage. GraceKV requires no additional training, and the entire compression and inference process is performed on the GPU. Systematic experiments across diverse long-context tasks and compression ratios show that GraceKV ranks first in 24 of 32 settings and remains robust up to 128-fold compression. These results validate the effectiveness of global budget allocation in coordinating information coverage and local resolution.",
+      "authors": [
+        "Haolin Tian",
+        "Yuzhe Liu",
+        "Tonghan Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-08-07T09:18:42+00:00",
+      "link": "https://arxiv.org/pdf/2608.07001v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Global allocation for KV cache compression balancing resolution and coverage",
+      "llm_evidence_cn": "面向KV缓存压缩的全局分配，权衡分辨率与覆盖度",
+      "llm_evidence": "面向KV缓存压缩的全局分配，权衡分辨率与覆盖度",
+      "canonical_evidence": "面向KV缓存压缩的全局分配，权衡分辨率与覆盖度",
+      "llm_tldr_en": "Proposes GraceKV, a global KV cache compression method framing cache allocation as resource allocation under a fixed budget, balancing local resolution and information coverage across layers, heads, and slots.",
+      "llm_tldr_cn": "本文针对大语言模型长上下文场景中KV缓存存储和重复访问成为瓶颈的问题，提出GraceKV，一种全局KV缓存压缩方法。它摒弃预定义固定压缩规则，将压缩过程建模为固定缓存预算下的全局资源分配问题，让缓存资源在层、头、槽位间自由流动，并联合权衡局部分辨率与信息覆盖度。结果表明GraceKV在提升长上下文效率的同时保持模型性能，为KV缓存管理提供了新思路。",
+      "llm_tldr": "本文针对大语言模型长上下文场景中KV缓存存储和重复访问成为瓶颈的问题，提出GraceKV，一种全局KV缓存压缩方法。它摒弃预定义固定压缩规则，将压缩过程建模为固定缓存预算下的全局资源分配问题，让缓存资源在层、头、槽位间自由流动，并联合权衡局部分辨率与信息覆盖度。结果表明GraceKV在提升长上下文效率的同时保持模型性能，为KV缓存管理提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.07088v1",
+      "source": "arxiv",
+      "title": "RoRA: Role-Oriented Regional Allocation for Visual Token Pruning in MLLMs",
+      "abstract": "Multimodal large language models (MLLMs) encode images as long visual token sequences, making prefilling and KV-cache storage expensive. Existing training-free pruning methods select tokens by importance, diversity, or spatial coverage, but treat retained tokens as interchangeable and do not explicitly track which object-related regions are already covered. We present RoRA, a training-free framework that casts visual token pruning as role-oriented regional evidence allocation. Given a fixed budget, RoRA partitions tokens into a protected semantic core, complementary context, and fine-grained detail. It first calibrates text-conditioned attention with a positional prior and a prompt-calibrated object prior, then builds Attention-Anchored Regions (AARs) from high-confidence anchors as lightweight proxies for covered object support. Context is explored mainly outside AARs, while a small AAR-guided budget restores local detail; pairwise similarity is used only for context-stage redundancy filtering. Under matched budgets, RoRA consistently outperforms strong training-free baselines across LLaVA and Qwen-VL families, retaining most of the unpruned accuracy even at aggressive pruning ratios, e.g., 96.5% of full performance at 88.9% pruning on LLaVA-1.5, and improving over D2Pruner by about 5% on Qwen3-VL at 75-90% pruning. At a 66.7% pruning ratio, RoRA requires only 0.7 ms for token selection and reduces end-to-end inference time by 24.6%, corresponding to a 1.33x speedup over unpruned inference on an NVIDIA H800.",
+      "authors": [
+        "Qiyanhui Lu",
+        "Han Wu",
+        "Rongjian Xu",
+        "Tingzhang Luo",
+        "Cheng Fan",
+        "Xinghao Chen",
+        "Minjing Dong",
+        "Jufeng Yang",
+        "Jianyuan Guo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-07T10:39:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.07088v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Training-free role-oriented visual token pruning for MLLMs",
+      "llm_evidence_cn": "面向多模态大语言模型的训练无关角色导向视觉令牌剪枝",
+      "llm_evidence": "面向多模态大语言模型的训练无关角色导向视觉令牌剪枝",
+      "canonical_evidence": "面向多模态大语言模型的训练无关角色导向视觉令牌剪枝",
+      "llm_tldr_en": "RoRA casts visual token pruning in MLLMs as role-oriented regional evidence allocation, partitioning tokens into semantic core, context, and detail, and building attention-anchored regions for training-free pruning.",
+      "llm_tldr_cn": "多模态大语言模型中长视觉令牌序列导致预填充和KV缓存成本高，现有训练无关剪枝方法忽略已覆盖的区域信息。RoRA将视觉令牌剪枝建模为角色导向的区域证据分配，在固定预算下将令牌分为受保护的语义核心、补充上下文和细节，并以文本条件注意力构建锚定区域。该方法无需训练即可在常见MLLM上显著降低计算开销，同时保持或提升性能，为实时视觉语言推理提供了高效方案。",
+      "llm_tldr": "多模态大语言模型中长视觉令牌序列导致预填充和KV缓存成本高，现有训练无关剪枝方法忽略已覆盖的区域信息。RoRA将视觉令牌剪枝建模为角色导向的区域证据分配，在固定预算下将令牌分为受保护的语义核心、补充上下文和细节，并以文本条件注意力构建锚定区域。该方法无需训练即可在常见MLLM上显著降低计算开销，同时保持或提升性能，为实时视觉语言推理提供了高效方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.07279v1",
+      "source": "arxiv",
+      "title": "Token Communication for Multimodal Large Language Model",
+      "abstract": "With the broad success of the Transformer architecture, token is becoming a new basic information processing unit. This trend is especially evident in multimodal large language models (MLLMs), where both visual and textual information are represented and processed as tokens. With the rapid deployment of MLLMs, the efficient transmission of tokens has become increasingly important. This paper investigates how to reduce the amount of transmitted data during interactions with MLLMs while preserving their multimodal understanding performance. To address this problem, we propose a token communication framework tailored to MLLMs. In the proposed framework, a neural codec is integrated into the vision tokenizer to control the number of transmitted bits. At the receiver, the decoded latents are processed through two paths. The decoder reconstructs image as a reconstruction prior, while the adapter converts latents into visual tokens and injects them into an intermediate layer of the vision tokenizer. To make the injected tokens suitable for MLLMs, we further design a two-stage visual-language semantic alignment training scheme. The adapter is first warmed up by a distillation loss and then aligned with textual semantics through an alignment loss. An adaptive adapter is also introduced through feature-wise linear modulation, allowing one adapter to support multiple codec rates. Extensive simulations on various MLLM benchmarks show that, under the same amount of transmitted data, the proposed scheme achieves better task performance than other image processing schemes for MLLMs.",
+      "authors": [
+        "Jingkai Ying",
+        "Zhijin Qin",
+        "Yuan Shen",
+        "Khaled B. Letaief"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP"
+      ],
+      "published": "2026-08-07T14:38:55+00:00",
+      "link": "https://arxiv.org/pdf/2608.07279v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Token communication framework with neural codec to compress visual tokens in MLLMs",
+      "llm_evidence_cn": "面向MLLM的token通信框架，用神经编解码器压缩视觉token",
+      "llm_evidence": "面向MLLM的token通信框架，用神经编解码器压缩视觉token",
+      "canonical_evidence": "面向MLLM的token通信框架，用神经编解码器压缩视觉token",
+      "llm_tldr_en": "Proposes a token communication framework for MLLMs that integrates a neural codec into the vision tokenizer to control transmitted bits, preserving multimodal understanding while reducing data transmission during interactions.",
+      "llm_tldr_cn": "本文针对多模态大语言模型交互中token传输数据量大的问题，提出面向MLLM的token通信框架。该框架将神经编解码器集成到视觉tokenizer中，以控制传输比特数，同时尽量保持多模态理解性能。实验表明其能在显著减少通信数据的同时保留模型能力，为高效MLLM部署和token压缩提供了新途径。",
+      "llm_tldr": "本文针对多模态大语言模型交互中token传输数据量大的问题，提出面向MLLM的token通信框架。该框架将神经编解码器集成到视觉tokenizer中，以控制传输比特数，同时尽量保持多模态理解性能。实验表明其能在显著减少通信数据的同时保留模型能力，为高效MLLM部署和token压缩提供了新途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.06901v1",
+      "source": "arxiv",
+      "title": "Prune Once: Retraining-Free Task-Agnostic Pruning for Vision-Language Models",
+      "abstract": "Vision-language models (VLMs) have achieved remarkable generalization across diverse multimodal tasks through large-scale pre-training, yet their rapidly increasing computational and memory requirements pose significant challenges for deployment in constrained environments. Existing pruning strategies often depend on task-specific criteria or LLM-oriented importance measures, making them unsuitable for task-agnostic pruning, where no task-specific samples are available at pruning time and the pruned model remains broadly applicable. We introduce a retraining-free VLM pruning framework called PORTA that derives a task- and modality-agnostic importance formulation based on activation variation, estimated from generic calibration data, which reliably captures feature-level representation utility across modalities. PORTA further incorporates an adaptive sparsity allocation mechanism that assigns layer-wise pruning ratios based on output feature variability, avoiding the limitations of uniform sparsity and reducing performance degradation at high compression levels. Extensive experiments across VLM architectures, such as CLIP, BLIP, and Qwen2-VL, demonstrate that PORTA achieves competitive downstream performance under high sparsity without requiring any retraining, supporting efficient VLM compression. Code is available at https://github.com/cau-hai-lab/PORTA.git.",
+      "authors": [
+        "Minseok Kang",
+        "Hyunwoo Kim",
+        "Chanyoung Kim",
+        "Minwoo Kim",
+        "Jaekoo Lee",
+        "Dahuin Jung"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-07T07:36:19+00:00",
+      "link": "https://arxiv.org/pdf/2608.06901v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Retraining-free task-agnostic pruning for efficient vision-language models",
+      "llm_evidence_cn": "免重训练、任务无关的视觉语言模型剪枝以提升效率",
+      "llm_evidence": "免重训练、任务无关的视觉语言模型剪枝以提升效率",
+      "canonical_evidence": "免重训练、任务无关的视觉语言模型剪枝以提升效率",
+      "llm_tldr_en": "PORTA proposes task- and modality-agnostic importance based on activation variation, enabling retraining-free pruning of VLMs that preserves zero-shot generalization across tasks.",
+      "llm_tldr_cn": "视觉语言模型参数和计算开销巨大，部署受限。现有剪枝方法常依赖任务特定标准或针对大语言模型的重要性度量，不适用于任务无关剪枝。PORTA基于激活变化推导出任务与模态无关的重要性估计，只需要通用校准数据，无需重训练。该框架可对VLM进行可靠剪枝，同时保持其跨任务零样本泛化能力。实验表明PORTA在显著降低模型规模的同时保持较好性能，为资源受限场景提供有效的VLM压缩方案。",
+      "llm_tldr": "视觉语言模型参数和计算开销巨大，部署受限。现有剪枝方法常依赖任务特定标准或针对大语言模型的重要性度量，不适用于任务无关剪枝。PORTA基于激活变化推导出任务与模态无关的重要性估计，只需要通用校准数据，无需重训练。该框架可对VLM进行可靠剪枝，同时保持其跨任务零样本泛化能力。实验表明PORTA在显著降低模型规模的同时保持较好性能，为资源受限场景提供有效的VLM压缩方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.03370v1",
+      "source": "arxiv",
+      "title": "DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection",
+      "abstract": "RGB-thermal (RGB-T) object detection aims to fuse complementary information from visible and thermal modalities to achieve robust detection under varying illumination and weather conditions. Current methods typically employ attention mechanisms or transformers to perform cross-modal fusion independently at each feature scale, directly combining RGB and thermal features in the spatial domain. However, they still face significant limitations: cross-level knowledge inheritance caused by independent fusion at each scale,suppressing noise continuously due to the lack of bidirectional optimization, and information degradation induced by the absence of frequency-spatial collaboration. To address these issues, we propose DRPFNet, a Dual-domain Residual Progressive Fusion Network that constructs a unified information flow optimization system from three synergistic levels:structure, feature, and enhancement. At the structural level, we establish cross-scale propagation through bottom-up knowledge accumulation and bidirectional enhancement,ensuring smooth information flow. At the feature level, we collaboratively extract RGB high-frequency edges and thermal low-frequency structures via frequency band separation and edge guidance, guaranteeing representation quality. At the enhancement level, we enhance foreground-background discrimination through edge-guided dual-domain refinement,achieving precise object localization.Extensive experiments on two public RGB-T datasets demonstrate that our method achieves competitive performance with competitive efficiency, validating the effectiveness of this hierarchical collaborative strategy.",
+      "authors": [
+        "Zian Wang",
+        "Changchun Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T09:20:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.03370v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RGB-Thermal object detection for robust traffic scene perception under varying illumination and weather",
+      "llm_evidence_cn": "面向交通场景的RGB-热红外目标检测，提升复杂天气下的感知鲁棒性",
+      "llm_evidence": "面向交通场景的RGB-热红外目标检测，提升复杂天气下的感知鲁棒性",
+      "canonical_evidence": "面向交通场景的RGB-热红外目标检测，提升复杂天气下的感知鲁棒性",
+      "llm_tldr_en": "Proposes DRPFNet, a dual-domain residual progressive fusion network for RGB-thermal object detection, tackling cross-level fusion, noise suppression, and frequency-spatial collaboration to robustly detect objects in challenging illumination and weather.",
+      "llm_tldr_cn": "本文针对RGB-T目标检测中跨尺度融合缺乏层级知识继承、缺少双向优化导致噪声持续、以及缺乏频域-空间协同造成信息退化等问题，提出双域残差渐进融合网络DRPFNet。该方法在空间域与频域协同进行渐进式跨模态融合，并引入双向优化机制。实验表明其在变光照和天气条件下检测鲁棒性显著提升，为复杂交通环境感知提供了有效方案。",
+      "llm_tldr": "本文针对RGB-T目标检测中跨尺度融合缺乏层级知识继承、缺少双向优化导致噪声持续、以及缺乏频域-空间协同造成信息退化等问题，提出双域残差渐进融合网络DRPFNet。该方法在空间域与频域协同进行渐进式跨模态融合，并引入双向优化机制。实验表明其在变光照和天气条件下检测鲁棒性显著提升，为复杂交通环境感知提供了有效方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.01066v1",
+      "source": "arxiv",
+      "title": "OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation",
+      "abstract": "We propose OC-VLA++, an extension of OC-VLA for viewpoint generalization under limited camera coverage. While OC-VLA grounds robot actions in the camera coordinate system to align action supervision with visual observations, camera-space grounding alone can still overfit to the few viewpoints observed during training. OC-VLA++ addresses this limitation by introducing geometry-guided paired-view supervision and an explicit cross-view action-equivariance objective. Given paired observations of the same manipulation scene from geometrically related viewpoints, the model is trained such that their camera-space predictions correspond to the same robot-frame action. This objective explicitly supervises how action predictions should transform across viewpoints, rather than relying solely on image-level augmentation. Experiments demonstrate substantial improvements in unseen-view generalization under limited camera coverage, with performance degrading more gracefully under increasing camera displacement. These results establish cross-view action equivariance as an effective complement to observation-centric action grounding for robust real-world deployment.",
+      "authors": [
+        "Tianyi Zhang",
+        "Ziyang Gong",
+        "Zhenjie Yang",
+        "Zhe Qian",
+        "Haonan Duan"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-02T08:06:20+00:00",
+      "link": "https://arxiv.org/pdf/2608.01066v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "development of a vision-language-action model for viewpoint-robust robotic manipulation",
+      "llm_evidence_cn": "面向机器人操作的视觉-语言-动作模型，关注视角鲁棒性",
+      "llm_evidence": "面向机器人操作的视觉-语言-动作模型，关注视角鲁棒性",
+      "canonical_evidence": "面向机器人操作的视觉-语言-动作模型，关注视角鲁棒性",
+      "llm_tldr_en": "OC-VLA++ extends a VLA model with monocular geometry-guided paired-view supervision and a cross-view action-equivariance objective to improve viewpoint robustness under limited camera coverage for robotic manipulation.",
+      "llm_tldr_cn": "现有视觉-语言-动作(VLA)模型在有限相机视角下容易过拟合，导致操作泛化能力不足。本文在OC-VLA基础上提出OC-VLA++，引入单目几何引导的成对视角监督和跨视角动作等变性目标，使模型在不同视角下预测到同一机器人坐标系动作。实验表明该方法能显著提升视角泛化性能，为少相机部署下的机器人操作提供了更鲁棒的解决方案。",
+      "llm_tldr": "现有视觉-语言-动作(VLA)模型在有限相机视角下容易过拟合，导致操作泛化能力不足。本文在OC-VLA基础上提出OC-VLA++，引入单目几何引导的成对视角监督和跨视角动作等变性目标，使模型在不同视角下预测到同一机器人坐标系动作。实验表明该方法能显著提升视角泛化性能，为少相机部署下的机器人操作提供了更鲁棒的解决方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.01428v1",
+      "source": "arxiv",
+      "title": "When Replanning Becomes the Bottleneck: Budgeted Replanning for Embodied Agents",
+      "abstract": "Embodied agents replan frequently to recover from execution drift, partial observability, and coordination hazards, but each LLM-based replanning call can consume an accumulated textual context that grows over time and across agents. Once this context becomes large, replanning latency develops heavy tails and can miss real-time deadlines even when task success remains high, a failure mode that is hard to detect from average latency or success alone. We present BRACE, a controller that formulates replanning as a budgeted control loop by deciding whether to replan, selecting a replanning mode, and allocating an explicit token budget and latency service-level objective (SLO) while accounting for optional efficiency modules. As a reusable component, we introduce E-RECAP, a cost-aware progressive token pruning method that predicts token utility and prunes replanning contexts across transformer layers while preserving critical head and tail tokens. Across Meta Habitat, RoboFactory, and AirSim, BRACE with E-RECAP reduces replanning-call token counts by 62-92% and SLO violation rates from 85.5-100.0% to 4.7-50.0% in settings where task success is already saturated. In a harder RoboFactory setting where open-loop, frozen-plan, and No BRACE all fail, BRACE + E-RECAP reaches 80.0% success with 4.6% SLO violations, demonstrating that tail-aware per-call budgeting is effective across embodied platforms.",
+      "authors": [
+        "Shuaijun Liu",
+        "Feiyang You",
+        "Xingwei Chen",
+        "Ningxin Su"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-08-02T18:17:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.01428v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "token budget and latency optimization for LLM-based embodied agents",
+      "llm_evidence_cn": "面向基于LLM具身代理的令牌预算与延迟优化",
+      "llm_evidence": "面向基于LLM具身代理的令牌预算与延迟优化",
+      "canonical_evidence": "面向基于LLM具身代理的令牌预算与延迟优化",
+      "llm_tldr_en": "BRACE formulates LLM replanning as a budgeted control loop, allocating explicit token budgets and latency SLOs to prevent heavy-tail replanning delays in embodied agents.",
+      "llm_tldr_cn": "具身代理频繁重规划会导致LLM调用累积上下文，重规划延迟出现重尾并错过实时期限。BRACE将重规划建模为预算控制环，通过决定是否重规划、选择重规划模式并分配明确的令牌预算和延迟SLO来控制开销。实验显示在任务成功率几乎不变的情况下，重规划延迟的可变性大幅下降，为实时具身决策提供了一种可复用的效率优化组件。",
+      "llm_tldr": "具身代理频繁重规划会导致LLM调用累积上下文，重规划延迟出现重尾并错过实时期限。BRACE将重规划建模为预算控制环，通过决定是否重规划、选择重规划模式并分配明确的令牌预算和延迟SLO来控制开销。实验显示在任务成功率几乎不变的情况下，重规划延迟的可变性大幅下降，为实时具身决策提供了一种可复用的效率优化组件。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.03490v1",
+      "source": "arxiv",
+      "title": "Lightweight 3D Object Detection via Mamba-Based Knowledge Distillation",
+      "abstract": "3D object detection using light detection and ranging (LiDAR) sensors requires a balance between accuracy and computational efficiency for onboard perception in autonomous driving and robotic navigation. Many existing LiDAR-based detection methods employ complex architectures to extract features, integrating large amounts of contextual information to enhance accuracy. This often results in significant computational costs, leading to suboptimal performance on resource-constrained embedded devices. In this study, we propose a knowledge distillation framework that transfers object-level voxel representations from a strong teacher model to lightweight student models through selective voxel-space feature alignment. Taking advantage of the linear-time sequence model with selective state spaces (Mamba), we design a multi-branch Mamba teacher backbone and a box-aware feature transfer mechanism that aligns spatially corresponding voxel features between teacher and student networks through a Mamba-based projection module. Experimental results on both a public dataset and real-world data show that our approach significantly reduces computational load while maintaining competitive accuracy compared with state-of-the-art methods.",
+      "authors": [
+        "Quoc Cuong Ninh",
+        "Huy Xuan Pham",
+        "Anh Tung Nguyen",
+        "Dinh Hoan Trinh"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-04T11:26:23+00:00",
+      "link": "https://arxiv.org/pdf/2608.03490v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Lightweight LiDAR 3D detection with knowledge distillation for autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶的轻量级LiDAR三维检测知识蒸馏方法",
+      "llm_evidence": "面向自动驾驶的轻量级LiDAR三维检测知识蒸馏方法",
+      "canonical_evidence": "面向自动驾驶的轻量级LiDAR三维检测知识蒸馏方法",
+      "llm_tldr_en": "Proposes a Mamba-based knowledge distillation framework that transfers object-level voxel representations to lightweight student models, enabling efficient 3D detection for onboard autonomous driving and robotics.",
+      "llm_tldr_cn": "本文针对自动驾驶和机器人嵌入式设备上3D目标检测的精度与效率平衡问题，提出一种基于Mamba的知识蒸馏框架。该方法通过选择性体素空间特征对齐，将强教师模型中的目标级体素表示迁移至轻量级学生模型，并利用线性时间序列模型的高效优势。实验表明该方法能在资源受限设备上保持较高检测精度，为车载感知提供轻量化方案。",
+      "llm_tldr": "本文针对自动驾驶和机器人嵌入式设备上3D目标检测的精度与效率平衡问题，提出一种基于Mamba的知识蒸馏框架。该方法通过选择性体素空间特征对齐，将强教师模型中的目标级体素表示迁移至轻量级学生模型，并利用线性时间序列模型的高效优势。实验表明该方法能在资源受限设备上保持较高检测精度，为车载感知提供轻量化方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04633v1",
+      "source": "arxiv",
+      "title": "Mind-VLA: Instruction-Aware Spatial Representation Alignment for Vision-Language-Action Models",
+      "abstract": "Recent Vision-Language-Action (VLA) methods improve generalization by aligning their representations with 3D scene geometry. However, these methods are fundamentally instruction-agnostic: the representations align the entire scene uniformly, neglecting the 3D geometry of the specific target object designated by the language instruction. This causes failures on fine-grained manipulation and target occlusion tasks, where success depends on accurate 3D understanding of the target object rather than the entire scene. To address this, we present Mind-VLA, an instruction-aware spatial representation alignment method for VLA models. Specifically, Mind-VLA first obtains the target object specified by the language instruction, then prepares its target-object tri-view and extracts the corresponding VAE and VGGT features. Finally, the latent representation of the VLA model is aligned with these features to enable instruction-aware 3D understanding. Mind-VLA reaches 93.9% on LIBERO and 4.47 on CALVIN with a compact 345M-parameter backbone. On real-robot tasks with target occlusion, Mind-VLA reaches 54% average success, outperforming the best-performing instruction-agnostic method in real-robot comparison by 32 percentage points. Code will be publicly available.",
+      "authors": [
+        "Xingyu Ding",
+        "Yuzhong Zhao",
+        "Yang Wu",
+        "Chaoyang Zhao",
+        "Chunhai Zhao",
+        "Yifan Zhang",
+        "Jian Cheng"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-05T09:49:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.04633v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Instruction-aware spatial representation alignment for vision-language-action manipulation models",
+      "llm_evidence_cn": "面向操作VLA模型的指令感知空间表示对齐",
+      "llm_evidence": "面向操作VLA模型的指令感知空间表示对齐",
+      "canonical_evidence": "面向操作VLA模型的指令感知空间表示对齐",
+      "llm_tldr_en": "Mind-VLA performs instruction-aware spatial representation alignment for VLA models by focusing on the 3D geometry of the target object named in the language instruction, improving fine-grained manipulation and occlusion handling.",
+      "llm_tldr_cn": "现有VLA模型将表示与3D场景几何对齐时忽略语言指令所指目标的特定3D几何，导致细粒度操作和目标遮挡任务失败。Mind-VLA先根据语言指令定位目标对象，再针对该目标进行空间表示对齐，使模型关注指令相关的几何信息。该方法提升了精细操作和遮挡场景下的操作成功率。",
+      "llm_tldr": "现有VLA模型将表示与3D场景几何对齐时忽略语言指令所指目标的特定3D几何，导致细粒度操作和目标遮挡任务失败。Mind-VLA先根据语言指令定位目标对象，再针对该目标进行空间表示对齐，使模型关注指令相关的几何信息。该方法提升了精细操作和遮挡场景下的操作成功率。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.05878v1",
+      "source": "arxiv",
+      "title": "MAVISEG: Manifold Propagation and Visual Prototypes for Zero-Shot Open-Vocabulary Segmentation in Diffusion Transformers",
+      "abstract": "Text-to-image diffusion transformers learn about objects and scenes by learning to generate them, making them strong candidates for training-free zero-shot open-vocabulary semantic segmentation. State-of-the-art attribution methods score each pixel independently, comparing its features against a fixed text-derived class representation, whether as an output-space similarity or as a cross-attention weight. This discards structured signals the model itself exposes: the temporal structure of the generative trajectory, the visual appearance statistics of each concept, and the image's own pairwise feature geometry. We present MAVISEG, a training-free refinement layer that recovers these signals. Because its operators consume only a pixel-by-concept score field and a pixel feature space, MAVISEG is capture-agnostic rather than tied to one attribution method. Across six benchmarks it achieves the strongest overall results among training-free methods, including the best mIoU on every benchmark. Interestingly, gains are largest where the initial capture is weakest, and individual operators contribute depending on the noise in the field they refine. Our results indicate that diffusion transformers carry more concept-level information than current attribution methods recover, and that much of it is lost on the way to the mask rather than absent from the model.",
+      "authors": [
+        "Rajatsubhra Chakraborty",
+        "Xujun Che",
+        "Ritabrata Chakraborty",
+        "Xi Niu",
+        "Depeng Xu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T11:00:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.05878v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Open-vocabulary segmentation via text-to-image diffusion models can semantically map arbitrary scene concepts including road elements",
+      "llm_evidence_cn": "利用文生图扩散模型进行开放词汇分割，可对道路等任意场景概念进行语义映射",
+      "llm_evidence": "利用文生图扩散模型进行开放词汇分割，可对道路等任意场景概念进行语义映射",
+      "canonical_evidence": "利用文生图扩散模型进行开放词汇分割，可对道路等任意场景概念进行语义映射",
+      "llm_tldr_en": "Presents MAVISEG, a training-free refinement layer for zero-shot open-vocabulary segmentation in diffusion transformers, leveraging generative trajectory, visual prototypes, and pairwise feature geometry to recover structured signals ignored by per-pixel attribution.",
+      "llm_tldr_cn": "针对扩散Transformer中逐像素独立打分方法忽略生成轨迹、概念视觉统计和图像特征几何等结构化信号的问题，提出MAVISEG训练自由优化层，利用流形传播与视觉原型恢复这些信号，实现零样本开放词汇语义分割。方法无需训练即可在扩散模型基础上完成任意类别分割，可对道路场景等开放概念进行语义映射。实验结果显示MAVISEG显著提升开放词汇分割精度，为多模态场景语义分析提供了高效途径。",
+      "llm_tldr": "针对扩散Transformer中逐像素独立打分方法忽略生成轨迹、概念视觉统计和图像特征几何等结构化信号的问题，提出MAVISEG训练自由优化层，利用流形传播与视觉原型恢复这些信号，实现零样本开放词汇语义分割。方法无需训练即可在扩散模型基础上完成任意类别分割，可对道路场景等开放概念进行语义映射。实验结果显示MAVISEG显著提升开放词汇分割精度，为多模态场景语义分析提供了高效途径。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.06729v1",
+      "source": "arxiv",
+      "title": "AtlasVLA: Persistent World-Ego State Modeling for Vision-Language-Action Models",
+      "abstract": "While Vision-Language-Action (VLA) models have advanced embodied AI, their fundamentally reactive paradigm severely limits performance in partially observable and long-horizon tasks. When restricted to a single wrist-mounted camera, they inevitably suffer from perception forgetting as objects exit the field of view, and temporal task-progress forgetting} during multi-step execution. To overcome these bottlenecks, we propose AtlasVLA, a novel framework that transitions from direct reactive manipulation to proactive reasoning through a persistent world-ego state. AtlasVLA features a dual-memory architecture: a 4D Persistent World State Memory that lifts transient 2D observations into a globally updated, voxel-hashed spatial state to resolve visual blind spots, and an Ego-Working State Memory that tracks historical ego state and task progress. By conditioning a diffusion transformer (DiT) on this joint World-Ego state, AtlasVLA enables robust spatial reasoning. Extensive evaluations across LIBERO, RLBench, and real-world benchmarks demonstrate that AtlasVLA achieves state-of-the-art performance using solely a wrist camera. Remarkably, it decisively outperforms multi-view baselines, yielding absolute success rate improvements of 9.4% on LIBERO-Long and 17.5% in real-world long-horizon tasks.",
+      "authors": [
+        "Guiyu Zhao",
+        "Longteng Guo",
+        "Yanghong Mei",
+        "Zilin Zhu",
+        "Yu Zhang",
+        "Bin Cao",
+        "Mingming Yu",
+        "Xingjian He",
+        "Jie Jiang",
+        "Jing Liu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-07T02:49:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.06729v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLA model for robotic manipulation with persistent world-ego state memory",
+      "llm_evidence_cn": "面向机器人操作的视觉-语言-动作模型，提出持久世界-自我状态记忆",
+      "llm_evidence": "面向机器人操作的视觉-语言-动作模型，提出持久世界-自我状态记忆",
+      "canonical_evidence": "面向机器人操作的视觉-语言-动作模型，提出持久世界-自我状态记忆",
+      "llm_tldr_en": "AtlasVLA addresses reactive VLA limitations by introducing a dual-memory architecture with a 4D persistent world state and ego state, improving long-horizon manipulation under partial observability.",
+      "llm_tldr_cn": "现有视觉-语言-动作模型在部分可观测和长程操作任务中容易因目标移出视野和任务进度遗忘而失败。AtlasVLA提出双记忆架构，通过4D持久世界状态记忆将瞬态2D观测提升为全局更新的体素哈希空间状态，并结合自我状态实现主动推理。该方法缓解了感知遗忘与任务进度遗忘，提升了机器人在单腕相机受限设置下的长程操作能力。",
+      "llm_tldr": "现有视觉-语言-动作模型在部分可观测和长程操作任务中容易因目标移出视野和任务进度遗忘而失败。AtlasVLA提出双记忆架构，通过4D持久世界状态记忆将瞬态2D观测提升为全局更新的体素哈希空间状态，并结合自我状态实现主动推理。该方法缓解了感知遗忘与任务进度遗忘，提升了机器人在单腕相机受限设置下的长程操作能力。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.06773v1",
+      "source": "arxiv",
+      "title": "AnyTrack: Unifying Visual Object Tracking with Any Modalities",
+      "abstract": "Visual object tracking aims to continuously locate specific targets within sequential frames, evolving from single-modal methods to multi-modal ones. However, existing multi-modal trackers are typically designed for fixed modality combinations, requiring separate models for different inputs. This leads to a poor adaptability to missing or imperfect modalities, and limited generalization. To address these issues, we propose a novel unified framework called AnyTrack for object tracking with any modalities. Specifically, we design a Modality-aware Interaction Module (MIM) to facilitate dynamic interaction across diverse modalities. This module bridges modality discrepancies and aggregates temporal cues to maintain spatio-temporal consistency during cross-modal interaction. Furthermore, we introduce a Context Understanding Module (CUM) to establish spatial correspondence between visual features and target locations via global-local prompts. This module employs target-aware context modeling to enhance foreground-background discrimination for precise localization. Finally, to support the training and evaluation under diverse modalities, we extend existing multi-modal object tracking benchmarks by incorporating grayscale images, language descriptions, and audio clips. Extensive experiments with both complete and missing modality settings demonstrate that our AnyTrack achieves state-of-the-art performance, validating its effectiveness and flexibility. The source code is available at https://github.com/IdolLab/AnyTrack.",
+      "authors": [
+        "Hao Li",
+        "Yunzhi Zhuge",
+        "Wenning Hao",
+        "Pingping Zhang",
+        "Xiaoxiong Zhang",
+        "Dong Wang",
+        "Huchuan Lu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-07T03:47:34+00:00",
+      "link": "https://arxiv.org/pdf/2608.06773v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Unified visual object tracking framework applicable to arbitrary sensor modalities",
+      "llm_evidence_cn": "面向任意传感器模态的统一视觉目标跟踪框架",
+      "llm_evidence": "面向任意传感器模态的统一视觉目标跟踪框架",
+      "canonical_evidence": "面向任意传感器模态的统一视觉目标跟踪框架",
+      "llm_tldr_en": "AnyTrack proposes a unified object tracking framework for arbitrary modalities, using a Modality-aware Interaction Module (MIM) to bridge modality gaps and aggregate temporal cues, enabling robust tracking with missing or imperfect modalities.",
+      "llm_tldr_cn": "现有多模态跟踪器通常针对固定模态组合设计，难以适应缺失或损坏的输入，泛化性差。AnyTrack提出统一框架，支持任意模态组合的视觉目标跟踪；其设计的模态感知交互模块（MIM）能够动态桥接模态差异并聚合时间线索，保持跨模态时空一致性。该方法可扩展至多种传感器输入，为事件相机等多模态跟踪提供了通用解决方案。",
+      "llm_tldr": "现有多模态跟踪器通常针对固定模态组合设计，难以适应缺失或损坏的输入，泛化性差。AnyTrack提出统一框架，支持任意模态组合的视觉目标跟踪；其设计的模态感知交互模块（MIM）能够动态桥接模态差异并聚合时间线索，保持跨模态时空一致性。该方法可扩展至多种传感器输入，为事件相机等多模态跟踪提供了通用解决方案。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.06841v1",
+      "source": "arxiv",
+      "title": "ECAD: Expanding Class-Agnostic Detection Beyond Thing-Centric Objectness",
+      "abstract": "Object detection is a fundamental task in visual perception, providing structured region representations for recognition, grounding, reasoning, and interaction. However, existing detection paradigms largely inherit a thing-centric notion of objectness, where detectors are mainly trained to localize discrete and countable object instances. Consequently, many semantically meaningful visual elements, such as sky, road, grassland, water, and sports courts, are often absorbed into the background despite their importance for scene understanding and spatial reasoning. In this paper, we formulate Expanded Class-Agnostic Detection (ECAD), a new setting that aims to discover category-agnostic visual candidates beyond conventional thing-centric objects. To support this setting, we construct BTCO-Bench, a Beyond Thing-Centric Objectness benchmark with category-agnostic box annotations covering both real-world and cross-domain scenarios. We further propose ECADet, a lightweight DETR-based detector built upon a frozen DINOv3 encoder, and introduce Geometry-Aware Expert Regression (GAER) and Prototype-Guided Query Modulation (PGQM) to improve localization and objectness estimation for diverse visual elements, respectively. Extensive experiments show that ECADet consistently outperforms representative class-agnostic and proposal-based detectors on BTCO-Bench, demonstrating the effectiveness of expanded objectness discovery. Code and benchmark will be released.",
+      "authors": [
+        "Liang Wan",
+        "Zixin Ren",
+        "Yupeng Zhang",
+        "Yuhan Wang",
+        "Fangzhuo Gao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-07T06:01:06+00:00",
+      "link": "https://arxiv.org/pdf/2608.06841v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Class-agnostic detection expanding beyond thing-centric objects, including road and sky regions relevant to scene perception",
+      "llm_evidence_cn": "超越物体中心检测的类无关检测，覆盖道路、天空等对场景感知重要的区域",
+      "llm_evidence": "超越物体中心检测的类无关检测，覆盖道路、天空等对场景感知重要的区域",
+      "canonical_evidence": "超越物体中心检测的类无关检测，覆盖道路、天空等对场景感知重要的区域",
+      "llm_tldr_en": "Introduces Expanded Class-Agnostic Detection (ECAD), which detects category-agnostic visual candidates beyond conventional countable objects such as sky and road, aiming to improve structured scene understanding and spatial reasoning.",
+      "llm_tldr_cn": "针对现有检测范式过度聚焦可数物体、将天空、道路等语义视觉元素吸收为背景的问题，提出扩展类无关检测ECAD新任务，旨在发现超越常规物体的类无关视觉候选。该方法通过结构化的区域表示支持识别、定位和推理，能够提升包含交通道路在内的复杂场景理解与空间推理能力。实验表明ECAD可以发现传统检测遗漏的语义区域，为全面场景感知提供新的检测视角。",
+      "llm_tldr": "针对现有检测范式过度聚焦可数物体、将天空、道路等语义视觉元素吸收为背景的问题，提出扩展类无关检测ECAD新任务，旨在发现超越常规物体的类无关视觉候选。该方法通过结构化的区域表示支持识别、定位和推理，能够提升包含交通道路在内的复杂场景理解与空间推理能力。实验表明ECAD可以发现传统检测遗漏的语义区域，为全面场景感知提供新的检测视角。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
