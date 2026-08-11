@@ -1,0 +1,364 @@
+Title: Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring for Robust Lane Detection
+
+URL Source: https://arxiv.org/pdf/2608.09610v1
+
+Published Time: Tue, 11 Aug 2026 02:22:52 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring for Robust Lane Detection 
+
+Weize Cai 1, †
+
+, Yongqi Dong 2, †,*
+
+, Zhida Shao 1, Yichen Liu 1, and Zixin Fu 3 
+
+> 1
+
+RWTH Aachen University, Aachen, Germany  
+
+> 2
+
+Delft University of Technology, Delft, The Netherlands  
+
+> 3
+
+Chang’an University, Xi’an, China  
+
+> †
+
+Equal contribution. * Corresponding author: yongqi.dong@rwth-aachen.de .
+
+Abstract. Lane detection requires recovering thin, elongated, and fre-quently occluded lane structures under challenging driving conditions. While anchor-based detectors provide efficient candidate generation, their performance is limited by two coupled issues: backbone features often lose structural continuity along partially visible lanes, and clas-sification confidence may decouple from line-level localization qual-ity, allowing inaccurate anchors to persist before non-maximum sup-pression (NMS). We propose a structure-enhanced and quality-aware framework that improves lane representation and dynamic-anchor scor-ing while preserving the inference pipeline of the Anchor Decomposi-tion Network (ADNet). Specifically, a Gated Horizontal-Vertical To-ken (GHVT) module enhances mid- and high-level backbone features via lightweight directional token interactions with a learnable residual gate. In parallel, Line-Quality-Aware Dynamic Anchor Scoring (LQAS) calibrates existing classification logits using quality supervision, hard-negative suppression, and pairwise ranking without adding inference branches. On the VIL-100 dataset, our method improves ADNet-R34 from 89.97 to 91.28 in F1 score at the 0.5 intersection-over-union thresh-old (F1@50), reducing both false positives and false negatives. Addi-tional experiments on CULane and TuSimple datasets, extensive abla-tions, score-distribution diagnostics, and runtime analysis confirm com-plementary structural and ranking improvements with minimal compu-tational overhead. 
+
+Keywords: Lane detection · Dynamic anchors · Structure-enhanced features · Quality-aware scoring · Pre-NMS candidate ranking 
+
+## 1 Introduction 
+
+Lane detection is a core perception task for autonomous driving and advanced driver-assistance systems, estimating lane instances from forward-facing cam-era images to support localization, lane keeping, trajectory planning, and safety monitoring. The task remains challenging because lane markings are thin, elon-gated, sparse, and frequently interrupted by occlusion, poor illumination, worn arXiv:2608.09610v1 [cs.CV] 10 Aug 2026 2 W. Cai et al. 
+
+paint, glare, shadows, and dense traffic. A robust detector must therefore infer coherent lane-set structure across the image, rather than relying solely on local pixel evidence or fragmented visual cues. Recent methods advance lane detection through diverse representations and context-modeling strategies, including segmentation-based mask prediction [14,7,10], spatial-propagation and spatio-temporal aggregation [15,30,2,32,16], and keypoint-, curve-, and Transformer-based modeling [19,24,20,3,13,4]. These advances improve lane geometry modeling, but robust detection in difficult scenes still depends on preserving continuous lane-aware features and assigning reliable confidence to candidate lanes. Another efficient line is anchor- and candidate-based lane detection, which formulates lane prediction as candidate generation, ranking, and refinement. Row-anchor methods use lightweight row-wise classification [17,18], while detector-style approaches refine instance-level candidates through attention-guided anchor pooling [21], conditional heads [12], cross-layer priors [31], or dynamic anchor decomposition [26]. Despite their efficiency, these detectors remain vulnerable to two coupled failure modes: backbone features may lose continuity along long and partially occluded lanes, and the classification scores used before non-maximum suppression (NMS) may not faithfully reflect line-level localization quality. As a result, poorly localized or false candidates can receive high pre-NMS scores, outrank better-localized lanes, and persist in the final predictions. This paper addresses these two failure modes with a structure-enhanced and quality-aware framework built upon the Anchor Decomposition Network (ADNet) [26], a strong dynamic-anchor lane detector. To strengthen lane repre-sentation, we introduce the Gated Horizontal-Vertical Token (GHVT) module, a lightweight residual backbone plug-in that models directional token interac-tions along horizontal and vertical axes and adaptively injects the resulting context through a learnable residual gate. Because it preserves feature ten-sor shapes and leaves the detector head, geometry decoder, and NMS pipeline unchanged, GHVT is not tied to ADNet’s dynamic-anchor formulation and can serve as a general detector-agnostic backbone enhancement. To improve candidate ranking, we further propose Line-Quality-Aware Dynamic Anchor Scoring (LQAS), which calibrates ADNet’s existing classification logits so that pre-NMS scores better reflect line-level localization quality. These two components are deliberately decoupled: GHVT acts within the feature hierarchy, particularly ResNet stages 3 and 4, to strengthen the con-tinuity of long, thin, and occluded markings, while LQAS combines quality supervision, hard-negative suppression, and pairwise ranking on the reused classification layer. This complementary design jointly improves missed-lane recovery and false-positive suppression while preserving the original ADNet inference pipeline. The experimental results support these claims. On the VIL-100 benchmark [29], the enhanced ADNet-R34 model with GHVT and LQAS improves the reproduced ADNet-R34 baseline from 89.97 to 91.28 in F1 score at the 0.5 Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 3
+
+intersection-over-union threshold (F1@50) while reducing both false positives (FPs) and false negatives (FNs), and even outperforms the reported ADNet-R101 results in [26] despite using the smaller ResNet-34 backbone. Together with the lightweight design of GHVT and the branch-free inference of LQAS, this indicates that the gain stems from more effective lane-structure representa-tion and quality-aware score calibration rather than increased parameter count. On the full 34,680-frame CULane test split [15], GHVT provides positive cross-detector transfer evidence when integrated into both ADNet and LaneATT [21]. Extensive ablations further show that GHVT provides the primary improve-ment through enhanced lane-structure representation, while LQAS reduces FPs by suppressing high-scoring hard negatives. 
+
+## 2 Related Work 
+
+2.1 Lane Representations: Dense Masks, Keypoints, and Curves 
+
+Lane detection methods are commonly distinguished by how they parameter-ize lane instances. Segmentation-based methods formulate lane detection as semantic or instance mask prediction, using instance grouping, representation learning, self-distillation, or tailored losses [14,7,10], but often require additional grouping or post-processing to obtain lane instances. To reduce dense predic-tion, bottom-up keypoint methods associate local lane evidence into complete lanes [19,24], while parametric methods regress compact continuous curves, such as polynomial or B´ ezier representations, to model lane geometry directly [20,3]. 
+
+2.2 Anchor- and Candidate-based Lane Detection 
+
+Another efficient line formulates lane detection as candidate generation, rank-ing, and refinement, where predefined or dynamically generated anchors are classified, scored, and regressed into final lane instances. Row-anchor methods provide a lightweight variant by discretizing lane locations along predefined im-age rows and solving row-wise classification [17,18], while instance-level candi-date methods improve prediction through attention-guided anchor pooling [21], conditional convolutional heads [12], cross-layer lane priors [31], or dynamic an-chor decomposition [26]. These designs enable efficient inference, but their final predictions remain sensitive to feature continuity and score calibration: thin or occluded lanes require coherent lane-aware responses, while pre-NMS scores should rank well-localized lanes above ambiguous or false proposals. 
+
+2.3 Context Modeling for Lane-structure Features 
+
+Lane markings are sparse, elongated, and frequently interrupted, making con-textual aggregation important for robust detection. Spatial message-passing and recurrent aggregation propagate fragmented lane evidence across rows 4 W. Cai et al. 
+
+or columns within a frame [15,30], and spatio-temporal methods further ex-ploit adjacent frames under occlusion, blur, and worn markings [2,32,16]. Transformer-style approaches model row-, column-, or instance-level depen-dencies with global attention [13,4], and horizontal-vertical attention has been explored for multi-frame lane detection [27]. General visual modules such as residual learning [5], self-attention [23], and channel/spatial recalibration [8,25] also provide useful enhancement mechanisms. These studies motivate lightweight structure-aware feature enhancement that preserves the down-stream detection pipeline. 
+
+2.4 Quality-aware Scoring and Pre-NMS Ranking 
+
+Localization-aware confidence is crucial whenever candidates are ranked before NMS. In object detection, IoU-Net predicts localization confidence [9], GFL unifies classification confidence with localization quality [11], and VarifocalNet learns an IoU-aware classification score [28]. Lane detection faces an analogous problem, where candidate scores should reflect line-level localization quality rather than foreground likelihood alone; CLRerNet addresses this by introduc-ing LaneIoU into assignment and loss design [6]. However, quality-aware scoring for dynamic-anchor lane detectors remains underexplored, especially when the goal is to recalibrate existing classification logits without adding an inference branch or changing geometry decoding. 
+
+## 3 Method 
+
+3.1 Overview 
+
+The proposed framework improves the dynamic-anchor lane detector ADNet [26] from two complementary perspectives: lane-structure representation and score calibration, while preserving the original inference pipeline. As illustrated in Figure 1, an input image is first processed by a ResNet-34 backbone, where the proposed GHVT plug-in is applied to the stage-3 and stage-4 feature maps to strengthen mid- and high-level lane structure representations. The enhanced feature hierarchy is subsequently fed into the unchanged ADNet head, which consists of a Feature Pyramid Network (FPN), a Start Point Generate Unit (SPGU), and an Adaptive Lane Aware Unit (ALAU), followed by the origi-nal lane-geometry regression and candidate classification branches. For score calibration, LQAS reuses the existing classification logits and supervises them with line-level quality targets, encouraging pre-NMS scores to better reflect localization quality without introducing an additional inference branch. Formally, given an input image I, the framework can be summarized as ˜F = TGHVT (B(I)) , (1) 
+
+{(ˆℓi, s i)}Mcand  
+
+> i=1
+
+= DADNet 
+
+ ˜F
+
+
+
+, (2) Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 5ADNet Head         
+
+> (FPN →SPGU →ALAU)
+> Geometry Regression Classification
+> logits
+> LQAS
+> NMS
+> (Non-Maximum Suppression)
+> Proposed (Ours) Baseline / Frozen Input Image ResNet-34 Backbone Stage 4 Stage 1 Stage 2 Stage 3 Output Lanes
+
+GHVT Plug-in 
+
+> Residual-gated feature enhancement
+
+LQAS   
+
+> Pre-NMS score calibration with LineloU supervision (only classification layer trainable) BN 1×1 Reduce 1×1 Expand
+> gate
+> (init 10 -4 )
+
++    
+
+> Loss Supervision (only classification layer trainable)
+> Input Features
+> Candidate anchors/ lane proposals
+> Score Classification logits
+> Output
+> GHVT Plug-in (detector-agnostic)
+> Auxiliary supervision Trainable (LQAS classification layer)
+> GHVT Core
+> Vertical branch
+> (Channel recalibration)
+> Horizontal branch
+> (Head re-weighting)
+> Fusion
+> Residual / no-gradient GHVT modules (trainable) Gating (trainable, near-zero init) BN Batch normalization
+> Quality target (LineloU)
+> (: ground-truth lane)
+
+Fig. 1: Overview of the proposed lane detection framework. where B is the ResNet-34 backbone, TGHVT the GHVT feature-enhancement module, and DADNet the unchanged ADNet detector. Mcand is the number of pre-NMS dynamic-anchor candidates, ˆℓi the i-th lane hypothesis, and si
+
+its pre-NMS ranking score computed from the existing classification logits. Since GHVT enhances features while LQAS modifies only score supervision, the detector head, geometry decoder, ranking rule, and NMS procedure remain unchanged during inference. During training, GHVT is optimized with the original ADNet loss, and LQAS provides an additional score-calibration loss for the classification layer, as detailed in subsection 3.2 and subsection 3.3. 
+
+3.2 GHVT for Lane-Structure Enhancement 
+
+GHVT is a residual backbone enhancement module for strengthening elongated lane features. Given a stage feature map Xs ∈ RCs×Hs×Ws , GHVT applies nor-malization and channel compression, performs horizontal-vertical token mod-eling, projects the features back to the original dimension, and injects the enhanced representation through a learnable near-identity residual gate: ˜Xs = Xs + γs ⊙ ψs(As(ϕs(BN( Xs)))) , (3) where ϕs and ψs denote 1 ×1 channel reduction and expansion projections, BN denotes batch normalization, As is the horizontal-vertical token operator, 
+
+⊙ represents element-wise multiplication, and γs is a learnable residual gate initialized to 10 −4 to stabilize early-stage training by preserving the original ADNet representation. The operator As captures complementary spatial and channel dependen-cies. Let Ts ∈ RNs×ds be the flattened feature map with Ns spatial tokens and embedding dimension ds. The horizontal branch produces a spatial representa-tion Hs via multi-head token attention, while the vertical branch generates a 6 W. Cai et al. 
+
+channel-wise gating vector ws from globally aggregated context: 
+
+As(Ts) = Hs ⊙ ws, (4) 
+
+Hs = Concat Hh=1 Attn h(Ts), (5) 
+
+ws = σ(W2 δ(W1 GAP( Ts))) , (6) where GAP denotes global average pooling, W1 and W2 form a bottleneck transformation, δ(·) and σ(·) denote ReLU and sigmoid activations, Concat Hh=1 
+
+concatenates the H attention-head outputs along the channel dimension, and 
+
+⊙ performs element-wise channel reweighting between the spatial features Hs
+
+and channel importance ws.In implementation, GHVT is applied to ResNet stages 3 and 4: stage 3 operates on higher-resolution features with reduced token dimensionality for efficiency, while stage 4 captures global context from low-resolution represen-tations. The design is detector-agnostic: since GHVT only transforms backbone fea-ture maps while preserving their tensor shape, it is independent of ADNet’s dynamic-anchor head, lane parameterization, and NMS procedure, enabling direct transfer to other lane detectors such as LaneATT [21]. 
+
+3.3 Line-Quality-Aware Dynamic Anchor Scoring (LQAS) 
+
+LQAS aligns ADNet [26] classification confidence with line-level localization quality. ADNet ranks dynamic-anchor candidates using classification confidence before NMS. However, binary foreground confidence is not always consistent with lane localization quality: poorly localized or background anchors may still receive high pre-NMS scores. LQAS addresses this mismatch by recalibrating the existing classification logits into quality-aware candidate scores, without introducing an additional inference branch or modifying the geometry decoder. For each dynamic anchor i, the detector predicts a lane hypothesis ˆℓi and two classification logits ( z+ 
+
+> i
+
+, z − 
+
+> i
+
+). We use the logit margin to define the pre-NMS ranking score as: 
+
+si = σ(z+ 
+
+> i
+
+− z− 
+
+> i
+
+), (7) For a matched anchor set P and an unmatched anchor set N , LQAS assigns continuous quality targets, q, to positive samples based on Line Intersection-over-Union (LineIoU) [6], while assigning zero to negative samples: 
+
+qp =
+
+h
+
+clip 
+
+
+
+LineIoU( ˆℓp, g π(p); w), 0, 1
+
+i β
+
+, p ∈ P ; qj = 0 , j ∈ N . (8) Here, gπ(p) denotes the ground-truth lane assigned to anchor p, and LineIoU follows the lane-overlap formulation in confidence-aware lane detection [6]. The parameter w controls the spatial tolerance in LineIoU computation, while β
+
+is a fixed calibration exponent controlling the sharpness of the quality target. Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 7
+
+This formulation encourages classification scores to reflect line-level localization quality rather than merely foreground likelihood. To focus supervision on candidates that influence NMS, we mine score-adaptive hard negatives from unmatched anchors N :
+
+H = Top-K 
+
+> j∈N
+
+(sj , K ), K = min ( |N | , max( Kmin , ⌊r|P|⌋ )) . (9) Here, H denotes the set of selected hard-negative anchors, and sj is the pre-NMS ranking score of candidate j ∈ N . The parameter K controls the number of mined hard negatives, where Kmin ensures a minimum selection size and r
+
+defines the proportional sampling ratio with respect to the positive set P.The final LQAS loss combines quality alignment, hard-negative suppression, and pairwise ranking: 
+
+LLQAS = 1
+
+|P| 
+
+X
+
+> p∈P
+
+BCE( sp, q p) + λh
+
+1
+
+|H| 
+
+X
+
+> h∈H
+
+BCE( sh, 0) + λr
+
+1
+
+|P||H| 
+
+X
+
+> p∈P
+
+X
+
+> h∈H
+
+[τ + sh − sp]+ .
+
+(10) Here, P and H denote the sets of positive and hard-negative anchors, re-spectively. sp is the pre-NMS ranking score, and qp is the LineIoU-based quality target. BCE( ·, ·) denotes the binary cross-entropy loss, while [ ·]+ = max( ·, 0) denotes the hinge function with margin τ . The hyperparameters λh and λr
+
+balance hard-negative suppression and ranking supervision, respectively. Overall, the first term in Equation 10 enforces alignment between scores and continuous lane quality, the second term suppresses high-scoring hard neg-atives, and the third term explicitly encourages correct ranking of positives over confusing negatives before NMS. In implementation, LQAS is trained on top of the GHVT-enhanced ADNet checkpoint with a narrow trainable scope: only the classification layer is up-dated, while the backbone, GHVT, FPN, SPGU, ALAU, and regression head are frozen. This design isolates score-quality alignment from geometry learn-ing and ensures that the observed improvements are attributed to enhanced pre-NMS ranking rather than additional inference complexity. 
+
+3.4 Inference 
+
+The proposed model preserves the original ADNet inference pipeline. At test time, dynamic-anchor candidates are decoded and ranked using the same score formulation and logic described in subsection 3.3, followed by the unchanged NMS and lane decoding procedure. No additional inference branches are intro-duced, and the computational complexity remains identical to ADNet apart from the GHVT-enhanced backbone. 8 W. Cai et al. 
+
+## 4 Experiments and Results 
+
+4.1 Experimental Setup 
+
+We evaluate the proposed method on three lane-detection benchmarks with complementary scene characteristics: VIL-100 [29], CULane [15], and TuSim-ple [22]. VIL-100 [29] serves as the primary benchmark, as it contains video-derived driving scenes with frequent occlusion, illumination variation, dense lane layouts, and challenging road structures. CULane [15] provides diverse real-world scenarios and challenging difficult subsets, including crowded, night, and no-line conditions; we use its full 34,680-frame test split to evaluate cross-dataset generalization performance beyond VIL-100. TuSimple [22] consists of relatively structured highway scenes and is used as an auxiliary benchmark under simpler geometric conditions. For all datasets, we report standard lane-detection metrics, including F1@50, accuracy (Acc), false positive (FP) rate, and false negative (FN) rate, and additionally report F1@75 on CULane to evaluate performance un-der stricter localization requirements. All local training, fine-tuning, testing, and runtime measurements are conducted on a single NVIDIA A40 GPU with CUDA 12.1 and 128 GB system RAM to ensure fair comparisons. 
+
+4.2 Main Results on the VIL-100 Benchmark 
+
+Table 1: Quantitative comparison of lane detection methods on VIL-100 bench-mark.                                                         
+
+> Method F1@50 ↑Acc (%) ↑FP (%) ↓FN (%) ↓
+> MMA-Net [29] 83.90 91.00 11.10 10.50 MHVT [27] 84.60 91.50 8.20 9.50 LaneNet [14] 72.10 85.80 12.20 20.70 SCNN-VGG16 [15] 49.10 90.70 12.80 11.00 SAD-ENet [7] 75.50 88.60 17.00 15.20 UFLD-R34 [17] 31.00 85.20 11.50 21.50 LSTR [13] 70.30 88.40 16.30 14.80 CLRNet-R18 [31] 57.27 88.99 6.90 13.50 CLRNet-R101 [31] 59.41 88.65 2.10 12.50 ADNet-R34 [26] 90.39 94.38 4.40 4.90 ADNet-R101 [26] 90.90 94.27 4.70 5.00 Baseline ADNet-R34 89.97 94.38 4.43 4.90
+> Enhanced ADNet-R34 91.28 94.43 4.26 4.69
+
+The proposed framework achieves strong performance on the VIL-100 benchmark. As shown in Table 1, the enhanced ADNet-R34 with the proposed GHVT and LQAS (ADNet-R34 GHVT+LQAS) achieves the F1@50 of 91.28, surpassing the reproduced ADNet-R34 baseline by 1.31 points. This improve-ment is accompanied by consistent reductions in both FP (4.43% → 4.26%) Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 9
+
+and FN (4.90% → 4.69%), indicating that the gain is not obtained through a precision–recall trade-off. The proposed method also surpasses the ADNet-R101 results in [26], which uses a larger backbone, across all evaluated metrics. This suggests the performance gain is not due to increased model complexity or parameter count, but rather to more effective lane-structure modeling and quality-aware scoring. Consistent with these quantitative results, the qualitative comparisons in Figure 2 show that the enhanced ADNet-R34 GHVT+LQAS produces more complete and stable lane hypotheses under challenging conditions, including fog, glare, night driving, dense traffic, and heavy occlusion. In these scenarios, the baseline model is more prone to fragmented or distracted predictions due to incomplete markings and surrounding structural interference. 
+
+Fig. 2: Qualitative comparison on the VIL-100 benchmark. The selected scenes include fog, dense lane layout, truck occlusion, glare, and night driving. 
+
+4.3 Cross-Dataset Generalization and Transfer Evidence 
+
+This section evaluates whether the proposed representation enhancement re-mains effective beyond the primary VIL-100 benchmark. 10 W. Cai et al. 
+
+Results on CULane. Table 2 reports both literature and locally reproduced results on the full 34,680-frame CULane test split. The enhanced ADNet-R34 GHVT+LQAS improves the ADNet-R34 baseline from 78.95 to 79.09 in F1@50 and from 60.65 to 60.86 in F1@75. Similarly, the enhanced LaneATT-R34 with GHVT and LQAS (LaneATT-R34 GHVT+LQAS) improves the cor-responding baseline from 76.58 to 76.75 in F1@50 and from 53.62 to 54.63 in F1@75. These consistent improvements across two different detector fami-lies indicate that the proposed GHVT and LQAS generalize effectively beyond ADNet backbone and the VIL-100 training distribution. More importantly, the gains are observed across multiple challenging subsets, including crowded, night, and no-line scenarios, as shown in Table 2. The qualitative results in Figure 3 further corroborate this observation with ADNet-R34 GHVT+LQAS and LaneATT-R34 GHVT+LQAS outperforming their corresponding baseline by more correctly detected lane line numbers and more stable lane lines. Table 2: CULane benchmark evaluation. Literature results are reported for reference, while reproduced results assess the cross-dataset and cross-detector generalization of the proposed GHVT and LQAS. Values in parentheses indi-cate gains/decreases over the corresponding baseline.                                                                                     
+
+> Method Backbone F1@50 ↑F1@75 ↑Normal ↑Crowd ↑NoLine ↑Cross ↓Night ↑
+> SCNN [15] VGG16 71.60 N/R 90.60 69.70 43.40 1990 66.10 LaneAF [1] DLA34 77.41 N/R 91.80 75.61 51.38 1360 73.03 GANet [24] R34 79.39 N/R 93.73 77.92 52.63 1368 73.67 CondLane [12] R34 78.74 59.39 93.38 77.14 51.85 1387 73.92 CLRNet [31] R34 79.73 62.11 93.49 78.06 54.01 1216 75.02 CLRerNet [6] R34 80.76 63.77 93.93 79.51 55.55 1088 76.02 ADNet [26] R34 78.94 N/R 92.90 77.45 52.89 1499 74.78 Baseline ADNet-R34 R34 78.95 60.65 92.90 77.46 52.89 1498 74.78 Enhanced ADNet-R34 R34 79.09
+> (+0 .14)
+> 60.86
+> (+0 .21)
+> 93.46
+> (+0 .56)
+> 77.58
+> (+0 .12)
+> 53.49
+> (+0 .60)
+> 1499
+> (−1)
+> 74.99
+> (+0 .21)
+> Baseline LaneATT-R34 R34 76.58 53.62 92.12 74.84 49.22 1310 70.54 Enhanced LaneATT-R34 R34 76.75
+> (+0 .17)
+> 54.63
+> (+1 .01)
+> 92.37
+> (+0 .25)
+> 74.79
+> (−0.05)
+> 49.98
+> (+0 .76)
+> 1311
+> (−1)
+> 71.18
+> (+0 .64)
+
+Results on TuSimple. The TuSimple benchmark provides auxiliary evidence under a more structured highway setting. As shown in Table 3, the repro-duced ADNet-R34 baseline matches the reported ADNet-R34 results in [26]. Incorporating the proposed GHVT and LQAS modules improves performance, increasing F1@50 from 97.31 to 97.49 while reducing the FP rate from 2.83% to 2.41%. These results indicate that the proposed model enhancement provides precision-oriented transfer gains under the simpler lane geometry in TuSimple. 
+
+4.4 Ablation Study of GHVT and LQAS on VIL-100 
+
+We conduct a sequential ablation on the VIL-100 benchmark to isolate the con-tributions of the two proposed components. Starting from ADNet-R34 baseline, we first add the GHVT module to evaluate lane-structure representation and Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 11 
+
+then add the LQAS module to evaluate quality-aware score calibration for pre-NMS candidate ranking. 
+
+Fig. 3: Qualitative comparison on CULane benchmark in crowd, night, normal, arrow-marking, and no-line scenarios. Table 3: TuSimple benchmark evaluation.                                    
+
+> Method Backbone F1@50 ↑Acc(%) ↑FP(%) ↓FN(%) ↓
+> UFLDv2 [18] R34 96.22 95.56 3.18 4.37 LaneATT [21] R34 96.77 95.63 3.53 2.92 CondLaneNet [12] R101 97.24 96.54 2.01 3.50 ADNet-R34 [26] R34 97.31 96.60 2.83 2.53 Baseline ADNet-R34 R34 97.31 96.60 2.83 2.53 Enhanced ADNet-R34 R34 97.49 96.49 2.41 2.62
+
+As shown in Table 4, adding GHVT provides the dominant gain, improving F1@50 from 89.97 to 91.21 (+1.24), while increasing the number of true posi-tives (TPs) from 7580 to 7702 and reducing FNs from 869 to 747. This indicates improved lane recovery. Adding LQAS further improves F1@50 to 91.28 and yields the best precision, mainly by reducing FPs from 738 to 712 while keeping recall rate close to ADNet GHVT. These results support the intended comple-mentarity: GHVT improves structural lane recovery, whereas LQAS improves candidate ranking and false-positive suppression before NMS. 
+
+4.5 Analysis of GHVT for Lane-Structure Enhancement 
+
+Branch and stage placement. Table 5 analyzes both the branch composition and insertion stage of GHVT. For branch composition, the branch-removal variants keep the module inserted at stages 3 and 4, but remove either the horizontal or vertical branch. The results show that GHVT is not a generic 12 W. Cai et al. 
+
+Table 4: Sequential component ablation of GHVT and LQAS on VIL-100 bench-mark.                             
+
+> Model TPs ↑FPs ↓FNs ↓Prec.(%) ↑Rec.(%) ↑F1@50 ↑∆F1@50 ↑
+> ADNet-R34 (baseline) 7580 821 869 90.23 89.71 89.97 0.00 ADNet GHVT 7702 738 747 91.26 91.16 91.21 +1.24 ADNet GHVT+LQAS 7692 712 757 91.53 91.04 91.28 +1.31
+
+attention add-on: using only the horizontal branch leads to severe degrada-tion, whereas the vertical-only variant still improves model performance over the ADNet-R34 baseline. This suggests that the vertical channel-recalibration branch is important for stabilizing the enhanced representation, and that hor-izontal token interactions become effective when coupled with channel-wise reliability modeling. For stage placement, stage 3 contributes more than stage 4, indicating that lane detection benefits from enhancing features while thin lane evidence remains spatially resolvable. Combining stages 3 and 4 with full GHVT branches achieves the best result among those variants, suggesting com-plementarity between mid-level spatial detail and high-level context. Table 5: GHVT branch and stage-placement ablation on the VIL-100 bench-mark. Rows 2–3 remove either the vertical or horizontal branch with GHVT inserted at stages 3+4, while rows 4–5 evaluate the full GHVT block at indi-vidual backbone stages.                      
+
+> Variant Placement F1@50 ↑∆F1@50 ↑
+> ADNet-R34 none 89.97 0.00 GHVT w/o vertical stages 3+4, horizontal only 77.31 -12.66 GHVT w/o horizontal stages 3+4, vertical only 90.77 +0.79 Stage 4 only stage 4 90.79 +0.82 Stage 3 only stage 3 91.11 +1.14 Full GHVT stages 3+4 91.21 +1.24
+
+Difficult-case analysis and feature visualization. We next examine whether GHVT improves the performance in scenes where lane-structure modeling is most critical. Table 6 reports subset results on VIL-100. Sample sizes in each subset are counted from annotations, while F1@50, FPs, and FNs follow the same validation protocol as the main evaluation. The ADNet-R34 and ADNet-R34 GHVT columns report F1@50, and ∆F1@50, ∆FPs, and ∆FNs are com-puted as the performance of ADNet-R34 GHVT minus that of ADNet-R34. The subset results indicate that GHVT strengthens lane-structure repre-sentation, with the main gains appearing in scenes where lane continuity is difficult to recover. On the full VIL-100 test set, GHVT reduces both FPs and FNs. The improvements are especially clear in occlusion-related subsets: F1@50 increases by 1.68, 1.28, and 1.48 points for partial, severe partial, and full occlusion subsets, respectively, with consistent reductions in FPs and FNs. A similar trend is observed in multi-lane scenes, where the occluded multi-lane subset achieves a 1.44-point F1@50 gain while substantially reducing both Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 13 
+
+Table 6: GHVT performance analysis across different subsets on VIL-100 bench-mark.                                                                
+
+> Subset #Img #Lane ADNet-R34 ADNet-R34 GHVT ∆F1@50 ∆FPs ∆FNs All test set 2000 8451 89.97 91.21 +1.24 -83 -122 Non-occluded 244 934 92.57 92.41 -0.16 +1 +2 Partial occlusion 279 1252 85.40 87.08 +1.68 -11 -28 Severe partial occlusion 858 3815 88.51 89.79 +1.28 -51 -47 Full occlusion 619 2450 93.53 95.00 +1.48 -22 -49 Four-lane scenes 835 3341 90.23 91.78 +1.55 -51 -54 Five-lane scenes 911 4556 88.94 89.97 +1.03 -27 -62 Occluded multi-lane 1546 6987 88.97 90.41 +1.44 -78 -118
+
+FPs and FNs. By contrast, the non-occluded subset remains nearly unchanged. These results suggest that GHVT mainly benefits cases requiring continuous lane evidence to be recovered from occlusion, dense lane layouts, or visually incomplete cues. Figure 4 provides visual support and further illustrates the effect of GHVT. Compared with ADNet-R34, ADNet-R34 GHVT produces more continuous stage-3 responses along lane regions and suppresses activations around vehi-cle occlusions, glare, road boundaries, and other distracting structures. This supports the role of GHVT in strengthening lane-structure representation. 
+
+Fig. 4: Effect of GHVT on stage-3 feature activations. From top to bottom: (a) input images with ground-truth lanes, (b) ADNet-R34 stage-3 activations, and (c) ADNet-R34 GHVT stage-3 activations. 
+
+4.6 Analysis of LQAS for Quality-Aware Candidate Ranking 
+
+Detection-level effect. LQAS targets residual ranking errors after GHVT en-hances lane-structure representation. As shown in Table 4, adding LQAS to ADNet-R34 GHVT reduces FPs from 738 to 712 and improves precision from 91.26% to 91.53%, while maintaining similar recall rate. This indicates that LQAS improves pre-NMS candidate ranking and false-positive suppression. 14 W. Cai et al. 
+
+Score-distribution diagnostics. The score diagnostics in Table 7 and Figure 5 help explain why LQAS reduces FPs. Figure 5(a) reports the hard-negative survivor rate, defined as the percentage of unmatched dynamic anchors whose pre-NMS score exceeds a given threshold. Figure 5(b) shows the corresponding raw score distribution, where the dashed line marks the 0.30 score threshold. With LQAS, the hard-negative 90th-percentile score decreases from 0.262 to 0.238, and the proportion of hard negatives above 0.30 drops from 8.73% to 8.02%. Meanwhile, positive scores are preserved. These results indicate that LQAS improves pre-NMS ranking by suppressing confusing high-scoring nega-tives without weakening positive candidates. Table 7: LQAS score-distribution diagnostics on the VIL-100 benchmark. Rel-ative benefits are computed according to the metric direction. Lower hard-negative scores and larger positive–negative score separation indicate better pre-NMS ranking.                   
+
+> Metric ADNet-R34 +GHVT ADNet-R34 +GHVT+LQAS Relative benefit Hard-neg. mean score ↓0.067 0.062 7.46% Hard-neg. P90 score ↓0.262 0.238 9.16% Hard-neg. survivor ( s≥0.30) ↓8.73% 8.02% 8.13% Positive mean score ↑0.624 0.632 1.28% Pos. vs. hard-neg. separation ↑0.556 0.571 2.70%
+
+Fig. 5: Effect of LQAS for quality-aware pre-NMS candidate ranking on VIL-100 benchmark. 
+
+4.7 Analysis of Computational Efficiency and Model Complexity 
+
+We evaluate whether the proposed modules introduce practical deployment overhead. Table 8 reports model size and local throughput measured on a single NVIDIA A40, with ∆ values computed relative to the corresponding baselines. Since LQAS recalibrates the existing classification logits and in-troduces no additional inference branch, the inference-time overhead mainly comes from GHVT. The enhanced ADNet-R34 GHVT+LQAS increases the parameter count by 1.32% and reduces FPS by 3.31%, while LaneATT-R34 GHVT+LQAS increases the parameter count by 1.31% and reduces Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 15 
+
+FPS by 2.16%. Overall, the proposed model enhancement adds only about 1.3% parameters and preserves high inference throughput, indicating limited computational overhead. Table 8: Runtime and model complexity measured locally on an NVIDIA A40. 
+
+Model Params (M) ∆Params FPS ∆FPS ADNet-R34 21.95 – 272 –ADNet-R34 GHVT+LQAS 22.24 +1.32% 263 -3.31% LaneATT-R34 22.13 – 231 –LaneATT-R34 GHVT+LQAS 22.42 +1.31% 226 -2.16% 
+
+## 5 Conclusion 
+
+In this paper, we present a structure-enhanced and quality-aware framework for robust lane detection. The proposed GHVT module strengthens mid- and high-level backbone features via lightweight residual horizontal-vertical token modeling, while LQAS aligns ADNet’s classification confidence with line-level localization quality without introducing additional inference-time branches. On the VIL-100 benchmark, the proposed enhanced ADNet-R34 model (ADNet-R34 GHVT+LQAS) improves the reproduced baseline from 89.97 to 91.28 in F1@50 and reduces both false positives and false negatives. Extensive evalu-ations, including ablation studies, difficult-subset analysis, score-distribution diagnostics, cross-dataset performance generalization on CULane and TUSim-ple, and runtime measurements, further demonstrate that GHVT provides the primary structural improvement, while LQAS enhances pre-NMS candidate ranking with minimal computational overhead. 
+
+## References 
+
+1. Abualsaud, H., Liu, S., Lu, D.B., Situ, K., Rangesh, A., Trivedi, M.M.: Laneaf: Robust multi-lane detection with affinity fields. IEEE Robotics and Automation Letters 6(4), 7477–7484 (2021) 2. Dong, Y., Patil, S., van Arem, B., Farah, H.: A hybrid spatial–temporal deep learning architecture for lane detection. Computer-Aided Civil and Infrastructure Engineering 38 (1), 67–86 (2023). https://doi.org/10.1111/mice.12829 
+
+3. Feng, Z., Guo, S., Tan, X., Xu, K., Wang, M., Ma, L.: Rethinking efficient lane detection via curve modeling. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 17062–17070 (2022) 4. Han, J., Deng, X., Cai, X., Yang, Z., Xu, H., Xu, C., Liang, X.: Laneformer: Object-aware row-column transformers for lane detection. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 36, pp. 799–807 (2022) 5. He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recogni-tion. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 770–778 (2016) 16 W. Cai et al. 6. Honda, H., Uchida, Y.: Clrernet: Improving confidence of lane detection with laneiou. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 1176–1185 (2024) 7. Hou, Y., Ma, Z., Liu, C., Loy, C.C.: Learning lightweight lane detection cnns by self attention distillation. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 1013–1021 (2019) 8. Hu, J., Shen, L., Sun, G.: Squeeze-and-excitation networks. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 7132–7141 (2018) 9. Jiang, B., Luo, R., Mao, J., Xiao, T., Jiang, Y.: Acquisition of localization confi-dence for accurate object detection. In: Proceedings of the European Conference on Computer Vision. pp. 784–799 (2018) 10. Li, R., Dong, Y.: Robust lane detection through self-pretraining with masked se-quential autoencoders and fine-tuning with customized PolyLoss. IEEE Transac-tions on Intelligent Transportation Systems 24 (12), 14121–14132 (2023). https: //doi.org/10.1109/TITS.2023.3305015 
+
+11. Li, X., Wang, W., Wu, L., Chen, S., Hu, X., Li, J., Tang, J., Yang, J.: Generalized focal loss: Learning qualified and distributed bounding boxes for dense object detection. In: Advances in Neural Information Processing Systems. vol. 33, pp. 21002–21012 (2020) 12. Liu, L., Chen, X., Zhu, S., Tan, P.: Condlanenet: A top-to-down lane detection framework based on conditional convolution. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 3773–3782 (2021) 13. Liu, R., Yuan, Z., Liu, T., Xiong, Z.: End-to-end lane shape prediction with trans-formers. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 3694–3702 (2021) 14. Neven, D., De Brabandere, B., Georgoulis, S., Proesmans, M., Van Gool, L.: Towards end-to-end lane detection: An instance segmentation approach. In: IEEE Intelligent Vehicles Symposium. pp. 286–291 (2018) 15. Pan, X., Shi, J., Luo, P., Wang, X., Tang, X.: Spatial as deep: Spatial cnn for traffic scene understanding. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 32 (2018) 16. Patil, S., Dong, Y., Farah, H., Hellendoorn, H.: Efficient sequential neural network with spatial-temporal attention and linear LSTM for robust lane detection using multi-frame images (2026). https://doi.org/10.48550/arXiv.2602.03669 
+
+17. Qin, Z., Wang, H., Li, X.: Ultra fast structure-aware deep lane detection. In: Proceedings of the European Conference on Computer Vision. pp. 276–291 (2020) 18. Qin, Z., Zhang, P., Li, X.: Ultra fast deep lane detection with hybrid anchor driven ordinal classification. IEEE Transactions on Pattern Analysis and Machine Intelligence pp. 1–14 (2022). https://doi.org/10.1109/TPAMI.2022.3182097 
+
+19. Qu, Z., Jin, H., Zhou, Y., Yang, Z., Zhang, W.: Focus on local: Detecting lane marker from bottom up via key point. In: Proceedings of the IEEE/CVF Con-ference on Computer Vision and Pattern Recognition. pp. 14122–14130 (2021) 20. Tabelini, L., Berriel, R., Paixao, T.M., Badue, C., De Souza, A.F., Oliveira-Santos, T.: Polylanenet: Lane estimation via deep polynomial regression. In: In-ternational Conference on Pattern Recognition. pp. 6150–6156 (2020) 21. Tabelini, L., Berriel, R., Paixao, T.M., Badue, C., De Souza, A.F., Oliveira-Santos, T.: Keep your eyes on the lane: Real-time attention-guided lane detection. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 294–302 (2021) Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring 17 22. TuSimple: Tusimple lane detection benchmark. https://github.com/TuSimple/ tusimple-benchmark (2017) 23. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, L., Polosukhin, I.: Attention is all you need. In: Advances in Neural In-formation Processing Systems. vol. 30 (2017) 24. Wang, J., Ma, Y., Huang, S., Hui, T., Wang, F., Qian, C., Zhang, T.: Akeypoint-based global association network for lane detection. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 1392–1401 (2022) 25. Woo, S., Park, J., Lee, J.Y., Kweon, I.S.: Cbam: Convolutional block attention module. In: Proceedings of the European Conference on Computer Vision. pp. 3–19 (2018) 26. Xiao, L., Li, X., Yang, S., Yang, W.: Adnet: Lane shape prediction via anchor decomposition. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 6404–6413 (2023) 27. Zhang, H., Gu, Y., Wang, X., Pan, J., Wang, M.: Lane detection transformer based on multi-frame horizontal and vertical attention and visual transformer module. In: Proceedings of the European Conference on Computer Vision. pp. 1–16 (2022). https://doi.org/10.1007/978-3-031-19842-7_1 
+
+28. Zhang, H., Wang, Y., Dayoub, F., Sunderhauf, N.: Varifocalnet: An iou-aware dense object detector. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 8514–8523 (2021) 29. Zhang, Y., Zhu, L., Feng, W., Fu, H., Wang, M., Li, Q., Li, C., Wang, S.: Vil-100: A new dataset and a baseline model for video instance lane detection. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 15681–15690 (2021) 30. Zheng, T., Fang, H., Zhang, Y., Tang, W., Yang, Z., Liu, H., Cai, D.: Resa: Recurrent feature-shift aggregator for lane detection. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 35, pp. 3547–3554 (2021) 31. Zheng, T., Huang, Y., Liu, Y., Tang, W., Yang, Z., Cai, D., He, X.: Clrnet: Cross layer refinement network for lane detection. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 898–907 (2022) 32. Zou, Q., Jiang, H., Dai, Q., Yue, Y., Chen, L., Wang, Q.: Robust lane detection from continuous driving scenes using deep neural networks. IEEE Transactions on Vehicular Technology 69 (1), 41–54 (2020)

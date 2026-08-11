@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-10</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-11</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 16 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-10 21:09:47 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-11 20:45:55 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日处理16篇论文，精读7篇、速读9篇，最高分为视觉Token剪枝框架（10/10）。</p>
-<p>最值得关注：AI4AI视觉Token剪枝（10分）与LLM智能体KV Cache压缩实证（9分）。</p>
-<p>建议优先精读这两篇高分论文，关注推理效率优化方向。</p>
+<p>今日精读与速读共16篇论文，其中零样本交通事故检测与KV缓存压缩两篇获得最高分。最值得重点关注的是粗到细VLM追踪管道（10.0分）和生命周期感知KV缓存压缩（9.0分）。下一步建议优先精读这两篇，把握多模态追踪与智能体缓存优化的前沿思路。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -73,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">9 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="An AI4AI Framework for Visual Token Pruning">An AI4AI Framework for Visual Token Pruning</span></li><li><span class="dpr-home-dashboard-paper-title" title="Practical Online KV Cache Compaction for LLM Agents: An Empirical Study">Practical Online KV Cache Compaction for LLM Agents: An Empirical Study</span></li><li><span class="dpr-home-dashboard-paper-title" title="Learning to Predict Middle-Layer Attention in MLLMs for Visual Token Prunin">Learning to Predict Middle-Layer Attention in MLLMs for Visual Token Prunin</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Zero-Shot Traffic Accident Detection via a Coarse-to-Fine VLM-Tracking Pipeline">Zero-Shot Traffic Accident Detection via a Coarse-to-Fine VLM-Tracking Pipeline</span></li><li><span class="dpr-home-dashboard-paper-title" title="CommitKV: Lifecycle-Aware KV Cache Compression via Commit Transitions for Multi-Turn Agents">CommitKV: Lifecycle-Aware KV Cache Compression via Commit Transitions for Multi-Turn Agents</span></li><li><span class="dpr-home-dashboard-paper-title" title="eBIRD: Event-based Intensity Image Reconstruction Using Controllable Diffusion Models">eBIRD: Event-based Intensity Image Reconstruction Using Controllable Diffusion Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -86,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">9 篇</strong>
+    <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection">DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection</span></li><li><span class="dpr-home-dashboard-paper-title" title="OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation">OC-VLA++: Monocular Geometry-Guided Cross-View Consistency for Viewpoint-Robust Robotic Manipulation</span></li><li><span class="dpr-home-dashboard-paper-title" title="When Replanning Becomes the Bottleneck: Budgeted Replanning for Embodied Agents">When Replanning Becomes the Bottleneck: Budgeted Replanning for Embodied Agents</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding">LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding</span></li><li><span class="dpr-home-dashboard-paper-title" title="ZOMP: Zeroth-Order Multi-Modal Prompt Tuning for Vision-Language Models">ZOMP: Zeroth-Order Multi-Modal Prompt Tuning for Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not Worth Another Token: Marginal Value Estimation for Efficient Deep Research Agents">Not Worth Another Token: Marginal Value Estimation for Efficient Deep Research Agents</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>4</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
 </section>
 </div>
 

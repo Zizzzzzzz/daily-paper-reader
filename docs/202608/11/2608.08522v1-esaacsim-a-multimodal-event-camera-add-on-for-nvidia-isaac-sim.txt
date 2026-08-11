@@ -1,0 +1,265 @@
+Title: EsaacSim: A Multimodal Event Camera Add-on for NVIDIA Isaac Sim
+
+URL Source: https://arxiv.org/pdf/2608.08522v1
+
+Published Time: Tue, 11 Aug 2026 01:08:47 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# EsaacSim: A Multimodal Event Camera Add-on for NVIDIA Isaac Sim 
+
+Ignacio Bugueno-Cordova 1 , Malte Kuhlmann 1 , Nicolás Navarro-Guerrero 1 ,Miguel Campusano 2 , and Rodrigo Verschae 3 
+
+> 1
+
+Leibniz Universität Hannover, L3S Research Center, Hanover, Germany  
+
+> 2
+
+University of Southern Denmark, Odense, Denmark  
+
+> 3
+
+The Iniciativa de Datos e Inteligencia Artificial, University of Chile, Santiago, Chile 
+
+i.bugueno@ieee.org , malte.kuhlmann@l3s.de ,
+
+nicolas.navarro.guerrero@gmail.com , mica@mmmi.sdu.dk , rodrigo@verschae.org 
+
+Abstract. Event-based vision is becoming an increasingly important sensing paradigm for robotics, yet its adoption remains limited by sensor availability and the lack of integrated simulation tools for modern robotics platforms. This paper presents EsaacSim , a multimodal event camera add-on for NVIDIA Isaac Sim that enables online simulation of config-urable event cameras with grayscale and Bayer RGGB event generation. The framework supports multiple event camera resolutions and provides synchronized RGB, APS, event, depth, and IMU outputs through native ROS 2 interfaces. A motion-guided frame-gap synthesis strategy further increases the effective temporal resolution while preserving compatibility with the Isaac Sim rendering pipeline. Experimental evaluation demon-strates synchronized multimodal simulation across representative robotic scenes and efficient online performance over five event camera resolutions at effective event rates from 240 to 960 Hz. Event stream generation requires 6.98–27.28 ms for grayscale events and 7.58–29.16 ms for Bayer RGGB events while using less than 400 MB of additional GPU memory on an NVIDIA RTX 4060 GPU. These results show that EsaacSim 
+
+enables supports online multimodal event-camera simulation for robotics research and synthetic data generation. We release an early version of the simulator and report its current architecture and performance. 
+
+Keywords: Event camera simulation · NVIDIA Isaac Sim · Neuromor-phic vision · Robotics simulation · ROS 2 
+
+## 1 Introduction 
+
+Event-based cameras are attracting increasing attention in robotics due to their low latency, high dynamic range, and high temporal resolution [6, 7, 9]. These characteristics make them well suited for perception tasks in highly dynamic environments, including autonomous navigation, aerial robotics, robotic manipu-lation, and visual tracking [15, 31, 33–35]. Recent studies have demonstrated their advantages over conventional frame-based cameras under challenging motion and illumination conditions [8]. arXiv:2608.08522v1 [cs.RO] 9 Aug 2026 2 I. Bugueno-Cordova et al. 
+
+Despite these advantages, the development of event-based robotic systems remains constrained by the limited availability of sensors and large-scale event datasets [35]. Event camera simulators have therefore become an important alternative for synthetic data generation and algorithm development [13]. Rep-resentative examples include ESIM [26], V2E [16], and more recent simulation frameworks [12, 22, 28]. However, few support online event generation, and most operate as standalone tools or dataset-generation pipelines [13]. At the same time, robotics research increasingly relies on simulation-centric development workflows. NVIDIA Isaac Sim has emerged as a prominent robotics simulation platform by combining photorealistic RTX rendering, GPU-accelerated physics simulation, synthetic data generation, and integration with modern robot learning frameworks [3, 10, 17, 27]. Recently, EVIS [32] introduced a physics-grounded event camera plugin for Isaac Sim, marking an important step toward native event camera simulation. While EVIS primarily focuses on synchronized RGB and event generation through a Python API, EsaacSim targets robotics-oriented simulation by providing configurable sensor models, support for multiple event camera resolutions, native Bayer RGGB event generation, synchronized RGB, APS, event, depth, and IMU outputs, and seamless ROS 2 integration. Motivated by these requirements, this paper presents EsaacSim , a multi-modal event camera add-on for NVIDIA Isaac Sim capable of generating online event streams from grayscale and Bayer RGGB image sequences. The proposed framework provides configurable event sensor simulation together with synchro-nized RGB, APS, event, depth, and IMU outputs through native ROS 2 interfaces. Furthermore, it supports multiple event camera resolutions through a unified architecture, enabling the simulation of a broad range of existing event sensor configurations. The main contributions of this work are: 
+
+– A multimodal online event camera add-on for NVIDIA Isaac Sim supporting multiple event camera resolutions, grayscale event generation, and native Bayer RGGB event generation together with synchronized RGB, Active Pixel Sensor frames (APS), depth, IMU, and event outputs through native ROS 2 interfaces. 
+
+– A configurable sensor modeling framework enabling the emulation of different event camera profiles through customizable thresholds, latency, refractory periods, and noise characteristics. 
+
+– An experimental evaluation including qualitative comparisons and perfor-mance benchmarking across multiple event camera resolutions and temporal interpolation factors. The EsaacSim add-on will be publicly released. 
+
+## 2 Related work 
+
+The event camera simulation literature can be broadly divided into frame-based, physics-based, and robotics-oriented approaches. Table 1 summarizes represen-tative simulators and emulators according to their online capabilities, sensor EsaacSim 3                                                         
+
+> Table 1: Comparison of representative event camera simulators and emulators in terms of online operation, color event generation, configurable sensor modeling, physics-based event modeling, ROS 2 integration, availability within NVIDIA Isaac Sim, and generated data modalities. Output modalities are RGB images, APS frames, events (E), depth images (D), and IMU data. ∗Physics-based event modeling for EsaacSim is currently under development. Year Simulator Online Color Events Sensor Model Physics Model ROS 2Isaac Sim Outputs 2012 jAER Emulator [20] ✓E2016 DVS Gazebo Plugin [19] ✓✓E2016 pyDVS [11] ✓E2017 PIX2NVS [2] E2018 ESIM [26] ✓✓E2020 V2E [16] ✓APS + E 2021 AirSim Event Camera [1] ✓✓RGB + E 2021 Joubert et al. [18] ✓✓E2024 Color Event Emulator [4] ✓✓✓✓RGB + E 2024 PECS [14] ✓✓E2025 EventTracer [22] ✓✓E2025 NeRF Simulator [28] ✓✓E2025 SENPI [12] ✓✓E2026 EVIS [32] ✓✓✓✓RGB + E 2026 EsaacSim (Ours) ✓✓✓✓∗✓✓RGB + APS + E + D + IMU
+
+modeling, robotics integration, supported simulation platforms, and generated data modalities. 
+
+2.1 Frame-based Simulators and Emulators 
+
+Early event emulation approaches demonstrated that conventional cameras could be used to approximate event-based sensing. Katz et al. [20] integrated event emulation into the jAER framework using high-speed USB cameras, while pyDVS [11] and PIX2NVS [2] enabled real-time and parameterized conversion from image sequences to event streams. More recently, V2E [16] and the real-time simulator of Ziegler et al. [36] have become representative frame-based approaches for generating realistic event data from conventional imagery. Bugueno-Cordova et al. [4] extended this paradigm to color event cameras through a ROS-based online emulator for robot vision applications. 
+
+2.2 Physics-based Simulators 
+
+Physics-based simulators aim to model the event generation process more ac-curately by incorporating sensor characteristics, noise sources, optics, or direct 4 I. Bugueno-Cordova et al. 
+
+interaction with 3D scenes. Representative examples include ESIM [26], the parameter-characterized simulator of Joubert et al. [18], differentiable event simu-lators for tracking and reconstruction [24], and simulators designed for hardware prototyping and attention-based architectures [25]. More recent works include PECS [14], which models the complete optical path, NeRF-based event synthesis from arbitrary viewpoints [28], and EventTracer [22], which combines path tracing and event rendering to improve realism. 
+
+2.3 Robotics-oriented Simulation Frameworks 
+
+Several simulators have been developed specifically for robotics applications. The DVS Gazebo Plugin [19] integrates event sensing into Gazebo, while AirSim [1,30] provides event camera support within Unreal Engine. Similarly, Mueggler et al. [23] and InteriorNet/ViSim [21] provide simulation environments and datasets for tasks such as visual odometry, SLAM, and autonomous navigation. Recently, EVIS [32] introduced a physics-grounded event camera plugin for NVIDIA Isaac Sim, representing the first event camera integration within this simulator. While EVIS demonstrates the feasibility of native event simulation in Isaac Sim through a physics-grounded sensor model, it primarily focuses on event generation itself. As summarized in Table 1, existing simulators typically generate event streams alone or, in some cases, RGB images together with events. In contrast, EsaacSim 
+
+provides synchronized RGB images, event streams, depth images, and IMU measurements through native ROS 2 interfaces within Isaac Sim, facilitating the development of multimodal robotic perception pipelines. 
+
+## 3 Event Generation Model 
+
+Event cameras asynchronously generate events when changes in logarithmic image intensity exceed a contrast threshold. We adopt the standard event gener-ation model illustrated in Figure 1; comprehensive descriptions of event camera principles and hardware can be found in [9, 29]. For a pixel located at uk = ( xk, y k)T , an event is generated when L(uk, t k) −
+
+L(uk, t k − ∆t k) ≥ pkC, where L = log( I) denotes the logarithmic image intensity, 
+
+C is the contrast threshold, pk ∈ {− 1, +1 } is the event polarity, and ∆t k is the elapsed time since the previous event generated at the same pixel. Positive and negative polarities correspond to increases and decreases in brightness, respectively. Consequently, the sensor output is represented as the asynchronous event stream E = {(xk, y k, t k, p k)}Nk=1 .
+
+## 4 EsaacSim : An Event Camera Add-on for Isaac Sim 
+
+EsaacSim is an event camera add-on for NVIDIA Isaac Sim that enables on-line event simulation within photorealistic robotic environments. Rather than replacing the native RTX camera pipeline, EsaacSim attaches to existing cam-era render products and converts their outputs into asynchronous grayscale or EsaacSim 5time time log intensity (log I) OFF OFF ON ON ON ON threshold reset level thres-hold OFF OFF reconstruction DVS operation   
+
+> Fig. 1: Temporal evolution of the logarithmic intensity signal L(t). Positive and negative events are generated whenever the accumulated logarithmic intensity variation reaches the corresponding contrast thresholds.
+
+Bayer RGGB event streams. In contrast to EVIS [32], which primarily provides a physics-grounded event camera plugin for RGB-event simulation through a Python API, EsaacSim is designed as a multimodal robotics add-on supporting configurable sensor models, multiple event camera resolutions, synchronized RGB, Activel Pixel Sensor (APS), event, depth, and IMU outputs, and native ROS 2 integration. 
+
+4.1 System Overview and Architecture Functional Architecture EsaacSim is organized into three logical layers, as illustrated in Fig. 2. The native Isaac Sim layer is responsible for scene represen-tation, physics simulation, rendering, and camera image generation. Built on top of this infrastructure, the EsaacSim extension layer discovers configured cam-era primitives, manages runtime configuration, acquires rendered image buffers through GPU-oriented ingestion paths, and provides visualization and ROS 2 communication. Finally, the event generation backend converts grayscale or Bayer image streams into asynchronous events using a frame-based log-intensity model with configurable sensor parameters before forwarding the generated event batches to the available output interfaces. This layered organization decouples rendering, event generation, and data dissemination, allowing the event generation backend and output modules to evolve independently while preserving compatibility with the underlying Isaac Sim rendering pipeline. Unlike EVIS [32], which focuses on a dedicated event camera plugin for RGB-event generation, EsaacSim is organized as a multimodal sensing layer built on top of the native Isaac Sim sensor pipeline. This design enables synchronized RGB, APS, event, depth, and IMU outputs while preserving compatibility with existing Isaac Sim rendering, physics, and ROS 2 workflows. 
+
+Runtime Deployment Figure 3 illustrates the runtime deployment of Esaac-Sim . The extension is loaded as a native Isaac Sim Kit add-on and executes inside the Docker-based simulation environment, where it receives rendered images 6 I. Bugueno-Cordova et al. NVIDIA ISAAC SIM                
+
+> Robots Objects Lights Materials
+> Scene Layer
+> Simulation Layer
+> PhysX Newton/Warp
+> Sensor Layer
+> Native RTX
+> Camera
+> Native Camera Outputs
+> HDR RGB Depth
+> ESAACSIM ADD-ON
+> Discovery Configuration Lifecycle ROS 2 I/O
+> Extension Layer
+> Event Generation Backend
+> RGB Render Product
+> APS Generation
+> Configurable
+> Sensor Model
+> Log-Intensity
+> Noise Model
+> Shot + Leak
+> Grayscale Events
+> Event Buffer
+> OUTPUT INTERFACES
+> RGB APS Events Depth IMU ROS 2
+> Publishers
+> Bayer RGGB Events
+> IMU Sensor
+
+Fig. 2: Layered architecture of EsaacSim within NVIDIA Isaac Sim. Native Isaac Sim components (green) provide scene simulation and camera render products (RGB, HDR, and depth). EsaacSim (red) acquires the RGB render products to generate APS frames and applies a configurable event camera model to produce either grayscale or Bayer RGGB event streams. RGB, APS, event, depth, and IMU data are synchronized and exposed through ROS 2 interfaces (blue). 
+
+from RTX cameras and generates asynchronous event streams. These streams are published through ROS 2 to external applications running in a host environment managed with pixi , enabling seamless integration with visualization, recording, and robotics software while maintaining a clear separation between the simulation and application environments. EsaacSim 7  
+
+> Container Environment (Docker / Isaac Sim) Host Environment (pixi)
+> Robots, Scene, and Objects RTX Cameras
+> EsaacSim Add-on Output Interfaces ROS 2 Publishers Native API
+> APS, events, depth, IMU, metadata
+> ROS 2 Applications
+> Nodes, RViz2, rosbag2
+> ROS 2
+> DDS / Zenoh
+
+Fig. 3: Runtime deployment of EsaacSim . The extension executes inside the Docker-based Isaac Sim environment and exposes generated data through ROS 2 publishers and native output interfaces. ROS 2 applications run in the host environment managed with pixi .
+
+4.2 Event Generation 
+
+First, rendered images are converted into asynchronous events using a configurable log-intensity model. Subsequently, motion-guided frame-gap synthesis is employed to increase the effective temporal resolution without increasing the rendering frequency of Isaac Sim. 
+
+Log-Intensity Event Model The default event generation model in EsaacSim 
+
+follows a frame-based log-intensity formulation. Given an HDR image Ik, it is first converted into a scalar intensity representation Sk using grayscale, weighted luminance, or a Bayer Red-Green-Green-Blue (RGGB) sampling pattern, cor-responding to the native color filter array used by Bayer image sensors. The logarithmic intensity is then computed as 
+
+Lk(x, y ) = log ( Sk(x, y ) + 1) , (1) and compared against a per-pixel reference state 
+
+∆L k(x, y ) = Lk(x, y ) − Lref (x, y ). (2) An ON or OFF event is generated whenever the accumulated contrast satisfies 
+
+∆L k(x, y ) ≥ CON , ∆L k(x, y ) ≤ − COFF , (3) producing an event e = ( x, y, t, p ). The corresponding reference intensity is then updated before processing the next sample. For Bayer RGGB event generation, the scalar intensity representation Sk
+
+is obtained from the virtual RGGB mosaic rather than a grayscale conversion. Consequently, each pixel stores only one sampled color component (R, G 1, G 2,or B), and the same log-intensity formulation is applied independently to the corresponding channel. This approach preserves the spatial sampling pattern of Bayer-based event cameras while maintaining the same event generation model. 8 I. Bugueno-Cordova et al. 
+
+Motion-Guided Frame-Gap Synthesis Although the event generation model operates on discrete rendered images, the temporal resolution can be increased through motion-guided frame-gap synthesis. Rather than increasing the rendering frequency, EsaacSim synthesizes intermediate intensity images using the motion vectors provided by Isaac Sim and processes them using the same log-intensity event generation model. Given two consecutive rendered images Ik−1 and Ik, the renderer provides a dense motion vector field v(x, y ) =  u(x, y ), v (x, y ), which describes the image-space displacement between consecutive rendered images. Intermediate samples are synthesized by backward warping the current rendered image according to a temporally scaled motion field. For an interpolation factor α = nN , n =1, . . . , N − 1, the synthesized intensity image is obtained as 
+
+Ik,n (x, y ) = Ik(x − αu (x, y ), y − αv (x, y )) , (4) where bilinear interpolation is used for non-integer sampling locations. Each synthesized image is subsequently processed using the same log-intensity event generation model described above. If motion vectors are unavailable or invalid, the implementation falls back to linear image interpolation. For N temporal subdivisions between consecutive rendered images acquired at times tk−1 and tk, the timestamp of the n-th synthesized image is defined as 
+
+tk,n = tk−1 + nN (tk − tk−1) , n = 1 , . . . , N − 1. (5) Figure 4 illustrates the motion-guided frame synthesis pipeline. Given two consecutive rendered images and their associated motion vectors, intermediate intensity images are synthesized at uniformly spaced timestamps. Both rendered and synthesized images are subsequently processed by the same event generation stage, producing a unified asynchronous event stream. 
+
+4.3 Sensor Model Configuration 
+
+EsaacSim exposes a configurable sensor model that allows users to adapt the event generation process to different event camera characteristics without modi-fying the underlying implementation. Sensor parameters are specified at runtime and independently configured for each simulated camera, enabling multiple virtual sensors with different characteristics to coexist within the same Isaac Sim scene. The current implementation supports configurable contrast thresholds, thresh-old mismatch, refractory period, latency, timestamp quantization, shot and leak noise, and grayscale or Bayer RGGB intensity generation. These parameters affect only the event generation backend while remaining independent of the rendering pipeline, allowing the same rendered images to be reused under different sensor configurations. 
+
+4.4 Output Interfaces 
+
+To facilitate integration with robotics applications, EsaacSim provides dedicated ROS 2 message interfaces for event streams. As illustrated in Fig. 5, generated EsaacSim 9
+
+> Ik−1
+> tk−1
+> Ik, 1
+> tk, 1
+> Ik, 2
+> tk, 2
+
+· · · Ik,N −1  
+
+> tk,N −1
+> Ik
+> tk
+> Motion-guided interpolation Event generation model Asynchronous events
+> (x, y, t, p )
+
+Fig. 4: Motion-vector-based frame-gap synthesis in EsaacSim . Given two consecutive rendered images, motion information is used to synthesize N − 1 intermediate intensity samples at uniformly spaced timestamps. Both rendered and synthesized samples are processed by the same frame-based event backend, producing a unified asynchronous event stream. 
+
+Table 2: Configurable parameters of the EsaacSim sensor model. The simulator exposes runtime-configurable settings controlling spatial resolution, event generation thresholds, temporal behavior, noise characteristics, and intensity conversion modes. 
+
+Parameter Description 
+
+Spatial resolution 128 × 128 , 240 × 180 , 304 × 240 , 260 × 346 , 320 × 320 
+
+CON , COFF Positive and negative contrast thresholds Threshold mismatch Pixel-wise threshold variability Refractory period Minimum time between consecutive events Latency Event output delay Timestamp quantization Timestamp discretization resolution Shot noise Random spurious events Leak noise Background activity generation Intensity mode Grayscale, luminance, or Bayer RGGB 
+
+events can be represented individually, grouped into conventional event packets, or encoded using a packed Structure-of-Arrays layout for high-rate communication. In addition to event streams, EsaacSim can publish synchronized auxiliary data generated by Isaac Sim, including APS intensity images (grayscale or Bayer RGGB), depth images, and IMU measurements. These data streams are timestamped consistently with the generated events, enabling multimodal perception pipelines and facilitating the development and evaluation of event-based visual-inertial, RGB-event, and depth-event algorithms. 
+
+## 5 Results and Discussion 
+
+EsaacSim was evaluated through qualitative and performance analyses. First, representative simulation outputs are presented to demonstrate the framework’s 10 I. Bugueno-Cordova et al. Generated Event Stream   
+
+> Event.msg
+> (x, y, t, p)
+> EventPacket.msg
+> Event[] + metadata
+> PacketEventPacket.msg
+> x[], y [], t [], p [] + metadata
+
+Fig. 5: ROS 2 message interfaces provided by EsaacSim for event-stream communica-tion. Individual events are represented by Event , conventional batched communication uses EventPacket , and PackedEventPacket adopts a structure-of-arrays layout to re-duce serialization overhead in high-rate event streams. 
+
+capability to generate synchronized multimodal data, including RGB, APS grayscale, event, and depth streams. Subsequently, the computational performance of the event generation pipeline is analyzed across multiple sensor resolutions and temporal interpolation factors. 
+
+5.1 Qualitative Evaluation 
+
+Figure 6 presents representative outputs generated by EsaacSim for a subset of YCB objects [5] with diverse geometries, textures, and material properties. For each object, the simulator simultaneously produces an RGB image, an APS grayscale image, a grayscale event visualization, a Bayer RGGB event visualization, and a depth image from the same virtual sensor configuration. The results show that EsaacSim consistently generates synchronized multi-modal outputs while preserving object appearance and geometric structure across different sensing modalities. The grayscale and Bayer event visualizations capture object contours and intensity transitions induced by camera motion, whereas the depth images accurately represent the three-dimensional scene geometry. Together, these examples illustrate the flexibility of the proposed framework for simulating heterogeneous event-camera data for photorealistic robotic environ-ment applications. 
+
+5.2 Sensor Model Evaluation 
+
+Figure 7 illustrates the influence of the configurable sensor model by varying the contrast threshold while maintaining the same Power Drill sequence, camera trajectory, and illumination conditions. As expected from the event generation model, increasing the contrast threshold substantially reduces the number of generated events because larger logarithmic intensity variations are required to trigger events. Despite the reduced event density, the dominant object contours and motion-induced structures remain visible across all configurations. These results show that the proposed frame-work enables runtime-configurable event camera behavior while preserving the qualitative characteristics of the generated event stream. EsaacSim 11 
+
+Fig. 6: Qualitative results produced by EsaacSim on representative YCB objects using a simulated DAVIS346 event camera ( 346 × 260 resolution). Each row corresponds to a different object, while columns show the synchronized RGB image, APS grayscale image, grayscale event visualization, Bayer RGGB event visualization, and depth image generated from the same simulated scene. 0.00 0.10 0.20 0.30 
+
+> Contrast Threshold
+> 0.0 0.5 1.0 1.5
+> Number of Events
+> 1e6
+> Total Events Positive Events Negative Events
+
+Fig. 7: Effect of the configurable contrast threshold on event generation. Left: total, positive, and negative event counts obtained from the same Power Drill sequence while varying the contrast threshold. Right: corresponding event visualizations for thresholds of 0.00, 0.10, 0.20, and 0.30. Increasing the threshold reduces the generated event density while preserving the dominant scene structure. 12 I. Bugueno-Cordova et al. 
+
+5.3 Performance Evaluation 
+
+To assess the computational efficiency of EsaacSim , the event generation pipeline was benchmarked on a local workstation equipped with an NVIDIA GeForce RTX 4060 GPU with 8 GB of GPU memory. This consumer-grade setup was used without access to high-performance computing infrastructure. Five repre-sentative event camera resolutions (DVS128, DAVIS240, ATIS, DAVIS346, and GenX320) were evaluated under temporal interpolation factors of ×8, ×16 , and 
+
+×32 . Assuming a 30 Hz rendering cadence, these factors correspond to effec-tive temporal sampling frequencies of 240, 480, and 960 Hz, respectively. The evaluation measures only the event generation pipeline, excluding scene loading, rendering initialization, ROS 2 communication, logging, and file I/O. Figure 8 shows the average event stream generation time per rendered-frame interval as a function of sensor resolution for both grayscale and Bayer RGGB event generation. The reported execution times correspond to the processing time required by the event-generation backend to generate the complete event stream associated with one interval between two consecutive rendered frames. Therefore, the effective temporal sampling frequencies characterize the temporal resolution of the generated event stream rather than the processing throughput of the simulator. DVS128 128 × 128 16.4k px DAVIS240 240 × 180 43.2k px ATIS 304 × 240 73.0k px DAVIS346 346 × 260 90.0k px GenX320 320 × 320 102.4k px 
+
+> Sensor, spatial resolution and number of pixels
+> 0510 15 20 25 30 35
+> Event stream generation time per rendered-frame interval (ms)  Gray ×8 Gray ×16 Gray ×32 Bayer ×8 Bayer ×16 Bayer ×32
+
+Fig. 8: Event stream generation time per rendered-frame interval across sensor resolu-tions for grayscale and Bayer RGGB event generation under temporal interpolation factors of ×8, ×16 , and ×32 . Assuming a 30 Hz rendering cadence, these correspond to effective temporal sampling frequencies of 240, 480, and 960 Hz, respectively. 
+
+As expected, the computational cost generally increases with both sensor resolution and temporal interpolation factor because additional synthesized intermediate samples must be processed within each rendered-frame interval. Across the five evaluated sensor resolutions, event stream generation ranged from 6.98 to 27.28 ms for grayscale mode and from 7.58 to 29.16 ms for Bayer RGGB mode. Small non-monotonic variations are observed between sensors with similar EsaacSim 13                                                  
+
+> Table 3: GPU memory (MB) allocated during event generation for grayscale and Bayer RGGB modes. Time interpolation factors ×8,×16 , and ×32 correspond to effective event rates of 240, 480, and 960 Hz, respectively.
+> Sensor Resolution ×8×16 ×32
+> Gray Bayer Gray Bayer Gray Bayer
+> DVS128 128 ×128 51.4 51.4 55.4 55.4 64.0 64.1 DAVIS240 240 ×180 135.5 135.6 146.0 146.2 167.8 168.0 ATIS 304 ×240 228.7 229.0 246.5 246.8 282.4 282.7 DAVIS346 346 ×260 287.0 288.5 310.4 310.8 354.3 354.6 GenX320 320 ×320 324.2 324.6 349.2 349.7 399.3 399.7
+
+pixel counts due to implementation and memory-access characteristics, while the overall trend remains consistent. Table 3 summarizes the GPU memory allocated during grayscale and Bayer RGGB event generation. For both modes, memory consumption scales approxi-mately linearly with sensor resolution and temporal interpolation factor, ranging from 51.4 MB for DVS128 at ×8 to 399.7 MB for GenX320 at ×32 . Bayer RGGB event generation incurs only a marginal increase in GPU memory, with differences of at most 1.5 MB compared with grayscale mode. Even under the most demanding evaluated configuration, the event generation backend required less than 400 MB of additional GPU memory, leaving substantial capacity available for the Isaac Sim rendering pipeline and other robotic percep-tion components on the evaluated 8 GB GPU. Overall, these results indicate that 
+
+EsaacSim efficiently generates both gray and Bayer RGGB event streams across a range of commonly used event camera resolutions while maintaining predictable computational and memory scaling. Importantly, all experiments were conducted on a local consumer-grade RTX 4060 GPU rather than specialized HPC hardware. The measured execution times and moderate memory requirements therefore suggest that EsaacSim can support online event simulation on an accessible workstation, facilitating development and experimentation even when dedicated high-performance computing resources are unavailable. Despite these promising results, several limitations remain in the current version of EsaacSim . First, the event generation backend is currently frame-based only; the physics-grounded backend reserved in the sensor interface has not yet been implemented, so effects such as optical path modeling and pixel-level circuit behavior are not yet captured. Second, the reported evaluation focuses on computational efficiency and qualitative multimodal consistency, without a quantitative comparison against real event camera recordings; establishing this correspondence is necessary to assess the fidelity of the generated event streams. Third, all experiments were conducted on a single consumer-grade GPU with a limited set of static and quasi-static robotic scenes, and further evaluation under more dynamic manipulation tasks and multi-camera configurations is needed to characterize performance under more demanding robotic workloads. 14 I. Bugueno-Cordova et al. 
+
+## 6 Conclusions and Future Work 
+
+This paper presented EsaacSim , a multimodal event camera add-on for NVIDIA Isaac Sim that enables online simulation of asynchronous event streams within photorealistic robotic environments. By integrating directly into the native Isaac Sim rendering pipeline, the proposed framework provides synchronized RGB, APS grayscale, grayscale event, Bayer RGGB event, IMU, and depth outputs while remaining fully compatible with existing Isaac Sim and ROS 2 workflows. Experimental results showed efficient online event simulation across five representative event camera resolutions. Event streams corresponding to a single rendered-frame interval were generated in 6.98–27.28 ms for grayscale mode and 7.58–29.16 ms for Bayer RGGB mode while requiring less than 400 MB of additional GPU memory on a consumer-grade NVIDIA RTX 4060 GPU. Motion-guided temporal interpolation enabled effective temporal sampling rates of up to 960 Hz while maintaining online processing of each rendered-frame interval. The current version of EsaacSim nonetheless presents several limitations that motivate ongoing development. The event generation pipeline remains frame-based, with the physics-grounded backend interface defined but not yet active, limiting the sensor-level realism achievable relative to native circuit-level event models. In addition, the generated event streams have not yet been quantitatively validated against real event camera data, and the evaluation reported in this work does not yet include downstream robotic perception tasks. Future work will focus on extending the sensor model with additional event camera effects, including more realistic noise sources and hardware-specific char-acteristics, as well as incorporating support for additional event sensor configura-tions. We also plan to implement and evaluate the physics-based backend, validate the simulated event streams against real event camera data, and assess their effectiveness in downstream robotic perception tasks such as visual odometry, SLAM, object detection, and event-based learning. 
+
+## Acknowledgements 
+
+This research was supported by the NVIDIA Academic Grant Program 2025, Robotics and Edge AI Track. 
+
+## References   
+
+> 1. Event camera - airsim (2021), https://microsoft.github.io/AirSim/event_sim/
+> 3, 4 2. Bi, Y., Andreopoulos, Y.: Pix2nvs: Parameterized conversion of pixel-domain video frames to neuromorphic vision streams. In: 2017 IEEE International Conference on Image Processing (ICIP). pp. 1990–1994 (2017) 3 3. Bonetto, E., Xu, C., Ahmad, A.: Grade: Generating realistic and dynamic environ-ments for robotics research with isaac sim. The International Journal of Robotics Research 45 (2), 204–232 (2026) 2
+
+EsaacSim 15 4. Bugueno-Cordova, I., Campusano, M., Guaman-Rivera, R., Verschae, R.: A color event-based camera emulator for robot vision. In: International Conference on Robotics, Computer Vision and Intelligent Systems. pp. 375–390. Springer (2024) 3 5. Calli, B., Singh, A., Walsman, A., Srinivasa, S., Abbeel, P., Dollar, A.M.: The ycb object and model set: Towards common benchmarks for manipulation research. In: 2015 International Conference on Advanced Robotics (ICAR). pp. 510–517 (2015). 
+
+https://doi.org/10.1109/ICAR.2015.7251504 10 6. Cazzato, D., Bono, F.: An application-driven survey on event-based neuromor-phic computer vision. Information 15 (8) (2024). https://doi.org/10.3390/ info15080472 , https://www.mdpi.com/2078-2489/15/8/472 17. Chakravarthi, B., Verma, A.A., Daniilidis, K., Fermuller, C., Yang, Y.: Recent event camera innovations: A survey. In: European Conference on Computer Vision. pp. 342–376. Springer (2024) 1 8. Dürr, P., El Gheche, M., Maeda, G.J., Mukai, N., Takahashi, N., Heusser, S., Sahloul, H., Saraiji, Y., Adodin, P., Bi, Y., Blakeman, S., Conti, C., Fuentes Hitos, D., Hu, Y., Khadivar, F., Kreiser, R., Martinez, L., Schilling, F., Tapiador Morales, R., Torrente, G., Ynocente Castro, M., Abecassis, L., Giammarino, A., Huang, Y.T., Nagel, Y., Scotti, A., Sigrist, A., Silva, T., Walther, E., Wong, J., Yang, B., Aydin, A., Grover, D., Saha, A., Cavinato, V., Kakinuma, T., Kunori, T., Monferrato, V., Richter, S., Charalambous, S., Guist, S., Kuhlmann-Jorgensen, M.A., Miele, L., Politis, A., Scardecchia, M., Kitano, H., Wurman, P.R., Stone, P., Spranger, M.: Outplaying elite table tennis players with an autonomous robot. Nature 652 (8111), 886–891 (2026). https://doi.org/10.1038/s41586-026-10338-5 19. Gallego, G., Delbrück, T., Orchard, G., Bartolozzi, C., Taba, B., Censi, A., Leuteneg-ger, S., Davison, A.J., Conradt, J., Daniilidis, K., Scaramuzza, D.: Event-based vision: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence 
+
+44 (1), 154–180 (2022) 1, 4 10. Gao, S., Pagnucco, M., Bednarz, T., Song, Y.: Nvidia isaac sim: Enabling scalable, gpu-accelerated simulation for robotics. arXiv preprint arXiv:2606.03551 (2026) 2 11. García, G.P., Camilleri, P., Liu, Q., Furber, S.: pydvs: An extensible, real-time dynamic vision sensor emulator using off-the-shelf hardware. In: 2016 IEEE Sym-posium Series on Computational Intelligence (SSCI). pp. 1–7 (2016) 3 12. Greene, J.L., Kar, A., Galindo, I., Quiles, E., Chen, E., Anderson, M.: A pytorch-enabled tool for synthetic event camera data generation and algorithm development. In: Synthetic Data for Artificial Intelligence and Machine Learning: Tools, Tech-niques, and Applications III. vol. 13459, pp. 117–137. SPIE (2025) 2, 3 13. Hageman, O.: A Survey on Event Camera Simulators and Datasets for Optical Flow Estimation. Ph.D. thesis, Delft University of Technology (2024) 2 14. Han, H., Lyu, J., Li, J., Wei, H., Li, C., Wei, Y., Chen, S., Ji, X.: Physical-based event camera simulator. In: European Conference on Computer Vision. pp. 19–35. Springer (2024) 3, 4 15. Hong, Y., Lu, T., Chen, J., Zhu, D., Wang, Z.: A comprehensive review of event camera-based depth estimation methods. In: 2025 IEEE International Conference on Real-time Computing and Robotics (RCAR). pp. 1046–1053 (2025). https: //doi.org/10.1109/RCAR65431.2025.11139613 116. Hu, Y., Liu, S.C., Delbruck, T.: v2e: From video frames to realistic dvs events. In: 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW). pp. 1312–1321 (2021) 2, 3 17. Jacinto, M., Pinto, J., Patrikar, J., Keller, J., Cunha, R., Scherer, S., Pascoal, A.: Pegasus simulator: An isaac sim framework for multiple aerial vehicles simulation. 16 I. Bugueno-Cordova et al. In: 2024 International Conference on Unmanned Aircraft Systems (ICUAS). pp. 917–922 (2024). https://doi.org/10.1109/ICUAS60882.2024.10556959 218. Joubert, D., Marcireau, A., Ralph, N., Jolley, A., Van Schaik, A., Cohen, G.: Event camera simulator improvements via characterized parameters. Frontiers in Neuroscience 15 , 702765 (2021) 3, 4 19. Kaiser, J., Tieck, J.C.V., Hubschneider, C., Wolf, P., Weber, M., Hoff, M., Friedrich, A., Wojtasik, K., Roennau, A., Kohlhaas, R., Dillmann, R., Zöllner, J.M.: Towards a framework for end-to-end control of a simulated vehicle with spiking neural networks. In: 2016 IEEE International Conference on Simulation, Modeling, and Programming for Autonomous Robots. pp. 127–134 (Dec 2016) 3, 4 20. Katz, M.L., Nikolic, K., Delbruck, T.: Live demonstration: Behavioural emulation of event-based vision sensors. In: 2012 IEEE International Symposium on Circuits and Systems (ISCAS). pp. 736–740 (2012) 3 21. Li, W., Saeedi, S., McCormac, J., Clark, R., Tzoumanikas, D., Ye, Q., Huang, Y., Tang, R., Leutenegger, S.: Interiornet: Mega-scale multi-sensor photo-realistic indoor scenes dataset. In: British Machine Vision Conference (BMVC) (2018) 4 22. Li, Z., Bai, X., Lu, J., Shen, P., Lam, E.Y., Peng, Y.: Eventtracer: Fast path tracing-based event stream rendering (2025) 2, 3, 4 23. Mueggler, E., Rebecq, H., Gallego, G., Delbruck, T., Scaramuzza, D.: The event-camera dataset and simulator: Event-based data for pose estimation, visual odom-etry, and slam. The International Journal of Robotics Research 36 (2), 142–149 (2017) 4 24. Nehvi, J., Golyanik, V., Mueller, F., Seidel, H.P., Elgharib, M., Theobalt, C.: Differentiable event stream simulator for non-rigid 3d tracking. In: 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops (CVPRW). pp. 1302–1311 (2021) 4 25. Pantho, M.J.H., Mbongue, J.M., Bhowmik, P., Bobda, C.: Event camera simulator design for modeling attention-based inference architectures. Journal of Real-Time Image Processing 19 (2), 363–374 (2022) 4 26. Rebecq, H., Gehrig, D., Scaramuzza, D.: Esim: an open event camera simulator. In: Billard, A., Dragan, A., Peters, J., Morimoto, J. (eds.) Proceedings of The 2nd Conference on Robot Learning. Proceedings of Machine Learning Research, vol. 87, pp. 969–982. PMLR (29–31 Oct 2018) 2, 3, 4 27. Richard, A., Kamohara, J., Uno, K., Santra, S., van der Meer, D., Olivares-Mendez, M., Yoshida, K.: Omnilrs: A photorealistic simulator for lunar robotics. In: 2024 IEEE International Conference on Robotics and Automation (ICRA). pp. 16901– 16907 (2024). https://doi.org/10.1109/ICRA57147.2024.10610026 228. Rodríguez, D., Sonogashira, M., Kitano, K., Fujimura, Y., Funatomi, T., Mukaigawa, Y., Kawanishi, Y.: An event camera simulator for arbitrary viewpoints based on neural radiance fields. In: Proceedings of the 20th International Joint Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications -Volume 2: VISAPP. pp. 774–780. INSTICC, SciTePress (2025). https://doi.org/ 10.5220/0013388400003912 2, 3, 4 29. Shah, P., Rathod, S.S.: Review of bio-inspired silicon retina: From cell to system level implementation. In: 2021 International Conference on Communication information and Computing Technology (ICCICT). pp. 1–13. IEEE (2021) 4 30. Shah, S., Dey, D., Lovett, C., Kapoor, A.: Airsim: High-fidelity visual and physical simulation for autonomous vehicles. In: Field and Service Robotics (2017) 4 31. Shariff, W., Dilmaghani, M.S., Kielty, P., Moustafa, M., Lemley, J., Corcoran, P.: Event cameras in automotive sensing: A review. IEEE Access 12 , 51275–51306 (2024). https://doi.org/10.1109/ACCESS.2024.3386032 1EsaacSim 17 32. Shi, L., Zhang, R., Wang, Z.: Evis: A physics-grounded event camera plugin for nvidia isaac sim. arXiv preprint arXiv:2607.08098 (2026) 2, 3, 4, 5 33. Tenzin, S., Rassau, A., Chai, D.: Application of event cameras and neuromorphic computing to vslam: A survey. Biomimetics 9(7) (2024). https://doi.org/10. 3390/biomimetics9070444 , https://www.mdpi.com/2313-7673/9/7/444 134. Wang, H., Guo, R., Ma, P., Ruan, C., Luo, X., Ding, W., Zhong, T., Xu, J., Liu, Y., Chen, X.: Event camera meets mobile embodied perception: Abstraction, algorithm, acceleration, application. ACM Comput. Surv. 58 (8) (Feb 2026). https: //doi.org/10.1145/3786332 , https://doi.org/10.1145/3786332 135. Zafar, M.H., Moosavi, S.K.R., Sanfilippo, F.: Applications of neuromorphic/event camera in robotics with human in loop: A systematic review, datasets, and challenges. IEEE Transactions on Human-Machine Systems 56 (1), 32–47 (2026). https://doi. org/10.1109/THMS.2025.3628064 1, 2 36. Ziegler, A., Teigland, D., Tebbe, J., Gossard, T., Zell, A.: Real-time event simulation with frame-based cameras. In: 2023 IEEE International Conference on Robotics and Automation (ICRA). pp. 11669–11675 (May 2023). https://doi.org/10.1109/ ICRA48891.2023.10160654 3

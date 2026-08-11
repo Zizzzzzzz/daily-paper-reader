@@ -1,0 +1,692 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-11T20:35:10.458393+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 13,
+    "deep_cap": 8,
+    "deep_selected": 9,
+    "quick_candidates": 7,
+    "quick_skim_target": 13,
+    "quick_selected": 7
+  },
+  "deep_dive": [
+    {
+      "id": "2608.08867v1",
+      "source": "arxiv",
+      "title": "Zero-Shot Traffic Accident Detection via a Coarse-to-Fine VLM-Tracking Pipeline",
+      "abstract": "Traffic surveillance cameras capture accidents continuously, yet converting raw CCTV footage into structured event records that pinpoint when, where, and what type of collision occurred remains unsolved at scale. The ACCIDENT @ CVPR benchmark evaluates exactly this joint prediction under a strict constraint: no labeled real-world training data is available. We introduce a training-free, two-pass coarse-to-fine pipeline that pairs a frozen Qwen3-VL-32B-Instruct vision-language model with YOLO11x object detection and BoT-SORT tracking. A first pass sparsely samples the full clip to anchor the collision moment in time; a second pass re-examines a tight window around that estimate using frames annotated with stable vehicle identities and normalized bounding-box coordinates, which gives the model both a visual overlay and an explicit numeric description of the same scene. On the official 2,027-clip real-CCTV test set, our system achieves a three-way harmonic mean score of 0.504, surpassing all organizer-published baselines including the best multi-model ensemble (0.412) by a 22% relative margin.",
+      "authors": [
+        "Dipit Saha",
+        "Shah Mohammad Abdul Mannan",
+        "Mohammad Raihan Rashid",
+        "Ruwad Naswan",
+        "Ahnaf Tahmid"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T19:08:56+00:00",
+      "link": "https://arxiv.org/pdf/2608.08867v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "zero-shot traffic accident detection using frozen VLM with detection and tracking pipeline",
+      "llm_evidence_cn": "利用冻结视觉语言模型与检测跟踪流水线的零样本交通事故检测",
+      "llm_evidence": "利用冻结视觉语言模型与检测跟踪流水线的零样本交通事故检测",
+      "canonical_evidence": "利用冻结视觉语言模型与检测跟踪流水线的零样本交通事故检测",
+      "llm_tldr_en": "Introduces a training-free two-pass coarse-to-fine pipeline combining a frozen VLM with YOLO11x and BoT-SORT to perform zero-shot traffic accident detection on CCTV footage, addressing the ACCIDENT@CVPR benchmark without labeled real-world data.",
+      "llm_tldr_cn": "面向监控视频中交通事故的结构化记录，该文提出无训练的两阶段由粗到细流水线，将冻结的Qwen3-VL视觉语言模型与YOLO11x目标检测和BoT-SORT跟踪相结合。第一阶段稀疏采样整段视频以锚定碰撞时刻，第二阶段在紧致时间窗内利用车辆身份和归一化坐标精确定位事故类型。在ACCIDENT@CVPR基准上实现零样本交通事故检测，无需真实标注训练数据。这项研究展示了视觉语言模型在交通场景结构化理解中的应用潜力。",
+      "llm_tldr": "面向监控视频中交通事故的结构化记录，该文提出无训练的两阶段由粗到细流水线，将冻结的Qwen3-VL视觉语言模型与YOLO11x目标检测和BoT-SORT跟踪相结合。第一阶段稀疏采样整段视频以锚定碰撞时刻，第二阶段在紧致时间窗内利用车辆身份和归一化坐标精确定位事故类型。在ACCIDENT@CVPR基准上实现零样本交通事故检测，无需真实标注训练数据。这项研究展示了视觉语言模型在交通场景结构化理解中的应用潜力。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.07855v1",
+      "source": "arxiv",
+      "title": "CommitKV: Lifecycle-Aware KV Cache Compression via Commit Transitions for Multi-Turn Agents",
+      "abstract": "Multi-turn Reasoning-and-Acting (ReAct) agents accumulate growing trajectories of reasoning, tool calls, and observations. Their key-value (KV) caches grow accordingly, increasing memory use and attention cost during model inference. Existing KV cache compression methods reduce these costs by evicting states with low attention scores. However, low attention in the current turn does not imply future irrelevance, as temporarily inactive information may become important later. Snapshot-based eviction methods therefore do not explicitly distinguish temporarily dormant information from information that appears to have completed its role. In this paper, we present CommitKV, which identifies KV lifecycles through commit transitions. Specifically, CommitKV first divides completed agent events into token pages and compares each eligible page's deletion effect before a tool-call commit and after the commit's returned observation has been incorporated. Based on these paired measurements, CommitKV distinguishes dormant pages from high-to-low completion candidates. It then applies a greedy joint test, accepting candidates for retirement only when their combined post-commit effect remains bounded. Finally, at a later compression checkpoint, accepted pages are excluded, a bounded set of pages awaiting post-commit measurement is protected, and the remaining KV states are retained within the cache budget using the same token indices for keys, values, and absolute positions. These mechanisms ensure that CommitKV can distinguish dormant information from information that has completed its observed role and can be safely removed. Experiments on various benchmarks show that CommitKV reduces agent memory use, accelerates end-to-end inference, and achieves higher accuracy than existing KV cache compression methods.",
+      "authors": [
+        "Weizhong Huang",
+        "Jinchao Zhang",
+        "Xiawu Zheng"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-08-08T01:50:55+00:00",
+      "link": "https://arxiv.org/pdf/2608.07855v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression with lifecycle awareness for multi-turn agents",
+      "llm_evidence_cn": "面向多轮智能体的生命周期感知KV缓存压缩",
+      "llm_evidence": "面向多轮智能体的生命周期感知KV缓存压缩",
+      "canonical_evidence": "面向多轮智能体的生命周期感知KV缓存压缩",
+      "llm_tldr_en": "CommitKV performs lifecycle-aware KV cache compression by identifying commit transitions in multi-turn ReAct agents, distinguishing dormant from completed information to reduce memory and attention costs.",
+      "llm_tldr_cn": "多轮ReAct智能体在推理中不断累积轨迹，KV缓存增长带来高内存和注意力开销。现有压缩方法按注意力得分驱逐状态，却无法区分暂时休眠与已完成作用的信息。本文提出CommitKV，通过提交转换识别KV条目的生命周期，对已完成使命的缓存进行压缩，同时保留暂时休眠但未来可能相关的状态。实验显示在多轮智能体任务中，CommitKV显著降低缓存内存和计算开销，同时维持生成质量，为长上下文智能体提供了有效的KV缓存管理方案。",
+      "llm_tldr": "多轮ReAct智能体在推理中不断累积轨迹，KV缓存增长带来高内存和注意力开销。现有压缩方法按注意力得分驱逐状态，却无法区分暂时休眠与已完成作用的信息。本文提出CommitKV，通过提交转换识别KV条目的生命周期，对已完成使命的缓存进行压缩，同时保留暂时休眠但未来可能相关的状态。实验显示在多轮智能体任务中，CommitKV显著降低缓存内存和计算开销，同时维持生成质量，为长上下文智能体提供了有效的KV缓存管理方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08519v1",
+      "source": "arxiv",
+      "title": "eBIRD: Event-based Intensity Image Reconstruction Using Controllable Diffusion Models",
+      "abstract": "Intensity-image reconstruction from event streams remains a challenging problem due to the binary, sparse, and asynchronous nature of event data. This work proposes eBIRD, an event-guided reconstruction framework that combines a DDPM with ControlNet-based conditioning. We analyze generic and specialized diffusion learning strategies for handwritten digit (N-MNIST) and face (RGBE-Gaze) reconstruction using 33ms event windows. On N-MNIST, the general model achieves the best reconstruction quality (MSE 0.0052, SSIM 0.8982, PSNR 23.34dB), whereas the specialized model performs best on RGBE-Gaze (MSE 0.0161, SSIM 0.7605, PSNR 19.08dB). These preliminary results suggest that controllable diffusion models are a promising approach for event-guided intensity-image reconstruction, while highlighting that the preferred learning strategy depends on the reconstruction domain.",
+      "authors": [
+        "Ignacio Bugueno-Cordova",
+        "Fabian Valderrama",
+        "Rodrigo Verschae"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T06:37:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.08519v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "query:EV-CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Event-based intensity image reconstruction from event streams using diffusion models",
+      "llm_evidence_cn": "基于事件流和扩散模型的强度图像重建",
+      "llm_evidence": "基于事件流和扩散模型的强度图像重建",
+      "canonical_evidence": "基于事件流和扩散模型的强度图像重建",
+      "llm_tldr_en": "eBIRD reconstructs intensity images from event streams using a DDPM and ControlNet conditioning, achieving strong results on N-MNIST and RGBE-Gaze.",
+      "llm_tldr_cn": "针对事件流数据稀疏、二值且异步的特点，事件驱动的强度图像重建一直是挑战。该文提出eBIRD框架，将扩散模型与ControlNet条件机制结合，实现事件引导的图像重建。在N-MNIST手写数字和RGBE-Gaze人脸数据集上，通用模型和专用模型分别取得了最佳重建质量。结果表明可控扩散模型是事件引导重建的有效方法。",
+      "llm_tldr": "针对事件流数据稀疏、二值且异步的特点，事件驱动的强度图像重建一直是挑战。该文提出eBIRD框架，将扩散模型与ControlNet条件机制结合，实现事件引导的图像重建。在N-MNIST手写数字和RGBE-Gaze人脸数据集上，通用模型和专用模型分别取得了最佳重建质量。结果表明可控扩散模型是事件引导重建的有效方法。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event stream",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08522v1",
+      "source": "arxiv",
+      "title": "EsaacSim: A Multimodal Event Camera Add-on for NVIDIA Isaac Sim",
+      "abstract": "Event-based vision is becoming an increasingly important sensing paradigm for robotics, yet its adoption remains limited by sensor availability and the lack of integrated simulation tools for modern robotics platforms. This paper presents EsaacSim, a multimodal event camera add-on for NVIDIA Isaac Sim that enables online simulation of configurable event cameras with grayscale and Bayer RGGB event generation. The framework supports multiple event camera resolutions and provides synchronized RGB, APS, event, depth, and IMU outputs through native ROS2 interfaces. A motion-guided frame-gap synthesis strategy further increases the effective temporal resolution while preserving compatibility with the Isaac Sim rendering pipeline. Experimental evaluation demonstrates synchronized multimodal simulation across representative robotic scenes and efficient online performance over five event camera resolutions at effective event rates from 240 to 960Hz. Event stream generation requires 6.98--27.28ms for grayscale events and 7.58--29.16ms for Bayer RGGB events while using less than 400MB of additional GPU memory on an NVIDIA RTX~4060 GPU. These results show that EsaacSim enables supports online multimodal event-camera simulation for robotics research and synthetic data generation. We release an early version of the simulator and report its current architecture and performance.",
+      "authors": [
+        "Ignacio Bugueno-Cordova",
+        "Malte Kuhlmann",
+        "Nicolás Navarro-Guerrero",
+        "Miguel Campusano",
+        "Rodrigo Verschae"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-09T06:41:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.08522v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Multimodal event camera simulation add-on for Isaac Sim supporting event generation and ROS2",
+      "llm_evidence_cn": "多模态事件相机仿真插件，支持事件生成与ROS2输出，面向事件相机视觉系统",
+      "llm_evidence": "多模态事件相机仿真插件，支持事件生成与ROS2输出，面向事件相机视觉系统",
+      "canonical_evidence": "多模态事件相机仿真插件，支持事件生成与ROS2输出，面向事件相机视觉系统",
+      "llm_tldr_en": "Presents EsaacSim, an event camera add-on for NVIDIA Isaac Sim enabling configurable event stream simulation with RGB, APS, event, depth, and IMU outputs through ROS2.",
+      "llm_tldr_cn": "由于真实事件相机稀缺且缺乏机器人仿真集成工具，事件视觉的应用受限。本文提出EsaacSim，为NVIDIA Isaac Sim提供多模态事件相机插件，支持可配置的事件相机分辨率、灰度与Bayer RGGB事件生成，并通过原生ROS2接口输出同步的RGB、APS、事件、深度和IMU数据。运动引导的帧间合成进一步提高了时间分辨率。该工具为机器人事件视觉研究提供了易用的仿真平台。",
+      "llm_tldr": "由于真实事件相机稀缺且缺乏机器人仿真集成工具，事件视觉的应用受限。本文提出EsaacSim，为NVIDIA Isaac Sim提供多模态事件相机插件，支持可配置的事件相机分辨率、灰度与Bayer RGGB事件生成，并通过原生ROS2接口输出同步的RGB、APS、事件、深度和IMU数据。运动引导的帧间合成进一步提高了时间分辨率。该工具为机器人事件视觉研究提供了易用的仿真平台。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08569v1",
+      "source": "arxiv",
+      "title": "VoxZip: Semantic-Anchored Temporal KV Cache Compression for Long-Context Audio Inference",
+      "abstract": "Recent advancements in Speech Large Language Models have demonstrated remarkable capabilities in understanding complex audio tasks. Despite this progress, their long-context inference remains severely bottlenecked by prohibitive KV cache memory demands. Existing text-centric compression methods struggle here, often disrupting speech continuity or discarding crucial semantic cues. To address this, we propose VoxZip, a train-free, two-stage semantic-anchored KV cache compression framework. The first stage uses automatic speech recognition (ASR) transcriptions as explicit semantic anchors to temporally align, compress, and fuse audio tokens, significantly reducing the initial KV cache while elevating token information density. To further improve the compression ratio, the second stage employs a dynamic filtering strategy based on temporally decayed accumulated attention to evict non-essential tokens while mitigating early-token bias. Comprehensive evaluations on Qwen3-Omni across six diverse audio benchmarks demonstrate the superiority of our approach. VoxZip excels in long-audio reasoning and consistently maintains high-fidelity perception on short-form tasks. Notably, it sustains over 90\\% of the uncompressed baseline performance even under an aggressive 20x KV cache compression in long-context scenarios. Furthermore, at a 4x compression ratio, VoxZip yields a 1.9x increase in inference throughput alongside a 3.3x reduction in peak memory overhead. Code and models will be available at https://github.com/MM-Speech/VoxZip.",
+      "authors": [
+        "Wenxu Jia",
+        "Dongjie Fu",
+        "Xize Cheng",
+        "Fangming Feng",
+        "Linjun Li",
+        "Wenshi Chen",
+        "Yingming Li",
+        "Zhou Zhao",
+        "Tao Jin"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.SD"
+      ],
+      "published": "2026-08-09T08:17:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.08569v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression for long-context audio LLMs using semantic anchors",
+      "llm_evidence_cn": "基于语义锚点的长上下文音频推理KV缓存压缩",
+      "llm_evidence": "基于语义锚点的长上下文音频推理KV缓存压缩",
+      "canonical_evidence": "基于语义锚点的长上下文音频推理KV缓存压缩",
+      "llm_tldr_en": "VoxZip is a train-free semantic-anchored KV cache compression framework for speech LLMs, reducing memory via ASR transcription-guided token alignment and fusion.",
+      "llm_tldr_cn": "语音大模型长上下文推理受限于巨大的KV缓存内存占用，而文本中心的压缩方法会破坏语音连续性或丢失语义信息。该文提出免训练的VoxZip框架，利用ASR转录作为语义锚点，对音频token进行时间对齐、压缩和融合，显著压缩初始KV缓存。进一步结合语义感知的缓存重组策略，在保持理解能力的同时实现高效长上下文推断。该方法为语音大模型的缓存管理提供了新方案。",
+      "llm_tldr": "语音大模型长上下文推理受限于巨大的KV缓存内存占用，而文本中心的压缩方法会破坏语音连续性或丢失语义信息。该文提出免训练的VoxZip框架，利用ASR转录作为语义锚点，对音频token进行时间对齐、压缩和融合，显著压缩初始KV缓存。进一步结合语义感知的缓存重组策略，在保持理解能力的同时实现高效长上下文推断。该方法为语音大模型的缓存管理提供了新方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08630v1",
+      "source": "arxiv",
+      "title": "VLZip: Unified Visual and Textual Compression for Interleaved Long-Context Modeling",
+      "abstract": "Vision Language Models (VLMs) face significant challenges with ultra-long, interleaved image-text sequences due to the quadratic complexity of self-attention. Current solutions either resort to aggressive token pruning, risking irreversible information loss, or adopt efficient but less precise architectures, while largely ignoring the equally vital textual component. We introduce VLZip, a framework that unifies visual and textual compression for high-fidelity reasoning within a pure Transformer. At its core, VLZip hierarchically distills visual and textual segments into compact, layer-specific \"soft prefixes\" and injects them into each decoder layer's hidden states, drastically shortening the attention sequence while preserving fine-grained global context. To address deficient evaluations in the field, we also introduce LongVLBench, a new benchmark derived from video narratives that demands holistic, narrative-level reasoning. Extensive experiments show VLZip achieves leading performance on long-context multimodal reasoning, enabling training up to 120K tokens, a 6x increase over the baseline, and inference beyond 280K tokens with significantly reduced memory, while demonstrating the memory scalability to handle up to 2M tokens. By excelling at extreme context lengths where existing methods collapse, VLZip establishes an efficient and powerful new standard for long-context multimodal AI. Code is available at https://github.com/ShareLab-SII/VLZip.",
+      "authors": [
+        "Yuqi Zhang",
+        "Cheng Chen",
+        "Yuyu Guo",
+        "Wenjie Yang",
+        "Lingchen Meng",
+        "Peng Di",
+        "Hang Yu",
+        "Zuxuan Wu",
+        "Yu-Gang Jiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T10:31:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.08630v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "unified visual-textual compression for long-context VLMs",
+      "llm_evidence_cn": "面向长上下文VLM的统一视觉-文本压缩",
+      "llm_evidence": "面向长上下文VLM的统一视觉-文本压缩",
+      "canonical_evidence": "面向长上下文VLM的统一视觉-文本压缩",
+      "llm_tldr_en": "VLZip hierarchically distills visual and textual segments into per-layer soft prefixes and injects them into decoder hidden states, shortening attention length while preserving fine-grained reasoning.",
+      "llm_tldr_cn": "针对VLM处理超长图文交错序列时自注意力二次复杂度的问题，该论文提出VLZip统一压缩框架，将视觉和文本片段分层蒸馏为紧凑的逐层软前缀，注入解码器隐藏状态，从而大幅缩短注意力序列并保留细粒度信息。该框架在纯Transformer内实现高保真长上下文推理，为VLM长序列高效建模提供了一种兼顾视觉与文本的新路径。",
+      "llm_tldr": "针对VLM处理超长图文交错序列时自注意力二次复杂度的问题，该论文提出VLZip统一压缩框架，将视觉和文本片段分层蒸馏为紧凑的逐层软前缀，注入解码器隐藏状态，从而大幅缩短注意力序列并保留细粒度信息。该框架在纯Transformer内实现高保真长上下文推理，为VLM长序列高效建模提供了一种兼顾视觉与文本的新路径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08732v1",
+      "source": "arxiv",
+      "title": "AnchorFold: A Focus-Then-Fold Framework via Recursive Attention Propagation for Efficient Multi-Vector Visual Document Retrieval",
+      "abstract": "Multi-vector vision-language retrievers enable fine-grained Visual Document Retrieval (VDR) through late interaction, but storing and scoring hundreds of visual patch embeddings per page incurs substantial overhead. Existing training-free methods rely on pruning or merging: pruning degrades sharply under aggressive compression, whereas merging does not explicitly prioritize important regions when forming representatives. We introduce AnchorFold, a training-free focus-then-fold framework for document-side index compression. AnchorFold applies Recursive Attention Propagation over visual self-attention graphs, performing multi-step propagation within each attention head and integrating scores across heads and layers. The focus stage selects the highest-centrality tokens as anchors. The fold stage assigns remaining tokens to their most similar anchors in the normalized retrieval space and summarizes each anchor-centered group through centrality-weighted aggregation. This preserves non-anchor contributions while concentrating capacity on structurally important tokens. Across ViDoRe v1/v2 and REAL-MM-RAG with three diverse retrieval backbones, AnchorFold consistently outperforms all evaluated training-free baselines at $γ\\leq 0.20$. On ViDoRe v1/v2, it retains 98.3% of full-index NDCG@5 on average at $5\\times$ compression, achieving near-lossless compression, and 92.4% at $20\\times$ compression.",
+      "authors": [
+        "Haoyu Zuo",
+        "Yibo Yan",
+        "Xin Zou",
+        "Shuliang Liu",
+        "Yi Cao",
+        "Mingdong Ou",
+        "Xuming Hu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL",
+        "cs.IR"
+      ],
+      "published": "2026-08-09T14:23:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.08732v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free token compression for multi-vector vision-language retrievers via recursive attention propagation",
+      "llm_evidence_cn": "通过递归注意力传播实现多向量视觉语言检索器的无训练token压缩",
+      "llm_evidence": "通过递归注意力传播实现多向量视觉语言检索器的无训练token压缩",
+      "canonical_evidence": "通过递归注意力传播实现多向量视觉语言检索器的无训练token压缩",
+      "llm_tldr_en": "AnchorFold proposes a training-free focus-then-fold compression framework using recursive attention propagation to cut multi-vector visual document index overhead while preserving accuracy.",
+      "llm_tldr_cn": "多向量视觉语言检索器因每页存储数百个视觉patch嵌入而开销巨大，现有无训练剪枝在激进压缩下性能下降，合并又不突出重要区域。本文提出AnchorFold，一种无训练的聚焦-折叠框架，在视觉自注意力图上进行递归注意力传播，并跨注意力头集成分数，实现对文档端索引的有效压缩。实验表明该方法在激进压缩下仍保持检索精度，为视觉语言模型的token压缩与高效推理提供了新思路。",
+      "llm_tldr": "多向量视觉语言检索器因每页存储数百个视觉patch嵌入而开销巨大，现有无训练剪枝在激进压缩下性能下降，合并又不突出重要区域。本文提出AnchorFold，一种无训练的聚焦-折叠框架，在视觉自注意力图上进行递归注意力传播，并跨注意力头集成分数，实现对文档端索引的有效压缩。实验表明该方法在激进压缩下仍保持检索精度，为视觉语言模型的token压缩与高效推理提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.09227v1",
+      "source": "arxiv",
+      "title": "Omni2LoRA: Coherence-Preserving Parametric Memory for Efficient Omni Language Models",
+      "abstract": "Omnimodal language models (OLMs) enable unified audio-visual understanding, but processing long joint token sequences makes inference computationally prohibitive. While recent token compression methods attempt to alleviate this burden, compressing modalities in isolation often destroys the temporal cross-modal anchors necessary for coherent reasoning. We introduce Omni2LoRA, a two-stage framework for efficient parametric memory compression via coherence-preserving context distillation that bypasses the token bottleneck entirely. First, a Perceiver hypernetwork processes intermediate representations from a frozen OLM to encode the multimodal context into a full-rank Low-Rank Adaptation (LoRA) adapter in a single forward pass. To prevent the resulting parameter footprint from scaling linearly with recording length, we optimize a discrete rank allocation policy via Group Relative Policy Optimization (GRPO) that uses a modality-ablated counterfactual reward to explicitly penalize the loss of audio-visual coherence, forcing the model to allocate its fixed sub-linear rank budget to synergistic cross-modal anchors rather than isolated visual features. Across three omnimodal backbones, Omni2LoRA operating at a 30% rank budget outperforms direct full-context inference and strong token-compression baselines (OmniZip, OMAC, O-MARC) on four audio-visual question answering benchmarks, improving average accuracy by 8-12% over the strongest baseline and remaining stable under compression ratios as tight as 75%, where token-pruning methods degrade sharply. By converting multimodal memory into a fixed-budget, reusable parameter state, our method drives answer-time multimodal-token load to zero, cutting per-query Time to First Token (TTFT) by up to 12x relative to full-context inference and amortizing to under 0.5s after a handful of queries.",
+      "authors": [
+        "Puneet Mathur",
+        "Manan Suri",
+        "Dinesh Manocha"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-10T07:49:10+00:00",
+      "link": "https://arxiv.org/pdf/2608.09227v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "parametric memory compression via coherence-preserving context distillation bypasses token bottleneck in omni LLMs",
+      "llm_evidence_cn": "面向全能语言模型的保连贯参数记忆压缩，通过低秩适配绕过token瓶颈",
+      "llm_evidence": "面向全能语言模型的保连贯参数记忆压缩，通过低秩适配绕过token瓶颈",
+      "canonical_evidence": "面向全能语言模型的保连贯参数记忆压缩，通过低秩适配绕过token瓶颈",
+      "llm_tldr_en": "Proposes Omni2LoRA, a two-stage framework for omni language models that compresses long multimodal context into a LoRA adapter via a Perceiver hypernetwork, bypassing token bottleneck and preserving cross-modal coherence.",
+      "llm_tldr_cn": "全能语言模型能统一处理音视频等多模态理解，但长联合token序列使推理开销巨大，现有token压缩往往孤立压缩各模态，破坏时序交叉模态锚点。Omni2LoRA提出两阶段参数记忆压缩框架：先用Perceiver超网络将冻结OLM的中间表示编码为全秩LoRA适配器，以保连贯上下文蒸馏绕过token瓶颈。该方法避免了直接依赖token压缩，在压缩多模态上下文的同时保持跨模态推理的连贯性，显著提升长多模态推理效率。",
+      "llm_tldr": "全能语言模型能统一处理音视频等多模态理解，但长联合token序列使推理开销巨大，现有token压缩往往孤立压缩各模态，破坏时序交叉模态锚点。Omni2LoRA提出两阶段参数记忆压缩框架：先用Perceiver超网络将冻结OLM的中间表示编码为全秩LoRA适配器，以保连贯上下文蒸馏绕过token瓶颈。该方法避免了直接依赖token压缩，在压缩多模态上下文的同时保持跨模态推理的连贯性，显著提升长多模态推理效率。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.09520v1",
+      "source": "arxiv",
+      "title": "A Height-Constrained 2-Point Minimal Solver for Pose Estimation from Active LED Markers with Event Cameras",
+      "abstract": "In many autonomous applications requiring real-time localization, active marker-based systems are preferred due to their low latency and ease of deployment compared to computationally demanding feature-based methods. Event~\\mbox{cameras} offer high temporal resolution and minimal delay and are commonly used with active LED markers for robust real-time localization. Existing methods typically rely on Perspective-n-Point (PnP) solvers for pose estimation. However, structured marker layouts can be challenging to deploy in space-constrained scenarios, while partial self-motion information (e.g., gravity direction and altitude) is readily available from onboard sensors. We derive a robust and accurate minimal solver that estimates camera pose from only two LED markers by incorporating known tilt angle and camera height measured by an onboard sensor, such as an IMU or an altimeter. The proposed formulation uniquely determines the camera pose through both a closed-form and a linear least-squares solution. We further analyze degenerate configurations and characterize the conditions under which height information does not contribute to rotation estimation. For evaluation, we developed an event-based active marker system to collect real-world data with ground truth from a motion capture system. Experiments on both synthetic and real data demonstrate improved accuracy over the state-of-the-art P2P solver and competitive performance relative to P3P.",
+      "authors": [
+        "Runze Yuan",
+        "Alexander Kappler",
+        "Jun Zhang",
+        "Kuangyi Chen",
+        "Fabio Morbidi",
+        "Pascal Vasseur",
+        "Cédric Demonceaux",
+        "Friedrich Fraundorfer"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-10T12:19:24+00:00",
+      "link": "https://arxiv.org/pdf/2608.09520v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "query:EV-CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "pose estimation from active LED markers with event cameras",
+      "llm_evidence_cn": "基于事件相机与主动LED标记的位姿估计",
+      "llm_evidence": "基于事件相机与主动LED标记的位姿估计",
+      "canonical_evidence": "基于事件相机与主动LED标记的位姿估计",
+      "llm_tldr_en": "Derives a height-constrained 2-point minimal solver for pose estimation from active LED markers with event cameras, offering robust real-time localization.",
+      "llm_tldr_cn": "实时自主应用常采用主动LED标记与事件相机进行低延迟定位，但现有PnP求解器在空间受限场景下部署困难，且机载高度信息常被忽视。论文基于事件相机输出，利用已知的重力方向和海拔形成高度约束，推导出一个鲁棒且精确的两点最小求解器。相比经典PnP方法，该求解器在保持高时间分辨率和低延迟的同时提升了定位鲁棒性，为事件相机定位应用提供高效求解方案。",
+      "llm_tldr": "实时自主应用常采用主动LED标记与事件相机进行低延迟定位，但现有PnP求解器在空间受限场景下部署困难，且机载高度信息常被忽视。论文基于事件相机输出，利用已知的重力方向和海拔形成高度约束，推导出一个鲁棒且精确的两点最小求解器。相比经典PnP方法，该求解器在保持高时间分辨率和低延迟的同时提升了定位鲁棒性，为事件相机定位应用提供高效求解方案。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based camera vision sensors and systems",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.07596v1",
+      "source": "arxiv",
+      "title": "LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding",
+      "abstract": "Vision-Language-Action (VLA) models transform representations from pretrained vision-language models (VLMs) into robot actions, yet the interface that routes intermediate VLM features into action decoders remains underexplored. Existing designs either expose only a narrow part of the representation hierarchy or rigidly match each decoder block to one VLM layer, restricting access to complementary task evidence across depths. We introduce LIRA, a local cross-layer action-conditioning mechanism that formulates VLM-to-action conditioning as depth-aware information routing. LIRA operates on task-token features and LIRA Query features derived from intermediate VLM states, then assigns each Parallel Fusion Block a depth-aligned local window centered on its corresponding VLM layer. Parallel Fusion Blocks aggregate neighboring LIRA Query features and integrate them with task-token features and proprioceptive inputs before action prediction. This routing interface leaves the backbone architecture, action decoder, and supervised training recipe unchanged. Across LIBERO, LIBERO-Plus, CALVIN ABC$\\rightarrow$D, and real-world manipulation, LIRA improves the principal aggregate metrics over the VLA-Adapter baseline under the same 0.5B-parameter configuration. In zero-shot transfer to LIBERO-Plus, LIRA increases average success from 59.1% to 78.0%, an 18.9-point gain indicating improved robustness under controlled distribution shifts.",
+      "authors": [
+        "Zhewei Zhang",
+        "Puyue Wang",
+        "Guanren Qiao",
+        "Yijie Weng",
+        "Jiawei Hu",
+        "Guo Li",
+        "Lujia Wang",
+        "Junyan Wang",
+        "Tao Gu",
+        "Hongliang Lu",
+        "Guiliang Liu",
+        "Hong Jia",
+        "Xinhu Zheng"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-06T08:12:32+00:00",
+      "link": "https://arxiv.org/pdf/2608.07596v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Vision-Language-Action decoding with local cross-layer information routing",
+      "llm_evidence_cn": "面向视觉-语言-动作模型的高效解码架构，提出局部跨层信息路由机制",
+      "llm_evidence": "面向视觉-语言-动作模型的高效解码架构，提出局部跨层信息路由机制",
+      "canonical_evidence": "面向视觉-语言-动作模型的高效解码架构，提出局部跨层信息路由机制",
+      "llm_tldr_en": "Proposes LIRA, a local cross-layer action-conditioning mechanism for VLA decoding, routing task-token features across depth-aligned windows to improve VLM-to-action conditioning.",
+      "llm_tldr_cn": "视觉-语言-动作模型在将预训练视觉语言特征转化为机器人动作时，VLM特征到动作解码器的接口仍未被充分探索。现有方法要么只暴露部分表示层次，要么将解码器与单层VLM特征刚性匹配，限制了对跨层互补证据的利用。为此提出LIRA，将VLM到动作的条件化建模为深度感知的信息路由，为每个并行融合块分配深度对齐的局部窗口。该方法在VLA解码任务中增强了跨层信息访问与动作条件化，验证了其在机器人动作生成中的有效性。",
+      "llm_tldr": "视觉-语言-动作模型在将预训练视觉语言特征转化为机器人动作时，VLM特征到动作解码器的接口仍未被充分探索。现有方法要么只暴露部分表示层次，要么将解码器与单层VLM特征刚性匹配，限制了对跨层互补证据的利用。为此提出LIRA，将VLM到动作的条件化建模为深度感知的信息路由，为每个并行融合块分配深度对齐的局部窗口。该方法在VLA解码任务中增强了跨层信息访问与动作条件化，验证了其在机器人动作生成中的有效性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient architectures for vision language action models",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.07616v1",
+      "source": "arxiv",
+      "title": "HSMLA: Hierarchical Softmax Multi-scale Linear Attention for Efficient Vision Transformers",
+      "abstract": "Vision transformers face significant computational overheads in high-resolution dense prediction due to the quadratic complexity of self-attention. Linear attention offers efficiency but sacrifices local context modeling. We propose \\textbf{HSMLA (Hierarchical Softmax Multi-scale Linear Attention)}, which combines ReLU-based linear attention for global context, selective softmax refinement for critical local features, and multi-scale token representations via depthwise convolutions. HSMLA achieves superior accuracy-efficiency trade-offs: up to $4.2\\times$ inference-time speedup across dense prediction tasks, $87.3%$ Dice with $3.2\\times$ speedup on CT organ segmentation, and $94.2%$ AUC with $4.1\\times$ speedup on pathology WSI.",
+      "authors": [
+        "Dong Liu",
+        "Yanxuan Yu",
+        "Renata Borovica-Gajic",
+        "Ying Nian Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-07T03:47:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.07616v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "efficient multi-scale linear attention for vision transformers, applicable to VLM backbones",
+      "llm_evidence_cn": "面向视觉Transformer的高效多尺度线性注意力，可应用于视觉语言模型骨干",
+      "llm_evidence": "面向视觉Transformer的高效多尺度线性注意力，可应用于视觉语言模型骨干",
+      "canonical_evidence": "面向视觉Transformer的高效多尺度线性注意力，可应用于视觉语言模型骨干",
+      "llm_tldr_en": "Proposes HSMLA combining ReLU linear attention, selective softmax refinement, and multi-scale token representations for efficient vision transformers, achieving large speedups in dense prediction.",
+      "llm_tldr_cn": "视觉Transformer在高分辨率密集预测中因自注意力的二次复杂度而计算开销巨大，线性注意力虽高效但损失局部建模。为此提出HSMLA，将ReLU线性注意力用于全局上下文、选择性Softmax精修关键局部特征，并通过深度卷积构建多尺度token表示，兼顾精度与效率。在CT器官分割、病理全切片等密集预测任务上取得最高4.2倍推理加速和与强基线相当的精度。该设计可直接作为高效视觉编码器支撑视觉语言模型的快速推理。",
+      "llm_tldr": "视觉Transformer在高分辨率密集预测中因自注意力的二次复杂度而计算开销巨大，线性注意力虽高效但损失局部建模。为此提出HSMLA，将ReLU线性注意力用于全局上下文、选择性Softmax精修关键局部特征，并通过深度卷积构建多尺度token表示，兼顾精度与效率。在CT器官分割、病理全切片等密集预测任务上取得最高4.2倍推理加速和与强基线相当的精度。该设计可直接作为高效视觉编码器支撑视觉语言模型的快速推理。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.09564v1",
+      "source": "arxiv",
+      "title": "From Semantic Grounding to Decision Optimization: A Unified Framework for Long-Horizon UAV Vision-Language Navigation",
+      "abstract": "UAV vision-language navigation (UAV-VLN) focuses on enabling an aerial agent to follow natural-language instructions in open 3D environments from egocentric visual observations. Current approaches suffer from three coupled issues: weak grounding of instruction-relevant landmarks in visual observations, insufficient exploitation of long-horizon history, and unstable decisions under local traps or repeated exploration. To address these issues, we propose a unified semantic-to-decision framework. First, we present an instruction-grounded semantic enhancement module that injects object-level semantics and relative spatial cues into the current observation state. Subsequently, we develop a relevance-aware dynamic temporal aggregation strategy that reweights the full history buffer while converting a few high-relevance frames into structured landmark prompts for the decoder. Finally, we devise a topology-aware decision method that combines local-optimum cognition with group-relative policy optimization under progress, goal, semantic, and path-compliance rewards. Experiments on the widely used AerialVLN and OpenFly benchmarks clearly demonstrate that our method achieves state-of-the-art performance.",
+      "authors": [
+        "Zeyuan Ma",
+        "Jiaxin Chen",
+        "Di Huang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-10T12:59:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.09564v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "unified vision-language-action style framework for long-horizon UAV navigation",
+      "llm_evidence_cn": "面向长时程无人机视觉语言导航的统一语义到决策框架，涉及VLA式决策",
+      "llm_evidence": "面向长时程无人机视觉语言导航的统一语义到决策框架，涉及VLA式决策",
+      "canonical_evidence": "面向长时程无人机视觉语言导航的统一语义到决策框架，涉及VLA式决策",
+      "llm_tldr_en": "Proposes a unified semantic-to-decision framework for UAV vision-language navigation, with instruction-grounded semantic enhancement and relevance-aware dynamic history exploitation.",
+      "llm_tldr_cn": "无人机视觉语言导航需要智能体在开放3D环境中依据自然语言指令进行长时程决策，现有方法存在地标语义锚定弱、历史信息利用不充分和决策不稳定等问题。围绕这些问题，提出一个统一的语义到决策框架：先通过指令驱动的语义增强模块注入对象级语义与相对空间线索，再设计相关性感知的动态历史利用机制增强长时程状态建模，并联合优化决策。实验表明该框架能提升长时程导航的稳定性和成功率，为VLA类导航决策优化提供统一思路。",
+      "llm_tldr": "无人机视觉语言导航需要智能体在开放3D环境中依据自然语言指令进行长时程决策，现有方法存在地标语义锚定弱、历史信息利用不充分和决策不稳定等问题。围绕这些问题，提出一个统一的语义到决策框架：先通过指令驱动的语义增强模块注入对象级语义与相对空间线索，再设计相关性感知的动态历史利用机制增强长时程状态建模，并联合优化决策。实验表明该框架能提升长时程导航的稳定性和成功率，为VLA类导航决策优化提供统一思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.08060v1",
+      "source": "arxiv",
+      "title": "ZOMP: Zeroth-Order Multi-Modal Prompt Tuning for Vision-Language Models",
+      "abstract": "Fine-tuning vision-language models such as CLIP typically requires backpropagation (BP) through the full model, which is infeasible when only forward-pass access is available, as is common for memory-constrained edge devices and proprietary model deployments. Prior BP-free, zeroth-order prompt-tuning methods avoid this requirement but often tune prompts in a single modality or optimize over a search space large enough that convergence requires thousands of forward passes, which is impractical under realistic query budgets. We propose ZOMP (Zeroth-Order Multimodal Prompt tuning), a query-efficient, fully forward-only method that tunes deep prompts in both the vision and text branches of a frozen CLIP model using simultaneous perturbation stochastic approximation. ZOMP combines three ingredients: a cross-modal low-rank reparameterization that ties the two branches through a shared factor and keeps the effective search dimensionality small, a gradient-correction momentum term that stabilizes the noisy zeroth-order estimate, and a budget-indexed rank schedule that unlocks capacity as the query budget is spent. Across 13 vision-language benchmarks under a matched 5,000-query budget, ZOMP consistently outperforms prior BP-free prompt-tuning methods in both few-shot accuracy and query efficiency, and it generalizes better across base-to-new, cross-dataset transfer, and out-of-distribution settings. Our results show that jointly exploiting multimodality and low-rank structure is an effective route to practical, query-efficient BP-free prompt tuning.",
+      "authors": [
+        "Sajjad Ghiasvand",
+        "Yifan Yang",
+        "Mahnoosh Alizadeh",
+        "Ramtin Pedarsani"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-08T10:55:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.08060v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "query-efficient zeroth-order multimodal prompt tuning for forward-only VLM adaptation",
+      "llm_evidence_cn": "面向仅前向视觉语言模型适配的高查询效率零阶多模态提示调优",
+      "llm_evidence": "面向仅前向视觉语言模型适配的高查询效率零阶多模态提示调优",
+      "canonical_evidence": "面向仅前向视觉语言模型适配的高查询效率零阶多模态提示调优",
+      "llm_tldr_en": "ZOMP tunes deep prompts in both vision and text branches of a frozen CLIP model using zeroth-order optimization, enabling efficient adaptation when backpropagation is unavailable, with improved query efficiency.",
+      "llm_tldr_cn": "在只能进行前向传播的场景下（如边缘设备和专有模型），传统的CLIP微调因反向传播不可用而受限。该文提出ZOMP，一种完全前向的零阶多模态提示调优方法，在视觉和文本分支同时调整深层提示，并采用同时扰动随机逼近提升查询效率。该方法避免了高维搜索空间，显著减少达到收敛所需的前向次数，为视觉语言模型在资源受限环境中的高效适配提供了实用方案。",
+      "llm_tldr": "在只能进行前向传播的场景下（如边缘设备和专有模型），传统的CLIP微调因反向传播不可用而受限。该文提出ZOMP，一种完全前向的零阶多模态提示调优方法，在视觉和文本分支同时调整深层提示，并采用同时扰动随机逼近提升查询效率。该方法避免了高维搜索空间，显著减少达到收敛所需的前向次数，为视觉语言模型在资源受限环境中的高效适配提供了实用方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.09610v1",
+      "source": "arxiv",
+      "title": "Structure-Enhanced Features and Quality-Aware Dynamic Anchor Scoring for Robust Lane Detection",
+      "abstract": "Lane detection requires recovering thin, elongated, and frequently occluded lane structures under challenging driving conditions. While anchor-based detectors provide efficient candidate generation, their performance is limited by two coupled issues: backbone features often lose structural continuity along partially visible lanes, and classification confidence may decouple from line-level localization quality, allowing inaccurate anchors to persist before non-maximum suppression (NMS). We propose a structure-enhanced and quality-aware framework that improves lane representation and dynamic-anchor scoring while preserving the inference pipeline of the Anchor Decomposition Network (ADNet). Specifically, a Gated Horizontal-Vertical Token (GHVT) module enhances mid- and high-level backbone features via lightweight directional token interactions with a learnable residual gate. In parallel, Line-Quality-Aware Dynamic Anchor Scoring (LQAS) calibrates existing classification logits using quality supervision, hard-negative suppression, and pairwise ranking without adding inference branches. On the VIL-100 dataset, our method improves ADNet-R34 from 89.97 to 91.28 in F1 score at the 0.5 intersection-over-union threshold (F1@50), reducing both false positives and false negatives. Additional experiments on CULane and TuSimple datasets, extensive ablations, score-distribution diagnostics, and runtime analysis confirm complementary structural and ranking improvements with minimal computational overhead.",
+      "authors": [
+        "Weize Cai",
+        "Yongqi Dong",
+        "Zhida Shao",
+        "Yichen Liu",
+        "Zixin Fu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG",
+        "eess.IV",
+        "eess.SP"
+      ],
+      "published": "2026-08-10T13:52:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.09610v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Lane detection for traffic scene understanding and perception",
+      "llm_evidence_cn": "面向交通场景理解与感知的车道线检测",
+      "llm_evidence": "面向交通场景理解与感知的车道线检测",
+      "canonical_evidence": "面向交通场景理解与感知的车道线检测",
+      "llm_tldr_en": "A structure-enhanced and quality-aware lane detection framework improves feature representation and dynamic anchor scoring for robust detection in challenging driving scenes while preserving the ADNet inference pipeline.",
+      "llm_tldr_cn": "车道检测需要在复杂驾驶条件下恢复细长、多为遮挡的车道结构，而现有锚点检测器存在特征结构连续性不足和分类置信度与定位质量脱钩的问题。本文提出一种结构增强与质量感知框架，在保持ADNet推理流程的同时，利用门控水平垂直结构增强特征表示，并设计动态锚点评分机制，在NMS前抑制不准确锚点。在公开数据集上的实验验证了该方法对遮挡和复杂道路场景下车道检测鲁棒性的提升。",
+      "llm_tldr": "车道检测需要在复杂驾驶条件下恢复细长、多为遮挡的车道结构，而现有锚点检测器存在特征结构连续性不足和分类置信度与定位质量脱钩的问题。本文提出一种结构增强与质量感知框架，在保持ADNet推理流程的同时，利用门控水平垂直结构增强特征表示，并设计动态锚点评分机制，在NMS前抑制不准确锚点。在公开数据集上的实验验证了该方法对遮挡和复杂道路场景下车道检测鲁棒性的提升。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.08389v1",
+      "source": "arxiv",
+      "title": "Not Worth Another Token: Marginal Value Estimation for Efficient Deep Research Agents",
+      "abstract": "Long-horizon research agents solve open-ended tasks through iterative retrieval, aggregation, and synthesis, but context grows rapidly while the marginal value of additional evidence often declines. This leads to unnecessary token cost, higher latency, and noisier inputs for final report generation. We study marginal value estimation for context management in deep research agents and present the first systematic stage-aware comparison of pruning strategies across the pipeline. We evaluate lightweight heuristic criteria and a learned value model at pre-retrieval, post-retrieval, and pre-synthesis stages. Our results show that pruning effectiveness depends more on where pruning is applied than on the specific scoring rule: early pruning yields the largest end-to-end savings, while later pruning mainly refines the final synthesis context. Lightweight heuristics reduce token usage by up to 73% with little quality degradation, learned pruning remains competitive on selected trade-offs, and no single method dominates across quality, efficiency, and faithfulness. These findings provide practical guidance for designing efficient long-horizon agentic systems.",
+      "authors": [
+        "Harshitha Kolukuluru",
+        "Reshma Ashok",
+        "Kirat Arora",
+        "Evan William Ciccarelli",
+        "Nischal Ashok Kumar",
+        "Lunyiu Nie",
+        "Franck Dernoncourt",
+        "Samyadeep Basu",
+        "Ryan A. Rossi",
+        "Nedim Lipka"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.IR",
+        "cs.MA"
+      ],
+      "published": "2026-08-09T00:56:37+00:00",
+      "link": "https://arxiv.org/pdf/2608.08389v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "stage-aware token pruning using marginal value estimation for deep research agents, directly relevant to token pruning",
+      "llm_evidence_cn": "面向深度研究代理的分阶段令牌剪枝方法，基于边际价值估计，直接对应令牌剪枝需求",
+      "llm_evidence": "面向深度研究代理的分阶段令牌剪枝方法，基于边际价值估计，直接对应令牌剪枝需求",
+      "canonical_evidence": "面向深度研究代理的分阶段令牌剪枝方法，基于边际价值估计，直接对应令牌剪枝需求",
+      "llm_tldr_en": "Studies marginal value estimation for context pruning in deep research agents, comparing lightweight heuristics and learned value models across pre/post-retrieval and pre-synthesis, finding pruning stage matters more than scoring rule.",
+      "llm_tldr_cn": "长程研究代理在迭代检索与合成中上下文快速增长，但额外证据的边际价值递减，导致令牌成本与噪声增加。论文首次系统比较了研究流水线各阶段的剪枝策略，评估轻量启发式准则与学习价值模型，发现剪枝的有效性更多取决于应用阶段而非具体评分规则，早期剪枝效果更佳，为智能体上下文管理提供了实用指导。",
+      "llm_tldr": "长程研究代理在迭代检索与合成中上下文快速增长，但额外证据的边际价值递减，导致令牌成本与噪声增加。论文首次系统比较了研究流水线各阶段的剪枝策略，评估轻量启发式准则与学习价值模型，发现剪枝的有效性更多取决于应用阶段而非具体评分规则，早期剪枝效果更佳，为智能体上下文管理提供了实用指导。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.09541v1",
+      "source": "arxiv",
+      "title": "Towards Collaborative Joint Perception and Prediction: Framework, Baseline Evaluation, and Deployment Perspectives",
+      "abstract": "Connected Autonomous Vehicles (CAVs) increasingly exploit Vehicle-to-Everything (V2X) communication to exchange multi-source sensor information, enabling advanced Collaborative Perception (CP) capabilities. Extending beyond these capabilities, this work focuses on Collaborative Joint Perception and Prediction (Co-P&P), a paradigm that unifies CP with motion prediction to mitigate two persistent challenges: the accumulation of perception errors and visual occlusions. We present a conceptual framework for Collaborative Joint Perception and Prediction (Co-P&P) that improves motion prediction of surrounding road users, thereby enhancing situational awareness in complex and dynamic traffic environments. Building upon our preliminary study, this extended version compares the performance of different fusion strategies and establishes baseline performance for a modular design of perception and prediction. Experimental results show that prediction-level fusion leads to a decline in overall system performance compared to detection-level or tracking-level fusion. We further implement a minimal end-to-end Co-P&P prototype that couples collaborative point-cloud sharing via the RENO neural codec with joint detection-forecasting via FutureDet, showing that collaboration improves forecasting accuracy while neural compression preserves this benefit at roughly 34x lower communication bandwidth.",
+      "authors": [
+        "Lei Wan",
+        "Hannan Ejaz Keen",
+        "Alexey Vinel"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-10T12:39:51+00:00",
+      "link": "https://arxiv.org/pdf/2608.09541v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Proposes collaborative perception and prediction framework for complex traffic environments",
+      "llm_evidence_cn": "提出复杂交通环境下的协作感知与预测框架",
+      "llm_evidence": "提出复杂交通环境下的协作感知与预测框架",
+      "canonical_evidence": "提出复杂交通环境下的协作感知与预测框架",
+      "llm_tldr_en": "This paper presents a framework for Collaborative Joint Perception and Prediction (Co-P&P) that unifies collaborative perception with motion prediction to improve situational awareness in complex traffic environments.",
+      "llm_tldr_cn": "该论文针对协同感知在多智能体交通场景中的应用，提出协同联合感知与预测（Co-P&P）范式，将多源传感器信息与运动预测统一，以缓解感知误差累积和视觉遮挡问题。文章给出了概念框架、基线评估和部署视角，表明该范式能改善对周围交通参与者的运动预测，提升复杂动态环境中的态势感知。该工作为车联网环境下的交通场景理解提供了新方向。",
+      "llm_tldr": "该论文针对协同感知在多智能体交通场景中的应用，提出协同联合感知与预测（Co-P&P）范式，将多源传感器信息与运动预测统一，以缓解感知误差累积和视觉遮挡问题。文章给出了概念框架、基线评估和部署视角，表明该范式能改善对周围交通参与者的运动预测，提升复杂动态环境中的态势感知。该工作为车联网环境下的交通场景理解提供了新方向。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    }
+  ]
+}
