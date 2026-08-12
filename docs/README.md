@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-11</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-12</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 16 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 19 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>12</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-11 20:45:55 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-12 20:02:47 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读与速读共16篇论文，其中零样本交通事故检测与KV缓存压缩两篇获得最高分。最值得重点关注的是粗到细VLM追踪管道（10.0分）和生命周期感知KV缓存压缩（9.0分）。下一步建议优先精读这两篇，把握多模态追踪与智能体缓存优化的前沿思路。</p>
+<p>今日精读12篇、速读7篇，共扫描19篇论文，聚焦高效压缩与自适应执行优化。最值得关注的是《AnchorKV》与《OmniPack》双9.0分，前者突破KV Cache压缩瓶颈，后者统一多模态Token压缩，均直指推理效率痛点。建议普通读者优先精读这两篇，重点关注其压缩率与计算开销的平衡设计，可为大模型部署降本提供直接参考。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">9 篇</strong>
+    <strong class="dpr-home-dashboard-count">12 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Zero-Shot Traffic Accident Detection via a Coarse-to-Fine VLM-Tracking Pipeline">Zero-Shot Traffic Accident Detection via a Coarse-to-Fine VLM-Tracking Pipeline</span></li><li><span class="dpr-home-dashboard-paper-title" title="CommitKV: Lifecycle-Aware KV Cache Compression via Commit Transitions for Multi-Turn Agents">CommitKV: Lifecycle-Aware KV Cache Compression via Commit Transitions for Multi-Turn Agents</span></li><li><span class="dpr-home-dashboard-paper-title" title="eBIRD: Event-based Intensity Image Reconstruction Using Controllable Diffusion Models">eBIRD: Event-based Intensity Image Reconstruction Using Controllable Diffusion Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="AnchorKV: Anchor-Residual KV Cache Compression">AnchorKV: Anchor-Residual KV Cache Compression</span></li><li><span class="dpr-home-dashboard-paper-title" title="OmniPack: Unified Token Compression for Efficient Omni-modal Large Language Models">OmniPack: Unified Token Compression for Efficient Omni-modal Large Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles">Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>10</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -87,9 +87,9 @@
     <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding">LIRA: Local Cross-Layer Information Routing for Vision-Language-Action Decoding</span></li><li><span class="dpr-home-dashboard-paper-title" title="ZOMP: Zeroth-Order Multi-Modal Prompt Tuning for Vision-Language Models">ZOMP: Zeroth-Order Multi-Modal Prompt Tuning for Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not Worth Another Token: Marginal Value Estimation for Efficient Deep Research Agents">Not Worth Another Token: Marginal Value Estimation for Efficient Deep Research Agents</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Continue or Replan? Bernoulli-Continuation Policy Learning for Adaptive Horizon Execution">Continue or Replan? Bernoulli-Continuation Policy Learning for Adaptive Horizon Execution</span></li><li><span class="dpr-home-dashboard-paper-title" title="When and Where to Look: Adaptive Visual Evidence Scheduling for Efficient Long Video Understanding">When and Where to Look: Adaptive Visual Evidence Scheduling for Efficient Long Video Understanding</span></li><li><span class="dpr-home-dashboard-paper-title" title="TEMPO: Semantic-Action Decoupled RL Post-Training for Vision-Language-Action Models">TEMPO: Semantic-Action Decoupled RL Post-Training for Vision-Language-Action Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span></div>
 </section>
 </div>
 

@@ -1,0 +1,175 @@
+Title: Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents
+
+URL Source: https://arxiv.org/pdf/2608.10198v1
+
+Published Time: Wed, 12 Aug 2026 00:14:06 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents 
+
+Di Wu 
+
+Xi’an Jiaotong-Liverpool University 
+
+Di.Wu23@student.xjtlu.edu.cn 
+
+Xiaohui Zhu 
+
+Xi’an Jiaotong-Liverpool University 
+
+Xiaohui.Zhu@xjtlu.edu.cn 
+
+# Abstract 
+
+Latent-space communication allows heterogeneous vision-language model agents to exchange continuous representations without serializing visual and reasoning states into text. Vision Wormhole realizes this approach by translating visual features into a universal latent representation that can be consumed by another model, but every message is transported as a dense tensor of the same size regardless of its content. A fixed-capacity dense tensor therefore need not have a fixed effective information density: some messages may use only a small fraction of the available representational degrees of freedom. This observation suggests that the communication channel may be substantially compressible. We study its redundancy by fitting a post-hoc sparse autoencoder to frozen Vision Wormhole activations and measuring reconstruction, downstream utility, feature reuse, and token-level interventions across nine reasoning benchmarks. Relative to the original float32 transport, a uint16-index/float16-value sparse payload with k=4 active coefficients per token reduces the transmitted bytes by 128 ×. In a single-run evaluation, the seven-task non-AIME mean accuracy changes from 49.85% to 49.77%. The fitted 4096-element dictionary uses only 50 features, and task-level active sets have a mean pairwise Jaccard similarity of 0.906. These measurements establish strong post-hoc compressibility relative to the original transport, but do not yet isolate the incremental contribution of sparse coding from position selection, reduced precision, low-rank structure, or SAE optimization effects. The results motivate matched-payload comparisons and communication mechanisms whose payload adapts to the information used by each message. 
+
+# 1 Introduction 
+
+Cooperative vision-language agents must communicate visual observations and intermediate reason-ing across models. Natural-language messages provide a convenient interface, but they require the sender to serialize a continuous multimodal state into discrete text before the receiver can act on it. Latent-space communication avoids this conversion by exchanging continuous representations directly, preserving information that may be difficult to express in language. Vision Wormhole [Liu et al., 2026] provides a practical solution for heterogeneous agents. It uses a visual encoder and a learned codec to translate model-specific visual features into a universal latent representation Uref ∈ RN ×D that can be injected into a different receiver model. This design enables direct communication across incompatible representation spaces, but its transmitted tensor has a fixed shape. Every message therefore uses the same nominal transport capacity, even when its content and informational demands differ. The informational demand of a message, however, can vary with its visual content, task, and reasoning stage. A fixed-capacity dense tensor therefore need not have a fixed effective information density: some messages may use only a small fraction of the available representational degrees of freedom. 
+
+Preprint. Under review. arXiv:2608.10198v1 [cs.AI] 10 Aug 2026 We do not claim to estimate Shannon entropy directly. Instead, we ask an operational question: how much of the dense Vision Wormhole channel is required to reconstruct its messages and preserve their downstream utility? Answering this question is a necessary step before designing adaptive or training-time communication mechanisms. We investigate the channel with a post-hoc sparse autoencoder (SAE) trained on frozen Vision Wormhole activations. Because neither the agents nor the original codec is updated, the SAE exposes structure already present in the learned channel rather than imposing sparsity during its training. We use it as both a measurement instrument and a compressor: sparse reconstruction measures effective representational redundancy, task accuracy tests whether the retained structure remains useful to the receiver, and feature analyses examine whether that structure changes across tasks, token roles, and reasoning rounds. The experiments show that the original dense transport admits a compact post-hoc code, achieving a 
+
+128 × payload reduction with little change in single-run macro-average accuracy. Feature analyses further indicate a small, broadly reused support and token-role-dependent activation patterns. Our contributions are: 1. We formulate and empirically study the mismatch between Vision Wormhole’s fixed-shape latent payload and the empirical structure used by its communication channel. 2. We measure an end-to-end 128 × payload reduction relative to the original float32 transport and test the reconstructed messages on downstream tasks under explicit payload-accounting assumptions. 3. We characterize the support learned by a post-hoc SAE across nine tasks, quantifying its size and cross-task reuse. 4. We analyze token-group interventions to distinguish shared feature support from role-dependent activation patterns. These findings also motivate future work on matched-payload baselines, behavioral interventions, cross-pair validation, and communication protocols with message-dependent sparse budgets. 
+
+# 2 Related Work 
+
+2.1 Latent Communication Between Heterogeneous Agents 
+
+Communication is a central design choice in multi-agent systems. Language, tool calls, and hand-designed discrete protocols are easy to route between agents, but they constrain what one model can communicate to what can be serialized explicitly. Learned communication in cooperative multi-agent reinforcement learning instead allows agents to develop differentiable or discrete protocols, as in DIAL/RIAL and emergent grounded languages [Foerster et al., 2016, Mordatch and Abbeel, 2018]. For heterogeneous vision-language models, the challenge is sharper because their internal visual representations are not directly compatible. Vision Wormhole [Liu et al., 2026] addresses this problem with a learned codec that maps a sender’s visual hidden states into a universal latent representation and injects it into a receiver. It establishes that latent communication can bridge heterogeneous models. Our study asks how efficiently the resulting channel uses its fixed representational capacity. Recent work has also compared text, dense-latent, and SAE-sparse channels between language-model agents [Wenzel, 2026]. That study focuses on information survival through text serialization and cross-architecture latent alignment, including probe-based evaluation. Our setting is complementary: we analyze the fixed-shape tensor produced by an existing heterogeneous VLM communication codec, reconstruct it at several sparse rates, and measure the receiving agents’ task accuracy. The overlap makes matched-rate baselines and careful boundaries around SAE-based claims especially important. 
+
+2.2 Efficient and Sparse Neural Representations 
+
+That question connects latent agent communication to a broad literature on efficient neural represen-tations. Pruning, quantization, low-rank approximation, and sparse coding exploit redundancy in parameters or activations [Zhou et al., 2016, Frankle and Carbin, 2019, Dettmers et al., 2022, Frantar 2et al., 2022, Xiao et al., 2023]. Vision-transformer acceleration similarly removes or reorganizes visual tokens that contribute little to prediction [Rao et al., 2021, Liang et al., 2022]. Communication-efficient distributed learning reduces network traffic by sparsifying or quantizing gradients, sometimes carrying residual errors across optimization rounds [Kairouz et al., 2021, Lin et al., 2018]. These methods demonstrate that dense tensors often contain removable redundancy, but their target is a model, an internal computation, or an optimization update. A latent agent message is different: it is a semantic representation consumed immediately by another model, so fidelity must be judged not only by tensor reconstruction but also by the receiver’s task performance. Sparse autoencoders provide a way to measure such redundancy without retraining the communication system. They decompose dense neural activations into a small set of active dictionary features and have primarily been used to study representations inside individual language models [Bricken et al., 2023, Cunningham et al., 2023, Templeton et al., 2026]. Applied to Vision Wormhole, the same technique probes the interface between two models. The resulting features provide a post-hoc coordinate system for measuring support size, reuse across tasks, and differences between token groups. Establishing them as communication primitives would additionally require stability across SAE seeds and interventions on receiver behavior. This perspective also relates to the information bottleneck, which formalizes a trade-off between compression and predictive utility [Tishby et al., 2000, Alemi et al., 2017]. We neither optimize an information-bottleneck objective nor estimate the entropy of individual messages. Instead, we test whether Vision Wormhole’s uniformly sized messages exhibit a smaller empirical structure than their dense shape implies. By combining reconstruction, explicit payload accounting, downstream accuracy, cross-task overlap, and token-group interventions, our analysis examines how much empirical redundancy is present in a fixed-shape heterogeneous VLM communication tensor. 
+
+# 3 Post-Hoc Sparse Communication Analysis 
+
+Communication setting. We analyze the Vision Wormhole communication tensor Uref for the Qwen3.5-9B ↔ LFM2.5-VL-1.6B model pair. The dense representation contains N =1026 token positions and D=512 dimensions, corresponding to roughly 2052 KB per communication round in float32. Following the codec implementation, the effective semantic structure is concentrated in 18 token positions: 16 semantic tokens, one global token, and one style token. 
+
+Post-hoc sparse autoencoder. Given frozen communication activations, we train a sparse autoen-coder with dictionary size M =4096 . For each token representation u ∈ RD, the encoder produces sparse coefficients z = TopK( Wenc u, k ) and reconstructs ˆu = Wdec z. The SAE is trained inde-pendently of the Vision Wormhole codec, so gradients do not flow back into either agent or the communication codec. Unless otherwise specified, the main dictionary is trained for 50K steps with batch size 512, Adam, cosine learning-rate decay from 10 −4, AuxK regularization, and dead-feature replacement during early training. 
+
+Evaluation tasks. We collect activations and evaluate downstream behavior on nine benchmarks: GSM8K, ARC-Easy, ARC-Challenge, GPQA, MedQA, MBPP+, HumanEval+, AIME 2024, and AIME 2025. Each benchmark question is processed by three sender roles—planner, critic, and refiner—and each role produces one Uref tensor. Consequently, the activation counts used for SAE analysis are counts of communication tensors rather than counts of unique benchmark questions. For example, the 30 questions in each AIME subset produce 90 communication tensors. The stored activation files pool the three sender roles for each task. For quantitative mean accuracy comparisons, we report the mean over seven non-AIME tasks because the AIME subsets are very small and dense accuracy is 0% in our runs. 
+
+Metrics. We measure reconstruction error, cosine similarity, mean-squared error, bandwidth, com-pression ratio, and downstream task accuracy. For communication tensor Ui and its reconstruction 
+
+ˆUi, the per-sample relative reconstruction error is 
+
+ei =
+
+vuut mean 
+
+h
+
+(Ui − ˆUi)2
+
+i
+
+mean[ U 2 
+
+> i
+
+] + ϵ ≈ ∥Ui − ˆUi∥F
+
+∥Ui∥F
+
+, ϵ = 10 −8.
+
+3Reported reconstruction error is the arithmetic mean 1
+
+> S
+
+PSi=1 ei over communication tensors, whereas MSE is the element-wise squared error aggregated over all evaluated tensors. Cosine similarity is computed after flattening each communication tensor and is then averaged over tensors. To study whether features are task-specific or shared, we compute pairwise Jaccard similarity between active feature-index sets for each task pair. 
+
+Token-level intervention analysis. For the style-token ablation, we encode a batch of 50 frozen communication tensors with the k=16 , M =4096 SAE, set every sparse coefficient at token position 17 to zero, and decode the intervened representation. We report the tensor-wide MSE before and after intervention. We also report a normalized style-energy ratio 
+
+rstyle = mean b,d U 2
+
+> b, 17 ,d
+
+mean b,n,d U 2
+
+> b,n,d
+
+,
+
+which compares the style token’s mean-squared magnitude with the tensor-wide per-element mean. This normalized ratio is not the fraction of total tensor energy assigned to the style token. The exact aggregate measurements and artifact provenance are reported in the appendix. 
+
+Bandwidth accounting. Dense communication transmits the full float32 tensor, so its payload is 
+
+BW dense = N · D · 4 bytes .
+
+For sparse communication, each active coefficient transmits a dictionary index and a coefficient value: 
+
+BW sparse = N · k · (bidx + bval ).
+
+Because M =4096 , a dictionary index needs 12 bits. We store it as uint16, so bidx =2 bytes. Unless otherwise stated, reported sparse bandwidths assume float16 coefficients, bval =2 bytes, and exclude fixed packet headers or other system-level metadata. For example, at N =1026 and k=4 , sparse transmission costs 1026 × 4 × (2 + 2) = 16 ,416 bytes, or 16.0 KB, yielding 128 × compression relative to the original 2052 KB float32 dense payload. This ratio uses the original transport as its reference and should not be attributed to sparse coding alone. In particular, transmitting the 18 information-bearing positions in float16 would require 
+
+18 × 512 × 2 = 18 ,432 bytes, or 18.0 KB, before protocol metadata. The current experiments do not evaluate whether those 18 positions can be transmitted and deterministically expanded at the receiver, nor do they include matched-rate quantized, low-rank, or vector-quantized baselines. We therefore report 128 × as an end-to-end payload reduction relative to the deployed float32 representation, not as the incremental advantage of the SAE over simpler codecs. 
+
+# 4 Results 
+
+4.1 Post-Hoc Coding Reduces the Original Transport Payload 
+
+Sparse reconstruction remains accurate even at aggressive sparsity. Table 1 reports reconstruction and bandwidth as the number of active coefficients per token varies, using the uint16-index/float16-value accounting defined in the previous section. At k=4 , the payload drops from 2052 KB to 16.0 KB, cor-responding to 128 × compression relative to the original float32 transport, while reconstruction error remains 0.01158 and cosine similarity remains 0.99992. This comparison establishes compressibility of the deployed representation. 
+
+4.2 Mean Accuracy Changes Little in a Single-Run Evaluation 
+
+High reconstruction quality coincides with a small change in macro-averaged downstream accuracy in our single-run evaluation. Table 2 shows task accuracy when the receiver consumes sparse reconstructions instead of dense messages. The most compressed setting, k=4 , changes the seven-task non-AIME mean from 49.85% to 49.77%, a difference of −0.08 percentage points. Because these are single-run estimates and no paired uncertainty analysis is available, differences among sparse settings should be treated as descriptive. Per-task changes are heterogeneous: several knowledge-task point estimates increase, whereas code tasks are more sensitive to compression. 4Table 1: Post-hoc SAE payload and reconstruction quality relative to the original 1026-token float32 transport. Sparse bandwidth counts one uint16 dictionary index and one float16 coefficient per active feature, excluding fixed packet headers and system metadata. 
+
+k Bandwidth Compression Recon. Error Cosine Sim. MSE Dense 2052 KB 1× 0.00000 1.00000 0.0 4 16.0 KB 128 × 0.01158 0.99992 3.20e-4 8 32.1 KB 64 × 0.00978 0.99995 2.06e-4 16 64.1 KB 32 × 0.00976 0.99994 1.99e-4 32 128.3 KB 16 × 0.00884 0.99996 1.77e-4 Table 2: End-to-end task accuracy under post-hoc sparse transmission. Values are single-run point estimates. Mean excludes AIME 2024/2025 because those subsets are small and dense accuracy is 0% in these runs.                                              
+
+> Task Dense k=4 k=8 k=16 k=32
+> GSM8K 59.14 59.67 58.38 57.54 57.47 ARC-Easy 75.46 78.96 77.90 79.25 78.62 ARC-Challenge 62.12 62.29 61.18 63.82 64.85 GPQA 27.78 27.78 20.71 21.72 28.79 MedQA 39.33 39.00 38.33 39.67 41.33 MBPP+ 45.50 44.71 46.03 43.12 43.92 HumanEval+ 39.63 35.98 35.37 37.80 37.80 Mean 49.85 49.77 48.27 48.99 50.40
+
+4.3 The Fitted SAE Uses a Small Active Support 
+
+The fitted dictionary is much larger than its observed active support. Table 3 shows that only 50 of 4096 features ever activate, leaving 98.78% of the dictionary dead under this training configuration. The top 10 features appear in all nine tasks. This result is consistent with a compact shared code, but it is also compatible with low-rank input structure, repeated token positions, or SAE optimization collapse. The exact support size should not yet be interpreted as an intrinsic vocabulary. Cross-task overlap provides a descriptive view of reuse. Across all 36 task pairs, active-feature Jaccard similarity averages 0.906, with a minimum of 0.878 and a maximum of 0.922. Table 4 summarizes the matrix. Because each task-level set is a union over many messages and the global active support contains only about 50 features, these values may be inflated by set saturation and unequal sample counts. Frequency-weighted similarities, role-stratified analyses, and size-matched null models are needed to establish semantic sharing beyond broad reuse. 
+
+4.4 Token Groups Show Different Activation Patterns 
+
+The sparse dictionary is shared across token groups, but different token groups use it differently. Across 50 evaluated communication tensors, zeroing the sparse coefficients at style-token position 17 raises overall MSE from 2.4289e-4 to 6.9136e-3, a final-to-baseline ratio of 28 .46 ×. The style token has a normalized mean-squared energy ratio of 0.9238 under the definition in the analysis method. This quantity is not a share of total tensor energy. However, semantic-token MSE is unchanged under this intervention. Conversely, replacing semantic tokens changes which source the reconstruction follows, while style replacement alone does not override semantic content. The active feature vocabulary is therefore substantially shared, while activation patterns over that vocabulary differ by token role. The intervention establishes a representational effect on reconstruction, not a causal effect on receiver behavior: receiver logits, generated outputs, and downstream accuracy were not measured after the ablation. 5Table 3: Dictionary activation statistics for the main SAE ( k=16 , M =4096 ). Metric Value Dictionary size M 4096 Active features 50 (1.22%) Dead features 4046 (98.78%) Top-10 feature task coverage 9/9 (100%) Top feature mean activation value 9.30 Table 4: Summary of pairwise Jaccard similarity between task-level active feature sets. The full matrix is reported in Section A.2. Statistic Task Pair Jaccard Mean over all 36 pairs – 0.906 Minimum AIME24 ↔ GSM8K 0.878 Maximum GSM8K ↔ HumanEval+ 0.922 Cross-category example GSM8K ↔ HumanEval+ 0.922 
+
+# 5 Discussion and Limitations 
+
+The experiments support a bounded conclusion: the deployed Vision Wormhole float32 transport admits a compact post-hoc code with high reconstruction fidelity, and its single-run macro-average accuracy changes little after reconstruction. The fitted SAE also reuses a small active support across tasks and exhibits token-role-dependent activation patterns. These findings indicate substantial empirical redundancy, but they do not yet identify which part is structural, numerical, low-rank, or specifically sparse. The evidence should therefore be interpreted as channel analysis rather than a claim that sparsity is uniquely responsible for the compression or that it improves accuracy. All downstream results are single-run point estimates. Uncertainty is especially large for GPQA, HumanEval+, and AIME, and code tasks are more sensitive to compression. We therefore report the observed macro-average change, exclude AIME from mean comparisons, and avoid an equivalence claim until paired uncertainty is available. Moreover, all experiments use one Qwen3.5-9B ↔
+
+LFM2.5-VL-1.6B pair. High feature overlap establishes reuse within this channel, but not dictionary transfer to other sender–receiver pairs. Two controls are especially important. First, the codec documentation concentrates semantic structure in 18 positions, and an 18-position float16 payload is already close in size to the reported k=4 
+
+payload. Second, 98.78% of the fitted dictionary is dead, so the observed 50-feature support may reflect SAE optimization or low-rank structure rather than an identifiable sparse vocabulary. Matched-rate position-selection, quantization, PCA or linear-autoencoder, and vector-quantization baselines, together with multiple SAE seeds and held-out splits, are required to separate these explanations. The post-hoc design separates the observation from the method it motivates. It shows that the trained dense channel already uses a small, recurring feature vocabulary, but it does not establish that an end-to-end sparse bottleneck would be superior. The next tests should therefore evaluate paired non-inferiority, behavioral interventions, cross-pair transfer, and codecs with message-dependent sparse budgets. Multi-round delta transmission is another possible extension, but its evaluation must encode changes in feature coefficients and token positions rather than only feature identities. 
+
+# 6 Conclusion 
+
+This paper analyzes redundancy in the Vision Wormhole communication channel with a post-hoc sparse autoencoder. Relative to the original 2 MB float32 transport, the evaluated sparse payload is much smaller while retaining high reconstruction fidelity and a similar single-run macro-average accuracy. The fitted SAE uses a small support that is broadly reused across tasks, and token groups show different activation patterns over that support. Together, these results establish the deployed representation as a concrete target for message-dependent communication across heterogeneous VLM agents. Matched-payload baselines, paired 6downstream statistics, and behavioral interventions are the next steps for isolating sparse-specific gains and validating utility. 
+
+# References 
+
+Alexander A. Alemi, Ian Fischer, Joshua V. Dillon, and Kevin Murphy. Deep variational information bottleneck. In International Conference on Learning Representations , 2017. Trenton Bricken, Adly Templeton, Joshua Batson, Brian Chen, Adam Jermyn, Tom Con-erly, Nicholas L. Turner, Cem Anil, Carson Denison, Amanda Askell, Robert Lasenby, Yi-fan Wu, Shauna Kravec, Nicholas Schiefer, Tim Maxwell, Nicholas Joseph, Zac Hatfield-Dodds, Alex Tamkin, Karina Nguyen, Brayden McLean, Josiah E. Burke, Tristan Hume, Shan Carter, Tom Henighan, and Christopher Olah. Towards monosemanticity: Decompos-ing language models with dictionary learning. Transformer Circuits Thread, 2023. URL 
+
+https://transformer-circuits.pub/2023/monosemantic-features/index.html .Hoagy Cunningham, Aidan Ewart, Logan Riggs, Robert Huben, and Lee Sharkey. Sparse autoen-coders find highly interpretable directions in language models. arXiv preprint arXiv:2309.08600 ,2023. Tim Dettmers, Mike Lewis, Younes Belkada, and Luke Zettlemoyer. LLM.int8(): 8-bit matrix multiplication for transformers at scale. In Advances in Neural Information Processing Systems ,2022. Jakob N. Foerster, Yannis M. Assael, Nando de Freitas, and Shimon Whiteson. Learning to communi-cate with deep multi-agent reinforcement learning. In Advances in Neural Information Processing Systems , 2016. Jonathan Frankle and Michael Carbin. The lottery ticket hypothesis: Finding sparse, trainable neural networks. In International Conference on Learning Representations , 2019. Elias Frantar, Saleh Ashkboos, Torsten Hoefler, and Dan Alistarh. GPTQ: Accurate post-training quantization for generative pre-trained transformers. arXiv preprint arXiv:2210.17323 , 2022. Peter Kairouz, H. Brendan McMahan, Brendan Avent, Aurélien Bellet, Mehdi Bennis, Arjun Nitin Bhagoji, Keith Bonawitz, Zachary Charles, Graham Cormode, Rachel Cummings, et al. Advances and open problems in federated learning. Foundations and Trends in Machine Learning , 14(1–2): 1–210, 2021. Youwei Liang, Chongjian Ge, Zhan Tong, Yibing Song, Jue Wang, and Pengtao Xie. Not all patches are what you need: Expediting vision transformers via token reorganizations. In International Conference on Learning Representations , 2022. Yujun Lin, Song Han, Huizi Mao, Yu Wang, and William J. Dally. Deep gradient compression: Reducing the communication bandwidth for distributed training. In International Conference on Learning Representations , 2018. Xiaoze Liu, Ruowang Zhang, Weichen Yu, Siheng Xiong, Liu He, Feijie Wu, Hoin Jung, Matt Fredrikson, Xiaoqian Wang, and Jing Gao. The vision wormhole: Latent-space communication in heterogeneous multi-agent systems, 2026. URL https://arxiv.org/abs/2602.15382 .Igor Mordatch and Pieter Abbeel. Emergence of grounded compositional language in multi-agent populations. In AAAI Conference on Artificial Intelligence , 2018. Yongming Rao, Wenliang Zhao, Benlin Liu, Jiwen Lu, Jie Zhou, and Cho-Jui Hsieh. DynamicViT: Efficient vision transformers with dynamic token sparsification. In Advances in Neural Information Processing Systems , 2021. Adly Templeton, Tom Conerly, Jonathan Marcus, Jack Lindsey, Trenton Bricken, Brian Chen, Adam Pearce, Craig Citro, Emmanuel Ameisen, Andy Jones, Hoagy Cunningham, Nicholas L. Turner, Callum McDougall, Monte MacDiarmid, Alex Tamkin, Esin Durmus, Tristan Hume, Francesco Mosconi, C. Daniel Freeman, Theodore R. Sumers, Edward Rees, Joshua Batson, Adam Jermyn, Shan Carter, Chris Olah, and Tom Henighan. Scaling monosemanticity: Extracting interpretable features from claude 3 sonnet. arXiv preprint arXiv:2605.29358 , 2026. 7Naftali Tishby, Fernando C. Pereira, and William Bialek. The information bottleneck method. arXiv preprint physics/0004057 , 2000. Markus Wenzel. Latent communication between language model agents: Channels, alignment, and the limits of text, 2026. URL https://arxiv.org/abs/2607.14103 .Guangxuan Xiao, Ji Lin, Mickael Seznec, Hao Wu, Julien Demouth, and Song Han. SmoothQuant: Accurate and efficient post-training quantization for large language models. In International Conference on Machine Learning , 2023. Shuchang Zhou, Zekui Ni, Xinyu Zhou, He Wen, Yuxin Wu, and Yuheng Zou. Compressive neural networks. arXiv preprint arXiv:1606.06565 , 2016. 
+
+# A Additional Results and Implementation Details 
+
+A.1 Per-Task Reconstruction 
+
+Table 5: Per-task reconstruction with a single SAE checkpoint ( k=16 , M =4096 ). Communication tensors are role-level messages: each benchmark question contributes one tensor from each of the planner, critic, and refiner. Task Communication Tensors Recon. Error Cosine Sim. GSM8K 1800 0.00976 0.99994 ARC-Easy 1800 0.00975 0.99994 ARC-Challenge 1800 0.00980 0.99994 GPQA 594 0.00962 0.99995 MedQA 900 0.00963 0.99994 MBPP+ 1134 0.00961 0.99995 HumanEval+ 492 0.00956 0.99995 AIME 2024 90 0.00999 0.99994 AIME 2025 90 0.00974 0.99994 
+
+Mean 0.00972 ± 0.00013 0.99994 A.2 Full Cross-Task Jaccard Matrix 
+
+Table 6: Pairwise Jaccard similarity of TopK feature indices across nine tasks. GSM8K ARC-E ARC-C GPQA MedQA MBPP+ HE+ AIME24 AIME25 GSM8K 1.000 0.901 0.905 0.909 0.904 0.907 0.922 0.878 0.903 ARC-E 0.901 1.000 0.913 0.906 0.910 0.908 0.911 0.895 0.904 ARC-C 0.905 0.913 1.000 0.913 0.907 0.912 0.909 0.891 0.907 GPQA 0.909 0.906 0.913 1.000 0.908 0.911 0.919 0.893 0.906 MedQA 0.904 0.910 0.907 0.908 1.000 0.905 0.907 0.890 0.901 MBPP+ 0.907 0.908 0.912 0.911 0.905 1.000 0.911 0.894 0.908 HE+ 0.922 0.911 0.909 0.919 0.907 0.911 1.000 0.897 0.912 AIME24 0.878 0.895 0.891 0.893 0.890 0.894 0.897 1.000 0.889 AIME25 0.903 0.904 0.907 0.906 0.901 0.908 0.912 0.889 1.000 
+
+A.3 Dictionary Size Ablation A.4 Token-Level Intervention Measurements 
+
+The MSE ratio in Table 8 is computed as 6.9135940e −3/2.4288928e −4 = 28 .4628 . The normalized energy statistic is computed from the pre-intervention communication tensor using the definition in the analysis method. It compares mean-squared magnitudes and must not be interpreted as the style token’s percentage share of total energy. Only aggregate records are currently available because 8Table 7: Dictionary size ablation at k=16 after 5K training steps. Reconstruction improves up to roughly M =256 , while active features remain near 50. 
+
+M Recon. Error ↓ Cosine Sim. ↑ Active Features Dead Ratio 64 0.0421 0.9812 48 25.0% 128 0.0287 0.9893 50 60.9% 256 0.0198 0.9941 50 80.5% 512 0.0195 0.9943 50 90.2% 1024 0.0193 0.9944 50 95.1% 4096 0.0192 0.9945 50 98.8% Table 8: Aggregate reconstruction measurements from the style-token intervention on 50 communica-tion tensors. Per-example intervention records were not retained. Measurement Value Evaluated communication tensors 50 SAE setting k=16 , M =4096 
+
+Baseline reconstruction MSE 2.4288928e-4 MSE after zeroing style token (position 17) 6.9135940e-3 Final-to-baseline MSE ratio 28 .4628 ×
+
+Relative MSE increment (MSE abl − MSE base )/MSE base 27 .4628 
+
+Normalized style-token mean-squared energy ratio rstyle 0.9237802 Semantic-token MSE change after style ablation 0.0 Hybrid similarity to semantic source 0.9999 Hybrid similarity to style source 0.541 Active features shared by all token groups 34/47 (72.3%) Jaccard (semantic, style) 0.946 Jaccard (semantic, global) 0.895 per-example intervention outputs were not retained. These measurements show that zeroing the style token strongly changes overall reconstruction error without changing semantic-token MSE. Conversely, hybrid representations follow the source of their semantic tokens. Token roles therefore have different activation patterns over a substantially shared feature vocabulary. Because the receiver was not evaluated after intervention, these measurements do not establish a causal effect on model behavior or task performance. 
+
+A.5 Statistical Notes 
+
+All downstream task accuracies are single-run point estimates. Wilson score 95% intervals for representative dense settings are: GSM8K 59.14% ± 2.7% ( n=1319 ), GPQA 27.78% ± 3.8% (n=594 ), and HumanEval+ 39.63% ± 7.5% ( n=164 ). The observed GPQA variation across k values is within confidence-interval overlap after multiple-comparison correction. AIME is excluded from the main mean because each subset has only 30 evaluation examples and dense accuracy is 0%. 9

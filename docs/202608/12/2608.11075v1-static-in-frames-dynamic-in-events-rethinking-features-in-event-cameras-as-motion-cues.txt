@@ -1,0 +1,921 @@
+Title: Static in Frames, Dynamic in Events: Rethinking Features in Event Cameras as Motion Cues
+
+URL Source: https://arxiv.org/pdf/2608.11075v1
+
+Published Time: Wed, 12 Aug 2026 01:19:33 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# Static in Frames, Dynamic in Events: Rethinking Features in Event Cameras as Motion Cues 
+
+Hesam Araghi , Jan van Gemert , and Nergis Tomen 
+
+Computer Vision Lab, Delft University of Technology 
+
+{h.araghi, j.c.vangemert, n.tomen}@tudelft.nl 
+
+Abstract. Event cameras capture intensity changes asynchronously with high temporal resolution, requiring novel preprocessing methods for down-stream tasks. Unlike static intensity snapshots, event data inherently encode information about scene dynamics and object motion, meaning that features derived from events can exhibit behaviors with no direct analogue in frame-based vision. In this paper, we analyze two features used in event-based corner detection—the eigenvalues of the structure tensor and the spatiotemporal density values—and show that they are 
+
+motion cues . We hypothesize that these features, combined with local geometric information, can enhance motion estimation tasks. To vali-date this, we first theoretically analyze how the eigenvalues of the struc-ture tensor at moving corner points relate to the direction of motion. We then design controlled experiments on a synthetic dataset, confirm-ing that extending local geometric features with eigenvalues and den-sity values provides complementary motion information and is robust to texture and shot noise. Finally, we integrate the proposed features into a state-of-the-art event-based optical flow network and evaluate on the real-world DSEC benchmark, where the added features consistently improve accuracy, with the largest gains in data-scarce scenarios and for lower-capacity models. The code for this paper can be found at: https://github.com/hesamaraghi/static-in-frames-dynamic-in-events. 
+
+Keywords: Event cameras · Event features · Motion cues · Optical flow 
+
+1 Introduction 
+
+Event cameras differ fundamentally from conventional frame-based cameras. In-stead of capturing absolute intensity values at fixed time intervals, they asyn-chronously report per-pixel intensity changes with microsecond temporal res-olution [5]. While a frame-based camera captures instantaneous snapshots, an event camera continuously measures temporal derivatives of the visual signal. This sensing paradigm means that event data inherently encodes information about motion in ways that static frames do not. Because events are triggered by changes in intensity, their spatiotemporal distribution implicitly reflects the dynamics of the scene and the motion of objects. Consequently, features de-rived from event data can exhibit behaviors that have no direct analogue in arXiv:2608.11075v1 [cs.CV] 11 Aug 2026 2 H. Araghi et al.            
+
+> (a) Triangle motion (b) motion in −11 ◦(c) motion in 5◦(d) motion in 20 ◦
+> Fig. 1: Motion direction encoded in event-based density features. (a) A triangular shape moving in different directions. (b–d) Density visualizations for three different motion directions: the oriented traces in the density maps (dashed lines) align with the motion direction. Red indicates higher density of recent events.
+
+frame-based vision, where features are typically computed from static intensity snapshots and lack explicit motion encoding. Thus, if representations of the event features already contain motion information, they can help as motion cues for downstream estimation. Figure 1 presents a synthetic experiment illustrating how the spatiotemporal density of events encodes motion direction. A triangular shape translates in three directions, with angles of −11 ◦, 5◦, and 20 ◦ (Fig. 1a). For each direction, we gen-erate an event sequence and compute the density of recent events within a local spatiotemporal neighborhood. In the visualization, red indicates higher density of recent events. The resulting density representations exhibit clear, continuous traces whose orientation matches the underlying motion. This shows that spa-tiotemporal density values naturally encode directional motion information, a property that follows from the asynchronous event-sensing mechanism. In this paper, we analyze the features involved in event corner detection, specifically the eigenvalues of the structure tensor and the spatiotemporal den-sity values. We consider the Harris corner detector [14] approach for event cam-eras [11, 18, 26]. The common procedure for finding corners first generates a local grid representation around the event, then computes the structure tensor from the local gradients of the grid representation. The Harris eigenvalues of the structure tensor serve as indicators of corner scores. To obtain the local grid representation, we spatiotemporally filter the events to compute a density-based representation, and we compute the eigenvalues of the structure tensor from the gradients of this local grid. For event input, we discover that the Harris eigenval-ues and density value features are ‘motion cues’, meaning they carry information about scene dynamics and object motion. We hypothesize that these features, along with local geometric features, can aid motion estimation tasks. To validate our hypothesis, we conduct a theoretical analysis, controlled synthetic experi-ments, and real-world evaluation. Our main contributions are summarized as follows: 
+
+– We establish a theoretical connection between the Harris eigenvalues of the structure tensor and motion direction in event cameras. In particular, we Event Features for Motion Cues 3
+
+show how Harris eigenvalues, when combined with local geometric informa-tion, can be used to recover the motion direction of translating corners. 
+
+– We design controlled experiments on synthetic datasets to validate that ex-tending local geometric features with Harris eigenvalues and density value improves optical flow estimation. We demonstrate that these improvements stem from informative and complementary motion cues by showing that a network can learn the mapping from these features to optical flow. We fur-ther show that the proposed extending features are robust under challenging conditions, including textured foregrounds and shot noise. 
+
+– We validate our findings on the real-world DSEC benchmark [8] using ID-Net [29], showing consistent improvements in optical flow estimation. No-tably, larger gains are observed in data-scarce scenarios and for lower-capacity models. 
+
+2 Related works 
+
+2.1 Event representations 
+
+Converting the asynchronous event stream into a suitable representation is crit-ical for downstream tasks. Common representations include event count [20], time surfaces that record the most recent timestamp at each pixel [17, 23], voxel grids [32], and TORE volumes that store raw spike timing information [2]. Voxel grid [32] is a discretized event volume that accumulates events in temporal bins, which is widely used for event-based optical flow estimation. EventPoint [15] pro-posed Tencode, converting the event stream into the 3-channel structure similar to RGB input. Most of these representations are designed empirically for aggre-gating spatiotemporal information for general-purpose processing. In contrast, our work focuses on features that encode complementary motion information, accompanied by theoretical analysis on the explicit connection between these features and motion direction. Another line of works consider hybrid representations, fusing event data with other modalities. Gehrig et al . [10] combine frames and events for dense continuous-time optical flow by using separate encoders for each modality. Wan et al . [27] learn dense optical flow from events by fusing event and image informa-tion. Zhou et al . [31] bridge frame and event modalities through a common spatiotemporal fusion strategy for high-dynamic scene optical flow. Beyond bi-modal approaches, RPEFlow [28] fuses RGB, LiDAR point cloud, and event data for joint optical flow and scene flow estimation. Sun et al . [24] apply cross-modal attention to fuse events and frames for motion deblurring. These methods typically employ separate encoders for each modality and rely on feature-level attention or cross-attention mechanisms to integrate information across modali-ties. While our work shares a similar philosophy of extending the representation with complementary information, it is more lightweight. Its plug-and-play de-sign makes it easy to integrate into existing architectures without the need for separate encoders or complex fusion strategies. 4 H. Araghi et al. 
+
+2.2 Event-based optical flow estimation 
+
+Optical flow estimation is a fundamental task in computer vision that serves as a natural benchmark for assessing how well a method captures motion cues. Existing methods for event-based optical flow estimation can be divided into supervised or unsupervised approaches. Self-supervised methods [12, 13, 21, 32] learn optical flow typically using photometric or contrast maximization [6, 7, 22] losses. Supervised methods, on the other hand, generally achieve higher accuracy. E-RAFT [9] builds upon the idea of RAFT [25] in using correlation volumes for event-based optical flow estimation. TMA [19] exploits temporal continuity of events through a temporal motion aggregation strategy. To reduce the computa-tional complexity, IDNet [29] avoids the computationally expensive correlation volume component and instead directly estimates flow via iterative deblurring, achieving a favorable balance between accuracy and computational efficiency. These methods typically use voxel grids as spatiotemporal representations of events. In this work, we extend this representation with complementary motion features and show experimentally that they improve optical flow estimation. 
+
+3 Method 
+
+3.1 Feature extraction 
+
+An event camera produces a stream of asynchronous events {ei}Ni=1 , where each event ei = ( xi, y i, t i, p i) encodes a pixel location (xi, y i), a timestamp ti, and a polarity pi ∈ {− 1, +1 } indicating brightness increase or decrease. From this event stream, we follow the approach in [1] to construct an image I of density values that captures the causal spatiotemporal density of events. Specifically, as each event ei arrives, we update the density value at the wd × wd spatial neighborhood of ei by accumulating contributions from past events, weighted by polarity, spatial proximity, and temporal recency [1], i.e., 
+
+I(ri) = X
+
+> j≤i
+
+pj · g(ri − rj ) exp 
+
+ tj − ti
+
+τ
+
+
+
+, (1) where ri = ( xi, y i) denotes the spatial position, g(·) is a Gaussian spatial kernel of size wd × wd with standard deviation σ = wd/5, and τ is the temporal decay constant. The exponential temporal kernel enables recursive computation as the density values are updated efficiently as each event arrives without buffering past events. The result is a 2D image I where each pixel value reflects the recent event density in its neighborhood. From the density image I, we compute spatial gradients ∇I = [ Ix, I y ]T using Sobel operators, where Ix and Iy denote the horizontal and vertical derivatives of I. We then compute the structure tensor Sw at the event location, following the Harris corner detector formulation [14]: 
+
+Sw(ri) = w ∗
+
+ I2 
+
+> x
+
+IxIy
+
+IxIy I2
+
+> y
+
+
+
+= w ∗ (∇I∇IT ), (2) Event Features for Motion Cues 5𝐶 𝐵 𝑛 $!   
+
+> 𝑛 $"
+> 𝑢
+> 𝛼 !𝛼 "
+> 𝑑 ! = 𝑢 ⋅ 𝑛 $!
+> 𝑑 " = 𝑢 ⋅ 𝑛 $" 𝜃 𝐴 𝐶′ 𝐵 #
+> 𝐴′
+> 𝑁 𝑀 𝑃
+> Γ
+
+Fig. 2: Establishing the relationship between local geometry, eigenvalues and motion direction in an example of a triangle translation. The triangle △CAB translates to 
+
+△C′A′B′ along vector u. The red shading encodes event recency, with more recent events near △C′A′B′. Unit normals ˆn1 and ˆn2 at vertex A define the local geometry. 
+
+where w is a window function and ∗ denotes convolution. The structure tensor encodes the distribution of gradient orientations in a local neighborhood; its Harris eigenvalues λ1 and λ2 are computed in closed form as: 
+
+λ1,2 = 12
+
+
+
+tr( Sw) ± p(tr( Sw)) 2 − 4 det( Sw)
+
+
+
+. (3) The extracted per-event features, the density value I(ri) and the Harris eigenvalues pair (λ1, λ 2), are used to extend baseline representations. In Sec. 3.2, we analyze how these eigenvalues relate to motion cues. 
+
+3.2 From Eigenvalues to Motion Cues 
+
+Here, we theoretically establish the connection between Harris eigenvalues and motion direction using a simple translation example of a triangle, as illustrated in Fig. 2. The triangle △CAB moves to △C′A′B′ with displacement vector u,without any rotation or deformation. The red shading in the figure indicates recent event density after the motion is complete: newer events (near △C′A′B′)appear more red, while older ones fade to white. Our goal is to study the hypothesis that Harris eigenvalues, combined with local geometry information, delivers motion cues, by examining the motion of vertex A. As local geometry, we assume we know the shape of the triangle, with A a convex corner with angle θ. More specifically, we assume we have the unit normal vectors of ˆn1 and ˆn2 for edges AC and AB , and we construct matrix V = ˆn1, ˆn2
+
+. Matrix V thus represents the local geometric structure. 6 H. Araghi et al. 
+
+Algorithm 1 Computation of Motion Direction 
+
+Input: Local geometry V = ˆn1, ˆn2
+
+, Harris eigenvalues λ1, λ2
+
+Output: Motion direction ˆu
+
+1: Compute θ = π − arccos( ˆn1 · ˆn2).2: Compute A1 and A2 using Theorem 1. 3: Compute ˆu using Eq. (9). 
+
+Let d = V T u, whose entries correspond to the projections of u onto each normal, 
+
+i.e . d = [ d1, d 2]T ≜ [u· ˆn1, u· ˆn2]T , and (·)T denote transpose of a vector or a matrix. Since ˆn1 and ˆn2 are linearly independent, V is invertible and thus we have u = V −T d, where (·)−T is inverse transpose. From Fig. 2, d1 = ∥u∥ sin( α1)
+
+and d2 = ∥u∥ sin( α2), where ∥ · ∥ denote the ℓ2-norm. The motion direction is thus computed as 
+
+ˆu = V −T
+
+sin( α1)sin( α2)
+
+
+
+(4) where ˆu is the unit direction of u.We now relate the Harris eigenvalues to sin( α1) and sin( α2). We start with computing the structure tensor from (2) at position rA′ :
+
+Sw(rA′ ) = w ∗ (∇I∇IT ) r=rA′ =
+
+Z
+
+> r
+
+w(rA′ − r) ∇I(r)∇I(r)T dr, (5) where w(·) is a window function, and vector ∇I(r) is the gradient of density value image at r as described in Sec. 3.1. As the triangle translates, the edge 
+
+AC drifts to A′C′, forming the trapezoidal region AA ′C′C where gradients align with ˆn1. Similarly, in trapezoid AA ′B′B, the gradients align with ˆn2. Assuming a Gaussian window function, let Γ be a circular region centered at A′ with radius 
+
+A′N , outside of which the Gaussian response is negligible. We can compute the structure tensor in (5) as 
+
+Sw(rA′ ) = 
+
+> 2
+
+X
+
+> k=1
+
+Z
+
+> r∈Rk
+
+w(rA′ − r) ∇I(r) ∇I(r)T dr =
+
+> 2
+
+X
+
+> k=1
+
+Ak ˆnk ˆnTk (6) 
+
+= V diag( A1, A 2) V T , (7) where R1 and R2 denote the corresponding sectors A′P N and A′P M , and A1,
+
+A2 represent the relative strength of each gradient contribution. The equality between (6) and (7) is obtained by substituting ˆn1 and ˆn2 into matrix V .We assume that A1 and A2 are proportional to sector areas R1 and R2:
+
+A1
+
+A2
+
+= area( R1)area( R2) = α1
+
+α2
+
+. (8) This assumption may be affected in practice by factors such as object texture, background variation, rasterization effect in computing the gradients, border effects, and noise. We will evaluate the effect of texture and noise in detail Event Features for Motion Cues 70 50 100 150 200 250 
+
+> x [pixels]
+> 050 100 150 200 250
+> y [pixels]
+> t = 250 ms t = 750 ms t = 1250 ms t = 1750 ms Trajectory
+
+(a) Star shape trajectory 140 160 180 200 220    
+
+> x [pixels]
+> 120 140 160 180 200 220
+> y [pixels]
+> Event points −
+> Event points +
+
+(b) Events at t=200 –210 ms 140 160 180 200 220    
+
+> x [pixels]
+> 120 140 160 180 200 220
+> y [pixels]
+> Event points +
+> Event points −
+
+(c) OF at t=200 −201 ms 140 160 180 200 220 
+
+> x [pixels]
+> 120 140 160 180 200 220
+> y [pixels]
+> −0.6
+> −0.4
+> −0.20.00.20.40.6
+
+(d) Density value 140 160 180 200 220  
+
+> x [pixels]
+> 120 140 160 180 200 220
+> y [pixels]
+> 2468
+
+(e) Eigenvalue λ1140 160 180 200 220  
+
+> x [pixels]
+> 120 140 160 180 200 220
+> y [pixels]
+> 0.51.01.52.02.5
+
+(f ) Eigenvalue λ2
+
+Fig. 3: Toy dataset generation and feature extraction for a five-pointed star shape undergoing simultaneous translation and rotation. (a) The star follows a figure-eight (lemniscate) trajectory while rotating, with colored instances showing positions at dif-ferent time steps and curved arrows indicating local rotation. (b) Events generated during a 10 ms window, with blue ( +) and red ( −) polarities indicating brightness changes at object edges. (c) Ground truth optical flow (OF) vectors overlaid on events, showing the combined translational and rotational motion. (d)–(f ) Per-event features computed from the event stream: density value capturing spatiotemporal event density, and Harris eigenvalues λ1 and λ2.
+
+in Sec. 4.1. Given (8) and (4), the motion direction from constants A1 and A2
+
+follows as 
+
+ˆu = V −T h
+
+sin A1θA1+A2 , sin A2θA1+A2
+
+iT
+
+, (9) where θ = ∠CAB is the angle at vertex A, computed as θ = π − arccos( ˆn1 · ˆn2).
+
+Theorem 1. Constants A1 and A2 can be computed from the eigenvalues of the structure tensor, λ1 and λ2, as the roots of the following quadratic equation: 
+
+A2 − (λ1 + λ2)A + λ1λ2/ sin 2 θ = 0 . (10) 
+
+Proof: See supplementary material. 
+
+Finally, Algorithm 1 connects the combined Harris eigenvalues and the local geometric information to the motion direction, confirming the proposed link between eigenvalue features and motion cues. 
+
+3.3 Toy data generation 
+
+To evaluate our proposed features in a controlled setting, we design a synthetic toy dataset where ground truth optical flow is available for each event. We simu-late a five-pointed star shape undergoing simultaneous translation and rotation 8 H. Araghi et al. Order-invariant MLP         
+
+> 𝛥𝑥 !!∈𝒩 $
+> 𝒗 !=𝑣 !,#
+> 𝑣 !,$
+> 𝛥𝑡 !!∈𝒩 $
+> 𝛥𝑦 !!∈𝒩 $
+> 𝐼 !!∈𝒩 $
+> 𝜆 %,! !∈𝒩 $
+> 𝜆 ',! !∈𝒩 $
+> Relative spatial coordinates Relative temporal difference Density values Harris eigenvalues
+> Local geometry Temporal information Extended features
+
+Fig. 4: Input features of the order-invariant MLP: The model can receive per-event information for local geometry (relative spatial coordinates), temporal information (rel-ative temporal difference), and extended features (density values and Harris eigenval-ues), and outputs the optical flow vector. 
+
+within a 256 × 256 pixel image space. The shape follows a figure-eight (lemnis-cate of Gerono) trajectory defined by x(t) = A sin( t) and y(t) = B sin(2 t), while simultaneously rotating with a constant angular velocity, completing two full rotations over the sequence duration. For each event, we compute the ground truth optical flow vector from the known instantaneous velocity of the shape, combining both the translational component from the trajectory and the rotational component around the shape’s center. We reserve the last 20% of the sequence for testing and use the first 80% for training and validation. Figure 3 illustrates the dataset generation process and the extracted features. From the generated events, we compute the per-event features described in Sec. 3.1: the density value I and the structure tensor Harris eigenvalues (λ1, λ 2). As shown in Fig. 3d–3f, the density value captures the density of recent events, first eigenvalue λ1 is generally larger at edge regions, while the second eigenvalue λ2 is higher at corner regions. 
+
+3.4 Models Order-invariant MLP We design a toy model for supervised regression on the toy dataset to test whether Harris eigenvalues and density features contain information to predict motion. For each event, we compute the features as de-scribed in Sec. 3.1 and use them as input to the model. Each event ei has a ground truth flow vector vi ∈ R2. To balance spatial and temporal distances, we scale the time in milliseconds. We define a spatiotemporal local neighborhood set N (i) around event ei by a K nearest neighbor set of events. The goal of the model is to predict ˆvi from the features of event ei and N (i). Each event ei is assigned a feature vector zi ∈ RF . For all neighbors j ∈ N (i), we use relative spatial coordinates pj =[ ∆x j , ∆y j ]T = [ xj − xi, y j − yi]T instead of absolute posi-tions. This design choice prevents the model from overfitting by memorizing flow vectors based on absolute pixel locations, and provides the local spatiotemporal geometry of events in the neighborhood of the center event. We consider the following feature configurations: Baseline zj = pj ; Harris Eigenvalues zj = [ pj , λ 1,j , λ 2,j ]; Density value zj = [ pj , I j ]; and Eig. + Density Event Features for Motion Cues 9
+
+zj = [ pj , I j , λ 1,j , λ 2,j ], where (λ1,j , λ 2,j ) are the Harris eigenvalues and Ij is the density value from (1). We also consider time-extended variants where ∆t j is included in pj , i.e ., pj = [ ∆x j , ∆y j , ∆t j ]T . Figure 4 illustrates the different input features to the order-invariant MLP. The neighborhood N (i) is a set; its ordering should not affect the prediction. We therefore use a permutation-invariant architecture inspired by DeepSets [30]: 
+
+ˆvi = MLP 2
+
+ X 
+
+> j∈N (i)\{ i}
+
+MLP 1 (zi∥zj )
+
+
+
+, (11) where ∥ denotes concatenation. A shared MLP 1 embeds each pair of central and neighbor features, the sum aggregation ensures permutation invariance, and 
+
+MLP 2 produces the final flow prediction. Each of the MLPs has two hidden layers with the same number of units and ReLU activations. We train the model with mean-squared error over all events. 
+
+Iterative Deblurring Network (IDNet) To evaluate our proposed features on a state-of-the-art supervised optical flow estimation method, we adopt the Iterative Deblurring Network (IDNet) [29]. IDNet achieves competitive perfor-mance while remaining lightweight by avoiding the construction of costly corre-lation volumes used in methods like ERAFT [9]. IDNet uses a voxel grid rep-resentation of events with a convolutional encoder at the input level. To test our hypothesis that Harris eigenvalues and density value aid optical flow estima-tion, we voxelize the proposed per-event features into the same temporal bins and concatenate them with the event voxels along the channel dimension. See supplementary material for architecture and training details. 
+
+4 Experiments 
+
+4.1 Toy dataset with an order-invariant MLP Do the additional Harris eigenvalues and density value features pro-vide motion cues? First, we test the hypothesis that Harris eigenvalues and density features, when combined with local geometry, provide motion cues on the toy dataset. We evaluate the four input variants, baseline, Harris eigenval-ues, density value, and Eig. + Density, across two MLP hidden dimensions (64 and 128) and three neighborhood sizes K ∈ { 5, 10 , 50 }. Figure 5 shows MSE loss over training epochs, and additional metrics are provided in Supplementary. Overall, adding the extended features consistently reduces the test MSE loss compared to using relative positions alone, with best performance observed with both eigenvalues and density features. Increasing K or hidden dimensions benefit all feature settings, with larger gains observed for density features. This shows that density features along with larger neighborhoods, i.e. richer local geometry, can yield better results in capturing motion patterns. Across all tested config-urations, combining Harris eigenvalues and density value features produces the lowest test MSE loss. 10 H. Araghi et al. 0 100 200 300 400 500 
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(a) hidden_dim=64, k=5 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(b) hidden_dim=64, k=10 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(c) hidden_dim=64, k=50 0 100 200 300 400 500 
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(d) hidden_dim=128, k=5 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(e) hidden_dim=128, k=10 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(f ) hidden_dim=128, k=50 
+
+Fig. 5: Test set MSE loss over training epochs comparing baseline to extended inputs (Harris Eigenvalues, Density value, and both) across different hidden dimensions and 
+
+k-nearest neighbors. Shaded areas indicate ±1 standard deviation across 10 runs. 
+
+Are the gains due to informative features or merely increased model capacity? A natural concern is that extended features increase the input di-mensionality (and thus the number of parameters), potentially improving per-formance even with uninformative features. To control for this, we match the Eig. + Density input dimension by either concatenating random features or repeating the relative-position features. Figure 6a shows that neither control re-duces the test MSE, whereas extending with Harris eigenvalues, density value, or both yields clear gains, indicating that the improvements stem from informative features rather than increased capacity. 
+
+Are extended features sufficient on their own without local geometry? 
+
+As it was discussed in Sec. 3.2, the Harris eigenvalues features along with local geometry can be used to recover the motion direction. To test the necessity of local geometry, we trained models that exclude relative spatial coordinates (∆x j , ∆y j ). Figure 6b shows that these models fail to learn optical flow. This emphasizes our hypothesis that Harris eigenvalues and density value features are motion cues when complemented with local geometry. Moreover, this experiment shows that the model does not overfit on the extended features or memorize the motion flows derived from them. 
+
+Do Harris eigenvalues and density value features add information be-yond relative time? Since relative temporal information is used in computing the extended features as in Sec. 3.1, one may argue that simply appending rela-tive time to the input could capture the same motion cues as Harris eigenvalues and density value. To control for this, we compare Harris eigenvalues and density value against a time-extended baseline. Figure 7 shows results across different 
+
+K. Although time improves the baseline, Harris eigenvalues and density value achieve lower test MSE across all K, and adding time on top of Harris eigen-values and density value yields further gains. As K increases, the performance Event Features for Motion Cues 11 0 100 200 300 400 500 
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10
+> Test Set MSE Loss
+> Baseline Baseline + Random Concat. Baseline + Repeated Concat. w/ Eigenvalues w/ Density values w/ Eigenvalues + Density values
+
+(a) Matching input dimensionality 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test Set MSE Loss
+> Baseline w/ Eigenvalues + Density values only Eigenvalues + Density values (no XY) only Eigenvalues (no XY) only Density values (no XY)
+
+(b) Excluding relative position 
+
+Fig. 6: Test set MSE loss on the toy dataset over 10 runs when (a) matching baseline input dimensionality via random or repeated position features. Eig. + Density still outperforms these controls, confirming gains stem from informative features, not in-creased dimensionality. (b) Excluding relative position ( ∆x, ∆y ) causes models using only Harris eigenvalues or density value features to fail. 0 100 200 300 400 500 
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test set MSE Loss
+> Baseline w/ Eigenvalues + Density values Baseline + Rel. Time Concat. with Eigenvalues + Density + Rel. Time Concat.
+
+(a) k=5 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test set MSE Loss
+> Baseline w/ Eigenvalues + Density values Baseline + Rel. Time Concat. with Eigenvalues + Density + Rel. Time Concat.
+
+(b) k=10 0 100 200 300 400 500  
+
+> Epoch
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12
+> Test set MSE Loss
+> Baseline w/ Eigenvalues + Density values Baseline + Rel. Time Concat. with Eigenvalues + Density + Rel. Time Concat.
+
+(c) k=50 
+
+Fig. 7: Relative time as an additional input feature for different K. Combined Harris eigenvalues and density value features provide more informative features for optical flow than relative time. 
+
+gap narrows, yet the time-extended baseline still does not match the extended feature sets. 
+
+Feature Extending Under Textured Conditions As we mentioned in Sec. 3.2, the relation between the Harris eigenvalues and the direction of the movement can be affected by factors like object textures. To study this effect, we increase the complexity of the toy dataset by adding different texture patterns to the moving foreground object. Textures are randomly selected from the Describable Textures Dataset (DTD) [4]. Table 1 reports the test MSE loss for each texture, averaged over 10 runs with standard deviations. The results show that incorpo-rating Harris eigenvalues and density value features consistently improves mo-tion estimation in textured scenarios. MSE loss curves, additional metrics, and visualizations of the toy dataset with textures are provided in Supplementary. 
+
+Feature Extending Under Shot Noise Events Beyond texture, noise is another practical factor that can degrade the proposed features. We evaluate robustness by injecting shot noise events at varying frequencies. The noise fre-quencies tested are 0, 5, 20, and 50 Hz, where 0 Hz corresponds to no added noise. Table 2 reports the test MSE loss for each noise frequency, averaged over 10 runs. The results show that the model extended with Harris eigenvalues and density value maintains higher accuracy and exhibits stronger resilience to in-12 H. Araghi et al. 
+
+Table 1: Mean squared error (MSE) loss for different texture settings using the order-invariant MLP with baseline and combined extended features. For each texture, the mean and standard deviation over 10 independent runs are reported. Feature Type stratified-0106 flecked-0103 waffled-0063 crosshatched-0066 woven-0053 spiralled-0137 Overall (Mean ± Std) Baseline 0.0886 ± 0.0002 0 .0799 ± 0.0003 0 .0779 ± 0.0002 0.0762 ± 0.0002 0.0895 ± 0.0003 0 .0644 ± 0.0005 0.0794 ± 0.0084                          
+
+> w/ Eig. + Density 0.0711 ±0.0005 0 .0668 ±0.0010 0 .0583 ±0.0009 0.0540 ±0.0008 0.0467 ±0.0004 0 .0411 ±0.0008 0.0565 ±0.0105
+> Improvement(%) 19.74% 16.41% 25.10% 29.16% 47.75% 36.19% 28.84%
+
+Table 2: Test MSE loss under added shot noise with different frequencies (0 Hz indi-cates no added noise). Results are obtained using the order-invariant MLP. For each setting, the mean and standard deviation over 10 independent runs are shown. Feature Type 0 Hz 5 Hz 20 Hz 50 Hz Overall (Mean ± Std) Baseline 0.0282 ± 0.0004 0 .0361 ± 0.0008 0 .0480 ± 0.0008 0 .0606 ± 0.0004 0.0434 ± 0.0124                  
+
+> w/ Eig. + Density 0.0062 ±0.0001 0 .0104 ±0.0002 0 .0130 ±0.0006 0 .0196 ±0.0005 0.0122 ±0.0049
+> Improvement(%) 78.08% 71.20% 72.83% 67.67% 71.99%
+
+creasing shot noise levels. MSE loss curves, comparisons in different metrics, and visualizations under different noise levels are provided in Supplementary. 
+
+Toy dataset with IDNet So far, we employed an order-invariant MLP, to mea-sure the per-event “motion information” the Harris eigenvalues and density values contain. In this section, we evaluate the effectiveness of the proposed features in a more realistic scenario, using a state-of-the-art optical flow architecture. Specif-ically, we use a reduced-capacity configuration of IDNet [29], which we refer to as Tiny IDNet . We reduce the hidden-layer size and the RNN input dimension-ality to match the low complexity of our toy dataset. Unlike the order-invariant MLP, which predicts per-event flow vectors, Tiny IDNet predicts frame-to-frame optical flow (between consecutive ground-truth frames) over short temporal win-dows. We segment the event stream into temporal chunks of 20 ms and estimate one optical-flow field per chunk from its events. 
+
+Feature extending on Tiny IDNet We study feature extending under limited model capacity by varying Tiny IDNet’s RNN input dimensionality. Figure 8 shows that extending the baseline inputs with Harris eigenvalues and density values consistently reduces MSE error, with larger gains at smaller input di-mension. As capacity increases, the gap between baseline and extended inputs diminishes, suggesting that higher-capacity models can partially learn similar representations implicitly. This suggests that the proposed features are particu-larly effective for low-complexity, resource-constrained models. 
+
+Effect of texture on toy dataset with Tiny IDNet We repeat the texture-based analysis in Sec. 4.1, using Tiny IDNet. We choose the textures from DTD [4], and train Tiny IDNet with rnn_input_dim =4 and hidden_dim =4. Table 3 reports the MSE error for different texture patterns, averaged over 5 in-dependent runs. Consistent with the earlier findings, extending the inputs with density and Harris eigenvalues improves flow estimation under textured condi-tions. These results indicate that the proposed features generalize across other model architectures and are particularly beneficial when model capacity is lim-ited. Event Features for Motion Cues 13 0 100 200 300 400        
+
+> Validation Step
+> 123456789
+> L2 Error
+> Baseline w/ Eigenvalues + Density
+> (a) rnn_input_dim = 4 0100 200 300 400
+> Validation Step
+> 123456789
+> L2 Error
+> Baseline w/ Eigenvalues + Density (b) rnn_input_dim = 8
+
+Fig. 8: Test MSE error over training steps for Tiny IDNet . We compare baseline fea-tures against combined extended features for different RNN input dimensions (4 and 8). Shaded regions denote ±1 standard error across runs. Models with lower input di-mensionality benefit more from the added eigenvalue and density features. 
+
+Table 3: Test MSE error for different texture patterns using Tiny IDNet 
+
+(rnn_input_dim =4, hidden_dim =4) with baseline inputs and Eig. + Density. For each texture, the mean and standard deviation over 5 independent runs are reported. Feature Type flecked-0103 honeycombed-0139 spiralled-0137 stratified-0106 woven-0053 Overall (Mean ± Std) Baseline 5.5659 ± 0.2523 4.8770 ± 0.7717 4.4550 ± 0.7552 5.0143 ± 0.6433 4.7696 ± 1.2014 4.9364 ± 0.8663                   
+
+> w/ Eig. + Density 3.7602 ±0.9523 3.6062 ±0.4699 3.5789 ±1.0642 3.9544 ±0.5902 3.6059 ±0.8819 3.7094 ±0.8591
+> Improvement(%) 32.44% 26.06% 19.67% 21.14% 24.40% 24.86%
+
+4.2 DSEC dataset with IDNet 
+
+We evaluate Harris eigenvalues and density value on the standard real-world benchmark dataset DSEC [8] using the full IDNet architecture [29]. Follow-ing [29], we use 4 deblurring iterations, event voxel representation with 15 bins, and Adam [16] with learning rate 1 × 10 −4 and a OneCycle learning rate sched-ule. We train the 1/8 resolution model for 150 epochs (batch size 5) and the 1/4 resolution model for 500 epochs (batch size 4). We adopt the data augmentation protocol from [29], which includes random cropping to 288 × 384 pixels, vertical flips with probability 0.1, and horizontal flips with probability 0.5. Table 4 reports the results on the DSEC test set. We compare the baseline fea-tures against extending with Harris eigenvalues and density values. We evaluate using standard optical flow metrics: n-pixel error ( nPE) denotes the percentage of pixels with endpoint error exceeding n pixels, endpoint error (EPE) measures the average Euclidean distance between predicted and ground-truth flow vec-tors, and angular error (AE) quantifies the average angular deviation between predicted and ground-truth flow directions. We first train on a subset of the DSEC dataset comprising approximately one-sixth of the full training data (see Supplementary for the list of sequences used). For this sub-dataset experiment, we train at 1/8 resolution and report the average and standard deviation over 3 independent runs. For the full dataset, we train the network at both 1/4 and 1/8 resolutions with and without the combined extended features. 14 H. Araghi et al. 
+
+Table 4: Optical flow results on the DSEC test set (compact version). IDNet 1/8 and 1/4 Res. refer to the model’s internal resolution configuration. Sub-dataset results report mean ±std over 3 runs. Best results for each category are shown in bold .Category Feature Type 1PE ↓ 2PE ↓ 3PE ↓ EPE ↓ AE ↓                                                  
+
+> Sub-dataset, IDNet 1/8 Res. Baseline 29 .208 ±0.518 10 .805 ±0.306 5.578 ±0.132 1.191 ±0.011 4.824 ±0.046
+> w/ Eig. + Density 27 .519 ±1.012 10 .331 ±0.580 5.367 ±0.250 1.156 ±0.025 4.641 ±0.099
+> Full dataset, IDNet 1/8 Res. Baseline 13.504 4.901 2.745 0.82 3.037 w/ Eig. + Density 12.912 4.7 2.645 0.805 2.968
+> Full dataset, IDNet 1/4 Res. Baseline 10.256 3.448 1.928 0.725 2.755 w/ Eig. + Density 9.868 3.379 1.961 0.723 2.681
+
+The results demonstrate that extending with Harris eigenvalues and density value consistently reduces errors across all experimental settings. Notably, the improvement is higher on the sub-dataset, suggesting that the proposed features are beneficial in data-scarce scenarios. Furthermore, the relative improvement at 1/8 resolution exceeds that at 1/4 resolution. This aligns with our findings in Fig. 8, where we observed that lower-capacity models benefit more from the extended features. We also observe that the angular error (AE) is reduced in both the sub-dataset and full dataset experiments. This is consistent with our theoretical analysis in Sec. 3.2, where we established the connection between Harris eigenvalues and motion direction through the structure tensor. Addi-tional evaluation on another real-world EVIMO2v2 dataset [3], an ablation of hyperparameters of extended features, and an analysis of their memory footprint and per-event computational cost are provided in the supplementary material. 
+
+5 Conclusion 
+
+We presented a study revealing that two features used for corner detection— the Harris eigenvalues of the structure tensor and the spatiotemporal density values—are in fact motion cues , a property unique to event cameras with no analogue in frame-based vision. We formally established the connection between Harris eigenvalues and motion direction for translating corners, showing that eigenvalues, combined with local geometry, can recover the direction of motion. Through controlled experiments on synthetic data, we confirmed that extending local geometric features with eigenvalues and density values provides complemen-tary motion information, that the improvements stem from informative features rather than increased model capacity, and that these features are robust to fore-ground textures and shot noise. Integration into the state-of-the-art IDNet ar-chitecture on the real-world DSEC benchmark yielded consistent improvements in optical flow accuracy, with the largest gains observed in data-scarce training regimes and for lower-capacity models. Our lightweight, plug-and-play approach requires no additional encoders or complex fusion strategies, making it easy to adopt in existing event-based pipelines. Event Features for Motion Cues 15 
+
+References 
+
+1. Araghi, H., van Gemert, J., Tomen, N.: Making every event count: Balanc-ing data efficiency and accuracy in event camera subsampling. In: Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recogni-tion Workshops (CVPRW) (2025), https://openaccess.thecvf.com/content/ CVPR2025W/EventVision/html/Araghi_Making_Every_Event_Count_Balancing_ Data_Efficiency_and_Accuracy_in_CVPRW_2025_paper.html 
+
+2. Baldwin, R.W., Liu, R., Almatrafi, M., Asari, V., Hirakawa, K.: Time-Ordered Recent Event (TORE) Volumes for Event Cameras (Mar 2021), http://arxiv. org/abs/2103.06108 , arXiv:2103.06108 [cs] 3. Burner, L., Mitrokhin, A., Fermüller, C., Aloimonos, Y.: EVIMO2: An Event Camera Dataset for Motion Segmentation, Optical Flow, Structure from Mo-tion, and Visual Inertial Odometry in Indoor Scenes with Monocular or Stereo Algorithms (May 2022). https://doi.org/10.48550/arXiv.2205.03467 , http: //arxiv.org/abs/2205.03467 , arXiv:2205.03467 [cs] 4. Cimpoi, M., Maji, S., Kokkinos, I., Mohamed, S., , Vedaldi, A.: Describing textures in the wild. In: Proceedings of the IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) (2014) 5. Gallego, G., Delbruck, T., Orchard, G., Bartolozzi, C., Taba, B., Censi, A., Leutenegger, S., Davison, A.J., Conradt, J., Daniilidis, K., Scaramuzza, D.: Event-Based Vision: A Survey. IEEE Transactions on Pattern Analysis and Machine Intelligence 44 (1), 154–180 (Jan 2022). https://doi.org/10.1109/TPAMI.2020. 3008413 , https://ieeexplore.ieee.org/document/9138762/ 
+
+6. Gallego, G., Gehrig, M., Scaramuzza, D.: Focus Is All You Need: Loss Functions For Event-based Vision. In: 2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 12272–12281 (Jun 2019). https://doi.org/10. 1109/CVPR.2019.01256 , http://arxiv.org/abs/1904.07235 , arXiv:1904.07235 [cs] 7. Gallego, G., Rebecq, H., Scaramuzza, D.: A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation. In: 2018 IEEE/CVF Conference on Computer Vision and Pat-tern Recognition. pp. 3867–3876 (Jun 2018). https://doi.org/10.1109/CVPR. 2018.00407 , http://arxiv.org/abs/1804.01306 , arXiv:1804.01306 [cs] 8. Gehrig, M., Aarents, W., Gehrig, D., Scaramuzza, D.: DSEC: A Stereo Event Cam-era Dataset for Driving Scenarios. IEEE Robotics and Automation Letters 6(3), 4947–4954 (Jul 2021). https://doi.org/10.1109/LRA.2021.3068942 , conference Name: IEEE Robotics and Automation Letters 9. Gehrig, M., Millhausler, M., Gehrig, D., Scaramuzza, D.: E-RAFT: Dense Op-tical Flow from Event Cameras. In: 2021 International Conference on 3D Vi-sion (3DV). pp. 197–206. IEEE, London, United Kingdom (Dec 2021). https: //doi.org/10.1109/3DV53792.2021.00030 , https://ieeexplore.ieee.org/ document/9665931/ 
+
+10. Gehrig, M., Muglikar, M., Scaramuzza, D.: Dense Continuous-Time Optical Flow from Events and Frames. IEEE Transactions on Pattern Analysis and Machine Intelligence 46 (7), 4736–4746 (Jul 2024). https://doi.org/10.1109/TPAMI.2024. 3361671 , http://arxiv.org/abs/2203.13674 , arXiv:2203.13674 [cs] 11. Glover, A., Dinale, A., Rosa, L.D.S., Bamford, S., Bartolozzi, C.: luvHarris: A Prac-tical Corner Detector for Event-Cameras. IEEE Transactions on Pattern Analysis and Machine Intelligence 44 (12), 10087–10098 (Dec 2022). https://doi.org/10. 16 H. Araghi et al. 
+
+1109/TPAMI.2021.3135635 , https://ieeexplore.ieee.org/document/9652120/ ?arnumber=9652120 , conference Name: IEEE Transactions on Pattern Analysis and Machine Intelligence 12. Hagenaars, J., Paredes-Vallés, F., de Croon, G.: Self-Supervised Learning of Event-Based Optical Flow with Spiking Neural Networks (Oct 2021), http://arxiv.org/ abs/2106.01862 , arXiv:2106.01862 [cs] 13. Hamann, F., Wang, Z., Asmanis, I., Chaney, K., Gallego, G., Daniilidis, K.: Motion-prior Contrast Maximization for Dense Continuous-Time Motion Estimation (Jul 2024), http://arxiv.org/abs/2407.10802 , arXiv:2407.10802 [cs] 14. Harris, C., Stephens, M.: A combined corner and edge detector. In: Proceedings of the Alvey Vision Conference. pp. 23.1–23.6 (1988). https://doi.org/10.5244/C. 2.23 
+
+15. Huang, Z., Sun, L., Zhao, C., Li, S., Su, S.: EventPoint: Self-Supervised Interest Point Detection and Description for Event-based Camera. In: 2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV). pp. 5385–5394. IEEE, Waikoloa, HI, USA (Jan 2023). https://doi.org/10.1109/WACV56688. 2023.00536 , https://ieeexplore.ieee.org/document/10030887/ 
+
+16. Kingma, D.P., Ba, J.: Adam: A Method for Stochastic Optimization (Jan 2017), 
+
+http://arxiv.org/abs/1412.6980 , arXiv:1412.6980 [cs] 17. Lagorce, X., Orchard, G., Galluppi, F., Shi, B.E., Benosman, R.B.: HOTS: A Hierarchy of Event-Based Time-Surfaces for Pattern Recognition. IEEE Transac-tions on Pattern Analysis and Machine Intelligence 39 (7), 1346–1359 (Jul 2017). 
+
+https://doi.org/10.1109/TPAMI.2016.2574707 , conference Name: IEEE Trans-actions on Pattern Analysis and Machine Intelligence 18. Li, R., Shi, D., Zhang, Y., Li, K., Li, R.: FA-Harris: A Fast and Asynchronous Corner Detector for Event Cameras. In: 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). pp. 6223–6229 (Nov 2019). https: //doi.org/10.1109/IROS40897.2019.8968491 , https://ieeexplore.ieee.org/ document/8968491/?arnumber=8968491 
+
+19. Liu, H., Chen, G., Qu, S., Zhang, Y., Li, Z., Knoll, A., Jiang, C.: TMA: Temporal Motion Aggregation for Event-based Optical Flow. pp. 9685–9694 (2023), https:// openaccess.thecvf.com/content/ICCV2023/html/Liu_TMA_Temporal_Motion_ Aggregation_for_Event-based_Optical_Flow_ICCV_2023_paper.html 
+
+20. Maqueda, A.I., Loquercio, A., Gallego, G., Garcia, N., Scaramuzza, D.: Event-Based Vision Meets Deep Learning on Steering Prediction for Self-Driving Cars. In: 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 5419–5427. IEEE, Salt Lake City, UT (Jun 2018). https://doi.org/10.1109/ CVPR.2018.00568 , https://ieeexplore.ieee.org/document/8578666/ 
+
+21. Paredes-Vallés, F., Scheper, K.Y.W., De Wagter, C., de Croon, G.C.H.E.: Taming Contrast Maximization for Learning Sequential, Low-latency, Event-based Optical Flow (Mar 2023), http://arxiv.org/abs/2303.05214 , arXiv:2303.05214 [cs] 22. Shiba, S., Aoki, Y., Gallego, G.: Secrets of Event-Based Optical Flow (Jul 2022), 
+
+http://arxiv.org/abs/2207.10022 , arXiv:2207.10022 [cs] 23. Sironi, A., Brambilla, M., Bourdis, N., Lagorce, X., Benosman, R.: HATS: His-tograms of Averaged Time Surfaces for Robust Event-Based Object Classification. In: 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 1731–1740. IEEE, Salt Lake City, UT, USA (Jun 2018). https://doi.org/10. 1109/CVPR.2018.00186 , https://ieeexplore.ieee.org/document/8578284/ 
+
+24. Sun, L., Sakaridis, C., Liang, J., Jiang, Q., Yang, K., Sun, P., Ye, Y., Wang, K., Van Gool, L.: Event-based fusion for motion deblurring with cross-modal attention. In: Eur. Conf. Comput. Vis. pp. 412–428. Springer (2022) Event Features for Motion Cues 17 25. Teed, Z., Deng, J.: RAFT: Recurrent All-Pairs Field Transforms for Optical Flow (Aug 2020), http://arxiv.org/abs/2003.12039 , arXiv:2003.12039 [cs] 26. Vasco, V., Glover, A., Bartolozzi, C.: Fast event-based Harris corner detection exploiting the advantages of event-driven cameras. In: 2016 IEEE/RSJ Interna-tional Conference on Intelligent Robots and Systems (IROS). pp. 4144–4149 (Oct 2016). https://doi.org/10.1109/IROS.2016.7759610 , https://ieeexplore. ieee.org/document/7759610/?arnumber=7759610 
+
+27. Wan, Z., Dai, Y., Mao, Y.: Learning Dense and Continuous Optical Flow from an Event Camera. IEEE Transactions on Image Processing 31 , 7237–7251 (2022). 
+
+https://doi.org/10.1109/TIP.2022.3220938 , http://arxiv.org/abs/2211. 09078 , arXiv:2211.09078 [cs] 28. Wan, Z., Mao, Y., Dai, Y.: RPEFlow: Multimodal fusion of RGB-PointCloud-Event for joint optical flow and scene flow estimation. In: Int. Conf. Comput. Vis. (2024) 29. Wu, Y., Paredes-Vallés, F., Croon, G.C.H.E.d.: Lightweight Event-based Optical Flow Estimation via Iterative Deblurring. In: 2024 IEEE International Conference on Robotics and Automation (ICRA). pp. 14708–14715 (May 2024). https://doi. org/10.1109/ICRA57147.2024.10610353 , http://arxiv.org/abs/2211.13726 ,arXiv:2211.13726 [cs] 30. Zaheer, M., Kottur, S., Ravanbakhsh, S., Poczos, B., Salakhutdinov, R.R., Smola, A.J.: Deep sets. In: Advances in Neural Information Processing Systems. vol. 30. Curran Associates, Inc. (2017), https://proceedings.neurips.cc/paper_files/ paper/2017/file/f22e4747da1aa27e363d86d40ff442fe-Paper.pdf 
+
+31. Zhou, H., Liu, H., Yan, L.: Bridge frame and event: Common spatiotemporal fusion for high-dynamic scene optical flow (2025). https://doi.org/10.48550/arXiv. 2501.01753 , http://arxiv.org/abs/2501.01753 
+
+32. Zhu, A.Z., Yuan, L., Chaney, K., Daniilidis, K.: Unsupervised Event-Based Learn-ing of Optical Flow, Depth, and Egomotion. In: 2019 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR). pp. 989–997. IEEE, Long Beach, CA, USA (Jun 2019). https://doi.org/10.1109/CVPR.2019.00108 ,
+
+https://ieeexplore.ieee.org/document/8953979/ 18 H. Araghi et al. 
+
+# Supplementary Material 
+
+A Computing A1 and A2 from Eigenvalues 
+
+This subsection provides the derivation of how to recover A1 and A2 from the eigenvalues of the structure tensor. Starting from the structure-tensor formula-tion in the main paper, we can write the structure tensor as 
+
+Sw = V
+
+A1 00 A2
+
+
+
+V T . (12) The trace of Sw is given by 
+
+trace( Sw) = trace 
+
+
+
+V
+
+A1 00 A2
+
+
+
+V T
+
+
+
+= trace 
+
+ A1 00 A2
+
+
+
+V T V
+
+
+
+= trace 
+
+ A1 00 A2
+
+  1 − cos( θ)
+
+− cos( θ) 1
+
+ 
+
+= A1 + A2. (13) Similarly, the determinant of Sw is 
+
+det( Sw) = det 
+
+
+
+V
+
+A1 00 A2
+
+
+
+V T
+
+
+
+= det 
+
+ A1 00 A2
+
+  1 − cos( θ)
+
+− cos( θ) 1
+
+ 
+
+= A1A2
+
+ 1 − cos 2(θ)
+
+= A1A2 sin 2(θ). (14) From Eqs. (13) and (14), we observe that 
+
+A1 + A2 = trace( Sw) = λ1 + λ2, (15) 
+
+A1A2 = det( Sw)sin 2(θ) = λ1λ2
+
+sin 2(θ) . (16) Therefore, A1 and A2 are the two roots of the quadratic equation 
+
+A2 − (λ1 + λ2)A + λ1λ2
+
+sin 2(θ) = 0 . (17) 
+
+B IDNet 
+
+B.1 IDNet Architecture Details 
+
+IDNet uses a voxel grid representation of events as input. Given a time window, events are binned into B temporal bins to form a tensor of shape B × H × W ,Event Features for Motion Cues 19 
+
+where H and W are the spatial dimensions. A convolutional encoder extracts features at a reduced spatial resolution ( 1/D s resolution). The encoder output, with dimension rnn_input_dim , is fed into a recurrent update block based on a ConvGRU with hidden dimension hidden_dim . The network iteratively refines the flow estimate over Niter deblurring iterations. At each iteration, the current flow estimate is used to warp the event representation, and the update block predicts a residual flow correction. The final flow is upsampled to full resolution using a learned convex upsampling mask. 
+
+B.2 Tiny IDNet 
+
+For the toy dataset experiments, we use a reduced-complexity variant of IDNet, which we refer to as Tiny IDNet . The overall iterative deblur-and-refine archi-tecture remains identical to the full IDNet described in Sec. B.1; the changes target only the channel widths and encoder depth to obtain a lightweight model suitable for the simplicity of the toy setting. The following modifications are applied: 1. Encoder depth. Each residual layer in the feature encoder uses a single residual block instead of two, effectively halving the encoder depth (2 residual blocks total instead of 4). 2. RNN input dimension. The RNN input dimension ( rnn_input_dim ) is reduced, which proportionally shrinks the encoder output. 3. Hidden dimension. The ConvGRU hidden dimension ( hidden_dim ) is re-duced, which also reduces the flow head dimensions accordingly. 4. Upsampling mask head. The intermediate channel count in the learned convex upsampling mask network is reduced from 256 to 32. All other design choices—the ConvGRU recurrence, the convex upsampling mechanism, the deblur-and-iterate loop, and the 1/8 resolution ( Ds=8 )—remain unchanged. We use B=5 temporal bins and Niter =4 deblurring iterations for the toy dataset experiments. 
+
+B.3 IDNet Training Details 
+
+To incorporate our proposed features, we voxelize the per-event density value I
+
+and Harris eigenvalues (λ1, λ 2) into the same temporal bins as the event voxel grid. These feature volumes are concatenated along the feature dimension, result-ing in an input tensor of shape B ×F ×H ×W , where F ∈ { 1, 2, 3, 4} corresponds to baseline events, density value, Harris eigenvalues, and Eig. + Density config-urations, respectively. The first convolutional layer of the encoder is modified to match the extended input feature dimension. We use B = 15 temporal bins for DSEC and B = 5 for toy datasets, at 1/4 and 1/8 resolutions ( Ds ∈ { 4, 8}), 
+
+Niter = 4 deblurring iterations, and train using the Adam optimizer (learning rate 10 −4), a OneCycleLR scheduler, and sparse ℓ1 loss. To compute the density value features for IDNet and Tiny IDNet, we use a spatial filter size of 5 × 5 and a temporal decay of τ = 1 ms. 20 H. Araghi et al. 
+
+B.4 Ablation on Filter Size and Temporal Decay 
+
+Table 5 reports the endpoint error (EPE) of IDNet for different density-filter sizes and temporal decay values τ , trained on a subset of DSEC and evaluated on the validation sequence zurich_city_01_a . The results show robustness across a range of τ values and filter sizes. Based on this ablation, we use a filter size of 5 and τ = 1 ms for DSEC.                    
+
+> Table 5: Ablation study on the density-filter size and temporal decay τusing IDNet, reporting EPE on the DSEC validation sequence zurich_city_01_a .Filter Size τ= 1 ms τ= 5 ms τ= 15 ms
+> 50.786 0.804 0.793 70.795 0.789 0.805
+
+C Toy Dataset 
+
+C.1 Additional Metrics for Different K and Hidden Dimensions 
+
+Tables 9 to 11 report additional performance metrics (endpoint error, angular error, and percentage of outliers) for the order-invariant MLP across different neighborhood sizes K ∈ { 5, 10 , 50 } and hidden dimensions 64 and 128, comple-menting the MSE loss curves shown in the main paper. To compute the density value features for the toy dataset, we use a spatial filter size of 7 × 7 and a temporal decay of τ = 30 ms. 
+
+C.2 Toy Dataset Visualizations C.3 Textured Conditions: Additional Metrics and Visualizations 
+
+Table 12 provides additional metrics for the texture experiments described in the main paper. Figures 9 and 10 visualize the toy dataset under different fore-ground textures from DTD [2], showing the original texture, the rendered inten-sity frame, and the generated event polarity scatter. Figure 11 shows the MSE loss curves over training epochs for both baseline and Eig. + Density feature settings across different textures for the order-invariant MLP, while Figure 12 shows the corresponding textured experiment for Tiny IDNet .
+
+C.4 Shot Noise: Additional Metrics and Visualizations 
+
+Shot noise events were generated using the V2E simulator [3]. Figure 13 visu-alizes the event polarity scatter under different shot noise frequencies. Table 13 provides additional metrics for the shot noise experiments described in the main paper. Figure 14 shows the MSE loss curves comparing baseline and Eig. + Density features across noise levels. Event Features for Motion Cues 21 
+
+D DSEC Sub-dataset Sequences 
+
+For the sub-dataset experiments on DSEC, we use approximately one-sixth of the full training data. The following four sequences are used for training: 
+
+– zurich_city_02_d 
+
+– zurich_city_05_b 
+
+– zurich_city_08_a 
+
+– zurich_city_11_a 
+
+These sequences were selected to provide a diverse subset of the DSEC dataset while keeping the training data limited to evaluate the benefit of feature exten-sion in data-scarce scenarios. 
+
+E Additional Evaluation on EVIMO2v2 
+
+To further assess the proposed features on real-world data, we additionally eval-uate IDNet [4] on the EVIMO2v2 dataset [1]. EVIMO2v2 has dense flow ground-truth for independently moving objects and not for ego-motion alone. Second, the sequences are recorded indoors at short range, rather than by the large, smoothly varying ego-motion fields typical of driving data. Ground-truth flow frames are generated every 50 ms, and all evaluation is carried out at the full 
+
+640 × 480 sensor resolution without cropping. We consider two training cases of the subset and full dataset. The reduced subset uses 4 of the 20 training se-quences, corresponding to roughly one sixth of the training samples, while the full regime uses all 20; in both cases one sequence is held out for validation. As in the DSEC experiments, we compare the baseline against extended input with the Eig. + Density features. For the reduced-data setting, we report the mean and standard deviation over three independent runs. The results are reported in Tab. 6. In the reduced regime the extended fea-tures improve the metrics in optical flow estimation. When training on the full dataset, however, the performance of the two representations becomes compa-rable, and the advantage of the extended features diminishes. This behavior is consistent with our discussion in the main paper and mirrors the trend observed on DSEC: with sufficient training data, the network can increasingly learn the geometric information provided explicitly by the proposed features directly from the data, reducing the benefit of encoding this information in the input represen-tation. These results further support the benefit of the proposed features when the amount of training data is limited. 
+
+F Parameter and Computational Overhead 
+
+As Tab. 7 shows, the number of parameters added to IDNet is small, since only the number of input channels of the first convolutional layer of the encoder is increased; consequently, the added inference time is also small. Averaged over 22 H. Araghi et al. 
+
+Table 6: Optical flow evaluation on the EVIMO2v2 dataset [1] using IDNet, under a sub-dataset (4 of 20 sequences) and the full training set. Sub-dataset results are the mean ± standard deviation over 3 independently trained runs. Best results in bold .Category Feature Type 1PE ↓ 3PE ↓ EPE ↓ AE ↓
+
+Sub-dataset Baseline 17 .533 ± 0.149 4.596 ± 0.064 0.938 ± 0.006 20 .007 ± 0.234 
+
+w/ Eig. + Density 17 .302 ± 0.224 4.432 ± 0.052 0.910 ± 0.006 19 .478 ± 0.162 
+
+Full dataset Baseline 11 .663 2.232 0.633 15 .473 
+
+w/ Eig. + Density 11.860 2.264 0.638 15.701 
+
+the 1773 frames of the EVIMO2v2 evaluation split at full 640 × 480 resolution. Latency is measured around the forward pass only, at batch size 1 in fp32 after 25 discarded warm-up iterations, on a system with a single NVIDIA GeForce RTX 5090 GPU and 8-core AMD Ryzen 7 CPU. For computing the features themselves, Tab. 8 reports the memory usage and the number of multiply-accumulate operations (MACs) per event, where wd
+
+denotes the size of the density filter introduced in the main paper and ksize 
+
+is the size of the Sobel filters. As these features are designed to be causal and hardware-friendly, embedding their computation in the event camera hardware is a suitable direction for further speed improvement. 
+
+Table 7: Number of parameters and inference time for IDNet with and without the extended features. Inference time is the mean ± standard deviation over the 1773 frames of the EVIMO2v2 evaluation split at full 640 × 480 resolution. Feature type # parameters inference (ms/frame) Baseline 1.427 M 30 .43 ± 0.56 
+
+w/ Eig. + Density 1.430 M 32 .58 ± 0.39 
+
+Table 8: Memory usage and computational complexity (MACs/event) for computing the density value and Harris eigenvalues features. Feature type Memory Computational complexity (MACs/event) w/ Density value O(HW ) O(w2
+
+> d
+
+)
+
+w/ Eig. + Density O(HW ) O(w2 
+
+> d
+
+ksize 2)Event Features for Motion Cues 23 
+
+Table 9: Performance metrics for K = 5 using the order-invariant MLP. Comparing Baseline, Density value, Harris Eigenvalues, and Eig. + Density across hidden dimen-sions 64 and 128. Best values in bold .Feature Type hidden dim = 64 hidden dim = 128 L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE Baseline 2.600 ± 0.003 9.010 ± 0.010 4.004 ± 0.004 110 .1± 0.3 2.574 ± 0.001 8.920 ± 0.010 3.963 ± 0.002 108 .8± 0.2
+
+Density value 1.890 ± 0.022 5.600 ± 0.100 2.963 ± 0.030 64 .2± 1.2 1.701 ± 0.012 4.820 ± 0.060 2.670 ± 0.018 55 .6± 0.6
+
+Harris Eigenvalues 1.642 ± 0.011 4.250 ± 0.040 2.566 ± 0.015 47 .6± 0.6 1.459 ± 0.009 3.500 ± 0.040 2.286 ± 0.014 40 .8± 0.2
+
+Eig. + Density 1.324 ± 0.018 2.980 ± 0.060 2.076 ± 0.026 39 .1± 0.7 1.136 ± 0.010 2.310 ± 0.030 1.784 ± 0.014 32 .0± 0.3
+
+Table 10: Performance metrics for K = 10 using the order-invariant MLP. Comparing Baseline, Density value, Harris Eigenvalues, and Eig. + Density across hidden dimen-sions 64 and 128. Best values in bold .Feature Type hidden dim = 64 hidden dim = 128 L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE Baseline 2.322 ± 0.009 7.740 ± 0.040 3.605 ± 0.013 83 .9± 0.5 2.262 ± 0.006 7.470 ± 0.020 3.509 ± 0.009 79 .7± 0.3
+
+Density value 1.588 ± 0.011 4.110 ± 0.040 2.499 ± 0.016 50 .6± 0.7 1.343 ± 0.013 3.110 ± 0.050 2.105 ± 0.021 40 .1± 0.6
+
+Harris Eigenvalues 1.329 ± 0.010 2.920 ± 0.040 2.088 ± 0.015 35 .5± 0.3 1.166 ± 0.006 2.320 ± 0.020 1.833 ± 0.010 30 .3± 0.3
+
+Eig. + Density 1.092 ± 0.027 2.060 ± 0.080 1.716 ± 0.042 29 .2± 0.8 0.905 ± 0.012 1.480 ± 0.030 1.418 ± 0.019 23 .1± 0.4
+
+Table 11: Performance metrics for K = 50 using the order-invariant MLP. Comparing Baseline, Density value, Harris Eigenvalues, and Eig. + Density across hidden dimen-sions 64 and 128. Best values in bold .Feature Type hidden dim = 64 hidden dim = 128 L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE Baseline 1.374 ± 0.013 3.230 ± 0.050 2.159 ± 0.019 38 .6± 0.8 1.258 ± 0.016 2.800 ± 0.060 1.978 ± 0.024 34 .0± 0.6
+
+Density value 0.936 ± 0.020 1.620 ± 0.070 1.473 ± 0.031 24 .6± 0.9 0.737 ± 0.015 1.040 ± 0.030 1.155 ± 0.021 18 .0± 0.6
+
+Harris Eigenvalues 0.881 ± 0.015 1.460 ± 0.040 1.389 ± 0.025 23 .2± 0.4 0.721 ± 0.005 1.020 ± 0.020 1.134 ± 0.009 18 .5± 0.3
+
+Eig. + Density 0.700 ± 0.024 0.920 ± 0.050 1.098 ± 0.038 17 .7± 0.6 0.560 ± 0.007 0.620 ± 0.020 0.872 ± 0.011 13 .9± 0.4
+
+Table 12: Performance under textured conditions. Comparing Baseline and Eig. + Density features on two DTD texture patterns using the order-invariant MLP (hidden dim 128, K = 50 ). Best values in bold .Feature Type Flecked 0103 Spiralled 0137 L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE Baseline 2.408 ± 0.006 7.990 ± 0.030 3.796 ± 0.009 95 .8± 0.4 2.150 ± 0.009 6.440 ± 0.050 3.358 ± 0.013 87 .6± 0.7
+
+Eig. + Density 2.096 ± 0.016 6.680 ± 0.100 3.314 ± 0.027 75 .2± 0.9 1.521 ± 0.020 4.110 ± 0.080 2.423 ± 0.029 54 .5± 0.9
+
+Table 13: Performance under shot noise events. Comparing Baseline and Eig. + Den-sity features at 5 Hz and 50 Hz noise frequencies using the order-invariant MLP (hidden dim 128, K = 50 ). Best values in bold .Feature Type 5 Hz 50 Hz L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE L1 (×10 −1) MSE (×10 −2) EPE (×10 −1) AE Baseline 1.452 ± 0.015 3.610 ± 0.080 2.275 ± 0.023 42 .6± 0.5 2.031 ± 0.009 6.050 ± 0.050 3.149 ± 0.014 67 .1± 0.5
+
+Eig. + Density 0.761 ± 0.009 1.040 ± 0.020 1.189 ± 0.013 17 .8± 0.3 1.069 ± 0.017 1.960 ± 0.050 1.674 ± 0.026 25 .9± 0.524 H. Araghi et al. 
+
+Original Texture Intensity Frame at t=203 ms Events at t=200 –205 ms 
+
+crosshatched 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+flecked 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+spiralled 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+Fig. 9: Toy dataset with different foreground textures from DTD [2] (part 1 of 2). Left :original texture image applied to the star shape. Middle : rendered intensity frame. 
+
+Right : generated event polarity scatter (blue = positive, red = negative). Event Features for Motion Cues 25 
+
+Original Texture Intensity Frame at t=203 ms Events at t=200 –205 ms 
+
+stratified 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+waffled 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+woven 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220 
+
+> y [pixels]
+
+140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+Fig. 10: Toy dataset with different foreground textures from DTD [2] (part 2 of 2). 
+
+Left : original texture image applied to the star shape. Middle : rendered intensity frame. Right : generated event polarity scatter (blue = positive, red = negative). 26 H. Araghi et al. 0 100 200 300 400 500 
+
+Epoch 
+
+> 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10
+> Test Set MSE Loss
+> Forground Texture Image Name
+> stratified-0106 flecked-0103 waffled-0063 crosshatched-0066 woven-0053 spiralled-0137
+
+(a) Baseline 0 100 200 300 400 500 
+
+Epoch  
+
+> 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.10
+> Test Set MSE Loss
+> Forground Texture Image Name
+> stratified-0106 flecked-0103 waffled-0063 crosshatched-0066 woven-0053 spiralled-0137
+
+(b) With Eigenvalues + Density Values 
+
+Fig. 11: Effect of adding various textures to the moving foreground object. With tex-ture, the combined feature model still learns to estimate optical flow, while the baseline breaks down as the dataset complexity increases. 0 100 200 300 400 
+
+Validation Step 
+
+> 345678
+> L2 Error
+> Foreground Texture
+> flecked-0103 honeycombed-0139 spiralled-0137 stratified-0106 woven-0053
+
+(a) Baseline 0 100 200 300 400 
+
+Validation Step  
+
+> 345678
+> L2 Error
+> Foreground Texture
+> flecked-0103 honeycombed-0139 spiralled-0137 stratified-0106 woven-0053
+
+(b) with Harris Eigenvalues + Density value 
+
+Fig. 12: Effect of adding texture to the moving foreground object using Tiny IDNet 
+
+(rnn_input_dim =4, hidden_dim =4). Compared to the baseline, extending with Harris Eigenvalues and Density value achieves lower MSE error at test time. 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220   
+
+> y [pixels]
+> Event points −
+> Event points +
+
+(a) 5 Hz 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220    
+
+> y [pixels]
+> Event points −
+> Event points +
+
+(b) 20 Hz 140 160 180 200 220 
+
+x [pixels] 
+
+120 140 160 180 200 220    
+
+> y [pixels]
+> Event points −
+> Event points +
+
+(c) 50 Hz 
+
+Fig. 13: Toy dataset with different levels of shot noise generated by V2E [3]. Each subfigure shows the generated event polarity scatter at a different noise frequency. Higher shot-noise frequency produces more spurious events and visibly stronger noise contamination. Event Features for Motion Cues 27 0 100 200 300 400 500 
+
+Epoch 
+
+> 0.02 0.04 0.06 0.08 0.10
+> Test Set MSE Loss
+> 0 Hz (Baseline) 5 Hz (Baseline) 20 Hz (Baseline) 50 Hz (Baseline) 0 Hz (w/ Eig+Density) 5 Hz (w/ Eig+Density) 20 Hz (w/ Eig+Density) 50 Hz (w/ Eig+Density)
+
+Fig. 14: Shot noise robustness across different noise frequencies (higher frequency means noisier events). The combined feature model (dotted) remains robust and con-sistently outperforms the baseline (solid). 28 H. Araghi et al. 
+
+References 
+
+1. Burner, L., Mitrokhin, A., Fermüller, C., Aloimonos, Y.: EVIMO2: An Event Cam-era Dataset for Motion Segmentation, Optical Flow, Structure from Motion, and Visual Inertial Odometry in Indoor Scenes with Monocular or Stereo Algorithms (May 2022). https://doi.org/10.48550/arXiv.2205.03467 , http://arxiv.org/ abs/2205.03467 , arXiv:2205.03467 [cs] 2. Cimpoi, M., Maji, S., Kokkinos, I., Mohamed, S., , Vedaldi, A.: Describing textures in the wild. In: Proceedings of the IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) (2014) 3. Hu, Y., Liu, S.C., Delbruck, T.: v2e: From video frames to realistic DVS events. In: 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition Work-shops (CVPRW). IEEE (2021), http://arxiv.org/abs/2006.07722 
+
+4. Wu, Y., Paredes-Vallés, F., Croon, G.C.H.E.d.: Lightweight Event-based Optical Flow Estimation via Iterative Deblurring. In: 2024 IEEE International Conference on Robotics and Automation (ICRA). pp. 14708–14715 (May 2024). https://doi. org/10.1109/ICRA57147.2024.10610353 , http://arxiv.org/abs/2211.13726 ,arXiv:2211.13726 [cs]
