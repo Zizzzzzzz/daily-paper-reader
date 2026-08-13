@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-12</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-13</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 19 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 14 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>12</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-12 20:02:47 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-13 21:07:32 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,8 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读12篇、速读7篇，共扫描19篇论文，聚焦高效压缩与自适应执行优化。最值得关注的是《AnchorKV》与《OmniPack》双9.0分，前者突破KV Cache压缩瓶颈，后者统一多模态Token压缩，均直指推理效率痛点。建议普通读者优先精读这两篇，重点关注其压缩率与计算开销的平衡设计，可为大模型部署降本提供直接参考。</p>
+<p>今日共读14篇论文，精读7篇、速读7篇，覆盖事件流视频插帧、多模态音视频剪枝及推理自校正等前沿方向。</p>
+<p>最值得关注两篇10分/9分精读：事件引导的视频插帧（Bridging Event Streams and DiT）与延迟音频剪枝（Deferred Audio Pruning），前者</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +72,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">12 篇</strong>
+    <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="AnchorKV: Anchor-Residual KV Cache Compression">AnchorKV: Anchor-Residual KV Cache Compression</span></li><li><span class="dpr-home-dashboard-paper-title" title="OmniPack: Unified Token Compression for Efficient Omni-modal Large Language Models">OmniPack: Unified Token Compression for Efficient Omni-modal Large Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles">Not All Redundant Tokens Are Alike: Analyzing Visual Token Pruning through Token Roles</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation">Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Deferred Audio Pruning with Local Audio-Visual Dynamics for Omni-LLMs">Deferred Audio Pruning with Local Audio-Visual Dynamics for Omni-LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="DistillCache: KL-Guided Adaptive KV-Cache Eviction for Memory-Efficient LLM Inference">DistillCache: KL-Guided Adaptive KV-Cache Eviction for Memory-Efficient LLM Inference</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>10</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -87,9 +88,9 @@
     <strong class="dpr-home-dashboard-count">7 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Continue or Replan? Bernoulli-Continuation Policy Learning for Adaptive Horizon Execution">Continue or Replan? Bernoulli-Continuation Policy Learning for Adaptive Horizon Execution</span></li><li><span class="dpr-home-dashboard-paper-title" title="When and Where to Look: Adaptive Visual Evidence Scheduling for Efficient Long Video Understanding">When and Where to Look: Adaptive Visual Evidence Scheduling for Efficient Long Video Understanding</span></li><li><span class="dpr-home-dashboard-paper-title" title="TEMPO: Semantic-Action Decoupled RL Post-Training for Vision-Language-Action Models">TEMPO: Semantic-Action Decoupled RL Post-Training for Vision-Language-Action Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning">StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning</span></li><li><span class="dpr-home-dashboard-paper-title" title="Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents">Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents</span></li><li><span class="dpr-home-dashboard-paper-title" title="CoDAT: Collaborative Dual-Attention Transformer with Low-Cost Temporal Modeling for Efficient Edge Action Recognition">CoDAT: Collaborative Dual-Attention Transformer with Low-Cost Temporal Modeling for Efficient Edge Action Recognition</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 
