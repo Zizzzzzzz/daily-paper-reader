@@ -1,0 +1,554 @@
+Title: Tevatron-Elastic: A Unified Abstraction for Training Elastic Retrievers and Rerankers
+
+URL Source: https://arxiv.org/pdf/2608.08809v1
+
+Published Time: Tue, 11 Aug 2026 01:28:44 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Tevatron-Elastic: A Unified Abstraction for Training Elastic Retrievers and Rerankers 
+
+Yu Wang 1 Shengyao Zhuang 2 Xueguang Ma 3 Zongyu Wu 4 Jimmy Lin 3 Vivek Srikumar 1
+
+Zhichao Xu 11University of Utah, 2The University of Queensland, 3University of Waterloo, 4Pennsylvania State University 
+
+yuki.wang@utah.edu svivek@cs.utah.edu zhichao.xu@utah.edu 
+
+# Abstract 
+
+A single model scale challenges the flexibility of a production retrieval system: some settings need it faster, others need a smaller index, and the right trade-off changes with the workload. In the context of information retrieval (IR), a transformer-based model can be made smaller in three ways—using fewer layers, passing fewer tokens through the upper layers, or producing a shorter embedding—and each way saves a different compute resource. These options have been studied one at a time, each as its own method with its own code and training setup, which makes them hard to combine or adapt to a new model. We present Tevatron-Elastic to bring all three under one simple abstraction: a single object names any size the model can run at, and a short schedule lists the sizes to train. Training then produces one checkpoint that serves all of those sizes, and at deployment the user picks any of them. The same abstraction covers both retrievers and rerankers and both encoder and decoder models, as it works through interfaces that Hugging Face transformers already expose; a new backbone is a configuration change, not new modeling code. Prior methods—Matryoshka embeddings (Kusupati et al., 2022), early exit (Liu et al., 2020; Xin et al., 2020), 2D Matryoshka (e.g., Starbucks, Zhuang et al., 2026a), and layerwise token compression (LTC, Zhuang et al., 2026b)—become special cases of our unified abstraction. The same interface also enables Matryoshka LTC (MLTC), which jointly trains several token-compression ratios in one retriever checkpoint. To validate our framework, we train 20 checkpoints across three backbones and two tasks: the quality curves are smooth, one checkpoint costs little over a model trained for a single size, and a controlled study confirms the wallclock speedups. We release the framework and all checkpoints as a resource for building elastic retrieval systems. 
+
+Code Tevatron Elastic 
+
+Models Tevatron Elastic Collection 
+
+# 1 Introduction 
+
+A transformer-based information retrieval (IR) model (Lin et al., 2022; Xu et al., 2026b) has three largely separable axes that control its cost at inference time: • depth — how many transformer layers are executed before a readout. Fewer layers means less encoder/scorer compute and lower latency (Devlin et al., 2019; Liu et al., 2020; Xin et al., 2020; Warner et al., 2024). • token — how many sequence positions flow through the upper layers. Pooling the sequence partway up the stack reduces the floating-point operations (FLOPs) of those upper layers (Goyal et al., 2020; Zhang et al., 2025). • width — the dimensionality of the output embedding. A smaller embedding reduces the size of the stored index and the cost of nearest-neighbor search (Johnson et al., 2017; Kusupati et al., 2022). 1arXiv:2608.08809v1 [cs.CL] 9 Aug 2026 A useful mental model to group these axes is by the deployment cost each one reduces: depth and token reduce compute , while width reduces storage and search . Depth and token act at compute time and leave the index unchanged; width acts at storage time and leaves the per-input compute unchanged. Prior work on elastic modeling tends to commit to a single axis. Matryoshka representation learning (MRL) varies width (Kusupati et al., 2022); layer-dropping and early-exit methods vary depth (Liu et al., 2020; Xin et al., 2020; Elhoushi et al., 2024); Zhang et al. (2025) and Zhuang et al. (2026b) compress the retriever and reranker on the token axis; and 2D Matryoshka retrievers such as 2DMSE and Starbucks vary depth and width together (Li et al., 2024; Zhuang et al., 2026a). Each of the aforementioned methods is effective in its own setting, but each comes as a separate implementation with its own model class definition and training objective, so combining them, or adapting one to a new task or backbone, requires re-implementation. We posit that these compression axes are complementary rather than competing: because they reduce different costs, they can be applied independently and composed. Existing work, however, provides no single abstraction to unify the definitions of different compressed model classes, as well as the corresponding training and inference. Seeing this gap, we present Tevatron-Elastic to provide a unified abstraction of these axes based on 
+
+Tevatron (Ma et al., 2025; Xu et al., 2026a). We first abstract the action of compressing a model as an 
+
+operating point , e.g., early exit at a certain layer means defining the early exit operating point for that layer. Based on this definition, Tevatron-Elastic introduces two core components. A frozen dataclass, 
+
+Granularity , names any operating point with one optional field per axis; and a GranularitySchedule lists the operating points to train the underlying elastic model. Specifically, the training loop sums a per-granularity loss over the schedule from a single backbone forward pass, producing one checkpoint that serves every listed operating point. Instead of editing the model internals: the abstraction routes through the hidden-states tuple, the layer module list, and the pooling step that every Hugging Face transformer exposes, so a new backbone is a launch flag rather than new code. Our core contribution is the unified abstraction that accommodates different types of compression strategies: 1. one unified abstraction spans two tasks (retrieval, reranking), three axes, and five backbone families (BERT, ModernBERT, Qwen3, Llama3, Mistral) with no new model code per backbone (Section 3); 2. it reproduces prior elastic methods: MRL, early exit, 2D Matryoshka, Starbucks, and LTC as configurations (Section 4); 3. the operating points trained jointly behave as expected — the quality curves from our empirical studies are smooth and the cost of joint training relative to a dedicated single-point model is small (Section 4). Further, controlled study shows the measured inference speedup follows the analytic cost model (Section 4.3). 4. it introduces Matryoshka Layerwise Token Compression (MLTC), which jointly trains several token-compression ratios in one checkpoint as an extension of LTC (Zhuang et al., 2026b) and Zhang et al. (2025). MLTC uses the framework’s existing schedule and token readout path; supporting several mid-stack pooling points would otherwise require modifying the model class. We note that Tevatron-Elastic does not improve on prior methods in absolute quality, nor that combining all three axes is preferable to using one. In our empirical experiments, we hold the training recipe fixed (supervised fine-tuning from base checkpoints, without the pre-training some prior systems use (Gao and Callan, 2022; Zhuang et al., 2026a; Xu et al., 2026f)), so that we can study the trained elastic checkpoints in isolation. We plan to release our framework and checkpoints to help researchers reproduce existing elastic model recipes and develop new ones. 
+
+# 2 Related Works and Background 
+
+We first review work on IR model compression along the three compression axes (Section 2.1), then define the notation used in the rest of the paper (Section 2.2). 22.1 Prior methods 
+
+We focus on work that makes a retrieval or ranking model elastic — adjustable in cost after training — and group it by the axis it compresses.  
+
+> Width.
+
+Matryoshka representation learning trains an embedding whose leading coordinates remain usable on their own, so one model serves several vector sizes and, in retrieval, several index sizes (Kusupati et al., 2022). The truncation is at the output, so width changes storage and nearest-neighbor search cost (Johnson et al., 2017) but not the per-input compute.  
+
+> Depth.
+
+Early-exit and layer-dropping methods read out the representations at an intermediate layer to trade quality for fewer layers of compute, either with a fixed exit or an input-adaptive one (Liu et al., 2020; Xin et al., 2020; Elhoushi et al., 2024). In IR this yields a shallower encoder (retriever) or scorer (reranker).  
+
+> Token.
+
+Sequence-compression methods shorten the token sequence inside the stack so the upper layers process fewer positions (Goyal et al., 2020). Prior works Jasper-Token-Compression-600M (Zhang et al., 2025) and Layer-wise token compression (LTC, Zhuang et al., 2026b) pool the sequence of tokens at a chosen layer and run the remaining layers on the shortened sequence for retrieval and reranking, respectively.  
+
+> Composition.
+
+A few methods combine axes. 2D Matryoshka embeddings vary depth and width together (Li et al., 2024), and Starbucks trains a retriever elastic on both, so one checkpoint serves a grid of (layer, dim) points (Zhuang et al., 2026a). These are the closest prior systems to ours; each, however, fixes one particular pair of axes and one task.  
+
+> Our position.
+
+In existing works, each axis (or fixed pair) is realized as a separate method with its own model class definition and implementation as well as training strategy, and almost always on a single task. We do not introduce a new pooling operation; instead, we provide one abstraction in which depth, token, and width are named uniformly, the set of operating points to train is written as data, and the methods above — MRL, early exit, LTC, and 2D Matryoshka — appear as configurations for both retrieval and reranking. The per-operating-point objective is itself pluggable and can be a standard contrastive loss, a learning-to-rank loss (Cao et al., 2007; Xia et al., 2008; Oord et al., 2018), or distillation (Hinton et al., 2015; Xu et al., 2025b) (Section 3). MLTC is one new configuration enabled by this interface: it applies the same token-pooling path to several ratios in a single retriever checkpoint. 
+
+## 2.2 Notations 
+
+We set up notation shared by the three axes, which Section 3 then unifies. A transformer with L layers maps an input of T tokens to a sequence of hidden states; write H(ℓ) ∈ RT ×D for the output of layer ℓ, with D the hidden size. A dense encoder pools the top layer to a vector z = pool (H(L)) ∈ RD (CLS, mean, or last token); a cross-encoder maps H(L) to a scalar relevance score. An operating point chooses how this readout is taken, and each compression axis is one such choice.  
+
+> Width (MRL)
+
+Width keeps the first d ≤ D coordinates of the pooled vector, z1∶d, and scores with the truncated embedding. Training over a set of widths D = {d1, . . . , d k} sums the loss over the nested prefixes (Kusupati et al., 2022): 
+
+LMRL = ∑
+
+> d∈D
+
+L(z1∶d). (1) The forward pass is unchanged; only the output dimension varies, so width affects index size and search cost, not per-input compute.  
+
+> Depth (early exit)
+
+Depth reads out at an intermediate layer ℓ ≤ L instead of the top, using pool (H(ℓ)) (or the scalar head applied at layer ℓ). Training over a set of exit layers E = {ℓ1, . . . , ℓ k} gives 
+
+Ldepth = ∑
+
+> ℓ∈E
+
+L( pool (H(ℓ))) . (2) 3At inference, exiting at ℓ runs only the first ℓ layers, so the compute scales roughly as ℓ/L.
+
+Token (LTC) Token compression pools the sequence at a chosen layer p, reducing its length from T
+
+to m = ⌈rT ⌉ for a keep-ratio r ∈ (0, 1], then runs the remaining layers p+1, . . . , L on the shortened sequence (Zhuang et al., 2026b). Writing pool seq for the sequence pooling and fp∶L for the upper-layer stack, 
+
+˜H(p) = pool seq (H(p), r ), z = pool (fp∶L( ˜H(p))) , (3) The layers below p still run on the full sequence, so the compute saving applies only to the upper layers and is largest for long inputs. Although the three choices intervene at different components of transformer computations, they all read from or transform the same hidden-state sequence. This shared structure suggests a common interface: can we name and train these choices in a single framework, while retaining the deployment trade-offs each one offers? 
+
+# 3 Framework Design 
+
+To turn this shared structure into a framework, we first clarify the concept of residual stream and the readout. We then describe the requirements for a unified elastic framework. 
+
+Preliminary: residual stream and readout. A backbone processes an input and returns a sequence of hidden representations as output. This sequence is referred to as residual stream in literature (Elhage et al., 2021). When we set output_hidden_states=True , the standard Hugging Face interface returns it as a tuple 
+
+(H(0), H (1), . . . , H (L)), where H(0) is the embedding output and H(ℓ) ∈ RT ×D is the output after layer ℓ. A 
+
+readout is the method we use to turn this residual stream into the model output at the operating point: choose a layer, optionally shorten its token sequence, then pool it to a retrieval vector or map it to a relevance score. For a retriever, the readout can also keep only part of the vector. Depth chooses which layer to read; token compression changes the sequence length T ; and width truncates the feature dimension D.       
+
+> out = backbone(**inputs, output_hidden_states=True) H = out.hidden_states # tuple: (H0, H1, ..., HL), each [T, D] -- the residual stream
+> h = H[layer] # depth: read out at an intermediate layer [T, D]
+> z = pool(h, attention_mask) # -> [D] (cls / mean / eos)
+> z = z[:dim] # width: keep the first ‘dim‘ channels (MRL)
+
+Token compression is the one case that changes the stream between layers: it pools H(p) along T and runs the upper layers on the shorter sequence. The remaining operations are simple choices in the readout above. This view is the bridge between the three axes. 
+
+Desiderata. Starting from this common readout, a unified framework should meet four practical requirements: 1. Name every operating point in one convention, whether it changes depth, token count, or embedding width. 2. Let users combine operating points without new modeling code, and select the points to train in a small configuration rather than in a new training loop. 3. Work with the transformer interfaces models already expose, so changing a backbone does not mean rewriting the elastic model. 4. Train and serve many operating points efficiently, so one checkpoint is useful in practice rather than merely expressive on paper. The rest of this section answers these four goals in turn. 
+
+One description for every operating point. Every operating point can be represented as a single frozen dataclass with one optional field per axis: 4Table 1 The schedule grammar. One line of configuration selects an axis or a composition, and reproduces a prior method as a special case. what to train spec / preset reproduces depth-only (early exit) "2,4,6,8,10,12" / pure_depth early exit width-only (MRL) pure_mrl(12,(32,...,768)) MRL depth × width starbucks_bert / diagonal(...) Starbucks token-only (reranker) "20@0.6" LTC token-only (retriever) "28@1.0/20,...,28@0.4/20" MLTC (this work) width + token "28:256@0.6/20" — (composition) full three-axis "24:256@0.6/20" left open (Section 4)     
+
+> @dataclass(frozen=True) class Granularity: layer: int # depth: readout / exit layer (universal)
+> dim: int | None = None # width: keep first ‘dim‘ channels (MRL truncation)
+> keep_ratio: float | None = None # token: fraction of positions kept (LTC pooling)
+> pool_layer: int | None = None # token: pooling layer p (pool at p, exit at ‘layer‘)
+
+A Granularity prints as a compact, collision-free key ( L12 , L6xD128 , L20xR0.8 , L28xR0.6xP20 ) that doubles as the operating point’s name in logs and on disk. Fields are independent: setting only layer gives depth, adding dim gives width, and adding keep_ratio with pool_layer gives token compression. 
+
+A schedule instead of custom training code. The set of operating points to train is a list, written as a short spec string or JSON:  
+
+> schedule = GranularitySchedule.from_spec("2:32,6:128,12:768") # or JSON
+
+Table 1 maps spec strings to the prior methods they reproduce. The same grammar expresses single axes and their compositions; the user can choose the operating points by editing the string without changing code. 
+
+How readout operates on the standard Hugging Face interface. Because the readout only uses the hidden-states tuple, the layer module list, and a pooling step — all standard across Hugging Face transformers — we can use one function to realize all three axes for any backbone, parameterized by a Granularity g :    
+
+> def _readout(self, hidden_states, attention_mask, g): if g.pool_layer is not None: # token axis (compress mid-stack)
+> h_p = hidden_states[g.pool_layer] pooled_h, mask = pool_sequence(h_p, attention_mask, g.keep_ratio) h = self._range_runner(self.encoder, pooled_h, mask, g.pool_layer, end=g.layer) else: # depth (read out at g.layer)
+> h, mask = hidden_states[g.layer], attention_mask reps = self._pooling(h, mask) # cls / mean / eos
+> if g.dim is not None: # width axis (MRL truncation)
+> reps = reps[:, :g.dim] return F.normalize(reps) if self.normalize else reps
+
+The only backbone-specific code is the token path’s upper-layer runner, which rebuilds the attention mask (and, for decoders, the rotary position embeddings) for the shortened sequence; it is registered per model family:  
+
+> @register_upper_runner("qwen3", "qwen2", "mistral", "llama") def _decoder_upper(backbone, hidden, mask, l_star, end=None): ... # end=None => run to top
+
+Matryoshka Layerwise Token Compression (MLTC). With the proposed framework, we further extends LTC to the Matryoshka setting, where we train multiple compression ratios in one training run. We name this approach as MLTC and showcases its effectiveness in the retriever setting. Specifically, instead of using a single keep ratio r as LTC in Section 2.2, we use multiple keep ratios packed in the GranularitySchedule ,and the final loss is a sum over individual losses, similar to the MRL retriever setting. 5Table 2 Adding a backbone is a launch flag, not new model code. The pooling column is the only per-backbone choice for the depth and width axes. backbone family pooling new model code BERT-base (Devlin et al., 2019) encoder cls —ModernBERT-base (Warner et al., 2024) encoder cls —Qwen3-0.6B (Yang et al., 2025) decoder (GQA) eos —Llama3-{1B,3B,8B} (Grattafiori et al., 2024) decoder (GQA) eos — (full path verified) Mistral-7B-v0.3 (Jiang et al., 2023) decoder (GQA) eos — (full path verified) 
+
+MLTC requires no additional model path as all keep ratios use same token readout. Without the framework’s token runner and schedule interface, supporting these mid-stack pooling points would require modifying the Hugging Face model class. We verified that no new model code is required to train across BERT (Devlin et al., 2019), ModernBERT (Warner et al., 2024), Qwen3 (Yang et al., 2025), Llama3 (Grattafiori et al., 2024), and Mistral-7B (Jiang et al., 2023) (Table 2). 
+
+Joint training. We run the backbone model for a single forward pass per batch; every operating point in the schedule is then a cheap readout off that shared forward pass, and the training loss is the sum of the per-granularity losses:   
+
+> out_q = model(**query, output_hidden_states=True) # one shared forward pass per tower
+> out_p = model(**passage, output_hidden_states=True) loss = sum(gran_loss(out_q, out_p, g) for g in schedule.points) # sum over operating points
+
+The per-granularity loss gran_loss is a pluggable function of the readouts, not part of the training framework: the schedule decides which operating points to train, while gran_loss decides how each is supervised. In our experiments it is the task’s standard objective. For the retriever it is in-batch InfoNCE (Oord et al., 2018) over the query and passage readouts, which is softmax cross-entropy over each query’s candidate list together with in-batch negatives (Xiong et al., 2021; Qu et al., 2021) — equivalently, the ListNet objective (Cao et al., 2007) with a single relevant item:        
+
+> def gran_loss(out_q, out_p, g): # InfoNCE == ListNet (top-1) at granularity g
+> q = self._readout(out_q.hidden_states, q_mask, g) # [B, d] readout = depth/width/token
+> p = self._readout(out_p.hidden_states, p_mask, g) # [B*n, d] (1 positive + n-1 negatives)
+> scores = (q @ p.T) / self.temperature # [B, B*n] cosine logits per candidate list
+> target = torch.arange(B, device=q.device) * n # positive on the block diagonal
+> return F.cross_entropy(scores, target) # softmax CE = ListNet with one relevant
+
+Because gran_loss only sees the readouts for an operating point, substituting a different objective is a local change to this one function. Staying within learning-to-rank literature, we use ListMLE (Xia et al., 2008) as an example, which replaces the ListNet term with the Plackett–Luce likelihood of the target ordering:   
+
+> def gran_loss(out_q, out_p, g): # ListMLE (permutation likelihood)
+> q = self._readout(out_q.hidden_states, q_mask, g) p = self._readout(out_p.hidden_states, p_mask, g) scores = (q @ p.T) / self.temperature return listmle(scores, target_order) # log P(order) under Plackett-Luce
+
+Distillation instead supervises each operating point with a teacher model (Hinton et al., 2015; Xu et al., 2025b), where score_with_teacher returns the teacher’s query–passage scores for the batch (Xu et al., 2025b):   
+
+> def gran_loss(out_q, out_p, g): # distillation from a teacher model
+> q = self._readout(out_q.hidden_states, q_mask, g) p = self._readout(out_p.hidden_states, p_mask, g) student = (q @ p.T) / self.temperature teacher = score_with_teacher(query, passage) # a teacher model’s scores, precomputed or computed on-the-fly from an inference worker
+> return F.kl_div(student.log_softmax(-1), teacher.softmax(-1), reduction="batchmean")
+
+The reranker follows the same pattern with grouped cross-entropy over each query’s candidate list (the positive at index 0). In every case the schedule and the readout are unchanged; substituting ListNet with ListMLE or a distillation loss is a matter of plugging in a different gran_loss .65 10 15 20 25          
+
+> exit layer
+> 0.25 0.30 0.35 0.40 0.45 0.50
+> BEIR-15 nDCG@10
+> (a) depth
+> BERT ModernBERT Qwen3-0.6B
+> 2526272829210
+> embedding dim
+> 0.25 0.30 0.35 0.40 0.45 0.50
+> (b) width (MRL)
+> BERT ModernBERT Qwen3-0.6B
+> 510 15 20 25
+> exit layer (dim grows jointly)
+> 0.2 0.3 0.4 0.5
+> (c) depth × width
+> BERT ModernBERT Qwen3-0.6B
+
+Figure 1 Retriever quality (BEIR-15 nDCG@10) along each axis, three backbones. Dashed lines mark each backbone’s plain full point. (a) depth at full width; (b) width (MRL) at full depth, log dimension axis; (c) depth ×width (Starbucks), where layer and dimension grow jointly. Every curve is smooth and monotonic, and the elastic full points sit close to the plain reference. 
+
+Checkpoint serving. We load the full checkpoint and prune in place to a chosen operating point. Depth pruning physically removes the upper layers, so the saved compute is incurred once per input; width and token are applied at readout time:   
+
+> model = ElasticDenseModel.load(ckpt) # or ElasticReranker.load(ckpt)
+> model.prune_to(Granularity(16)) # one checkpoint -> any operating point
+
+We store one checkpoint rather than a separate checkpoint per operating point. 
+
+A cost model for the three axes. We can use a simple function to map a Granularity to its relative cost: encode/score FLOPs = L/Lmax for a depth point at layer L, and (p + (Lmax − p) r)/ Lmax for a token point that pools at layer p with keep-ratio r; relative index size = d/dmax for width d. Section 4.3 checks the measured wall clock speedup and index size reduction. 
+
+# 4 Experiments 
+
+This section presents the experimental setup and results, examining whether the proposed framework meets the desiderata above. 
+
+## 4.1 Experimental setup 
+
+Backbones. We experiment with three backbone models BERT-base (Devlin et al., 2019) (110M, encoder, CLS pooling), ModernBERT-base (Warner et al., 2024) (150M, encoder, CLS pooling, alternating global/local attention), and Qwen3-0.6B (Yang et al., 2025) (decoder, GQA, last-token pooling) on the full set of axes. Llama3 family models (Grattafiori et al., 2024) and Mistral-7B (Jiang et al., 2023) are used only to verify the backbone-agnostic path end to end. 
+
+Data and evaluation. All models are trained on RLHN-680K (Thakur et al., 2025) with query: and 
+
+passage: prefixes, at input length 512, albeit the different tokenizers. We evaluate on BEIR-15 (Thakur et al., 2021) as a single macro average (cqadupstack collapsed to the mean of its 12 subforums and counted once; MS MARCO dev included as one member), reporting nDCG@10 and Recall@100. Retrieval reports absolute nDCG@10; reranking reports nDCG@10 after reranking BM25 top-100, so the BM25 first stage (0.415) is the reference. The per-backbone plain (non-elastic, single full point) model is the baseline against which we read each compression curve. We refer the complete per-granularity numbers for Qwen3-0.6B checkpoints to Section A, and skip BERT and ModernBERT for the sake of space. 
+
+What the experiments assess. The experiments assess the desiderata discussed in Section 3. The backbone coverage exercises the common interface across encoder and decoder families. The quality curves test whether 70.4 0.5 0.6 0.7 0.8 0.9 1.0 
+
+> keep-ratio (pool@20)
+> 0.50 0.51 0.52 0.53 0.54 0.55
+> BEIR-15 nDCG@10
+> Token axis, both tasks (Qwen3-0.6B)
+> retriever (M-LTC) reranker (LTC)
+
+(a) Token axis on both tasks (Qwen3-0.6B): the retriever (MLTC) and reranker (LTC) curves have similar gentle shapes under the same pooling primitive. 5 10 15 20 25  
+
+> exit layer
+> 0.1 0.2 0.3 0.4 0.5
+> BEIR-15 nDCG@10
+> Reranker depth (cli ff -then-plateau)
+> BERT ModernBERT Qwen3-0.6B BM25 fi rst stage
+
+(b) Reranker depth, three backbones. A floor at the shallow end then a long plateau, distinct from the gradual retriever depth curve in Figure 1a. 
+
+Figure 2 Comparison of token-axis behavior and reranker depth. 
+
+a common operating-point description and schedule can express the expected depth, width, token, and composed trade-offs. The experiments also measure the cost of joint training at the full point (the elasticity tax : elastic full-point minus the dedicated plain full-point), and separately measure the deployment costs that each axis is intended to change. We focus less on absolute performance numbers and instead on diagnosing the framework. 
+
+## 4.2 Results and analysis 
+
+We first evaluate the single-axis operating points and then their compositions. These configurations correspond to prior elastic methods where applicable. Figures 1, 2a and 2b show the quality curves (BEIR-15 nDCG@10). 
+
+Depth. For the retriever, performance improves smoothly with the number of layers on all three backbones (Figure 1a; Qwen3 goes from 0.431 at layer 6 to 0.518 at layer 28, full width). The reranker has a different curve (Figure 2b): quality is very low when only a few layers run, then rises and levels off at about half the layers (Qwen3 reaches 0.555 by layer 16, matching layer 28; BERT levels off at layer 10, ModernBERT at layer 16). The retriever, which reads out a pooled vector, degrades gradually; the reranker, which reads out a single score, has a low-quality region at shallow depth and a plateau at greater depth. ModernBERT shows a step around layer 13 on both tasks, at the transition in its alternating global/local attention layout. 
+
+Width (MRL) The pure-width curve is smooth and monotonic on all three backbones (Figure 1b; e.g. Qwen3 0.365 → 0.505 from dim 64 to 1024 at full depth). This reproduces MRL as a configuration; the corresponding cost is index size rather than compute (Section 4.3). 
+
+Token (LTC Reranker and MLTC Retriever) On the reranker, we follow Zhuang et al. (2026b) to pool the sequence at layer 20 and sweep the keep-ratio for multiple runs; quality falls gently and never collapses (Figure 2a; Qwen3 0.552 at ratio 1.0 to 0.538 at ratio 0.4). We then apply the same pooling operation to the 
+
+retriever — the identical code, now on a bi-encoder — and obtain a curve with a similarly gentle shape ( 0.497 
+
+to 0.511 ). Different from the LTC reranker which trains a single (layer, ratio) point, we use MLTC, which jointly trains several ratios in one checkpoint. Compared to the plain Qwen3-0.6B retriever, we note the MLTC retriever achieves competitive performance (0.511 vs 0.513), suggesting the sanity of our implementation. We do not compare it directly with separately trained LTC retrievers due to limited bandwidth. 8Table 3 Elasticity tax (BEIR-15 nDCG@10). The depth ×width schedule is used for all backbones for comparability. plain elastic (2D) tax BERT @ 12:768 0.461 0.448 −0.013          
+
+> ModernBERT @ 22:768 0.476 0.450 −0.026
+> Qwen3 @ 28:1024 0.513 0.521 +0.008
+> Composition: depth ×width.
+
+The 2D Matryoshka schedule reproduces Starbucks on all three backbones (Figure 1c); each frontier is smooth and monotonic (BERT 0.263 → 0.448 ; Qwen3 0.250 → 0.521 ; ModernBERT 
+
+0.187 → 0.450 across six operating points from one checkpoint). The shape matches Starbucks. The comparison does not include the masked-autoencoding pretraining used in that work, which is not part of our training recipe.  
+
+> Cost of serving many sizes.
+
+Training elastic models may degrade model performance compared to the standard training; we refer to this cost as elasticity tax . Table 3 compares the full model trained in the elastic way to a model trained for that size alone (the elasticity tax ), using the depth ×width schedule so the comparison is the same across backbones. We note the measured difference is small: on the retriever it is 
+
+−0.013 and −0.026 for the two encoders and +0.008 for the decoder, and on the reranker it is within ±0.006 
+
+for all three. The reranker tax is close to zero, while the retriever’s full point changes modestly on the two encoder backbones. Among the retriever backbones, the Qwen3 decoder has the smallest tax.  
+
+> Which axes each task admits.
+
+A retriever produces a vector and admits all three axes; a reranker produces a scalar score and admits depth and token but not width, since there is no embedding to truncate. This is the one structural exclusion in the task-by-axis matrix, and it is why the reranker has fewer configurations than the retriever above.  
+
+> The three-axis composition is left open.
+
+A depth × width × token retriever is expressible today (e.g. 
+
+"24:256@0.6/20" ), and the machinery runs it (training and inference both route through the pool_layer 
+
+branch of Section 3). We do not report an operating point for it; we provide the capability and leave the configuration to future use. 
+
+## 4.3 Efficiency and deployment trade-offs 
+
+We measure the deployment costs associated with each axis on a single controlled testbed: Qwen3-0.6B on MS MARCO dev, with MRR@10 as the quality axis (a single in-domain corpus avoids the domain- and length-confounds of averaging across BEIR). We time on one GPU with a fixed workload, separately from the parallel evaluation runs. The retriever has two encode paths with opposite profiles, and we report both document encoding (offline, batch 128, length 512, reported as documents/second) and query encoding (on the request path, batch 1, length 32, reported as latency per query). For reranking, we host the model through a Hugging Face backend, send HTTP requests in batches of 128 query–document pairs, and compute throughput from the end-to-end request latency. We report efficiency results in Figures 3 and 4.  
+
+> The measured speedup follows the cost model.
+
+For reranking at the batch size 128, the measured speedup matches the prediction ( 1/relative FLOPs) to within about two percent at every depth (layer 4 measures 6.86 ×
+
+against a predicted 7.00 ×; layer 16, 1.75 × against 1.75 ×). Document encoding tracks just as closely (layer 6, 
+
+4.61 × measured against 4.67 × predicted). When the batch is large the work is dominated by arithmetic, so counting FLOPs is enough to predict the wall-clock speedup.  
+
+> Depth and token help different paths.
+
+At layer 16, the reranker retains the full-depth quality ( 0.342 
+
+MRR@10) while running 1.75 × faster. The token axis gives a smaller speedup because the layers below the pooling point still run on the full sequence (pooling at layer 20 of 28 leaves about 0.71 of the work in place), though its quality falls more gently. The gap is starker for queries: cutting depth still speeds up query encoding by about 4× at layer 6, while token pooling barely helps (around 0.99 ×), since an eight-token query 9Figure 3 Quality versus relative analytic cost. Left: retrieval document encoding, depth and MLTC, against relative FLOPs; MRL is absent because it does not change FLOPs. Center: retrieval against relative index size; only MRL moves along this axis. Right: reranking against relative score FLOPs. Depth and token reduce compute and leave the index unchanged; width reduces the index and leaves compute unchanged.        
+
+> Figure 4 Quality retained versus measured speedup. Left: retrieval document throughput. Center: online query latency at batch 1. Right: reranking throughput. Depth speeds up every path; the token axis helps document encoding modestly and online query encoding not at all, because pooling an eight-token query saves little and the layers below the pooling point still run.
+
+has almost nothing to pool and the lower layers run regardless. Token compression is therefore a lever for long documents, while depth speeds up both the offline corpus pass and the online query. At batch 1 the query pass spends much of its time on overhead rather than arithmetic, so its speedup falls short of the FLOP prediction — which is why we measure query latency directly instead of reading it off the FLOP count.  
+
+> Width reduces storage and search.
+
+With an exact inner-product index, both the stored index size and the search FLOPs are proportional to the embedding dimension, so the index size is a hardware-independent measure of the width axis’s cost. Reducing the Qwen3 embedding from dim 1024 to dim 64 reduces the MS MARCO index from about 36 GB to about 2.3 GB while MRR@10 moves from 0.329 to 0.261; depth and token leave the index size unchanged.  
+
+> Which axis for which constraint.
+
+Taken together, the three axes address different deployment constraints: depth reduces compute on every path and is the most broadly applicable axis; the token axis reduces compute on long inputs specifically (corpus encoding, not short queries); and width reduces index storage and search cost. The cost model and the figures above indicate which axis to reach for given a latency or storage budget. 10 5 Conclusion and Future Work 
+
+Tevatron-Elastic expresses depth, token, and width compression for both retrievers and rerankers through one small dataclass and a declarative schedule. It reproduces four prior methods—MRL, early exit, 2D Ma-tryoshka, and LTC—as configurations, and runs across five encoder and decoder backbone families with no new model code (the token axis adds one small per-family shim). Across 20 checkpoints the elastic curves are smooth and monotonic, the cost of joint training relative to a dedicated model is small, and the measured inference speedup follows the analytic cost model. The same interface enables MLTC, which serves several token-compression ratios from one retriever checkpoint. We release the code and all checkpoints so that the three axes can be combined and extended directly. We identify two promising future directions based on experiences building Tevatron-Elastic . First, the token axis currently targets global-attention backbones; extending it to sliding-window-attention models (such as ModernBERT) needs a pooling rule compatible with a fixed local window, after which the token axis applies to that family as well. Second, the abstraction already expresses the full depth ×width ×token composition on the retriever (Section 4); a practitioner with a specific latency and storage budget can train and select that operating point directly. Because a new axis, backbone, or per-granularity loss enters through a single interface, we expect further compression methods to slot in as additional configurations rather than as new systems. Lastly, learned sparse retrieval (Formal et al., 2021b,a; Lassance et al., 2024; Xu et al., 2025a, 2026f) remains an interesting yet underexplored direction for elastic modeling. 
+
+# References 
+
+Zhe Cao, Tao Qin, Tie-Yan Liu, Ming-Feng Tsai, and Hang Li. Learning to rank: from pairwise approach to listwise approach. In Proceedings of the 24th international conference on Machine learning , pages 129–136, 2007. Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. BERT: Pre-training of deep bidirectional transformers for language understanding. In Jill Burstein, Christy Doran, and Thamar Solorio, editors, Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) , pages 4171–4186, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics. doi: 10.18653/v1/N19-1423. URL https://aclanthology.org/ N19-1423/ .Nelson Elhage, Neel Nanda, Catherine Olsson, Tom Henighan, Nicholas Joseph, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Nova DasSarma, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, and Chris Olah. A mathematical framework for transformer circuits. Transformer Circuits Thread ,2021. https://transformer-circuits.pub/2021/framework/index.html. Mostafa Elhoushi, Akshat Shrivastava, Diana Liskovich, Basil Hosmer, Bram Wasti, Liangzhen Lai, Anas Mahmoud, Bilge Acun, Saurabh Agarwal, Ahmed Roman, Ahmed A Aly, Beidi Chen, and Carole-Jean Wu. Layerskip: Enabling early exit inference and self-speculative decoding, August 2024. URL https://aclanthology.org/2024.acl-long. 681 .Thibault Formal, Carlos Lassance, Benjamin Piwowarski, and Stéphane Clinchant. Splade v2: Sparse lexical and expansion model for information retrieval, 2021a. URL https://arxiv.org/abs/2109.10086 .Thibault Formal, Benjamin Piwowarski, and Stéphane Clinchant. SPLADE: Sparse Lexical and Expansion Model for First Stage Ranking , page 2288–2292. Association for Computing Machinery, New York, NY, USA, 2021b. ISBN 9781450380379. URL https://doi.org/10.1145/3404835.3463098 .Luyu Gao and Jamie Callan. Unsupervised corpus aware language model pre-training for dense passage retrieval. In Smaranda Muresan, Preslav Nakov, and Aline Villavicencio, editors, Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers) , pages 2843–2853, Dublin, Ireland, May 2022. Association for Computational Linguistics. doi: 10.18653/v1/2022.acl-long.203. URL https://aclanthology.org/ 2022.acl-long.203/ .Saurabh Goyal, Anamitra Roy Choudhury, Saurabh Raje, Venkatesan Chakaravarthy, Yogish Sabharwal, and Ashish Verma. PoWER-BERT: Accelerating BERT inference via progressive word-vector elimination. In Hal Daumé III and Aarti Singh, editors, Proceedings of the 37th International Conference on Machine Learning , volume 119 of 
+
+11 Proceedings of Machine Learning Research , pages 3690–3699. PMLR, 13–18 Jul 2020. URL https://proceedings. mlr.press/v119/goyal20a.html .Aaron Grattafiori, Abhimanyu Dubey, Abhinav Jauhri, Abhinav Pandey, Abhishek Kadian, Ahmad Al-Dahle, Aiesha Letman, Akhil Mathur, Alan Schelten, Alex Vaughan, et al. The llama 3 herd of models. arXiv preprint arXiv:2407.21783 , 2024. Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the knowledge in a neural network, 2015. URL https: //arxiv.org/abs/1503.02531 .Albert Qiaochu Jiang, Alexandre Sablayrolles, Arthur Mensch, Chris Bamford, Devendra Singh Chaplot, Diego de Las Casas, Florian Bressand, Gianna Lengyel, Guillaume Lample, Lucile Saulnier, L’elio Renard Lavaud, Marie-Anne Lachaux, Pierre Stock, Teven Le Scao, Thibaut Lavril, Thomas Wang, Timothée Lacroix, and William El Sayed. Mistral 7b. ArXiv , abs/2310.06825, 2023. URL https://api.semanticscholar.org/CorpusID:263830494 .Jeff Johnson, Matthijs Douze, and Hervé Jégou. Billion-scale similarity search with gpus, 2017. URL https: //arxiv.org/abs/1702.08734 .Aditya Kusupati, Gantavya Bhatt, Aniket Rege, Matthew Wallingford, Aditya Sinha, Vivek Ramanujan, William Howard-Snyder, Kaifeng Chen, Sham Kakade, Prateek Jain, et al. Matryoshka representation learning. Advances in Neural Information Processing Systems , 35:30233–30249, 2022. Carlos Lassance, Hervé Déjean, Thibault Formal, and Stéphane Clinchant. Splade-v3: New baselines for splade. arXiv preprint arXiv:2403.06789 , 2024. Xianming Li, Zongxi Li, Jing Li, Haoran Xie, and Qing Li. 2d matryoshka sentence embeddings, 2024. URL 
+
+https://arxiv.org/abs/2402.14776 .Jimmy Lin, Rodrigo Nogueira, and Andrew Yates. Pretrained transformers for text ranking: Bert and beyond . Springer Nature, 2022. Weijie Liu, Peng Zhou, Zhiruo Wang, Zhe Zhao, Haotang Deng, and Qi Ju. FastBERT: a self-distilling BERT with adaptive inference time. In Dan Jurafsky, Joyce Chai, Natalie Schluter, and Joel Tetreault, editors, Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 6035–6044, Online, July 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.acl-main.537. URL https://aclanthology.org/ 2020.acl-main.537/ .Xueguang Ma, Luyu Gao, Shengyao Zhuang, Jiaqi Samantha Zhan, Jamie Callan, and Jimmy Lin. Tevatron 2.0: Unified document retrieval toolkit across scale, language, and modality. In Proceedings of the 48th International ACM SIGIR Conference on Research and Development in Information Retrieval , SIGIR ’25, page 4061–4065, New York, NY, USA, 2025. Association for Computing Machinery. ISBN 9798400715921. doi: 10.1145/3726302.3730135. URL https://doi.org/10.1145/3726302.3730135 .Aaron van den Oord, Yazhe Li, and Oriol Vinyals. Representation learning with contrastive predictive coding. arXiv preprint arXiv:1807.03748 , 2018. Yingqi Qu, Yuchen Ding, Jing Liu, Kai Liu, Ruiyang Ren, Wayne Xin Zhao, Daxiang Dong, Hua Wu, and Haifeng Wang. RocketQA: An optimized training approach to dense passage retrieval for open-domain question answering. In Kristina Toutanova, Anna Rumshisky, Luke Zettlemoyer, Dilek Hakkani-Tur, Iz Beltagy, Steven Bethard, Ryan Cotterell, Tanmoy Chakraborty, and Yichao Zhou, editors, Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies , pages 5835– 5847, Online, June 2021. Association for Computational Linguistics. doi: 10.18653/v1/2021.naacl-main.466. URL 
+
+https://aclanthology.org/2021.naacl-main.466/ .Nandan Thakur, Nils Reimers, Andreas Rücklé, Abhishek Srivastava, and Iryna Gurevych. BEIR: A heterogeneous benchmark for zero-shot evaluation of information retrieval models. In Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 2) , 2021. URL https://openreview.net/forum?id= wCu6T5xFjeJ .Nandan Thakur, Crystina Zhang, Xueguang Ma, and Jimmy Lin. Hard negatives, hard lessons: Revisiting training data quality for robust information retrieval with LLMs. In Christos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng, editors, Findings of the Association for Computational Linguistics: EMNLP 2025 , pages 9064–9083, Suzhou, China, November 2025. Association for Computational Linguistics. ISBN 979-8-89176-335-7. doi: 10.18653/v1/2025.findings-emnlp.481. URL https://aclanthology.org/2025.findings-emnlp.481/ .
+
+12 Benjamin Warner, Antoine Chaffin, Benjamin Clavié, Orion Weller, Oskar Hallström, Said Taghadouini, Alexis Gallagher, Raja Biswas, Faisal Ladhak, Tom Aarsen, et al. Smarter, better, faster, longer: A modern bidirectional encoder for fast, memory efficient, and long context finetuning and inference. arXiv preprint arXiv:2412.13663 , 2024. Fen Xia, Tie-Yan Liu, Jue Wang, Wensheng Zhang, and Hang Li. Listwise approach to learning to rank: theory and algorithm. In Proceedings of the 25th International Conference on Machine Learning , ICML ’08, page 1192–1199, New York, NY, USA, 2008. Association for Computing Machinery. ISBN 9781605582054. doi: 10.1145/1390156.1390306. URL https://doi.org/10.1145/1390156.1390306 .Ji Xin, Raphael Tang, Jaejun Lee, Yaoliang Yu, and Jimmy Lin. DeeBERT: Dynamic early exiting for accelerating BERT inference. In Dan Jurafsky, Joyce Chai, Natalie Schluter, and Joel Tetreault, editors, Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics , pages 2246–2251, Online, July 2020. Association for Computational Linguistics. doi: 10.18653/v1/2020.acl-main.204. URL https://aclanthology.org/2020.acl-main. 204/ .Lee Xiong, Chenyan Xiong, Ye Li, Kwok-Fung Tang, Jialin Liu, Paul N. Bennett, Junaid Ahmed, and Arnold Overwijk. Approximate nearest neighbor negative contrastive learning for dense text retrieval. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=zeFrfgyZln .Zhichao Xu, Aosong Feng, Yijun Tian, Haibo Ding, and Lin Lee Cheong. CSPLADE: Learned sparse retrieval with causal language models. In Kentaro Inui, Sakriani Sakti, Haofen Wang, Derek F. Wong, Pushpak Bhattacharyya, Biplab Banerjee, Asif Ekbal, Tanmoy Chakraborty, and Dhirendra Pratap Singh, editors, Proceedings of the 14th International Joint Conference on Natural Language Processing and the 4th Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics , pages 99–114, Mumbai, India, December 2025a. The Asian Federation of Natural Language Processing and The Association for Computational Linguistics. ISBN 979-8-89176-298-5. doi: 10.18653/v1/2025.ijcnlp-long.7. URL https://aclanthology.org/2025.ijcnlp-long.7/ .Zhichao Xu, Zhiqi Huang, Shengyao Zhuang, and Vivek Srikumar. Distillation versus contrastive learning: How to train your rerankers. In Kentaro Inui, Sakriani Sakti, Haofen Wang, Derek F. Wong, Pushpak Bhattacharyya, Biplab Banerjee, Asif Ekbal, Tanmoy Chakraborty, and Dhirendra Pratap Singh, editors, Proceedings of the 14th International Joint Conference on Natural Language Processing and the 4th Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics , pages 564–578, Mumbai, India, December 2025b. The Asian Federation of Natural Language Processing and The Association for Computational Linguistics. ISBN 979-8-89176-303-6. doi: 10.18653/v1/2025.findings-ijcnlp.33. URL https://aclanthology.org/2025.findings-ijcnlp.33/ .Zhichao Xu, Jinghua Yan, Ashim Gupta, and Vivek Srikumar. State space models are strong text rerankers. In Vaibhav Adlakha, Alexandra Chronopoulou, Xiang Lorraine Li, Bodhisattwa Prasad Majumder, Freda Shi, and Giorgos Vernikos, editors, Proceedings of the 10th Workshop on Representation Learning for NLP (RepL4NLP-2025) ,pages 152–169, Albuquerque, NM, May 2025c. Association for Computational Linguistics. ISBN 979-8-89176-245-9. doi: 10.18653/v1/2025.repl4nlp-1.12. URL https://aclanthology.org/2025.repl4nlp-1.12/ .Zhichao Xu, Xueguang Ma, Shengyao Zhuang, Luyu Gao, Wenqian Ye, Yu Wang, Jamie Callan, and Jimmy Lin. Tevatron meets megatron: Expert-parallel llm reranker training on an academic budget, 2026a. URL 
+
+https://arxiv.org/abs/2608.00916 .Zhichao Xu, Fengran Mo, Zhiqi Huang, Crystina Zhang, Puxuan Yu, Bei Wang Phillips, Jimmy Lin, and Vivek Srikumar. A survey of model architectures in information retrieval. Transactions on Machine Learning Research ,2026b. ISSN 2835-8856. URL https://openreview.net/forum?id=xAIbTbHRrX . Survey Certification. Zhichao Xu, Minheng Wang, Yawei Wang, Wenqian Ye, Yuntao Du, Yunpu Ma, and Yijun Tian. Recon: Reasoning with condensation for efficient retrieval-augmented generation, 2026c. URL https://arxiv.org/abs/2510.10448 .Zhichao Xu, Zongyu Wu, Yun Zhou, Aosong Feng, Kang Zhou, Sangmin Woo, Kiran Ramnath, Yijun Tian, Xuan Qi, Weikang Qiu, Lin Lee Cheong, and Haibo Ding. Beyond correctness: Rewarding faithful reasoning in retrieval-augmented generation. Transactions on Machine Learning Research , 2026d. ISSN 2835-8856. URL https: //openreview.net/forum?id=mZ0gGlXelF .Zhichao Xu, Shengyao Zhuang, Xueguang Ma, Bingsen Chen, Yijun Tian, Fengran Mo, Tao Li, Jie Cao, and Vivek Srikumar. Rethinking on-policy optimization for query augmentation. Transactions on Machine Learning Research ,2026e. ISSN 2835-8856. URL https://openreview.net/forum?id=mmqbjhz5Br .Zhichao Xu, Shengyao Zhuang, Crystina Zhang, Xueguang Ma, Yijun Tian, Maitrey Mehta, Jimmy Lin, and Vivek Srikumar. Laconic: Dense-level effectiveness for scalable sparse retrieval via a two-phase training curriculum. In Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information 
+
+13 Retrieval , SIGIR ’26, page 4298–4304, New York, NY, USA, 2026f. Association for Computing Machinery. ISBN 9798400725999. doi: 10.1145/3805712.3809869. URL https://doi.org/10.1145/3805712.3809869 .An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, Chujie Zheng, Dayiheng Liu, Fan Zhou, Fei Huang, Feng Hu, Hao Ge, Haoran Wei, Huan Lin, Jialong Tang, Jian Yang, Jianhong Tu, Jianwei Zhang, Jianxin Yang, Jiaxi Yang, Jing Zhou, Jingren Zhou, Junyang Lin, Kai Dang, Keqin Bao, Kexin Yang, Le Yu, Lianghao Deng, Mei Li, Mingfeng Xue, Mingze Li, Pei Zhang, Peng Wang, Qin Zhu, Rui Men, Ruize Gao, Shixuan Liu, Shuang Luo, Tianhao Li, Tianyi Tang, Wenbiao Yin, Xingzhang Ren, Xinyu Wang, Xinyu Zhang, Xuancheng Ren, Yang Fan, Yang Su, Yichang Zhang, Yinger Zhang, Yu Wan, Yuqiong Liu, Zekun Wang, Zeyu Cui, Zhenru Zhang, Zhipeng Zhou, and Zihan Qiu. Qwen3 technical report, 2025. URL https://arxiv.org/abs/2505.09388 .Dun Zhang, Ziyang Zeng, Yudong Zhou, and Shuyang Lu. Jasper-token-compression-600m technical report, 2025. URL https://arxiv.org/abs/2511.14405 .Shengyao Zhuang, Shuai Wang, Fabio Zheng, Bevan Koopman, and Guido Zuccon. Starbucks: Improved training for 2d matryoshka embeddings. In Advances in Information Retrieval: 48th European Conference on Information Retrieval, ECIR 2026, Delft, The Netherlands, March 29 – April 2, 2026, Proceedings, Part I , page 67–82, Berlin, Heidelberg, 2026a. Springer-Verlag. ISBN 978-3-032-21288-7. doi: 10.1007/978-3-032-21289-4_5. URL 
+
+https://doi.org/10.1007/978-3-032-21289-4_5 .Shengyao Zhuang, Zhichao Xu, and Ivano Lauriola. Layer-wise token compression for efficient document reranking. In Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval , SIGIR ’26, page 4426–4432, New York, NY, USA, 2026b. Association for Computing Machinery. ISBN 9798400725999. doi: 10.1145/3805712.3809871. URL https://doi.org/10.1145/3805712.3809871 .
+
+14 A Complete per-dataset results 
+
+We report nDCG@10 on each of the 15 BEIR datasets for every operating point of all 20 trained checkpoints (13 retriever, 7 reranker). Each elastic checkpoint is one model serving all listed operating points via prune_-to /encode_at ; plain rows are dedicated single-point baselines with the identical recipe. The AVG column is the BEIR-15 single macro average (the 14 standalone datasets plus CQA, the mean of the 12 cqadupstack subforums; this matches the aggregate figures in the main text). Dataset abbreviations: ARG arguana, CFE climate-fever, DBP dbpedia-entity, FEV fever, FIQ fiqa, HOP hotpotqa, NFC nfcorpus, NQ nq, QUO quora, SCD scidocs, SCF scifact, TRC trec-covid, TOU webis-touche2020, MSM ms-marco dev, CQA cqadupstack (mean of 12). Granularity labels: L∶D exit layer L and dim D (retriever); L exit layer (reranker); L×Rr×Pp
+
+exit L, keep-ratio r, pool layer p (token / M-LTC). These are the checkpoints we release as artifacts. 
+
+Table 4 BERT retriever, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+12:768 0.576 0.294 0.368 0.862 0.284 0.645 0.286 0.502 0.846 0.170 0.586 0.580 0.235 0.360 0.312 0.461 Table 5 BERT retriever, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+2:768 0.368 0.183 0.278 0.739 0.162 0.459 0.213 0.307 0.788 0.105 0.409 0.517 0.188 0.246 0.203 0.344 
+
+4:768 0.449 0.222 0.307 0.809 0.198 0.534 0.229 0.378 0.811 0.126 0.479 0.493 0.214 0.293 0.236 0.385 
+
+6:768 0.489 0.245 0.325 0.834 0.222 0.578 0.238 0.427 0.824 0.143 0.523 0.481 0.220 0.322 0.264 0.409 
+
+8:768 0.522 0.275 0.358 0.855 0.244 0.622 0.260 0.473 0.836 0.158 0.546 0.508 0.244 0.342 0.286 0.435 
+
+10:768 0.545 0.287 0.364 0.864 0.261 0.638 0.264 0.502 0.842 0.160 0.571 0.541 0.255 0.351 0.294 0.449 
+
+12:768 0.552 0.281 0.371 0.859 0.267 0.636 0.272 0.505 0.844 0.157 0.570 0.584 0.254 0.352 0.297 0.453 Table 6 BERT retriever, width (MRL). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+12:32 0.461 0.161 0.196 0.599 0.139 0.275 0.162 0.302 0.786 0.097 0.357 0.375 0.169 0.256 0.166 0.300 
+
+12:64 0.526 0.224 0.292 0.784 0.199 0.475 0.213 0.406 0.822 0.125 0.460 0.515 0.215 0.322 0.232 0.387 
+
+12:128 0.549 0.257 0.331 0.831 0.234 0.555 0.236 0.445 0.834 0.140 0.505 0.540 0.217 0.341 0.260 0.418 
+
+12:256 0.560 0.270 0.350 0.853 0.255 0.589 0.256 0.467 0.839 0.148 0.520 0.552 0.235 0.350 0.274 0.435 
+
+12:512 0.566 0.282 0.355 0.864 0.256 0.606 0.261 0.477 0.841 0.150 0.523 0.544 0.237 0.355 0.283 0.440 
+
+12:768 0.565 0.285 0.364 0.866 0.260 0.613 0.265 0.483 0.842 0.155 0.527 0.564 0.237 0.356 0.288 0.445 
+
+15 Table 7 BERT retriever, depth ×width (Starbucks). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+2:32 0.305 0.108 0.225 0.577 0.100 0.222 0.152 0.221 0.739 0.076 0.281 0.451 0.151 0.187 0.142 0.263 
+
+4:64 0.440 0.170 0.268 0.740 0.165 0.402 0.197 0.315 0.794 0.110 0.370 0.434 0.191 0.256 0.198 0.337 
+
+6:128 0.482 0.209 0.288 0.796 0.202 0.510 0.217 0.389 0.819 0.133 0.459 0.421 0.205 0.305 0.240 0.378 
+
+8:256 0.511 0.255 0.334 0.841 0.237 0.592 0.241 0.458 0.837 0.153 0.515 0.503 0.220 0.333 0.279 0.421 
+
+10:512 0.530 0.282 0.357 0.856 0.257 0.624 0.265 0.500 0.846 0.155 0.558 0.539 0.236 0.348 0.295 0.443 
+
+12:768 0.545 0.275 0.360 0.854 0.271 0.628 0.273 0.506 0.847 0.156 0.567 0.544 0.235 0.354 0.302 0.448 Table 8 ModernBERT retriever, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+22:768 0.529 0.317 0.345 0.840 0.341 0.630 0.296 0.497 0.865 0.177 0.628 0.740 0.231 0.361 0.340 0.476 Table 9 ModernBERT retriever, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+4:768 0.281 0.118 0.145 0.541 0.103 0.281 0.132 0.117 0.773 0.076 0.250 0.369 0.191 0.119 0.145 0.243 
+
+7:768 0.353 0.138 0.166 0.608 0.139 0.368 0.156 0.173 0.793 0.090 0.318 0.433 0.210 0.164 0.188 0.287 
+
+10:768 0.380 0.214 0.205 0.698 0.177 0.433 0.183 0.241 0.816 0.106 0.402 0.517 0.227 0.209 0.238 0.336 
+
+13:768 0.346 0.218 0.202 0.676 0.178 0.406 0.167 0.237 0.820 0.103 0.365 0.513 0.217 0.212 0.235 0.326 
+
+16:768 0.369 0.268 0.247 0.753 0.252 0.496 0.228 0.360 0.844 0.130 0.482 0.672 0.231 0.284 0.286 0.393 
+
+19:768 0.436 0.310 0.317 0.787 0.306 0.574 0.276 0.439 0.857 0.159 0.590 0.770 0.258 0.325 0.326 0.449 
+
+22:768 0.488 0.284 0.317 0.795 0.313 0.591 0.284 0.446 0.860 0.160 0.589 0.781 0.264 0.331 0.336 0.456 Table 10 ModernBERT retriever, width (MRL). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+22:32 0.267 0.164 0.122 0.444 0.150 0.186 0.152 0.189 0.807 0.091 0.297 0.418 0.168 0.199 0.146 0.253 
+
+22:64 0.352 0.243 0.230 0.678 0.235 0.399 0.210 0.324 0.844 0.129 0.481 0.570 0.198 0.286 0.236 0.361 
+
+22:128 0.405 0.286 0.284 0.748 0.277 0.525 0.248 0.410 0.856 0.148 0.530 0.649 0.251 0.318 0.288 0.415 
+
+22:256 0.437 0.300 0.316 0.801 0.295 0.583 0.276 0.436 0.861 0.163 0.575 0.684 0.258 0.336 0.307 0.442 
+
+22:512 0.451 0.319 0.337 0.824 0.317 0.610 0.285 0.451 0.863 0.170 0.598 0.705 0.246 0.345 0.325 0.456 
+
+22:768 0.451 0.324 0.345 0.830 0.324 0.619 0.292 0.458 0.864 0.171 0.608 0.718 0.259 0.346 0.331 0.463 Table 11 ModernBERT retriever, depth ×width. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+4:32 0.300 0.085 0.088 0.393 0.074 0.136 0.082 0.067 0.722 0.050 0.184 0.276 0.163 0.079 0.102 0.187 
+
+7:64 0.361 0.115 0.146 0.615 0.124 0.282 0.131 0.148 0.781 0.086 0.317 0.404 0.247 0.140 0.177 0.272 
+
+10:128 0.295 0.204 0.203 0.719 0.167 0.399 0.178 0.231 0.817 0.113 0.401 0.516 0.232 0.214 0.222 0.327 
+
+13:256 0.300 0.219 0.232 0.753 0.190 0.457 0.186 0.293 0.835 0.122 0.413 0.594 0.229 0.245 0.257 0.355 
+
+16:512 0.371 0.278 0.288 0.763 0.272 0.537 0.263 0.406 0.856 0.147 0.565 0.686 0.243 0.311 0.299 0.419 
+
+22:768 0.420 0.284 0.316 0.792 0.302 0.599 0.301 0.437 0.863 0.165 0.631 0.741 0.226 0.339 0.335 0.450 Table 12 Qwen3-0.6B retriever, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+28:1024 0.650 0.344 0.386 0.855 0.393 0.738 0.344 0.539 0.858 0.225 0.686 0.704 0.234 0.392 0.349 0.513 
+
+16 Table 13 Qwen3-0.6B retriever, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+6:1024 0.488 0.260 0.314 0.804 0.248 0.603 0.279 0.405 0.835 0.168 0.580 0.646 0.219 0.330 0.284 0.431 
+
+10:1024 0.554 0.292 0.330 0.811 0.289 0.609 0.314 0.447 0.844 0.186 0.605 0.739 0.257 0.341 0.283 0.460 
+
+14:1024 0.592 0.321 0.326 0.817 0.320 0.621 0.317 0.493 0.845 0.196 0.620 0.767 0.237 0.350 0.289 0.474 
+
+18:1024 0.634 0.312 0.338 0.820 0.336 0.619 0.320 0.492 0.838 0.199 0.616 0.753 0.210 0.355 0.310 0.477 
+
+24:1024 0.641 0.293 0.368 0.837 0.353 0.673 0.312 0.509 0.845 0.203 0.639 0.699 0.230 0.368 0.314 0.486 
+
+28:1024 0.661 0.339 0.389 0.856 0.387 0.734 0.346 0.550 0.854 0.214 0.683 0.735 0.268 0.393 0.359 0.518 Table 14 Qwen3-0.6B retriever, width (MRL). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+28:64 0.470 0.231 0.213 0.666 0.265 0.392 0.226 0.334 0.820 0.172 0.481 0.482 0.228 0.311 0.183 0.365 
+
+28:128 0.542 0.278 0.295 0.786 0.318 0.567 0.279 0.418 0.838 0.197 0.549 0.577 0.244 0.351 0.251 0.433 
+
+28:256 0.579 0.301 0.338 0.816 0.351 0.644 0.306 0.460 0.846 0.207 0.597 0.625 0.257 0.368 0.287 0.465 
+
+28:512 0.612 0.320 0.362 0.833 0.375 0.689 0.323 0.487 0.853 0.215 0.620 0.663 0.275 0.381 0.320 0.489 
+
+28:768 0.623 0.333 0.370 0.846 0.384 0.713 0.333 0.496 0.855 0.220 0.640 0.671 0.271 0.387 0.338 0.499 
+
+28:1024 0.628 0.343 0.382 0.855 0.389 0.726 0.339 0.503 0.857 0.222 0.646 0.676 0.266 0.391 0.345 0.505 Table 15 Qwen3-0.6B retriever, depth ×width (2D-Matryoshka). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+6:64 0.346 0.117 0.101 0.501 0.098 0.228 0.139 0.144 0.775 0.106 0.318 0.457 0.195 0.141 0.085 0.250 
+
+10:128 0.460 0.216 0.195 0.683 0.176 0.393 0.210 0.289 0.824 0.150 0.453 0.563 0.248 0.235 0.160 0.350 
+
+14:256 0.565 0.301 0.287 0.777 0.272 0.527 0.291 0.440 0.842 0.191 0.564 0.669 0.246 0.317 0.237 0.435 
+
+18:512 0.620 0.329 0.326 0.807 0.333 0.581 0.313 0.495 0.839 0.197 0.601 0.715 0.242 0.346 0.293 0.469 
+
+24:768 0.657 0.320 0.351 0.820 0.351 0.641 0.302 0.511 0.842 0.202 0.638 0.635 0.226 0.362 0.312 0.478 
+
+28:1024 0.677 0.362 0.389 0.850 0.396 0.731 0.341 0.560 0.857 0.220 0.693 0.730 0.256 0.390 0.360 0.521 Table 16 Qwen3-0.6B retriever, token (M-LTC, pool@20). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L28xR0.4xP20 0.646 0.349 0.357 0.827 0.342 0.685 0.334 0.532 0.841 0.211 0.677 0.712 0.232 0.370 0.333 0.497 
+
+L28xR0.6xP20 0.657 0.363 0.369 0.832 0.366 0.704 0.329 0.540 0.850 0.215 0.683 0.734 0.245 0.374 0.342 0.507 
+
+L28xR0.8xP20 0.660 0.369 0.376 0.845 0.376 0.713 0.338 0.546 0.852 0.217 0.681 0.765 0.258 0.378 0.348 0.515 
+
+L28xR1.0xP20 0.655 0.377 0.381 0.842 0.368 0.722 0.339 0.546 0.855 0.219 0.669 0.712 0.245 0.389 0.349 0.511 Table 17 BERT reranker, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L12 0.290 0.226 0.407 0.846 0.300 0.757 0.352 0.477 0.780 0.154 0.686 0.666 0.331 0.342 0.321 0.462 Table 18 BERT reranker, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L2 0.003 0.025 0.062 0.114 0.011 0.029 0.141 0.016 0.005 0.011 0.011 0.300 0.050 0.011 0.004 0.053 
+
+L4 0.256 0.094 0.204 0.488 0.135 0.343 0.274 0.205 0.563 0.089 0.476 0.537 0.267 0.144 0.179 0.284 
+
+L6 0.261 0.205 0.386 0.822 0.286 0.701 0.348 0.428 0.760 0.145 0.688 0.654 0.336 0.329 0.310 0.444 
+
+L8 0.251 0.231 0.392 0.830 0.297 0.724 0.347 0.443 0.766 0.149 0.696 0.657 0.344 0.331 0.314 0.451 
+
+L10 0.260 0.226 0.396 0.829 0.303 0.730 0.346 0.447 0.758 0.149 0.703 0.656 0.337 0.331 0.319 0.453 
+
+L12 0.265 0.216 0.388 0.813 0.300 0.731 0.346 0.448 0.759 0.150 0.707 0.657 0.341 0.333 0.310 0.451 Table 19 ModernBERT reranker, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L22 0.217 0.161 0.382 0.832 0.346 0.722 0.334 0.467 0.765 0.135 0.683 0.770 0.373 0.338 0.325 0.457 
+
+17 Table 20 ModernBERT reranker, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L4 0.103 0.060 0.119 0.442 0.088 0.310 0.210 0.120 0.415 0.071 0.424 0.437 0.230 0.087 0.130 0.216 
+
+L7 0.146 0.093 0.215 0.640 0.173 0.422 0.272 0.232 0.591 0.099 0.519 0.505 0.292 0.179 0.231 0.307 
+
+L10 0.137 0.084 0.217 0.652 0.184 0.421 0.285 0.243 0.624 0.104 0.522 0.521 0.300 0.192 0.236 0.315 
+
+L13 0.234 0.171 0.355 0.805 0.298 0.657 0.346 0.401 0.813 0.146 0.674 0.672 0.311 0.311 0.325 0.435 
+
+L16 0.224 0.202 0.395 0.840 0.338 0.723 0.348 0.451 0.803 0.155 0.708 0.768 0.363 0.335 0.341 0.466 
+
+L19 0.222 0.198 0.394 0.827 0.346 0.716 0.349 0.451 0.805 0.156 0.700 0.751 0.344 0.333 0.340 0.462 
+
+L22 0.236 0.175 0.390 0.833 0.349 0.721 0.349 0.458 0.809 0.152 0.715 0.754 0.328 0.336 0.338 0.463 Table 21 Qwen3-0.6B reranker, plain. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L28 0.604 0.342 0.449 0.894 0.432 0.799 0.392 0.596 0.853 0.207 0.762 0.867 0.357 0.399 0.390 0.556 Table 22 Qwen3-0.6B reranker, depth. 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L4 0.011 0.047 0.062 0.111 0.009 0.027 0.130 0.016 0.006 0.011 0.011 0.307 0.102 0.015 0.005 0.058 
+
+L8 0.525 0.251 0.354 0.848 0.288 0.724 0.323 0.403 0.848 0.173 0.676 0.721 0.267 0.287 0.334 0.468 
+
+L12 0.535 0.273 0.365 0.854 0.295 0.737 0.329 0.438 0.856 0.166 0.674 0.744 0.290 0.312 0.314 0.479 
+
+L16 0.593 0.340 0.456 0.890 0.424 0.796 0.382 0.591 0.860 0.201 0.758 0.870 0.361 0.399 0.396 0.554 
+
+L20 0.600 0.344 0.457 0.892 0.420 0.796 0.390 0.592 0.829 0.203 0.759 0.864 0.368 0.400 0.391 0.554 
+
+L24 0.597 0.330 0.447 0.889 0.420 0.793 0.390 0.589 0.778 0.199 0.754 0.858 0.350 0.400 0.386 0.545 
+
+L28 0.603 0.337 0.453 0.891 0.422 0.797 0.389 0.592 0.848 0.201 0.755 0.862 0.368 0.400 0.389 0.554 Table 23 Qwen3-0.6B reranker, token (LTC, pool@20). 
+
+Model ARG CFE DBP FEV FIQ HOP NFC NQ QUO SCD SCF TRC TOU MSM CQA AVG 
+
+L20xR0.4 0.572 0.337 0.450 0.884 0.406 0.796 0.380 0.593 0.755 0.203 0.755 0.863 0.305 0.401 0.368 0.538 
+
+L20xR0.6 0.593 0.338 0.443 0.885 0.406 0.796 0.383 0.590 0.758 0.204 0.742 0.853 0.302 0.400 0.394 0.539 
+
+L20xR0.8 0.578 0.338 0.448 0.886 0.409 0.796 0.384 0.591 0.814 0.203 0.753 0.859 0.319 0.401 0.382 0.544 
+
+L20xR1.0 0.610 0.331 0.449 0.891 0.423 0.798 0.388 0.591 0.842 0.204 0.754 0.869 0.341 0.401 0.394 0.552 
+
+18

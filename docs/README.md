@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-13</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-14</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 14 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 21 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>7</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>13</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-13 21:07:32 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-14 21:30:49 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,8 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日共读14篇论文，精读7篇、速读7篇，覆盖事件流视频插帧、多模态音视频剪枝及推理自校正等前沿方向。</p>
-<p>最值得关注两篇10分/9分精读：事件引导的视频插帧（Bridging Event Streams and DiT）与延迟音频剪枝（Deferred Audio Pruning），前者</p>
+<p>今日精读8篇、速读13篇共21篇，聚焦视觉语言动作模型（VLA）与事件流视频插帧两大方向。最值得关注的两个9分工作：环境感知的VLA自适应推理框架，以及事件流引导的DiT视频插帧。下一步建议关注VLA在自动驾驶中的鲁棒感知、失败记忆增强与语言对齐等落地问题。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -72,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation">Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Deferred Audio Pruning with Local Audio-Visual Dynamics for Omni-LLMs">Deferred Audio Pruning with Local Audio-Visual Dynamics for Omni-LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="DistillCache: KL-Guided Adaptive KV-Cache Eviction for Memory-Efficient LLM Inference">DistillCache: KL-Guided Adaptive KV-Cache Eviction for Memory-Efficient LLM Inference</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Fast and Accurate: An Adaptive VLA Inference Framework through Environment-aware Model Selection">Fast and Accurate: An Adaptive VLA Inference Framework through Environment-aware Model Selection</span></li><li><span class="dpr-home-dashboard-paper-title" title="Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation">Bridging Event Streams and DiT: Event-Guided Video Frame Interpolation</span></li><li><span class="dpr-home-dashboard-paper-title" title="FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving">FlashDrive: Flash Vision-Language-Action Inference for Autonomous Driving</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>2</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -85,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">13 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning">StructReward: Efficient Structured Process Rewards for Self-Correcting Multimodal Reasoning</span></li><li><span class="dpr-home-dashboard-paper-title" title="Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents">Post-Hoc Sparse Coding of Latent Communication Between Vision-Language Model Agents</span></li><li><span class="dpr-home-dashboard-paper-title" title="CoDAT: Collaborative Dual-Attention Transformer with Low-Cost Temporal Modeling for Efficient Edge Action Recognition">CoDAT: Collaborative Dual-Attention Transformer with Low-Cost Temporal Modeling for Efficient Edge Action Recognition</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles">Distilling Vision-Language Models for Robust Traffic Sign Perception in Autonomous Vehicles</span></li><li><span class="dpr-home-dashboard-paper-title" title="DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving">DriveVLA-M0: Failure-Aware Memory Augmentation for Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="Lost in Reconstruction: Aligning Action Representations with Language in Vision-Language-Action Models">Lost in Reconstruction: Aligning Action Representations with Language in Vision-Language-Action Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>6</strong></span></div>
 </section>
 </div>
 
