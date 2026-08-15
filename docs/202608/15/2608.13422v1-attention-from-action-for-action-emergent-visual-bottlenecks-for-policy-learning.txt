@@ -1,0 +1,1236 @@
+Attention from Action, for Action:
+Emergent Visual Bottlenecks for Policy Learning
+Zheyu Zhuang1 # , Ruiyu Wang1, Nick Heppert2, Johannes Fabian Hahn3,
+Abhinav Valada2, Florian T. Pokorny1, Danica Kragic1
+1Department of Robotics, Perception and Learning, KTH Royal Institute of Technology, Sweden
+2Department of Computer Science, University of Freiburg, Germany
+3Department of Informatics, Universit¨at Hamburg, Germany
+Abstract: Visual bottlenecks that focus policy inputs on regions of interest (ROIs)
+can improve data-efficient visuomotor learning by separating where to look from
+how to act. Many ROI interfaces rely on external spatial labels, such as gaze,
+object classes, or affordance annotations. Label-free alternatives often derive crops
+from trajectories by detecting gripper or motion events and centering a fixed crop
+at the projected end-effector. Such action-derived crops are useful spatial priors
+that require no additional labels, but they encode fixed choices about event timing,
+proxy points, and crop scale. When the visual evidence needed for control lies away
+from the end-effector or changes continuously with task progress, these crops can
+become misaligned. We propose Seeker, a task- and state-conditioned readout that
+learns attention from action. Starting from frozen DINO features, Seeker iteratively
+updates a query with gathered visual evidence, producing progression-aware ROIs
+solely from action supervision. The learned ROI serves as a spatial interface for
+RGB cropping, mask-guided background augmentation, and point-cloud filtering.
+In simulation and the real world, Seeker improves data efficiency and robustness
+over no-crop, augmentation, and action-derived crop baselines. On real robots,
+Seeker raises average in-domain success from the best baseline’s 48.3 to 76.7%
+and success under lighting/background shifts from 20.0 to 60.0%.
+§ CODE
+Keywords: Imitation Learning, Data Efficiency, Region of Interest (ROI)
+1
+Introduction
+Imitation learning is increasingly applied to long-horizon manipulation in visually complex environ-
+ments, where decision-critical cues are often sparse and localized [1]. A common way to improve
+data efficiency is to separate where to look from how to act: estimate a region of interest (ROI) and
+train the policy on the resulting focused observation [2, 3, 4]. The difficulty is that the ROI is a
+control-dependent visual bottleneck rather than a fixed semantic category. It can shift with robot state,
+task phase, and camera view, and may correspond to an object, an affordance region, a tool–object
+contact, a goal region, or a spatial relation between objects.
+Because this control-dependent ROI is hard to specify directly, existing interfaces often rely on
+external spatial cues or semantic priors, such as predicted human gaze [2], object- or tool-centered
+crops [4], or vision–language model (VLM) grounding [5, 6, 7]. These signals can be powerful,
+but are not typically available in imitation datasets and may not directly specify the visual evidence
+needed for the next control decision. For long-horizon tasks, providing such evidence through
+language or VLMs often requires detailed stage-aware prompts or subtask decomposition [8, 9].
+In contrast, the action stream is intrinsic to imitation learning and tied to visual relevance: actions
+are generated from the cues the demonstrator used to decide what to do next. This makes the
+observation–action stream an implicit but control-aligned source of supervision for where to look.
+Action-grounded heuristics exploit this connection by deriving spatial targets from demonstration
+arXiv:2608.13422v1  [cs.RO]  13 Aug 2026
+
+
+trajectories, for example by projecting the end-effector at keyframes detected from motion stops or
+gripper-state changes [3, 10, 11]. These methods bring localization closer to the action signal, but
+still hand-design the action-to-ROI mapping through event thresholds, proxy points, and crop scales.
+This fixed design can become limiting under trajectory and task variability: velocity or acceleration
+changes can create noisy keyframes, continuous interactions may lack reliable discrete events, and
+the relevant cue may lie away from the proxy, such as on a tool contact, object part, goal region, or
+spatial relation.
+We propose Seeker to learn this action-to-ROI mapping directly from observation–action streams.
+Like action-grounded heuristics, it requires no spatial labels; unlike them, it does not predefine
+trajectory events, proxy points, or crop scales. Seeker starts from a task- and state-conditioned query
+over frozen DINOv3 [12] patch features and iteratively refines this query through visual evidence
+gathered from image patches. This readout is therefore not a static crop predictor: its focus can
+shift as the task stage and robot state change. Trained through action prediction, the resulting ROI
+adapts in size, location, and focus as control demands evolve, moving between object-, contact-, and
+relation-centric evidence rather than following semantic labels or keyframe heuristics.
+We evaluate Seeker in simulation and real-world manipulation to test three claims about action-
+supervised visual bottlenecks:
+(1) Action supervision can recover policy-useful ROIs: without spatial labels, Seeker nearly
+matches the privileged Oracle ROI reference for policy learning.
+(2) The resulting bottleneck improves policy learning: under the same downstream RGB stack,
+Seeker raises average simulation success from 42.6% to 62.6%, and improves real-world in-
+domain success from 48.3% to 76.7% over the best baseline.
+(3) The learned ROI is reusable and supports robustness: frozen Seeker ROIs support mask-
+guided augmentation and point-cloud filtering, and improve real-world robustness under both
+lighting and background shifts, raising average shifted-condition success from 20.0% to 60.0%.
+2
+Related Work
+Spatial Bottlenecks from Priors and Auxiliary Signals.
+Spatial bottlenecks restrict policy percep-
+tion to task-relevant regions, reducing the visual search space faced by downstream control. Prior
+work obtains such regions from external annotations or auxiliary structure, including human gaze [2],
+object- or tool-centered crops [4], VLM grounding [5, 6], recurring keypoints in demonstrations [13],
+or keypoints learned jointly with the policy [14]. However, a bottleneck tied to an external cue,
+semantic grounding, or keypoint representation may capture a plausible task region without matching
+the control-dependent evidence needed for the next action.
+Action-Derived Spatial Bottlenecks.
+A closely related line converts demonstrated actions into
+spatial targets. Q-attention [15] and Coarse-to-Fine Q-attention [3] discretize action localization and
+zoom into relevant regions, while PerAct [10], RVT [16], and RVT-2 [11] use keyframe gripper/TCP
+targets in voxel or multi-view representations, with RVT-2 explicitly predicting an area of interest
+before zoomed-in pose estimation. CLAP [8] adds VLM grounding and subtask decomposition.
+Although these methods differ architecturally, their spatial bottlenecks are still shaped by engineered
+choices about when to localize, which action proxy to use, and what crop, zoom, or voxel scale to
+impose. Seeker instead learns this action-to-ROI readout from observation–action streams, producing
+an explicit ROI reusable for RGB cropping, mask-guided augmentation, and point-cloud filtering.
+Data-Efficient Policy Learning.
+Spatial bottlenecks are complementary to policy-level strategies
+for data efficiency. Reflection-consistent augmentation [17] expands the effective training distribution
+through symmetry-based image–action transforms, while equivariant policy learning [18, 19] builds
+geometric structure into the policy architecture. These methods improve the policy learner or training
+distribution, but do not explicitly decide which visual evidence should be preserved for control. By
+contrast, an action-grounded bottleneck changes the visual input itself, making it compatible with
+standard policies while remaining complementary to augmentation and architectural priors.
+2
+
+
+Multi-head 
+Attention
+Head Gating
+Linear
+Linear
+Patch 
+Feats.
+DINO
+V3 
+Gated Iterative Refine
+FiLM(Z, s)
+T→
+Diffusion
+Context
+Task Emb.
+Robot State
+→
+LMSE
+Mask & B-box
+Top-p
+FiLM(Q(t→1), !C(t))
+Q(0)
+C(t)
+(a) Seeker Module
+(b) ROI Extraction
+Weighted Sum
+(c) Action-supervised Training
+!C(T )
+Context,
+Head Scores
+Attn. Maps
+Z
+Task Emb.,
+Robot State, s
+Head Scores
+Attn. Maps
+Q(t)
+Q(t)
+→
+V
+K
+Figure 1: Seeker Overview. (a) A state-conditioned query is iteratively refined over frozen DINOv3 patch tokens,
+producing a compact visual context together with attention maps and head scores. (b) Head-score-weighted
+attention is converted into a mask and bounding box using a top p mass criterion. (c) The visual context is
+trained through a diffusion action-prediction loss, allowing the ROI to emerge without spatial supervision.
+3
+Methodology
+Fig. 1(a) illustrates Seeker, a lightweight readout over frozen DINOv3 [12] patch tokens. Its design is
+related to attention-probing readouts over pretrained visual features [20, 21, 22], but is adapted for
+action-grounded ROI discovery. Rather than performing a single visual lookup, Seeker treats readout
+as an iterative search process: a task- and state-conditioned query repeatedly attends to DINO patches,
+gathers visual context, and updates itself before the next lookup. This allows the ROI to move from
+an initial control-conditioned prior toward visual evidence relevant to the current action. To capture
+diverse spatial cues, Seeker splits the projected DINO patch features into multiple readout heads and
+uses query-dependent head gating, allowing different heads to dominate as the task stage and robot
+state change. The final readout produces both a compact visual context and an ROI attention map;
+details and visualizations are provided in App. A.1.
+3.1
+Seeker Architecture
+Robot-conditioned Query.
+Given frozen DINOv3 [12] patch features x ∈RNp×D, Seeker first
+projects them into attention keys and values K, V ∈RNp×D. The query is task- and state-conditioned,
+and represents what to look for now. Specifically, given a task embedding Z ∈RD and proprioceptive
+state s = [seef, sgrip] ∈RS, the initial query is
+Q(0) = FiLM(Z, s) = (1 + γ(s)) ⊙Z + β(s),
+where γ(·) and β(·) are predicted by an MLP, and ⊙denotes element-wise multiplication.
+Iterative Gated Readout.
+Seeker applies the same gated cross-attention readout for T refinement
+steps. At each step, the current query is first projected and then attends to the visual keys and values:
+Q∗= ϕq(Q),
+{Ah, Ch}H
+h=1 = MHA(Q∗, K, V ),
+where ϕq(·) is a learnable linear projection, and Ah and Ch are the attention map and context from
+head h. Instead of uniformly averaging heads, Seeker predicts query-dependent head weights. Let ¯Q∗
+denote the mean of the head-wise query components. With dot product ⟨·, ·⟩and learned projection
+ϕg(·), each head is scored as
+ωh = softmaxh
+ 
+Ch, ϕg( ¯Q∗)
+
+.
+The head weights fuse the per-head outputs and update the query:
+eC =
+X
+ωhCh,
+eA =
+X
+ωhAh,
+Q ←FiLM(Q, eC).
+After T applications, the final eC is used as Seeker’s compact visual context, and the final eA is
+reshaped to the DINO patch grid as the ROI map. Head-gating visualizations in App. A.1 show that
+head weights vary with robot state and task stage.
+3
+
+
+Stack Three D1
+Square D2
+3-P Assem. D2
+Coffee Prep. D1
+Pick Place D0
+Threading D2
+(a) Task Overview
+Step
+(b) Progress-aware Seeker ROIs
+Continuous
+Motion 
+Tool Offset &
+Small Crop
+Gripper State 
+Noise
+(c) Heuristic ROI Stress Cases
+Square D2
+Pick Place D0
+Threading D2
+Stack Three D1
+(d) Seeker Crops and Masks
+Figure 2: Simulation setup and Seeker visualization. (a) MimicGen [24] task overview. (b) In Coffee
+Preparation, Seeker ROIs shift with task progress; selected frames correspond to peaks in pairwise context-feature
+distance. (c) RVT2-style heuristic ROI stress cases: missed continuous-motion cues, noisy gripper-triggered
+keyframes, and tool-contact regions offset from the TCP proxy. (d) Seeker crops and masks across tasks.
+Action-supervised ROI Interface.
+Seeker turns action supervision into an explicit ROI interface
+without spatial labels. As shown in Fig. 1(c), the final context eC is concatenated with proprioception
+and a task embedding, then passed to a diffusion action head trained with the standard noise-prediction
+objective [23]. This head is used only to provide a dense action-supervised signal for ROI discovery,
+not as the final downstream controller. After multi-task Seeker training, we discard the diffusion head
+and freeze the Seeker readout for downstream policies.
+As shown in Fig. 1(b), the final gated attention map eA is converted into a patch-level ROI by selecting
+the smallest set of tokens whose cumulative mass exceeds a top p threshold. This produces a tight
+bounding box and a coarse patch mask, which are reused in three downstream forms. RGB cropping:
+the box crops and resizes the static third-person view, providing a local visual input for RGB policies.
+Because cropping removes absolute spatial information, we FiLM-condition policy features on
+the box location and scale. We do not crop eye-in-hand views, whose scale and content change
+rapidly near contact. Point-cloud filtering: the same image-plane box filters projected point-cloud
+points before downsampling, yielding a localized 3D input without retraining Seeker. Mask-guided
+augmentation: the patch mask preserves task-relevant regions while perturbing task-irrelevant
+appearance, improving robustness to background changes. All ROIs are precomputed offline, so
+downstream policy training incurs no additional Seeker cost. Training protocols and implementation
+details are provided in App. A.2.
+4
+Simulation Evaluations
+Experimental Protocol
+Fig. 2a illustrates the six MimicGen[24] tasks used in our simulation study:
+Stack Three D1, Square D2, Three-Piece Assembly D2, Coffee Preparation D1, Pick & Place D0,
+and Threading D2. These tasks cover high spatial variance and long-horizon manipulation; detailed
+task descriptions are provided in App. B. We omit D0/D1/D2 suffixes where clear.
+We train a single multi-task Seeker once, using 100 demonstrations per task from the original-
+background RGB data, and keep it frozen for all simulation experiments. This design isolates the ROI
+interface from downstream policy learning: Seeker remains unchanged, while each policy is trained
+with the input format and data protocol required by its evaluation setting. We evaluate this fixed ROI
+interface through RGB data efficiency, background generalization, and point-cloud transfer, testing
+whether action supervision yields a reusable spatial bottleneck across input protocols, appearance
+shifts, and sensing modalities.
+4
+
+
+Stack Three
+Square 3-P Assembly
+Coffee Prep.
+Pick & Place†
+Threading
+Avg.
+Input-level Comparison
+DiffPo (Pre)
+52.7
+22.0
+14.0
+65.3
+20.0
+20.7
+32.5
+MirrorAug
+68.0
+32.7
+21.0
+62.0
+20.7
+18.7
+37.2
+RVT2-Crop
+71.3
+26.0
+26.7
+69.3
+49.3
+12.7
+42.6
+Seeker (ours)
+81.3
+46.0
+58.7
+82.0
+69.3
+38.0
+62.6
+Gain (rel., %)
+14.0↑
+40.7↑
+119.9↑
+18.3↑
+40.6↑
+83.6↑
+52.8↑
+External SOTA and Privileged ROI References
+RAVEN
+80.7
+50.0
+26.7
+72.7
+54.7
+28.0
+52.1
+Oracle ROI∗
+80.7
+44.7
+62.7
+81.3
+71.3
+44.7
+64.2
+Table 1: Data Efficiency on MimicGen with 100 Demos. Success rate (%) averaged over three seeds; stds in
+App. D.1. Gray cells mark the strongest non-Seeker input-level baseline. Seeker improves average success by 20
+points over this baseline (62.6 vs. 42.6), with a mean task-wise relative gain of +52.8%. It also exceeds external
+full-policy SOTA RAVEN (62.6 vs. 52.1) and remains within 1.6 points of the privileged Oracle ROI. ∗The
+oracle provides stage-aware affordance ROIs. †Pick & Place uses strict episode success with all baselines rerun.
+Baseline Design.
+(1) RGB Policy Learning. The RGB comparison isolates Seeker’s action-grounded
+visual bottleneck under a shared downstream stack. All controlled baselines use the same pretrained
+ResNet-18 policy encoder, since pretrained features substantially improve RGB manipulation per-
+formance [19]. In addition to vanilla Diffusion Policy [23], MirrorAug [17] provides an augmented
+no-crop reference, applying reflection-consistent image–action augmentation without an explicit
+spatial bottleneck. RVT2-Crop is our RVT-2-inspired [11] crop baseline, adapting its heatmap-based
+localization interface to predict a 2D crop target from frozen DINOv3 features and proprioception.
+The heatmap is supervised using the original keypoint extraction recipe based on gripper-state changes
+and low end-effector velocity, testing whether this strong action-derived prior is sufficient for policy
+cropping. Oracle ROI uses privileged stage-aware affordance pixels to crop target objects; it is not a
+control upper bound because contacts or inter-object relations may lie outside the crop. RAVEN [19]
+is included as an external equivariant-policy SOTA reference outside the controlled stack.
+(2) Background Generalization. This setting tests whether the same Seeker trained on original-
+background demos remains useful under shuffled tabletop textures (Fig. 3b) by using its mask to
+guide appearance augmentation. We use Random Overlay[17] as the default augmentation for visual
+domain generalization, blending each observation with a texture image using a spatially constant
+preservation mask. Guided variants replace this constant mask with a spatial mask when available:
+RVT2-Crop uses its Gaussian heatmap for the front view, while Seeker-Guided uses frozen Seeker
+masks for both views.
+(3) Point-Cloud Filtering. This setting tests whether Seeker’s ROI functions as a spatial interface
+rather than an RGB-specific feature. The baseline is DP3[25] with manual workspace cropping,
+following common practice in point-cloud policy learning [26, 25, 18]. Seeker is not retrained for
+point-clouds. Its frozen RGB ROI filters 3D points by image-plane projection before the same DP3.
+RGB Data Efficiency.
+We evaluate Seeker as an input-level visual bottleneck under the controlled
+RGB policy stack. Tab. 1 shows that Seeker improves average success from 42.6% for the strongest
+non-Seeker input-level baseline to 62.6%, with a mean task-wise relative gain of +52.8%. RVT2-
+Crop is the strongest non-Seeker baseline on average, but its uneven gains reflect settings where fixed
+keyframe/proxy assumptions can become limiting: as shown in Fig. 2c, they can miss continuous-
+motion cues, produce noisy gripper-triggered targets, or focus on TCP proxies offset from the
+interaction region. Seeker improves consistently, with the largest gains on spatially ambiguous or
+contact-rich tasks such as Three-Piece Assembly, Pick & Place, and Threading, where policies must
+repeatedly localize small control-relevant regions across objects, tools, and task stages. This supports
+the central premise that action supervision can expose visual evidence useful for control, rather than
+only producing semantic or object-centric crops. Seeker also exceeds the external SOTA reference
+RAVEN on average (62.6 vs. 52.1) and nearly matches Oracle ROI (64.2), despite using no scripted
+affordance boxes, spatial labels, gaze, or language grounding.
+5
+
+
+80
+60
+40
+20
+0
+!!!   
+!!!   
+!!!   
+Stack Three D1
+Square D2
+3-P Assembly D2
+Original Training Background
+Random Training Backgrounds
+In-domain Success
+(a) Background Robustness With Original or Diverse Training Textures.
+Guided Augmentation (3rd-person)
+Guided Augmentation (EiH)
+Evaluation Environments
+(b) Aug. / Eval.
+Figure 3: Background Robustness and Guided Augmentation. (a) Light bars use original-background training,
+solid bars use 25 randomized-background training, and diamonds show in-domain mean success from the main
+benchmark. We compare MirrorAug, RAVEN+Overlay, RVT2-Crop, and Seeker-Guided augmentation. (b)
+Seeker-guided augmentation examples and evaluation environments.
+Manual
++ Seeker
+Stack Three D1
+Pick Place D0
+Coffee Preparation D1
+Manual Seeker Pick Place Stack-3 Coffee Prep.
+✗
+✗
+0.0
+0.0
+0.0
+✓
+✗
+1.3
+23.3
+22.0
+✓
+✓
+26.0
+47.3
+64.3
+Gain (abs.)
+24.7↑
+24.0↑
+42.3↑
+DP3 point-cloud transfer.
+Figure 4: Point-cloud transfer with DP3 [25]. Left: manual workspace cropping vs. manual+Seeker ROI
+filtering, with point clouds independently scaled for visualization. Right: success rates with 200 demonstrations
+for no crop, manual crop, and manual+Seeker filtering; absolute gains are computed over the manual cropping.
+Mask-Guided Augmentation for Background Generalization.
+Beyond data efficiency, we reuse
+the same frozen Seeker trained on the original training set under background shifts. Its mask
+controls image superimposition by preserving predicted control-critical regions while perturbing
+task-irrelevant appearance. Given a Seeker mask M ∈[0, 1]H×W , image I, and texture image Itex,
+we form Iaug = M ⊙I + (1 −M) ⊙Itex, where M is broadcast over color channels and ⊙denotes
+element-wise multiplication. Random Overlay [17] is the constant-mask case; Seeker-Guided uses
+the frozen control-aware mask.
+We evaluate Stack Three D1, Square D2, and Three-Piece Assembly D2 under shuffled tabletop
+textures. Policies are trained either on the original 100 demonstrations or on the same trajectories re-
+rendered with 25 shuffled tabletop backgrounds. Baseline-specific augmentation details are described
+in Sec. 4; examples and implementation details are shown in Fig. 3b and App. D.3.
+Fig. 3a shows that Seeker-Guided augmentation is strongest when using the Seeker trained on the
+original demonstrations, and remains best on average when combined with background-randomized
+training. This indicates that the action-grounded regions identified by Seeker transfer across back-
+ground changes well enough to guide augmentation. Rather than perturbing the whole image,
+Seeker-Guided augmentation preserves the predicted control-relevant regions and applies appearance
+variation mainly to the surrounding background, reducing the burden on the policy to learn under
+visually distracting textures. The mixed effect of background-randomized training across tasks and
+methods further suggests that visual diversity does not by itself guarantee background generalization,
+especially when additional texture complexity can obscure fine interaction cues.
+Point-cloud Transfer.
+We evaluate whether Seeker’s image-plane ROI can serve as a plug-and-play
+spatial filter for point-cloud policies. Given a predicted Seeker box, we remove points whose image-
+plane projections fall outside the ROI, then apply farthest-point sampling to match the fixed input
+size required by DP3 [25]. Since point-cloud policy learning commonly relies on manually cropping
+a task-specific workspace to remove background and tabletop regions [26, 25, 18], we evaluate
+6
+
+
+Seeker as a complementary ROI filter on top of this manual workspace crop. This transfer study uses
+200 demonstrations because, with 100 demonstrations, the manual-crop baseline was too weak to
+support informative relative comparisons. As shown in Fig. 4, adding Seeker ROI filtering makes
+the retained point-clouds more task-focused and improves DP3 over manual workspace cropping
+by 30.3 absolute points on average on the three tasks, despite Seeker being trained only from RGB
+action supervision. Overall, DP3 remains below image-based policies (Tab. 1), consistent with prior
+work [18]. Seeker-only filtering and full per-task analyses are provided in App. D.2.
+5
+Real-world Evaluations
+Start
+Goal
+Coffee 
+Cleanup
+Board Assem.
+(a) Task Overview
+Background
+Lighting
+(b) OOD Setup
+In-domain Background
+(c) Seeker ROI
+False Positives
+(d) Heuristic Failures
+Figure 5: Real-world Setup and Visual Diagnostics. (a) Start and goal configurations for the three real-world
+tasks. (b) OOD evaluation conditions with background and lighting shifts. (c) Seeker ROIs remain focused on
+predicted control-relevant regions under appearance changes. (d) Heuristic crops can produce ghost keyframes
+or miss interaction-relevant continuous-motion cues without reliable gripper-state anchors.
+Method
+Coffee Trans.
+Table Cleanup
+Board Assem.
+Average
+ID
+Light.
+Bg.
+ID
+Light.
+Bg.
+ID
+Light.
+Bg.
+ID
+OOD
+Retention
+MirrorAug
+45
+30
+0
+40
+10
+10
+20
+0
+20
+35.0
+11.7
+33.4
+RVT2-Crop
+40
+15
+0
+60
+25
+35
+45
+20
+25
+48.3
+20.0
+41.4
+Seeker (ours)
+85
+80
+35
+80
+75
+60
+65
+60
+50
+76.7
+60.0
+78.2
+Table 2: Real-world experiments. Success rate (%) over 20 rollouts under in-domain (ID), lighting-shift
+(Light.), and background-shift (Bg.) evaluations. Gray cells mark the strongest non-Seeker baseline in each
+column. Avg. OOD averages lighting and background shifts; Ret. is the retention ratio, Avg. OOD/Avg. ID.
+We evaluate Seeker and two representative baselines on a real-world multi-view RGB setup with a
+UFactory xArm7, using a fixed third-person camera and an eye-in-hand camera. The three tasks are
+performed on visually distracting table textures and require different forms of spatial attention (Fig.5a):
+Coffee Transport is a low-tolerance continuous manipulation task, where the robot must carry coffee
+beans on a spoon and deposit them into a small white espresso cup under low foreground–background
+contrast; Table Cleanup is a long-horizon sequential insertion task requiring 3D object rotations,
+including tilting a carrot so that it fits through the bin opening; and Board Assembly requires precise
+shape-based placement despite color mismatch between the objects and target slots. Detailed real-
+world task descriptions are provided in App. E.
+Tab. 2 shows that Seeker improves average in-domain success from the best baseline’s 48.3 to 76.7%
+and raises average OOD success from 20.0 to 60.0%. Its 78.2% retention indicates that the learned
+ROI remains usable under real appearance changes, including lighting shifts that over-expose the
+eye-in-hand view.
+The RVT2-Crop results highlight two settings where action-heuristic crop supervision is challenged.
+First, in Table Cleanup and Board Assembly, inconsistent velocity profiles across demonstrations can
+create false-positive low-speed keyframes, causing the crop predictor to attend to spurious targets
+before reaching the relevant interaction region. Second, in Coffee Transport, continuous spoon motion
+provides no reliable gripper-state anchor, so the heuristic crop can miss the cup–spoon interaction and
+lock onto rotation-only or final end-effector poses (Fig. 5d). When this crop is misaligned, the policy
+loses useful third-person context and must rely more on the eye-in-hand stream, which is fragile
+when the white cup leaves the wrist-camera field of view or is washed out by lighting.
+7
+
+
+Variant
+Stack Three
+Square
+3-P Assem. Coffee Prep. Pick & Place† Threading
+Avg.
+Low-res Crop
+82.71.4↑
+46.70.7↑
+56.72.0↓
+75.36.7↓
+70.00.7↑
+36.02.0↓
+61.21.4↓
+FiLM Only
+64.716.6↓
+29.316.7↓
+16.742.0↓
+69.312.7↓
+28.041.3↓
+28.79.3↓
+39.423.2↓
+Table 3: ROI Conditioning, Cropping, and Resolution Ablation (100 demos). Entries report success rate (%);
+subscripts show absolute percentage-point change w.r.t. Seeker in Tab. 1.
+6
+Ablations
+Training Objective for Seeker.
+We compare direct regression, flow matching [27, 28], and
+IMLE [29] for training Seeker from action supervision. Direct regression yields noisy attention, while
+generative objectives produce more stable ROIs: IMLE is cleaner but diffuse, and flow matching gives
+tighter masks closest to diffusion. Across 300 trajectories from Square, Stack Three, and Three-Piece
+Assembly, the average ROI box IoU to the diffusion-trained Seeker is 0.50 for IMLE and 0.67 for
+flow matching. Additional qualitative comparisons in App. A.2.
+ROI Conditioning, Cropping, and Resolution.
+We next ablate whether Seeker’s gains come
+from box-level conditioning, explicit spatial cropping, or higher-resolution ROI content. FiLM-only
+conditions full-image CNN features on the predicted box location and scale, while low-res crop
+applies the same normalized box to the downsampled policy-resolution image. Tab. 3 shows that
+low-res cropping nearly matches Seeker on average, whereas FiLM-only is substantially weaker. This
+suggests that the main benefit comes from exposing the progression-aware ROI as an explicit crop, not
+merely telling the network where the box is. The small remaining gap indicates that high-resolution
+ROI content can help in fine-grained stages, but is secondary to reducing full-scene visual search.
+7
+Limitations
+Demonstration Coverage. Seeker can be pretrained on fewer demonstrations than the downstream
+policy when they contain sufficient spatial variation in control-relevant interaction regions and task
+phases. In App. C, spatially diverse subsets recover similar ROI behavior and policy performance to
+the full Seeker pretraining set, suggesting that coverage matters more than raw count. In spatially
+invariant or visually redundant phases, actions may be predictable from proprioception or trajectory
+regularities, giving little incentive to localize visual evidence. This shows little in-domain impact in
+Tab. 1, where Seeker still matches or approaches Oracle ROI on Coffee Preparation and Pick & Place
+despite largely static targets. New layouts that vary these targets may require additional spatially
+varied demonstrations or retraining.
+Training and Inference Overhead. Seeker adds a separate pretraining stage before the downstream
+policy, after which it is frozen and reused. For consistency, our main experiments train Seeker on
+the full policy-training set, giving a conservative total training overhead of roughly 1.5–1.8× over
+training the downstream policy alone. This overhead can be reduced by training Seeker on fewer
+spatially diverse demonstrations, as suggested by App. C. At inference time, ROI extraction adds
+approximately 12 ms per step in our implementation.
+8
+Conclusion
+We presented Seeker, an action-supervised module that learns where visual evidence is needed for
+visuomotor control. Seeker turns observation–action data into a progression-aware ROI, exposing
+an explicit spatial bottleneck without relying on semantic boxes, gaze, language grounding, or
+affordance annotations. Across simulation and real-robot experiments, the same bottleneck improves
+data efficiency, enables targeted background augmentation, and transfers from RGB crops to point-
+cloud filtering. These results point to action-grounded visual bottlenecks as a practical interface
+between perception and policy learning, and more broadly highlight that the visual structure recovered
+from action supervision depends on the coverage and variation present in the demonstrations.
+8
+
+
+References
+[1] C. Wang, L. Fan, J. Sun, R. Zhang, L. Fei-Fei, D. Xu, Y. Zhu, and A. Anandkumar. Mimicplay:
+Long-horizon imitation learning by watching human play. In Conference on Robot Learning
+(CoRL), 2023.
+[2] R. Takizawa, I. Karino, K. Nakagawa, Y. Ohmura, and Y. Kuniyoshi. Enhancing reusability
+of learned skills for robot manipulation via gaze information and motion bottlenecks. IEEE
+Robotics and Automation Letters (RA-L), 2025.
+[3] S. James, K. Wada, T. Laidlow, and A. J. Davison. Coarse-to-fine q-attention: Efficient learning
+for visual robotic manipulation via discretisation. In IEEE/CVF Conference on Computer Vision
+and Pattern Recognition (CVPR), 2022.
+[4] R. Wang, Z. Zhuang, D. Kragic, and F. T. Pokorny. PALM: Enhanced generalizability for local
+visuomotor policies via perception alignment. IEEE Robotics and Automation Letters (RA-L),
+2026.
+[5] S. Liu, Z. Zeng, T. Ren, F. Li, H. Zhang, J. Yang, Q. Jiang, C. Li, J. Yang, H. Su, J. Zhu, and
+L. Zhang. Grounding DINO: marrying DINO with grounded pre-training for open-set object
+detection. In European Conference on Computer Vision (ECCV), 2024.
+[6] A. Stone, T. Xiao, Y. Lu, K. Gopalakrishnan, K.-H. Lee, Q. Vuong, P. Wohlhart, S. Kirmani,
+B. Zitkovich, F. Xia, C. Finn, and K. Hausman. Open-world object manipulation using pre-
+trained vision-language models. In Conference on Robot Learning (CoRL), 2023.
+[7] T. Kwon, N. Di Palo, and E. Johns. Language models as zero-shot trajectory generators. IEEE
+Robotics and Automation Letters (RA-L), 2024.
+[8] J. Hu, L. Wang, S. Li, Y. Jiang, X. Li, P. Weng, and Y. Ban. Generalizable coarse-to-fine robot
+manipulation via language-aligned 3d keypoints. In International Conference on Learning
+Representations (ICLR), 2026.
+[9] V. Myers, C. Zheng, O. Mees, K. Fang, and S. Levine. Policy adaptation via language optimiza-
+tion: Decomposing tasks for few-shot imitation. In Conference on Robot Learning (CoRL),
+2024.
+[10] M. Shridhar, L. Manuelli, and D. Fox. Perceiver-actor: A multi-task transformer for robotic
+manipulation. In Conference on Robot Learning (CoRL), 2023.
+[11] A. Goyal, V. Blukis, J. Xu, Y. Guo, Y.-W. Chao, and D. Fox. Rvt2: Learning precise manip-
+ulation from few demonstrations. In Proceedings of Robotics: Science and Systems (RSS),
+2024.
+[12] O. Sim’eoni, H. V. Vo, M. Seitzer, F. Baldassarre, M. Oquab, C. Jose, V. Khalidov, M. Szafraniec,
+S. Yi, M. Ramamonjisoa, F. Massa, D. Haziza, L. Wehrstedt, J. Wang, T. Darcet, T. Moutakanni,
+L. Sentana, C. Roberts, A. Vedaldi, J. Tolan, J. Brandt, C. Couprie, J. Mairal, H. J’egou,
+P. Labatut, and P. Bojanowski. DINOv3, 2025.
+[13] G. Papagiannis, N. Di Palo, P. Vitiello, and E. Johns. R+ x: Retrieval and execution from
+everyday human videos. In IEEE International Conference on Robotics and Automation (ICRA),
+2025.
+[14] Y. Zhang, S. Mittal, Z. Zhang, L. Ke, S. Srinivasa, and A. Gupta. Atk: Automatic task-driven
+keypoint selection for robust policy learning. arXiv, abs/2505.13867, 2025.
+[15] S. James and A. J. Davison. Q-attention: Enabling efficient learning for vision-based robotic
+manipulation. IEEE Robotics and Automation Letters (RA-L), 2022.
+9
+
+
+[16] A. Goyal, J. Xu, Y. Guo, V. Blukis, Y.-W. Chao, and D. Fox. Rvt: Robotic view transformer for
+3d object manipulation. In Conference on Robot Learning (CoRL), 2023.
+[17] Z. Zhuang, R. Wang, G. L. Marchetti, F. T. Pokorny, and D. Kragic. Mirrorduo: Reflection-
+consistent visuomotor learning from mirrored demonstration pairs. In Conference on Robot
+Learning (CoRL), 2025.
+[18] D. Wang, S. Hart, D. Surovik, T. Kelestemur, H. Huang, H. Zhao, M. Yeatman, J. Wang,
+R. Walters, and R. Platt. Equivariant diffusion policy. In Conference on Robot Learning (CoRL),
+2024.
+[19] D. Klee, B. Hu, A. Cole, H. Tian, D. Wang, R. Platt, and R. Walters. Raven: End-to-end equivari-
+ant robot learning with rgb cameras. In International Conference on Learning Representations
+(ICLR), 2026.
+[20] A. Bardes, Q. Garrido, J. Ponce, X. Chen, M. Rabbat, Y. LeCun, M. Assran, and N. Ballas.
+Revisiting feature prediction for learning visual representations from video. arXiv preprint
+arXiv:2404.08471, 2024.
+[21] M. Fu, H. Huang, G. Datta, L. Y. Chen, W. Panitch, F. Liu, H. Li, and K. Goldberg. Icrt:
+In-context imitation learning via next-token prediction. In IEEE International Conference on
+Robotics and Automation (ICRA), 2025.
+[22] N. Tsagkas, A. Sochopoulos, D. Danier, S. Vijayakumar, C. X. Lu, and O. Mac Aodha. When
+pre-trained visual representations fall short: Limitations in visuo-motor robot learning. arXiv
+preprint arXiv:2502.03270, 2025.
+[23] C. Chi, S. Feng, Y. Du, Z. Xu, E. Cousineau, B. Burchfiel, and S. Song. Diffusion policy:
+Visuomotor policy learning via action diffusion. In Robotics: Science and Systems (RSS), 2023.
+[24] A. Mandlekar, S. Nasiriany, B. Wen, I. Akinola, Y. Narang, L. Fan, Y. Zhu, and D. Fox.
+Mimicgen: A data generation system for scalable robot learning using human demonstrations.
+In Conference on Robot Learning (CoRL), 2023.
+[25] Y. Ze, G. Zhang, K. Zhang, C. Hu, M. Wang, and H. Xu. 3d diffusion policy: Generalizable
+visuomotor policy learning via simple 3d representations. In Robotics: Science and Systems
+(RSS), 2024.
+[26] E. Chisari, N. Heppert, M. Argus, T. Welschehold, T. Brox, and A. Valada. Learning robotic
+manipulation policies from point clouds with conditional flow matching. In Conference on
+Robot Learning (CoRL), 2024.
+[27] Y. Lipman, R. T. Chen, H. Ben-Hamu, M. Nickel, and M. Le. Flow matching for generative
+modeling. In International Conference on Learning Representations (ICLR), 2023.
+[28] K. Black, N. Brown, D. Driess, A. Esmail, M. Equi, C. Finn, N. Fusai, L. Groom, K. Hausman,
+B. Ichter, et al. pi 0: A vision-language-action flow model for general robot control. In
+Proceedings of Robotics: Science and Systems (RSS), 2025.
+[29] K. Rana, R. Lee, D. Pershouse, and N. Suenderhauf. Imle policy: Fast and sample efficient
+visuomotor policy learning via implicit maximum likelihood estimation. In Robotics: Science
+and Systems (RSS), 2025.
+[30] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell,
+P. Mishkin, J. Clark, et al. Learning transferable visual models from natural language supervision.
+In International conference on machine learning (ICML), 2021.
+[31] A. Mandlekar, D. Xu, J. Wong, S. Nasiriany, C. Wang, R. Kulkarni, L. Fei-Fei, S. Savarese,
+Y. Zhu, and R. Mart´ın-Mart´ın. What matters in learning from offline human demonstrations for
+robot manipulation. In Conference on Robot Learning (CoRL), 2021.
+10
+
+
+Attention from Action, for Action
+APPENDIX
+This appendix provides implementation details, diagnostics, and extended results for Seeker. App. A
+details Seeker training and ROI extraction. App. B summarizes the simulation tasks. App. C studies
+data efficiency through spatial coverage. App. D reports full simulation and point-cloud results.
+App. E provides real-world setup details and qualitative visualizations.
+A
+Seeker Training Details
+A.1
+Head Gating Visualizations
+t = 0
+t = 50
+t = 110
+t = 260
+Head #1
+#2
+#3
+#4
+#5
+#6
+(a) Three-Piece Assembly
+t = 0
+t = 50
+t = 130
+t = 210
+(b) Stack Three
+Figure A.1: Per-frame head overlays and corresponding gating weights for two tasks.
+As shown in Fig. A.1, the contribution of each attention head changes over the course of the task.
+Taking the Three-Piece Assembly example, Head 1 remains relatively diffuse and becomes most
+salient for the final piece. During the final placement stage, Head 4 becomes more diffuse, while
+Head 3 becomes the dominant contributor.
+A.2
+Seeker Implementation Details
+Trained from epoch 0
+Introduced  after     epochs
+After       epochs
+Coarse Seeker
+(Global Search)
+Fine Seeker
+(ROI Constrained)
+Attention Trimming
+Coarse
+BBox
+Fine 
+BBox
+Coarse Attention
+ω
+NdcJyMUm+SrY=">AB7HicbVBNS8NAEJ3Ur1q/qh69LFbBU0mKX8eCF48VTFtoQ9lsN+3SzS
+bsToRS+hu8eFDEqz/Im/GbZuDtj4YeLw3w8y8MJXCoOt+O4W19Y3NreJ2aWd3b/+gfHjUNEm
+mGfdZIhPdDqnhUijuo0DJ26nmNA4lb4Wju5nfeuLaiEQ94jlQUwHSkSCUbSX+sizXrlilt1
+5yCrxMtJBXI0euWvbj9hWcwVMkmN6XhuisGEahRM8mpmxmeUjaiA96xVNGYm2AyP3ZKzq3SJ
+1GibSkc/X3xITGxozj0HbGFIdm2ZuJ/3mdDKPbYCJUmiFXbLEoyiTBhMw+J32hOUM5toQyLe
+ythA2pgxtPiUbgrf8ip1qredfXq4bJSP8vjKMIJnMIFeHADdbiHBvjAQMAzvMKbo5wX5935
+WLQWnHzmGP7A+fwBjOGOcA=</latexit>2ω
+Figure A.2: Coarse-to-fine Attention Trimming. From epoch 0, Seeker produces a coarse box; after τ epochs,
+the fine branch predicts a fine box within the coarse ROI; after 2τ, attention trimming suppresses out-of-box
+mass and tightens the coarse box.
+Coarse-to-Fine Attention Trimming.
+Fig. A.2 shows that action supervision already steers Seeker
+attention toward task-relevant regions, but the resulting maps can remain heavy-tailed, yielding
+non-compact ROIs, especially in long-horizon tasks with shifting targets. We adopt a coarse-to-fine
+staged training scheme (Fig. A.2) with stage stride τ (epochs) to obtain compact, adaptive ROIs. We
+train a coarse Seeker from the first epoch for localization, introduce a fine Seeker after τ epochs that
+operates only on patch tokens within the coarse ROI (box-cropped token set), and train both branches
+jointly with shared DINOv3 patch features but separate diffusion heads. After 2τ epochs, we activate
+11
+
+
+attention trimming: letting Mfine
+box ∈{0, 1}Np be the binary patch mask induced by the fine ROI box (1
+inside, 0 outside), we form a trimmed target attention for each head by masking and renormalizing
+the coarse last-step attention A(T )
+h , and minimize a head-weighted KL divergence,
+bAh = stopgrad
+h
+Norm
+
+Mfine
+box ⊙A(T )
+h
+i
+,
+Ltrim = PH
+h=1 ω(T )
+h
+DKL
+
+bAh ∥A(T )
+h
+
+.
+which suppresses residual out-of-box mass and tightens the coarse ROI until it largely overlaps the
+fine ROI. After training, we discard the fine branch and retain only the coarse branch for single-pass
+ROI prediction at inference.
+Iterative Refinement.
+Iterative refinement helps Seeker form task-progress-aware attention. A
+single state-conditioned query can already localize useful regions because proprioception and gripper
+state provide strong phase cues, such as picking versus insertion in Square D2. However, similar
+end-effector states can still correspond to different visual targets depending on object pose, scene
+layout, or task progress. In such ambiguous cases, a single lookup can produce less compact attention,
+while refinement lets the query update from retrieved visual evidence before producing the final
+attention map. We use two query updates in all experiments, and derive the training attention map
+and pooled context after the second update.
+The low-dimensional inputs consist of end-effector translation, end-effector rotation, gripper state, a
+one-hot embodiment identifier, and a task embedding. Task embeddings are derived from CLIP [30]
+given short task descriptions; the language serves only as an identifier, does not inject linguistic prior,
+and is similar to task-specific learnable tokens. Seeker fuses the task embedding with the remaining
+low-dimensional signals to form its conditioning context (Eq.3.1), while the policy head concatenates
+the low-dimensional inputs with a down-projected task embedding. In multi-embodiment training,
+ROI localization degrades without the embodiment identifier, so we include it in both Seeker’s
+conditioning context and the policy head. For Seeker, we use only the 3D translation and gripper
+state, since end-effector rotation is largely redundant for coarse ROI localization and can hinder
+convergence; rotation can be added back for tasks where wrist orientation is essential. Dataset images
+are stored at 240 × 240 and randomly cropped to 224 × 224 during training, which is important
+for stable policy learning [31]. During mask extraction, we drop the two lowest-scored attention
+heads, renormalize the remaining weights to sum to one, and use nucleus sampling (top p = 0.8) in
+both simulation and real-robot experiments to suppress low-probability patches. This hard dropping
+is applied only at extraction time; during policy training, head weights remain soft to preserve
+differentiability. Hyperparameters. Seeker uses the same hyperparameters as the default Diffusion
+Policy [23]. Learning rate warmup set for diffusion policy is also important for stable ROI emergence,
+as initial updates without warmup can impose strong early attention biases and hinder convergence.
+Without Random Overlay
+With Random Overlay
+Figure A.3: Effectiveness of Pixel Perturbation. At early training stages (10k updates), Seeker trained without
+Random Overlay exhibits noisy attention on spurious visual artifacts.
+Pixel-level Perturbation.
+We find pixel-space perturbations crucial for the quality of Seeker’s
+ROI (Fig. A.3). We therefore apply a simple yet effective Random Overlay augmentation, largely
+following MirrorAug [17]. At each update, each sample is independently overlaid with probability
+pov (i.e., pov is the per-sample augmentation probability). MirrorAug ramps pov linearly from 0 to
+0.5 during a warmup phase. In contrast, we set the warmup to zero and use pov = 0.5 from the start
+of training, so that on average half of the samples in every batch are augmented. Empirically, gradual
+ramp-up weakens the regularization effect when early spurious biases form, reducing its ability to
+prevent attention collapse. The same perturbation is also applied when training the RVT-2-style
+heatmap predictor. We mix the original image I with a random texture image Itex using overlay
+strength α = 0.6:
+˜I = α I + (1 −α) Itex = 0.6 I + 0.4 Itex.
+12
+
+
+View Complementarity and Sequential Training.
+In multi-view settings (third-person and eye-
+in-hand, with proprioception), the most informative view can change over the course of an episode.
+In particular, the eye-in-hand view often becomes dominant during the interaction phase, while the
+third-person view can become less informative. Under joint multi-view training, we observe that the
+third-person ROI may occasionally shift toward the next target or other salient regions. This behavior
+reflects Seeker exploiting cross-view complementarity, rather than a failure of localization.
+However, when a standalone third-person ROI is required (e.g., third-person-only policy or cropping
+for point clouds), this implicit cross-view dependency is no longer available and can lead to degraded
+performance. We therefore incorporate additional views sequentially during training. We first
+train Seeker using only the third-person view and cache the resulting third-person context features.
+We then initialize a multi-view Seeker that takes the cached third-person features while learning
+to incorporate the additional view(s). This yields the Seeker variant used in our simulation and
+real-robot experiments, encourages the third-person representation to remain reliable throughout an
+episode, and allows adding new cameras without retraining previously incorporated views.
+Seeker Localizes Rather Than Controls.
+Although Seeker’s ROI localization emerges from the
+policy objective, its pooled context is not intended to serve as a standalone action representation.
+Directly rolling out actions from Seeker’s context achieves near-zero average success across tasks,
+with Stack-Three being the highest at 20%, indicating that Seeker captures mainly where to attend
+while discarding fine-grained geometric and contact cues needed for control. Fine-tuning DINO
+improves this context but remains non-competitive with full policy baselines and weakens the
+pretrained geometric structure used for stable attention, so we keep Seeker frozen and use it only as
+an explainable visual bottleneck.
+Direct Regression, IoU 0.30
+IMLE, IoU 0.50
+Flow Matching, IoU 0.67
+Figure A.4: Seeker ROI under Different Training
+Objectives. Visualizations are shown with the mean
+IoU to the diffusion-trained Seeker.
+Training
+Objectives.
+We
+compare
+Seeker
+trained with different action objectives, including
+behavioral cloning (BC, direct regression), flow
+matching [27], and Implicit Maximum Likelihood
+Estimation (IMLE) [29]. As shown in Fig. A.4,
+all objectives bias attention toward foreground re-
+gions, but produce different ROI structures. BC
+yields heavier-tailed ROIs with more scattered
+noise, likely due to pointwise regression under
+multimodal expert behavior.
+IMLE produces
+cleaner maps but often spreads attention over mul-
+tiple plausible foreground cues. Flow matching
+yields ROIs closest to the default diffusion-trained
+Seeker, consistent with its closely related genera-
+tive formulation.
+We quantify these differences by measuring ROI IoU against the diffusion-trained Seeker on the
+merged six-task simulation dataset with 100 demonstrations per task. BC, IMLE, and flow matching
+achieve mean IoUs of 0.30, 0.50, and 0.67, respectively, matching the qualitative trend in Fig. A.4.
+B
+Simulation Task Overviews
+We use six simulation tasks from MimicGen [24] and the corresponding released datasets. We
+re-render the trajectories at higher image resolution (from 84 × 84 to 240 × 240) to match DINO’s
+default input size. Five tasks use a Franka Panda arm and one uses a Sawyer arm (Pick and Place
+D0). All tasks share a 7D action space, consisting of 3D translation, 3D rotation, and a 1D gripper
+command. Each task provides a third-person (agentview) camera and an eye-in-hand camera. Task
+descriptions are summarized below.
+Full Workspace Shuffling. Objects are randomized (both rotation and translation) across the
+workspace. Stack Three D1: 6 subtasks (3 pick-and-place). Sequentially stack three cubes. Square
+D2: 2 subtasks (pick-and-insert). Insert a square nut onto a square peg. Three-Piece Assembly D2: 6
+subtasks (3 pick-and-place). Sequentially assemble three pieces, requiring precise orientation and
+placement. Threading D2: 2 subtasks. Pick a needle by its cubic handle and insert the tip into a hole
+on a fixture.
+13
+
+
+Constrained Object Shuffling. Each component is randomized within a constrained region. Coffee
+Preparation D1: 7 subtasks. Pick up the mug, place it on the coffee machine, open the capsule
+slot’s lid, open the drawer, pick up a capsule, place it into the slot, and close the lid. The drawer
+has no spatial variation. Pick and Place D0: 8 subtasks. Sequentially place four objects into their
+corresponding baskets. Objects start on the left, and the target baskets are fixed on the right.
+C
+Data Efficiency and Spatial Coverage
+(a) Stack Three: green cube
+(b) Square: peg
+(c) 3-Piece Assembly: first piece
+Figure A.5: Sub-task Spatial Coverage. Sub-task target distributions used to construct coverage-controlled
+25-demo equivalent Seeker pretraining subsets. Each panel shows one representative sub-task, comparing the
+least diverse subset on the left with the most diverse subset on the right.
+This section contextualizes Seeker’s training overhead with a task-specific coverage diagnostic. Our
+main experiments train Seeker on the full 100-demo policy-training set, giving a conservative estimate
+of total training cost. Here, we ask whether this cost can be reduced when the selected demonstrations
+still preserve the spatial variation needed for ROI learning.
+We use task-specific Seekers to isolate spatial coverage from the additional factors introduced by
+multi-task training. In a multi-task Seeker, the effective data requirement is shaped not only by
+per-task coverage, but also by task balance and inter-task interference, especially when the pretraining
+set is reduced. Our early experiments showed that multi-task Seeker needed more data to match
+isolated task-specific Seekers. We therefore treat this study as a controlled diagnostic of spatial
+coverage, rather than a low-data multi-task pretraining protocol.
+We construct coverage-controlled subsets using privileged sub-task annotations only for selection.
+Each task is decomposed into sub-tasks, and demonstrations within each sub-task are ranked by
+farthest-point sampling over target poses. An N-demo equivalent setting denotes the top or bottom
+N demonstrations selected independently per sub-task from the 100-demo pool, rather than N
+trajectories selected globally. Seeker is trained on the corresponding demonstration windows, with a
+fixed-range normalizer to avoid subset-specific normalization shifts.
+Fig. A.5 visualizes the least and most diverse 25-demo equivalent subsets for representative sub-tasks.
+Tab. A.I shows that task-specific Seeker is robust to reduced pretraining data when spatial coverage
+is preserved: Most-25 is within 0.4 points of Full-100 on average, and Most-50 matches Full-100.
+Least-25 remains competitive but drops by 3.6 points, mainly on Square and 3-Piece Assembly. This
+suggests that spatial distribution matters most when the pretraining budget is small, especially for
+tasks such as 3-Piece Assembly where similarly colored, shape-dependent objects induce broader
+pose-dependent contact regions.
+Coverage
+Stack Three D1
+Square D2
+3-Piece Assembly D2
+Avg.
+Full-100
+81.3±1.2
+46.0±7.2
+58.7±2.3
+62.0
+Least-25
+81.3±1.2
+40.7±1.2
+53.3±2.3
+58.43.6↓
+Most-25
+78.7±4.2
+44.7±3.1
+61.3±2.3
+61.60.4↓
+Most-50
+80.0±2.0
+45.3±7.6
+60.7±5.0
+62.0
+Table A.I: Effect of Seeker Pretraining Spatial Coverage. Success rates (%) are computed as the mean over
+three seed-level best checkpoints. Full-100 denotes the Seeker used in the main experiments. Least-25 and
+Most-25 use the least and most spatially diverse 25-demo equivalent subsets, respectively, while Most-50 uses
+the most spatially diverse 50-demo equivalent subset. Average subscripts report the change relative to Full-100.
+Overall, this diagnostic suggests that task-specific Seeker pretraining can be substantively reduced
+with spatially covered subsets. In the multi-task setting, however, the reducible overhead depends on
+preserving both spatial coverage and task balance while mitigating cross-task interference. Quantify-
+ing this trade-off is beyond the scope of this diagnostic.
+14
+
+
+D
+Experimental Details and Results
+D.1
+RGB Cropping
+Stack Three
+Square
+3-P Assembly Coffee Prep. Pick & Place† Threading
+Input-level Comparison
+DiffPo (Pre)
+52.7±5.4
+22.0±3.5
+14.0±9.2
+65.3±2.1
+20.0±5.3
+20.7±2.1
+MirrorAug
+68.0±3.3
+32.7±2.5
+21.0±1.0
+62.0±2.0
+20.7±3.1
+18.7±1.2
+RVT2-Crop
+71.3±1.2
+26.0±2.0
+26.7±1.2
+69.3±2.3
+49.3±3.1
+12.7±1.2
+Seeker (ours)
+81.3±1.2
+46.0±7.2
+58.7±2.3
+82.0±2.0
+69.3±1.2
+38.0±2.0
+External SOTA and Privileged ROI References
+RAVEN
+80.7±2.1
+50.0±6.9
+26.7±7.3
+72.7±7.3
+54.7±1.2
+28.0±3.5
+Oracle ROI∗
+80.7±1.2
+44.7±4.2
+62.7±1.2
+81.3±4.2
+71.3±1.2
+44.7±1.2
+Table A.II: Data Efficiency on MimicGen [24]. Success rate (%) on six tasks with 100 demonstrations,
+averaged over three seeds and reported as mean±std. RAVEN and DiffPo (Pre) results are taken from the RAVEN
+paper [19] where protocol-matched. Pick & Place uses our strict episode-success reruns.
+D.2
+Point-cloud Filtering
+Implementation.
+For each observation, we unproject calibrated depth images from all cameras
+into a shared world-frame point cloud. Given a Seeker bounding box from camera ˜c, we reproject all
+world-frame points into the image plane of ˜c and retain only points whose projected pixel coordinates
+fall inside the box. This yields the Seeker-cropped point cloud while still leveraging points from all
+cameras. Unlike cropping each camera image independently before 3D projection, this strategy uses
+a single Seeker prediction and does not require training camera-specific Seekers. For the remaining
+point-cloud experiments, we follow EquiDiff’s [18] default DP3 [25] setup.
+Manual
+✗
+✓
+✗
+✓
+Seeker
+✗
+✗
+✓
+✓
+Stack Three D1
+0.0±0.0
+23.3±1.1
+34.6±5.7
+47.3±8.0
+Square D2
+0.0±0.0
+6.0±1.1
+8.6±1.1
+7.3±1.1
+3-Piece Assem. D2
+0.0±0.0
+1.3±1.1
+6.0±2.0
+6.0±0.0
+Coffee Prep. D1
+0.0±0.0
+22.0±6.9
+42.0±6.0
+64.3±8.0
+Pick & Place D0
+0.0±0.0
+1.3±1.1
+12.6±1.1
+26.0±3.5
+Threading D2
+0.0±0.0
+18.0±2.0
+22.6±4.6
+28.6±4.2
+Table A.III: Full Point-cloud Results. We compare different point-cloud cropping strategies across all tasks for
+three seeds, reporting the mean and standard deviation.
+(a) Rotation
+(b) Workspace
+Figure A.6: Point-cloud Policy Stress Cases. Under combined cropping, failures mainly arise from (a)
+inaccurate orientation estimation and (b) sparse task-relevant points in large workspaces, making fine-grained
+motions difficult to infer.
+Failure Analysis.
+Tab. A.III reports full results across all tasks and seeds. Seeker plus manual
+workspace cropping performs best in five out of six tasks, but point-cloud policies still lag image-
+based policies on most tasks. Fig. A.6 shows two typical failure modes. First, DP3 can struggle with
+fine-grained rotation inference, so Seeker’s spatial focus does not fully resolve orientation ambiguity
+in the point-cloud representation. This is most pronounced in Three-Piece Assembly, which has
+broad up-axis rotation variation, and less severe in Coffee Preparation, where orientation variation is
+smaller. Second, in large workspaces such as Pick & Place, task-relevant points can remain sparse
+after cropping, especially when Seeker under-crops and leaves distractor points.
+15
+
+
+D.3
+Random Overlay and Guided Overlay
+In Sec. 4 we introduced Random Overlay as one of the baseline augmentation techniques, with
+Seeker’ guided augmentation. We detail them below:
+Random Overlay is applied by blending the input image I with a randomly sampled background
+Itex, ˜I = (1 −α)I + αItex, where α ∈[0, 1] is the constant blending coefficient. Following App. A.2,
+the augmentation is applied with probability p, linearly warmed up to 0.5 over the first 2500 training
+steps, with α fixed to 0.6.
+Guided Overlay. Guided Overlay follows the same procedure, but replaces the global blending
+coefficient with a spatially varying map derived from Seeker’s mask M. The mask is produced at
+patch resolution (e.g., 14 × 14 for a 224 × 224 input), and we bilinearly upsample it to the image
+resolution before blending. The image I is either the ROI-cropped third-person view or the full eye-
+in-hand view. We convert M (summing to one) into an image-valued map by Mnorm = M/ max(M)
+and clamp it to [0.3, 0.8] to obtain Mclamp. We then blend per pixel as
+˜I = Mclamp ⊙I + (1 −Mclamp) ⊙Itex,
+Clamping is necessary as Seeker’s mask is produced at patch resolution rather than pixel-level
+accuracy. Overly extreme blending that fully replaces low-confidence regions or preserves high-
+confidence regions can degrade performance. Clamping moderates these extremes: low-confidence
+regions are strongly perturbed but still partially preserved, while high-confidence regions are only
+mildly perturbed rather than fully protected.
+E
+Real Experiments
+E.1
+Tasks and Setup
+All tasks are performed on a UFactory xArm 7 with fixed third-person and eye-in-hand RGB
+cameras. Demonstrations are collected via teleoperation, and objects are randomly shuffled within
+the workspace during both data collection and policy evaluation. All tasks use position-based end-
+effector control at 10 Hz. Both proprioceptive states and actions are 10-dimensional, comprising a
+3D Cartesian end-effector position, a 6D representation of end-effector rotation, and a 1D continuous
+gripper state. Image observations are captured at 848 × 480, center-cropped for the third-person
+view and square-padded for the eye-in-hand view, then resized to 240 × 240. Task descriptions are
+provided below, with dataset statistics summarized in Tab. A.IV.
+Coffee Transport requires the robot to scoop coffee beans from a yellow bowl using a spoon and
+pour them into an espresso cup. This task requires precise control of tool orientation and pouring
+motion, with the small white espresso cup placed against a white-dominant textured background,
+making target localization brittle from RGB observations. Successful execution requires coordinated
+reaching, scooping, transporting, and controlled tilting without spilling.
+Table Cleanup requires the robot to sequentially grasp and insert two toy vegetables with different
+geometries, a long thin carrot and a round tomato, into a bin, followed by placing a lid on top. The
+task involves multiple object interactions, ordered subtasks, and non-trivial 3D rotations during
+insertion, requiring temporal consistency and accurate pose control across subtasks.
+Board Assembly requires the robot to sequentially pick three pieces with distinct base shapes, round,
+square, then hexagonal, and insert them into corresponding slots on a board. Although the geometries
+match exactly, the part colors intentionally do not correspond to the slot colors, increasing the
+reasoning difficulty. Successful execution requires millimeter-level accuracy and robust shape-based
+pose estimation across a long horizon.
+Task
+# Demos
+# Subtasks
+ImgD
+PropD
+ActD
+Coffee Transport
+50
+4
+2 × 3 × 240 × 240
+10
+10
+Table Cleanup
+100
+6
+2 × 3 × 240 × 240
+10
+10
+Board Assembly
+100
+6
+2 × 3 × 240 × 240
+10
+10
+Table A.IV: Real-world task summary. # Demos: demonstrations used for both Seeker and downstream
+policies; ImgD: input RGB observation dimensionality; PropD and ActD: proprioception and action dimensions.
+16
+
+
+Step
+(a) Coffee Transport
+Step
+(b) Table Cleanup
+Step
+(c) Board Assembly
+Figure A.7: Seeker-selected Keyframes for Real-world Tasks. Predicted ROIs, crops, and masks are aligned
+with peaks in pairwise cosine distance from Seeker’s context feature.
+E.2
+Training Details
+We train our methods and all baselines on real-world data using the same protocol as in simulation.
+Limited demonstrations and complex visual backgrounds make convergence more challenging,
+especially with image-space noise from Random Overlay for baselines and Guided Overlay for
+Seeker policies. We therefore adjust two hyperparameters: the overlay warm-up is increased to 5,000
+steps for all policies, and Seeker training is extended to 600 epochs.
+E.3
+Seeker Visualization
+Fig. A.7 shows additional real-world visualizations, including Seeker-selected keyframes, masks, and
+crop outputs. Keyframe scores are computed from the cosine distance between consecutive Seeker
+context vectors, as in simulation, and highlight meaningful stage transitions. Qualitatively, Seeker
+maintains task-relevant localization and progression-aware focus switching on real hardware.
+Compared with MimicGen [24], real-world demonstrations are generated by human operators and
+contain smoother continuous translation and rotation within each subtask. Accordingly, Seeker more
+often exhibits an interaction-centric focus, covering both the manipulated object and the target, such
+as the spoon tip and cup in Coffee Transport or the part and slot in Board Assembly. In Table Cleanup,
+where manipulation involves less rotation, Seeker more often follows an object-centric pattern.
+Overall, these results suggest that Seeker can switch between object-centric and interaction-centric
+bottlenecks depending on the task and data distribution.
+17

@@ -1,0 +1,69 @@
+{
+  "label": "2026-08-15",
+  "date": "2026-08-15",
+  "generated_at": "2026-08-15T20:35:23",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202608/15/2608.07619v1-gwm-vla-geometry-aware-latent-world-modeling-for-vision-language-action-learning",
+      "section": "deep",
+      "title_en": "GWM-VLA: Geometry-Aware Latent World Modeling for Vision-Language-Action Learning",
+      "authors": "Yanping Zhao, Hang Yu, Yiwei Wang, Chen Ye, Siyu Tian, Di Zhang, Qingjun Wang, Qian Chen, Junqiao Zhao, Chen Ye, Guang Chen",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.07619v1",
+      "score": "8.0",
+      "evidence": "几何感知潜在世界建模的视觉语言动作模型",
+      "tldr": "视觉-语言-动作（VLA）模型在环境变化下鲁棒性不足，现有多视角潜在世界模型未显式建模几何关系。GWM-VLA提出几何感知潜在世界建模框架，通过VGGT-Ω聚合多视角状态，并预测目标视图下一时刻token，同时用共享动作表示联合监督世界模型与动作头。实验在仿真和真实环境验证了该方法在任务成功率和鲁棒性上的提升，为VLA模型的几何感知学习提供了新思路。",
+      "tags": "query:evlm",
+      "abstract_en": "Vision-Language-Action (VLA) models achieve strong robotic manipulation performance but often degrade under visual and environmental shifts. Latent world modeling offers a promising approach to improving robustness, yet existing methods commonly encode camera views independently and predict holistic scene dynamics without explicitly modeling their geometric relationships. We propose GWM-VLA, a geometry-aware latent world modeling framework for VLA learning. GWM-VLA combines geometry-aware multi-view state encoding, global context-conditioned target-view prediction, and shared latent-action representations grounded by robot-action supervision. Specifically, VGGT-$Ω$ jointly aggregates multi-view observations at each timestep to construct geometry-aware multi-view states. The latent world model predicts the next-step patch tokens of a selected target view using patch and register tokens obtained after multi-view aggregation, thereby retaining multi-view geometric information without predicting the complete multi-view state. We use the wrist view as the target in our experiments, placing greater emphasis on end-effector motion and local gripper-object interactions. Finally, the shared latent-action representations condition both the latent world model and the flow-matching action head, allowing latent-prediction supervision and ground-truth robot-action supervision to jointly shape the same latent-action representations. Experiments across both simulation and real-world environments demonstrate the effectiveness and robustness of GWM-VLA.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.10758v1-where-to-look--causal-tracing-of-vision-encoders-in-vlm",
+      "section": "quick",
+      "title_en": "Where To Look? : Causal Tracing of Vision Encoders in VLM",
+      "authors": "Naren Kumar S, Tirth Bhatt, Mayank Singh",
+      "date": "2026-08-11",
+      "pdf": "https://arxiv.org/pdf/2608.10758v1",
+      "score": "7.0",
+      "evidence": "VLM视觉编码器token的因果追踪",
+      "tldr": "视觉语言模型虽能准确描述图像，但驱动其回答的视觉信息往往不在目标区域，高因果视觉token常位于目标外。通过因果追踪，发现这种模式在多个模型和损坏设置中普遍存在，表明强多模态性能不代表空间局部因果表征。进一步实验揭示，模型利用视觉线索而非纯粹结构理解视觉结构。该工作暴露了“看到、使用与推理”视觉结构之间的差距，并提供了因果框架研究视觉信息的转换与使用。",
+      "tags": "query:evlm",
+      "abstract_en": "Vision-language models can describe an image with remarkable accuracy, yet a more fundamental question remains unanswered: what visual information actually drives their answers? In this work, we investigate this question through causal tracing, and we observe that highly causal vision tokens often lie outside the target region. Extending the analysis to larger vision-language models reveals a similar pattern across models and corruption settings, suggesting that strong multimodal performance does not necessarily imply spatially localized causal representations. We further investigate: can these models preserve visual structure when appearance cues are removed? and find that visual cues are exploited to understand visual structures. Together, our experiments expose a gap between seeing, using, and reasoning over visual structure, and provide a causal framework for studying how visual information is transformed, preserved, and ultimately used by modern vision-language models.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.13422v1-attention-from-action-for-action-emergent-visual-bottlenecks-for-policy-learning",
+      "section": "quick",
+      "title_en": "Attention from Action, for Action: Emergent Visual Bottlenecks for Policy Learning",
+      "authors": "Zheyu Zhuang, Ruiyu Wang, Nick Heppert, Johannes Fabian Hahn, Abhinav Valada, Florian T. Pokorny, Danica Kragic",
+      "date": "2026-08-13",
+      "pdf": "https://arxiv.org/pdf/2608.13422v1",
+      "score": "7.0",
+      "evidence": "面向高效视运动策略学习的视觉瓶颈方法",
+      "tldr": "现有视觉瓶颈方法依赖外部标签或固定裁剪，难以适应任务证据变化。本文提出Seeker，基于冻结DINOv3特征，仅从动作监督迭代学习进度感知ROI，用于裁剪、背景增强和点云过滤。在仿真和真实环境中，Seeker显著优于无裁剪、增强及动作派生裁剪基线，真实机器人域内成功率由48.3%提至76.7%，光照/背景变化下由20.0%提至60.0%。该工作实现无需标签的自适应视觉注意力，提升了数据效率与鲁棒性。",
+      "tags": "query:evlm",
+      "abstract_en": "Visual bottlenecks that focus policy inputs on regions of interest (ROIs) can improve data-efficient visuomotor learning by separating where to look from how to act. Many ROI interfaces rely on external spatial labels, such as gaze, object classes, or affordance annotations. Label-free alternatives often derive crops from trajectories by detecting gripper or motion events and centering a fixed crop at the projected end-effector. Such action-derived crops are useful spatial priors that require no additional labels, but they encode fixed choices about event timing, proxy points, and crop scale. When the visual evidence needed for control lies away from the end-effector or changes continuously with task progress, these crops can become misaligned. We propose Seeker, a task- and state-conditioned readout that learns attention from action. Starting from frozen DINOv3 features, Seeker iteratively updates a query with gathered visual evidence, producing progression-aware ROIs solely from action supervision. The learned ROI serves as a spatial interface for RGB cropping, mask-guided background augmentation, and point-cloud filtering. In simulation and the real world, Seeker improves data efficiency and robustness over no-crop, augmentation, and action-derived crop baselines. On real robots, Seeker raises average in-domain success from the best baseline's 48.3% to 76.7% and success under lighting/background shifts from 20.0% to 60.0%.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.13463v1-mllm-routed-heterogeneous-ensembles-for-robust-cross-dataset-image-classification",
+      "section": "quick",
+      "title_en": "MLLM-Routed Heterogeneous Ensembles for Robust Cross-Dataset Image Classification",
+      "authors": "Daniel Perkins, John Squires, Janou Milligan, Chandra Raskoti, Linda Ungerboeck",
+      "date": "2026-08-13",
+      "pdf": "https://arxiv.org/pdf/2608.13463v1",
+      "score": "6.0",
+      "evidence": "MLLM智能体将图像路由到最合适的视觉骨干，实现高效多模态推理",
+      "tldr": "图像分类模型在单一数据集上表现好但跨域泛化差。提出ARMDIL，利用多模态大语言模型(MLLM)作路由器，动态选择最合适的视觉骨干（如ResNet、自监督模型、视觉语言模型）组成异构集成。实验表明其性能与专用训练路由器相当，且通过提示修改可快速适应新信息，并提供自然语言推理增强可解释性。为实现可靠通用视觉系统迈出一步。",
+      "tags": "query:evlm",
+      "abstract_en": "Modern image classification models excel when trained on single task-specific datasets but often struggle to generalize across domains and difficulty levels. We propose ARMDIL, an Adaptive Router for Multi-Domain Image classification with LLMs. ARMDIL is an ensemble that uses a multimodal large language model (MLLM) agent to dynamically route each image to the most suitable vision backbone. Our diverse ensemble employs convolutional neural networks (ResNets), self-supervised representation learners (SSL), and vision-language models (VLMs), each trained on a unified label space constructed from multiple image datasets with differing distributions and characteristics. Empirical evaluations illuminate the distinct capabilities and vulnerabilities of each architecture across disparate visual domains. Crucially, we show that ARMDIL effectively navigates these trade-offs, performing competitively with specialized training-based routers. Furthermore, it drastically improves adaptability by allowing new information to be integrated via simple prompt modifications, while enhancing interpretability through natural language reasoning traces. These advances in cross-dataset image classification pave the way for more reliable general-purpose vision systems such as AI assistants and autonomous robots.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
