@@ -1,0 +1,585 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-16T19:21:18.993204+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 4,
+    "deep_cap": 8,
+    "deep_selected": 4,
+    "quick_candidates": 9,
+    "quick_skim_target": 13,
+    "quick_selected": 9
+  },
+  "deep_dive": [
+    {
+      "id": "2608.09202v1",
+      "source": "arxiv",
+      "title": "CRUISE: Vision-Language Model-Guided Uncertainty-Aware Cross-Modal Sensor Fusion for Robust Autonomous Driving",
+      "abstract": "Modern autonomous vehicles are equipped with multiple sensors, such as cameras, LiDAR, and radar, for comprehensive environmental perception. However, robust cross-modal feature fusion remains a critical challenge, as the reliability of each sensor varies significantly across diverse real-world driving conditions, including poor visibility and adverse weather. While uncertainty quantification (UQ) mitigates this issue by allowing models to prioritize reliable signals, existing uncertainty-aware fusion methods typically rely on simple feature-level uncertainty estimates and thus often fail to generalize effectively in complex, out-of-distribution scenarios. To address this limitation, we propose CRUISE, a novel uncertainty-aware cross-modal sensor fusion framework. CRUISE integrates a vision-language model (VLM)-guided UQ module that generates fine-grained, pixel-level uncertainty estimates. By leveraging the VLM's rich prior knowledge and superior contextual reasoning, our approach provides a highly informative guide for the fusion process. Furthermore, we introduce a dynamic adaptive mechanism that explicitly models and captures cross-modal dependencies, ensuring the framework fully exploits the inherent complementary nature of multi-sensor inputs.",
+      "authors": [
+        "Junyao Wang",
+        "Yulin Xu",
+        "Yu Li",
+        "Pramod Khargonekar",
+        "Mohammad Abdullah Al Faruque"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-10T07:17:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.09202v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "VLM-guided uncertainty-aware cross-modal sensor fusion for autonomous driving",
+      "llm_evidence_cn": "基于视觉语言模型引导的不确定性感知跨模态融合，面向自动驾驶",
+      "llm_evidence": "基于视觉语言模型引导的不确定性感知跨模态融合，面向自动驾驶",
+      "canonical_evidence": "基于视觉语言模型引导的不确定性感知跨模态融合，面向自动驾驶",
+      "llm_tldr_en": "CRUISE uses VLM guidance to enhance uncertainty-aware fusion of camera, LiDAR, and radar for robust autonomous driving perception in adverse conditions.",
+      "llm_tldr_cn": "自动驾驶需要对多种传感器进行鲁棒跨模态融合，现有不确定性融合方法在复杂分布外场景下泛化不足。该文提出CRUISE，以视觉语言模型引导不确定性感知的跨模态特征融合，动态优先可靠传感器信号。方法在恶劣天气和可见度差等场景下提升感知鲁棒性。该框架展示了多模态大模型在复杂交通环境感知中的实际应用价值。",
+      "llm_tldr": "自动驾驶需要对多种传感器进行鲁棒跨模态融合，现有不确定性融合方法在复杂分布外场景下泛化不足。该文提出CRUISE，以视觉语言模型引导不确定性感知的跨模态特征融合，动态优先可靠传感器信号。方法在恶劣天气和可见度差等场景下提升感知鲁棒性。该框架展示了多模态大模型在复杂交通环境感知中的实际应用价值。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-25",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.10989v1",
+      "source": "arxiv",
+      "title": "Putting Registers to Work: Task Registers for Token Pruning in Vision Transformers",
+      "abstract": "Token-pruning policies are usually designed for a single recognition pipeline, but pretrained Vision Transformers are reused across tasks with different spatial demands. We ask which parts of a pruning policy transfer across image classification, semantic segmentation, and object detection. For each pipeline, controlled probes freeze the no-pruning checkpoint and apply a series of parameter-free reduction criteria at one eligible layer at a time without retraining. The probes reveal three differences: segmentation and detection rank the criteria differently, classification is especially sensitive to attention-based pruning in the earliest layers, and the dense tasks prefer opposite recovery endpoints. These findings motivate Task-Adaptive Pruning (TAP). Existing register tokens serve as task-agnostic storage for feature artifacts. TAP instead introduces one task register per task and activates only the current one. Its evolving state ranks tokens, distributes an exact removal budget over depth, and sets the recovery scale for dense features. At a final keep rate of $ρ=0.5$, our jointly adapted model, TAP-J, reaches $47.0$ mIoU at $1.30\\times$ encoder throughput on ADE20K and $53.7$ box AP at $1.32\\times$ encoder throughput on COCO while remaining competitive on ImageNet-1K.",
+      "authors": [
+        "Hongsen Cao",
+        "Mona Jaber",
+        "Shanxin Yuan",
+        "Ahmed Sayed"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-11T14:43:52+00:00",
+      "link": "https://arxiv.org/pdf/2608.10989v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "task-adaptive token pruning for vision transformers",
+      "llm_evidence_cn": "面向视觉Transformer的任务自适应令牌剪枝",
+      "llm_evidence": "面向视觉Transformer的任务自适应令牌剪枝",
+      "canonical_evidence": "面向视觉Transformer的任务自适应令牌剪枝",
+      "llm_tldr_en": "Investigates transferable token-pruning policies for pretrained vision transformers across classification, segmentation, and detection; task-specific probes motivate task-adaptive pruning for efficient ViT inference.",
+      "llm_tldr_cn": "该论文研究视觉Transformer令牌剪枝策略在图像分类、语义分割与目标检测之间的可迁移性。通过冻结无剪枝检查点并逐层施加不同约简准则，发现分割和检测对剪枝标准排序不同，分类对早期层注意力剪枝尤其敏感，而密集任务偏好相反的恢复端点。基于这些发现提出任务自适应令牌剪枝，为视觉Transformer及视觉语言模型的高效推理提供依据。",
+      "llm_tldr": "该论文研究视觉Transformer令牌剪枝策略在图像分类、语义分割与目标检测之间的可迁移性。通过冻结无剪枝检查点并逐层施加不同约简准则，发现分割和检测对剪枝标准排序不同，分类对早期层注意力剪枝尤其敏感，而密集任务偏好相反的恢复端点。基于这些发现提出任务自适应令牌剪枝，为视觉Transformer及视觉语言模型的高效推理提供依据。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.10949v1",
+      "source": "arxiv",
+      "title": "StreamFlow: Dynamic Memory Flows for Streaming Video Understanding",
+      "abstract": "Streaming video understanding requires multimodal large language models (MLLMs) to preserve relevant evidence from continuously evolving streams under strict causality and bounded memory. Yet existing paradigms remain limited: model-based methods require intrusive backbone updates, while memory-based methods expend substantial visual-encoding computation on temporally redundant content and rely on rigid access to visual history. To address these limitations, we introduce StreamFlow, an efficient visual memory framework that enables dynamic, on-demand access to historical visual information. StreamFlow combines a lightweight, dynamics-aware mid-term memory that filters temporal redundancy before visual encoding with a latent long-term memory that consolidates historical video content into visual latents accessible to subsequent reasoning. During generation, an attention-guided retrieval mechanism injects relevant visual latents when the model's reliance on visual evidence weakens. StreamFlow achieves state-of-the-art streaming video understanding performance, reaching 67.73% overall accuracy on StreamingBench, while also delivering strong performance on offline long-video benchmarks. Relative to the vanilla setting, it improves the visual attention score (VAS) by 59.1% while reducing end-to-end latency and peak memory by 50.4% and 21.1%, respectively, enabling more visually grounded and efficient reasoning.",
+      "authors": [
+        "Muxin Fu",
+        "Yifan Zhang",
+        "Wentao Zhang",
+        "Fangming Guo",
+        "Qian Chen",
+        "Guibin Zhang",
+        "Shuicheng Yan",
+        "Bo An"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-08-11T14:19:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.10949v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient visual memory framework for streaming video understanding in multimodal LLMs, matching efficiency optimization requirement.",
+      "llm_evidence_cn": "多模态大语言模型中高效的视觉记忆管理，契合效率优化需求",
+      "llm_evidence": "多模态大语言模型中高效的视觉记忆管理，契合效率优化需求",
+      "canonical_evidence": "多模态大语言模型中高效的视觉记忆管理，契合效率优化需求",
+      "llm_tldr_en": "StreamFlow addresses streaming video understanding by introducing an efficient visual memory framework with lightweight dynamics-aware mid-term memory and latent long-term memory, reducing redundant visual encoding and enabling on-demand history access.",
+      "llm_tldr_cn": "该文针对流式视频理解中多模态大语言模型在严格因果性和有界记忆约束下难以保存关键证据的问题，指出现有记忆方法常对时间冗余内容投入大量视觉编码计算且历史访问方式僵化。作者提出StreamFlow高效视觉记忆框架，结合轻量级动态感知中期记忆在视觉编码前过滤时间冗余，并利用潜在长期记忆实现对历史视觉信息的按需访问。实验显示这一方案能有效减少冗余计算并保持或提升流式视频理解精度，为动态场景下的多模态智能体提供了高效记忆管理方案。",
+      "llm_tldr": "该文针对流式视频理解中多模态大语言模型在严格因果性和有界记忆约束下难以保存关键证据的问题，指出现有记忆方法常对时间冗余内容投入大量视觉编码计算且历史访问方式僵化。作者提出StreamFlow高效视觉记忆框架，结合轻量级动态感知中期记忆在视觉编码前过滤时间冗余，并利用潜在长期记忆实现对历史视觉信息的按需访问。实验显示这一方案能有效减少冗余计算并保持或提升流式视频理解精度，为动态场景下的多模态智能体提供了高效记忆管理方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.08832v1",
+      "source": "arxiv",
+      "title": "Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding",
+      "abstract": "Distributed deployment of large vision foundation models often partitions a ViT backbone and exchanges intermediate token features between computing nodes, making efficient feature compression critical under bandwidth and computation constraints. Existing ViT feature codecs typically flatten heterogeneous global and patch tokens into an L x C pseudo image, causing entropy models to mainly capture sequence-axis dependencies while overlooking the native two-dimensional patch-grid structure. In this paper, we show that ViT patch tokens retain strong local spatial correlations on the original grid. To exploit this structural prior, we propose the Visual Token Codec (VTC), a dual-path learned codec that separates global and patch tokens into dedicated coding paths. Global tokens are compressed with a lightweight factorized prior, whereas patch tokens are encoded on the patch-token grid using a spatial-channel context entropy model. To support intermediate-layer compression and practical rate adaptation, VTC further incorporates feature-matching supervision after subsequent ViT blocks and variable-rate modules within a single codec. Experiments on DINOv2 and SAM3 show that VTC consistently outperforms representative ViT feature coding baselines on classification, segmentation, and detection tasks. At 90% of uncompressed-feature performance, VTC reduces bitrate by 15.7x-37.4x across these tasks. We further provide intermediate-layer rate-utility analyses for practical transmission- and storage-oriented deployment scenarios.",
+      "authors": [
+        "Donghui Feng",
+        "Fengxi Zhang",
+        "Changsheng Gao",
+        "Wenhan Yang",
+        "Qi Wang",
+        "Qunshan Gu",
+        "Hongwei Hu",
+        "Zhengxue Cheng",
+        "Li Song"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T17:32:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.08832v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "visual token compression for ViT features",
+      "llm_evidence_cn": "视觉token压缩与ViT特征编码",
+      "llm_evidence": "视觉token压缩与ViT特征编码",
+      "canonical_evidence": "视觉token压缩与ViT特征编码",
+      "llm_tldr_en": "Proposes Visual Token Codec (VTC), a dual-path learned codec exploiting 2D spatial redundancy of ViT patch tokens to compress intermediate visual features, reducing bandwidth and computation in distributed vision model deployment.",
+      "llm_tldr_cn": "针对分布式部署大型视觉基础模型时中间token特征传输带宽和计算开销大的问题，本文提出视觉Token编解码器(VTC)。该方法利用ViT patch token在原始二维网格上的强局部空间相关性，设计双路径可学习编解码器，将全局token与patch token分离编码，从而高效压缩视觉特征。实验表明该方法能显著降低特征编码冗余，在带宽受限场景下提升分布式推理效率。相关工作为视觉语言模型中的token压缩提供了通用技术路径。",
+      "llm_tldr": "针对分布式部署大型视觉基础模型时中间token特征传输带宽和计算开销大的问题，本文提出视觉Token编解码器(VTC)。该方法利用ViT patch token在原始二维网格上的强局部空间相关性，设计双路径可学习编解码器，将全局token与patch token分离编码，从而高效压缩视觉特征。实验表明该方法能显著降低特征编码冗余，在带宽受限场景下提升分布式推理效率。相关工作为视觉语言模型中的token压缩提供了通用技术路径。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.08696v2",
+      "source": "arxiv",
+      "title": "OccAnyScene: Towards Unified Indoor-Outdoor 3D Occupancy Prediction",
+      "abstract": "3D occupancy prediction is fundamental to scene understanding, yet existing 3D semantic occupancy methods are typically specialized to fixed scene types and occupancy protocols. We introduce Cross-Scene 3D Semantic Occupancy Prediction, a new task setting which requires a single model to handle heterogeneous indoor and outdoor scenes with varying cameras, spatial ranges, voxel specifications, and semantic taxonomies. This setting poses a fundamental challenge: achieving metric-consistent yet scene-adaptive image-to-3D lifting across varying camera configurations and scene scales. To address this challenge, we propose OccAnyScene, a pixel-frustum-centered Gaussian framework built upon a pretrained depth foundation model. Specifically, the framework employs Pixel-Aligned Frustum Feature Aggregation to construct a camera-aware frustum query for each feature pixel, and Frustum-Parameterized Gaussian Construction to decode each query into multiple Gaussians whose positions and sizes are constrained by the predicted pixel depth and corresponding frustum geometry. OccAnyScene sets new state-of-the-art results, achieving 59.92% mIoU on the indoor Occ-ScanNet and 23.06% mIoU on the outdoor SurroundOcc-nuScenes.",
+      "authors": [
+        "Junjie Liu",
+        "Wanshui Gan",
+        "Zitong Dai",
+        "Guiping Cao",
+        "Yan Li",
+        "Ke Chen",
+        "Dongmei Jiang",
+        "Xiangyuan Lan",
+        "Jianguo Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T13:19:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.08696v2",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "3D semantic occupancy prediction for indoor and outdoor scenes, including traffic scenes, with a unified framework",
+      "llm_evidence_cn": "统一室内外3D语义占用预测，覆盖交通场景，属于综合场景感知",
+      "llm_evidence": "统一室内外3D语义占用预测，覆盖交通场景，属于综合场景感知",
+      "canonical_evidence": "统一室内外3D语义占用预测，覆盖交通场景，属于综合场景感知",
+      "llm_tldr_en": "Introduces cross-scene 3D semantic occupancy prediction, proposing OccAnyScene, a pixel-frustum-centered Gaussian framework built on a pretrained depth foundation model to handle varying cameras and scene scales.",
+      "llm_tldr_cn": "现有3D语义占用预测方法通常针对固定场景类型和占用协议，难以统一处理室内外多种场景。本文提出跨场景3D语义占用预测新任务，要求单一模型适应不同相机、空间范围和语义类别。为此构建OccAnyScene，基于像素-视锥中心的高斯框架，并结合预训练深度基础模型实现度量一致且场景自适应的图像到3D映射。该框架为自动驾驶与机器人等场景理解提供了统一方案，在异构场景上具有良好泛化性。",
+      "llm_tldr": "现有3D语义占用预测方法通常针对固定场景类型和占用协议，难以统一处理室内外多种场景。本文提出跨场景3D语义占用预测新任务，要求单一模型适应不同相机、空间范围和语义类别。为此构建OccAnyScene，基于像素-视锥中心的高斯框架，并结合预训练深度基础模型实现度量一致且场景自适应的图像到3D映射。该框架为自动驾驶与机器人等场景理解提供了统一方案，在异构场景上具有良好泛化性。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.08805v1",
+      "source": "arxiv",
+      "title": "LASA: Language-and-Source-Anchored Alignment for Domain Generalized Semantic Segmentation",
+      "abstract": "Domain Generalization Semantic Segmentation (DGSS) focuses on generalizing knowledge from labeled source domains to unseen target domains where data is unavailable during the training phase. While conventional methods utilize style randomization or feature normalization to mitigate domain shifts, they often impair feature integrity. Specifically, style randomization distorts the underlying feature manifold due to its coarse-grained nature, while feature normalization suppresses discriminative, domain-sensitive semantic details owing to its rigid design. To address these limitations, we propose the Language-and-Source-Anchored Alignment (LASA) framework, which comprises three synergistic components: Text-and-Source-Guided Style Transfer (TSGST), Domain-Aware Query Adapter (DAQA), and Domain-Aware Decoder Optimizer (DADO). Concretely, the TSGST module addresses manifold distortion by utilizing source features as structural anchors and vision-language model (VLM) priors as fine-grained guidance. To restore suppressed discriminative and domain-sensitive details, the DAQA module recalibrates object queries via categorical guidance and domain-aware signatures, while the DADO module aligns the resulting query distributions with a shared classifier to ensure consistent categorical responses across domains. Extensive experiments on challenging benchmarks demonstrate that our method significantly outperforms state-of-the-art approaches.",
+      "authors": [
+        "Jinhong Zhu",
+        "Weiqi Yan",
+        "Shengchuan Zhang",
+        "Liujuan Cao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T16:43:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.08805v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "language-anchored domain generalized semantic segmentation applicable to road scene perception",
+      "llm_evidence_cn": "语言-源锚定的域泛化语义分割，可用于道路场景感知",
+      "llm_evidence": "语言-源锚定的域泛化语义分割，可用于道路场景感知",
+      "canonical_evidence": "语言-源锚定的域泛化语义分割，可用于道路场景感知",
+      "llm_tldr_en": "Proposes LASA for domain generalized semantic segmentation, using text-and-source guidance to transfer style while preserving feature integrity, useful for road-scene perception under domain shift.",
+      "llm_tldr_cn": "域泛化语义分割旨在从标注源域泛化到未见目标域，现有风格随机化与特征归一化会破坏特征完整性。该文提出语言与源锚定对齐框架LASA，通过文本与源引导的风格迁移保持底层语义与判别性细节。方法在跨域场景下改善分割泛化性能。该分割技术可支撑交通场景的鲁棒感知与理解。",
+      "llm_tldr": "域泛化语义分割旨在从标注源域泛化到未见目标域，现有风格随机化与特征归一化会破坏特征完整性。该文提出语言与源锚定对齐框架LASA，通过文本与源引导的风格迁移保持底层语义与判别性细节。方法在跨域场景下改善分割泛化性能。该分割技术可支撑交通场景的鲁棒感知与理解。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.09147v1",
+      "source": "arxiv",
+      "title": "RefineAny3D: Depth Refinement as Semantic Alignment for Monocular 3D Detection",
+      "abstract": "Monocular 3D object detection spans two regimes: closed-set detectors operating within a fixed category vocabulary, and open-vocabulary detectors that localize arbitrary categories by leveraging depth foundation models for 3D geometry. We find that current depth foundation models, despite their strong zero-shot generalization, lack the object-level precision 3D detection demands: substituting a state-of-the-art depth foundation model for a strong detector's predicted depth degrades accuracy, even falling below the detector's own prediction. Rather than pushing detectors or depth models to be more accurate end-to-end, we treat object-level depth refinement as a stand-alone task and present RefineAny3D, a vision-language model that corrects depth without ever predicting a numerical value. Our key insight is that depth error has a direct visual signature in image space: when projected onto the image, a correctly placed box tightly encloses the object, while a too-far box projects too small and a too-close box projects too large. Depth refinement thus reduces to a visual alignment problem rather than a metric regression problem, which we instantiate by extending the VLM's vocabulary with action tokens that replace numerical depth output with categorical decisions, and by supervising the model on a large-scale chain-of-thought dataset that grounds each decision in explicit visual evidence. Applied as a single post-hoc step, RefineAny3D delivers consistent gains across closed-set detectors, open-vocabulary detectors, and 3D auto-labeling tools, and generalizes to novel categories, scenes, and cameras without retraining.",
+      "authors": [
+        "Zhihao Zhang",
+        "Gengwei Zhang",
+        "Tianlong Chen",
+        "Xiaoming Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-10T05:50:37+00:00",
+      "link": "https://arxiv.org/pdf/2608.09147v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Applies a vision-language model to refine depth for monocular 3D detection, supporting traffic environment perception",
+      "llm_evidence_cn": "使用视觉语言模型细化单目3D检测的深度，辅助复杂交通环境感知",
+      "llm_evidence": "使用视觉语言模型细化单目3D检测的深度，辅助复杂交通环境感知",
+      "canonical_evidence": "使用视觉语言模型细化单目3D检测的深度，辅助复杂交通环境感知",
+      "llm_tldr_en": "RefineAny3D treats object-level depth refinement as a standalone task using a vision-language model, correcting depth foundation model errors to improve monocular 3D detection.",
+      "llm_tldr_cn": "当前深度基础模型在零样本泛化上很强，但缺乏单目3D检测所需的物体级精度。RefineAny3D提出将物体级深度细化作为独立任务，使用视觉语言模型来纠正深度预测并语义对齐。该方法不改变检测器或深度模型的结构，而是后处理校正深度，从而提升3D检测准确率。该研究展示了VLM在感知任务中的新应用，对以自动驾驶为代表的复杂交通环境感知具有参考价值。",
+      "llm_tldr": "当前深度基础模型在零样本泛化上很强，但缺乏单目3D检测所需的物体级精度。RefineAny3D提出将物体级深度细化作为独立任务，使用视觉语言模型来纠正深度预测并语义对齐。该方法不改变检测器或深度模型的结构，而是后处理校正深度，从而提升3D检测准确率。该研究展示了VLM在感知任务中的新应用，对以自动驾驶为代表的复杂交通环境感知具有参考价值。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-25",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.11681v1",
+      "source": "arxiv",
+      "title": "Learning from Multimodal Pseudo-Labels for Robust Open-Vocabulary Instance and Panoptic Segmentation",
+      "abstract": "This work addresses the challenge of open-vocabulary instance segmentation (OVIS) and open-set panoptic segmentation (OSPS), which aim to recognize both predefined and unseen object categories without exhaustive human annotations. Existing methods often suffer from noisy pseudo-masks, limited visual-textual grounding, and difficulty handling synonyms or out-of-vocabulary (OOV) words. To overcome these challenges, we propose a multimodal framework that leverages pre-trained vision-language models for automatic pseudo-label generation, CLIP-guided synonym filtering, and GPT-based caption reconstruction. In our target-vocabulary-assisted pseudo-labeling setting, the framework first constructs pseudo segmentation masks, descriptive captions, and semantically aligned synonym sets using Grounded SAM, LLaVA, and CLIP, providing multimodal supervision without manual annotation. We then enhance visual-textual alignment through three complementary training objectives: an extended grounding loss that incorporates visually grounded synonyms, a semantic consistency loss, and a generative caption reconstruction loss. Extensive experiments on the COCO dataset demonstrate that the proposed method consistently outperforms previous state-of-the-art approaches under this protocol, achieving substantial improvements on both OVIS and OSPS benchmarks.",
+      "authors": [
+        "Duy Tran Thanh",
+        "Yeejin Lee",
+        "Byeongkeun Kang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.MM"
+      ],
+      "published": "2026-08-12T05:39:57+00:00",
+      "link": "https://arxiv.org/pdf/2608.11681v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Open-vocabulary segmentation with multimodal pseudo-labels and VLM, transferable to road scene semantic analysis",
+      "llm_evidence_cn": "利用多模态伪标签和视觉语言模型进行开放词汇分割，可迁移至道路场景语义分析",
+      "llm_evidence": "利用多模态伪标签和视觉语言模型进行开放词汇分割，可迁移至道路场景语义分析",
+      "canonical_evidence": "利用多模态伪标签和视觉语言模型进行开放词汇分割，可迁移至道路场景语义分析",
+      "llm_tldr_en": "Proposes a multimodal framework combining pre-trained VLMs, CLIP-guided synonym filtering, and GPT-based caption reconstruction for robust open-vocabulary instance and panoptic segmentation.",
+      "llm_tldr_cn": "开放词汇实例分割与开放集全景分割需识别未见类别，但现有方法受噪声伪掩码和脆弱文本-视觉对齐困扰。本文提出多模态伪标签框架，借助预训练视觉语言模型自动生成伪标签，结合CLIP同义词过滤与GPT描述重构，在目标词汇辅助下构建分割掩码。该方法缓解了噪声与词汇外问题，提升了开放词汇分割的鲁棒性，可泛化用于复杂场景语义理解。",
+      "llm_tldr": "开放词汇实例分割与开放集全景分割需识别未见类别，但现有方法受噪声伪掩码和脆弱文本-视觉对齐困扰。本文提出多模态伪标签框架，借助预训练视觉语言模型自动生成伪标签，结合CLIP同义词过滤与GPT描述重构，在目标词汇辅助下构建分割掩码。该方法缓解了噪声与词汇外问题，提升了开放词汇分割的鲁棒性，可泛化用于复杂场景语义理解。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.12748v1",
+      "source": "arxiv",
+      "title": "Scaling Representation Diversity: Modulated Attention and Reconstructive Regularization for Visual Grounding",
+      "abstract": "Referring Expression Comprehension (REC) is commonly studied under dataset-specific fine-tuning, resulting in specialist models with limited cross-dataset generalization. In this work, we revisit REC from the perspective of unified open-vocabulary grounding and identify representation degeneration as a key obstacle to scaling a single generalist model. To preserve representation diversity, we propose a holistic data-model co-design framework. Architecturally, we introduce the Modulated Attention-Contrastive Head (mACH) for efficient token-level vision-language alignment and a text-conditioned JEPA auxiliary stream that provides complementary gradient support to preserve alignment-active representations without inference overhead. On the data side, we introduce Objects365-Caption, enriching Objects365 with context-aware referring expressions for large-scale language supervision. We further provide a theoretical analysis showing that complementary gradient subspaces preserve alignment capacity and thereby scale representation diversity. Extensive experiments demonstrate that our single-checkpoint framework achieves highly competitive performance on standard REC benchmarks while exhibiting strong generalization across heterogeneous grounding datasets without benchmark-specific adaptation.",
+      "authors": [
+        "Junyi Hu",
+        "Tian Bai",
+        "Fengyi Wu",
+        "Yian Huang",
+        "Wei Wen",
+        "Zaoli Li",
+        "Junli Lin",
+        "Xingchen Li",
+        "Zhenming Peng",
+        "Yi Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T02:57:21+00:00",
+      "link": "https://arxiv.org/pdf/2608.12748v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "efficient token-level vision-language alignment and representation diversity preservation",
+      "llm_evidence_cn": "高效的token级视觉语言对齐与表征多样性保持",
+      "llm_evidence": "高效的token级视觉语言对齐与表征多样性保持",
+      "canonical_evidence": "高效的token级视觉语言对齐与表征多样性保持",
+      "llm_tldr_en": "Proposes a data-model co-design framework with Modulated Attention-Contrastive Head (mACH) for efficient token-level vision-language alignment and a text-conditioned JEPA auxiliary stream to preserve representation diversity, improving cross-dataset generalization in visual grounding.",
+      "llm_tldr_cn": "针对视觉定位模型在不同数据集间泛化能力差的问题，论文提出一种数据与模型协同设计的框架。方法上引入调制注意力对比头（mACH）实现高效的token级视觉语言对齐，并利用文本条件JEPA辅助流保持表征多样性，缓解表征退化。在多个视觉定位基准上的实验表明，该方法在提升跨数据集泛化能力的同时保持高效。相关工作为开放词汇视觉定位的通用模型训练提供了新思路。",
+      "llm_tldr": "针对视觉定位模型在不同数据集间泛化能力差的问题，论文提出一种数据与模型协同设计的框架。方法上引入调制注意力对比头（mACH）实现高效的token级视觉语言对齐，并利用文本条件JEPA辅助流保持表征多样性，缓解表征退化。在多个视觉定位基准上的实验表明，该方法在提升跨数据集泛化能力的同时保持高效。相关工作为开放词汇视觉定位的通用模型训练提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.11692v1",
+      "source": "arxiv",
+      "title": "HUGIN: Enhancing Vision-Language Planning for Autonomous Logistics Sorting",
+      "abstract": "Autonomous logistics sorting systems (ALSS) are an important industrial application of embodied AI, which requires joint planning over spatially disjoint camera views. We formulate this setting as Joint Multi-Scene Understanding (JMSU). With open-world visual understanding and task-planning capabilities, vision-language models (VLMs) are promising candidates for JMSU. However, directly applying existing VLMs to JMSU is non-trivial due to scarce cross-scene supervision and attention dispersion caused by long visual context in JMSU. To address these challenges, we propose HUGIN, a training framework with two complementary components. Endogenous Data Augmentation recombines verified atomic facts under operating constraints, while Global Context Ranking aligns the instruction representation more strongly with the complete visual context than with a partial visual context. To support ongoing research, we construct a high-quality industrial sorting dataset and benchmark named SortingBench from four layouts of autonomous logistics sorting systems. Across five open VLMs, HUGIN consistently outperforms matched baselines; for example, the accuracy on SortingBench of Qwen3-VL-8B increases from 63.6% to 78.8%. Additional experiments verify the effectiveness of each component and JMSU's spillover benefits in embodied tasks. Deployment tests involving more than 15,000 packages support the practical viability of VLM-based planning for autonomous logistics sorting.",
+      "authors": [
+        "Xikai Sun",
+        "Cangtian Zhou",
+        "Kebin Liu",
+        "Ke Ma",
+        "Xu Wang",
+        "Zaishu Chen",
+        "Haotian Wang",
+        "Li Liu",
+        "Yunhao Liu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-12T06:04:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.11692v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "addresses long visual context and attention dispersion in VLM planning",
+      "llm_evidence_cn": "解决VLM规划中长视觉上下文与注意力分散问题",
+      "llm_evidence": "解决VLM规划中长视觉上下文与注意力分散问题",
+      "canonical_evidence": "解决VLM规划中长视觉上下文与注意力分散问题",
+      "llm_tldr_en": "HUGIN is a training framework for vision-language planning in multi-scene logistics, tackling long visual context and attention dispersion with endogenous data augmentation and global context ranking.",
+      "llm_tldr_cn": "HUGIN针对物流分拣中多场景联合理解的长视觉上下文和注意力分散问题，提出一种无需修改模型结构的训练框架。通过内生数据增强与全局上下文排序两个互补组件，在缺乏跨场景监督的情况下提升视觉语言模型的规划能力。实验表明该方法能有效缓解长上下文的性能退化，为多场景VLM规划提供了通用训练范式。",
+      "llm_tldr": "HUGIN针对物流分拣中多场景联合理解的长视觉上下文和注意力分散问题，提出一种无需修改模型结构的训练框架。通过内生数据增强与全局上下文排序两个互补组件，在缺乏跨场景监督的情况下提升视觉语言模型的规划能力。实验表明该方法能有效缓解长上下文的性能退化，为多场景VLM规划提供了通用训练范式。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11770v1",
+      "source": "arxiv",
+      "title": "Achieving Near-Zero-Overhead Multi-Model Hierarchical Classification in Real-Time Detection Pipelines",
+      "abstract": "Edge-deployed vision systems in target recognition, surveillance, autonomous vehicles, and drone domains require hierarchical inference pipelines where a detection model identifies objects of interest and downstream classifiers provide fine-grained attribute analysis. Running all models on the GPU creates a serial bottleneck that limits real-time throughput as pipeline stages grow. Modern edge SoCs pair GPUs with dedicated neural accelerators (NPUs, DLAs) capable of concurrent execution, yet deploying custom models on these accelerators remains impractical due to strict operator constraints, quantization incompatibilities, and an undocumented end-to-end pipeline. We target NVIDIA Jetson DLA cores as the representative platform. We present a five-step methodology for zero GPU fallback DLA INT8 deployment of classification backbones, comprising architecture adaptation, manual dynamic range workaround to rescue TensorRT's implicit quantization (recovering 94.0% accuracy from implicit quantization's 75%) for rapid pipeline validation before explicit quantization, quantization-aware training, ONNX graph surgery for DLA compilation, and a concurrent GPU-detection/DLA-classification inference pipeline. We document nine engineering constraints with root-cause analysis and generalizable solutions. Validation on a dual-head person attribute classifier running on DLA alongside a GPU object detector on a Jetson Orin NX demonstrates near-zero pipeline overhead (12.5 vs. 13.3~FPS detector-only at 1080p), with dual-DLA scaling at no additional cost. The methodology is backbone-agnostic and generalizes to any detection-classification edge pipeline.",
+      "authors": [
+        "Vaishnav Raju"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.DC",
+        "cs.LG"
+      ],
+      "published": "2026-08-12T08:14:22+00:00",
+      "link": "https://arxiv.org/pdf/2608.11770v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Real-time edge inference optimization for multi-model pipelines, applicable to VLA inference efficiency",
+      "llm_evidence_cn": "面向多模型流水线的实时边缘推理优化，可适用于VLA推理效率提升",
+      "llm_evidence": "面向多模型流水线的实时边缘推理优化，可适用于VLA推理效率提升",
+      "canonical_evidence": "面向多模型流水线的实时边缘推理优化，可适用于VLA推理效率提升",
+      "llm_tldr_en": "Presents a method to deploy multi-model hierarchical classification across GPU and DLA cores on Jetson, achieving near-zero overhead for real-time edge vision pipelines.",
+      "llm_tldr_cn": "边缘视觉系统需要检测模型与下游分类器组成的层级推理流水线，但GPU串行瓶颈限制实时吞吐。本文针对NVIDIA Jetson DLA核心，解决自定义模型部署时的算子约束与量化不兼容问题，将模型卸载到专用加速器与GPU并发执行，实现近零开销的多模型层次分类。实验表明在目标识别、监控和自动驾驶等场景中可大幅提升实时性能。",
+      "llm_tldr": "边缘视觉系统需要检测模型与下游分类器组成的层级推理流水线，但GPU串行瓶颈限制实时吞吐。本文针对NVIDIA Jetson DLA核心，解决自定义模型部署时的算子约束与量化不兼容问题，将模型卸载到专用加速器与GPU并发执行，实现近零开销的多模型层次分类。实验表明在目标识别、监控和自动驾驶等场景中可大幅提升实时性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.13026v1",
+      "source": "arxiv",
+      "title": "Temporal GRPO: Beyond Trajectory-Level Credit in Vision-Language-Action Reinforcement Learning",
+      "abstract": "Outcome-driven reinforcement learning offers a scalable way to post-train vision-language-action (VLA) policies from sparse task-success feedback. In common GRPO-based VLA post-training, one rollout-level advantage is applied to every action in the trajectory. A rollout that completes several valid stages but fails later can therefore penalize the actions that produced its earlier progress. We call this trajectory-level credit aliasing. Temporal GRPO addresses this problem by constructing detectable task stages, aligning each rollout with stage-specific action intervals, and comparing only rollouts that have entered the same stage. The resulting stage advantages are applied to their corresponding intervals in a single policy update. On RoboTwin 2.0, Temporal GRPO improves task success and sample efficiency, with consistent gains across task horizons. Controlled updates on LIBERO-Long preserve shared prerequisite stages and concentrate improvement at the first stage where rollout outcomes diverge.",
+      "authors": [
+        "Yao Zhou",
+        "Hang Gao",
+        "Fengge Wu",
+        "Changwen Zheng",
+        "Wenwen Qiang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-13T09:54:14+00:00",
+      "link": "https://arxiv.org/pdf/2608.13026v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLA reinforcement learning credit assignment",
+      "llm_evidence_cn": "VLA强化学习信用分配",
+      "llm_evidence": "VLA强化学习信用分配",
+      "canonical_evidence": "VLA强化学习信用分配",
+      "llm_tldr_en": "Temporal GRPO constructs detectable task stages, aligns rollouts with stage-specific action intervals, and compares rollouts from the same stage, applying stage-level advantages to improve VLA reinforcement learning.",
+      "llm_tldr_cn": "常见的GRPO式VLA后训练对整个轨迹使用单一优势，导致先取得进展但最终失败的动作被错误惩罚。Temporal GRPO通过构造可检测的任务阶段，将rollout的各个阶段动作区间对齐，并仅比较进入同一阶段的rollout，从而在每个阶段分配独立优势。实验表明这种阶段级信用分配能更准确反映有效中间步骤，改善VLA策略的后训练效果。它为稀疏反馈下的VLA强化学习提供了一种更精细的优化方式。",
+      "llm_tldr": "常见的GRPO式VLA后训练对整个轨迹使用单一优势，导致先取得进展但最终失败的动作被错误惩罚。Temporal GRPO通过构造可检测的任务阶段，将rollout的各个阶段动作区间对齐，并仅比较进入同一阶段的rollout，从而在每个阶段分配独立优势。实验表明这种阶段级信用分配能更准确反映有效中间步骤，改善VLA策略的后训练效果。它为稀疏反馈下的VLA强化学习提供了一种更精细的优化方式。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.13144v1",
+      "source": "arxiv",
+      "title": "LipCache: A Local Inference Proxy with Certified Caching for Edge Image Classification Service",
+      "abstract": "As edge-side vision services continue to expand toward low-latency, high-throughput scenarios, reducing the inference cost of vision models without sacrificing reliability has become a central concern. Existing semantic caching methods largely rely on empirical similarity thresholds; while such thresholds improve hit rates, they tend to introduce silent misclassifications near decision boundaries. To address this, we propose \\texttt{LipCache}, a certified semantic caching framework for image classification. Without modifying the existing deployed main model, \\texttt{MainNet}, the framework introduces a lightweight network, \\texttt{GuardNet}, that maps inputs into a low-dimensional feature space subject to a Lipschitz constraint. It then computes a per-sample certified reuse radius from the local classification margin and the spectral norm of the classification head. At runtime, a cached result is reused only when the query feature falls inside the certified reuse ball; otherwise, the query falls back to \\texttt{MainNet}. Thus, cache hits are transformed from empirical threshold tests into geometric certification decisions with explicit theoretical boundaries. Across standard image classification tasks like CIFAR, Tiny-ImageNet, and SVHN, \\texttt{LipCache} achieves a measured speedup of up to $1.65\\times$ with limited end-to-end accuracy degradation, while all accepted cache hits satisfy the \\texttt{GuardNet}-side certified-consistency condition. Furthermore, an enhanced \\texttt{GuardNet} training recipe substantially improves cache hit rates in the Tiny-ImageNet multi-class extension while maintaining a certified-consistency rate of $100\\%$. These results demonstrate that per-sample certified reuse can reduce main-model fallback while preserving theoretical consistency, providing a feasible approach to reliable cache-assisted inference at the edge.",
+      "authors": [
+        "Zhengzhe Xiang",
+        "Yinlin Chen",
+        "Fuli Ying",
+        "Binbin Zhou",
+        "Hailiang Zhao",
+        "Schahram Dustdar"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC",
+        "cs.AI"
+      ],
+      "published": "2026-08-13T12:16:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.13144v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Certified semantic caching framework reduces inference cost for edge vision services, an efficiency optimization method applicable to multimodal models",
+      "llm_evidence_cn": "有认证的语义缓存框架降低边缘视觉服务推理成本，属于可迁移至多模态大模型的效率优化技术",
+      "llm_evidence": "有认证的语义缓存框架降低边缘视觉服务推理成本，属于可迁移至多模态大模型的效率优化技术",
+      "canonical_evidence": "有认证的语义缓存框架降低边缘视觉服务推理成本，属于可迁移至多模态大模型的效率优化技术",
+      "llm_tldr_en": "Proposes LipCache, a certified semantic caching framework for image classification that uses a lightweight Lipschitz-constrained GuardNet to cache predictions, reducing inference cost while maintaining reliability.",
+      "llm_tldr_cn": "边缘侧视觉服务追求低延迟高吞吐，现有语义缓存依赖经验相似度阈值，容易在决策边界产生静默误分类。LipCache在不修改主模型的前提下引入轻量网络GuardNet，将输入映射到受Lipschitz约束的低维特征空间，从而提供有认证保障的语义缓存。该方法既提升了缓存命中率，又避免了不可靠的误分类风险。它展示了如何以可证明方式缓存视觉模型推理结果，对高效多模态模型部署具有借鉴意义。",
+      "llm_tldr": "边缘侧视觉服务追求低延迟高吞吐，现有语义缓存依赖经验相似度阈值，容易在决策边界产生静默误分类。LipCache在不修改主模型的前提下引入轻量网络GuardNet，将输入映射到受Lipschitz约束的低维特征空间，从而提供有认证保障的语义缓存。该方法既提升了缓存命中率，又避免了不可靠的误分类风险。它展示了如何以可证明方式缓存视觉模型推理结果，对高效多模态模型部署具有借鉴意义。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
