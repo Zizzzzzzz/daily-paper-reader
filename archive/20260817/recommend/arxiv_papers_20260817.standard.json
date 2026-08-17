@@ -1,0 +1,455 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-17T19:40:44.302798+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 6,
+    "deep_cap": 8,
+    "deep_selected": 6,
+    "quick_candidates": 4,
+    "quick_skim_target": 13,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2608.08832v1",
+      "source": "arxiv",
+      "title": "Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding",
+      "abstract": "Distributed deployment of large vision foundation models often partitions a ViT backbone and exchanges intermediate token features between computing nodes, making efficient feature compression critical under bandwidth and computation constraints. Existing ViT feature codecs typically flatten heterogeneous global and patch tokens into an L x C pseudo image, causing entropy models to mainly capture sequence-axis dependencies while overlooking the native two-dimensional patch-grid structure. In this paper, we show that ViT patch tokens retain strong local spatial correlations on the original grid. To exploit this structural prior, we propose the Visual Token Codec (VTC), a dual-path learned codec that separates global and patch tokens into dedicated coding paths. Global tokens are compressed with a lightweight factorized prior, whereas patch tokens are encoded on the patch-token grid using a spatial-channel context entropy model. To support intermediate-layer compression and practical rate adaptation, VTC further incorporates feature-matching supervision after subsequent ViT blocks and variable-rate modules within a single codec. Experiments on DINOv2 and SAM3 show that VTC consistently outperforms representative ViT feature coding baselines on classification, segmentation, and detection tasks. At 90% of uncompressed-feature performance, VTC reduces bitrate by 15.7x-37.4x across these tasks. We further provide intermediate-layer rate-utility analyses for practical transmission- and storage-oriented deployment scenarios.",
+      "authors": [
+        "Donghui Feng",
+        "Fengxi Zhang",
+        "Changsheng Gao",
+        "Wenhan Yang",
+        "Qi Wang",
+        "Qunshan Gu",
+        "Hongwei Hu",
+        "Zhengxue Cheng",
+        "Li Song"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-09T17:32:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.08832v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token codec exploiting spatial redundancy for ViT feature compression",
+      "llm_evidence_cn": "视觉Token编解码器，利用空间冗余进行ViT特征压缩",
+      "llm_evidence": "视觉Token编解码器，利用空间冗余进行ViT特征压缩",
+      "canonical_evidence": "视觉Token编解码器，利用空间冗余进行ViT特征压缩",
+      "llm_tldr_en": "Shows ViT patch tokens retain strong 2D spatial correlations and introduces Visual Token Codec, a dual-path learned codec separating global and patch tokens to exploit spatial redundancy for efficient feature compression.",
+      "llm_tldr_cn": "分布式部署视觉基础模型时常需在计算节点间传输中间token特征，现有ViT特征编解码器将全局与patch token摊平成伪图像，忽略二维网格结构导致压缩效率受限。本文发现patch token在原网格上保留强局部空间相关，提出Visual Token Codec (VTC)，将全局与patch token分离并分别编码，利用结构先验与空间冗余实现高效视觉token特征压缩，降低带宽与计算开销。",
+      "llm_tldr": "分布式部署视觉基础模型时常需在计算节点间传输中间token特征，现有ViT特征编解码器将全局与patch token摊平成伪图像，忽略二维网格结构导致压缩效率受限。本文发现patch token在原网格上保留强局部空间相关，提出Visual Token Codec (VTC)，将全局与patch token分离并分别编码，利用结构先验与空间冗余实现高效视觉token特征压缩，降低带宽与计算开销。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14027v1",
+      "source": "arxiv",
+      "title": "E-S2Feat:Semantic-Guided Spiking Local Feature Detection and Description for Event Cameras",
+      "abstract": "Benefiting from high temporal resolution and dynamic range, event-based local feature methods have attracted increasing attention. However, event sparsity, noise, and limited texture still hinder robust local feature learning. Deploying such methods on resource-constrained platforms such as unmanned aerial vehicles also requires balancing accuracy and energy efficiency. To address these challenges, this paper proposes \\textbf{E-S2Feat}, a spiking neural network framework for event-based local feature detection and description. The framework jointly optimizes local feature learning from the perspectives of feature representation and selection. First, a module-specific spiking activation mechanism preserves fine-grained structural cues and discriminative information under low-bit, energy-efficient inference, thereby improving overall representation fidelity. Furthermore, a semantic-guided feature modulation mechanism leverages semantic priors to refine keypoint response distributions and enhance local descriptor discriminability, thereby guiding the model to extract local features with greater geometric stability and stronger discriminative capability. Experiments on the ECD and EDS datasets show that the proposed method significantly outperforms baseline methods such as SuperEvent in pose estimation accuracy. It also achieves accuracy comparable to its artificial neural network counterpart while delivering an approximately 4.8-fold improvement in theoretical computational energy efficiency. Visual-inertial odometry experiments on the TUM-VIE dataset further verify the effectiveness and practical application potential of the proposed method in complete SLAM systems.",
+      "authors": [
+        "Yang Yi",
+        "Juntao Hua",
+        "Jinpu Zhang",
+        "Liangwei Fan",
+        "Hui Shen",
+        "Dewen Hu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-14T07:18:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.14027v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "event-based local feature detection and description for event cameras",
+      "llm_evidence_cn": "面向事件相机的基于事件的局部特征检测与描述",
+      "llm_evidence": "面向事件相机的基于事件的局部特征检测与描述",
+      "canonical_evidence": "面向事件相机的基于事件的局部特征检测与描述",
+      "llm_tldr_en": "Presents E-S2Feat, a spiking neural network framework for event-based local feature detection and description, using semantic-guided module-specific activation to handle event sparsity and noise while balancing accuracy and energy efficiency.",
+      "llm_tldr_cn": "事件相机局部特征方法受事件稀疏、噪声和纹理有限影响，难以部署到无人机等资源受限平台。E-S2Feat提出一种脉冲神经网络框架，通过模块特定的语义引导脉冲激活机制保留细粒度结构线索，并联合优化特征表示与特征选择。该方法在保持高时间分辨率优势的同时兼顾精度与能效，为事件相机的鲁棒局部特征学习提供了语义引导的解决方案。",
+      "llm_tldr": "事件相机局部特征方法受事件稀疏、噪声和纹理有限影响，难以部署到无人机等资源受限平台。E-S2Feat提出一种脉冲神经网络框架，通过模块特定的语义引导脉冲激活机制保留细粒度结构线索，并联合优化特征表示与特征选择。该方法在保持高时间分辨率优势的同时兼顾精度与能效，为事件相机的鲁棒局部特征学习提供了语义引导的解决方案。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based vision",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14191v1",
+      "source": "arxiv",
+      "title": "KV Cache Compression Through the Lens of Transform Coding",
+      "abstract": "The key-value (KV) cache stores information from past tokens and is a major memory bottleneck in long-context inference. Existing quantization methods address this bottleneck by representing the KV cache uniformly with lower-precision data types and designing quantization schemes to minimize reconstruction error in the cache itself, without accounting for how that error propagates through attention mechanisms. We prove that, under a white-noise quantization model, the expected attention-aware distortion decomposes into additive key and value contributions that factor across tokens and channels. Building on transform coding and reverse water-filling, which are classical tools from signal processing and rate-distortion theory, we introduce Attention-Aware Transform Coding (AATC), which allocates bits over a calibration set to minimize attention-aware distortion. On Llama-3.1-8B-Instruct and Qwen-2.5-7B-Instruct, evaluated across LongBench, RULER, GSM8K, MMLU-Pro, and MATH-500, our method achieves near-lossless accuracy at approximately $5.8\\times$ compression, whereas each baseline degrades in at least some settings.",
+      "authors": [
+        "Hannah Laus",
+        "Claudio Mayrink Verdun",
+        "Hao Wang",
+        "Flavio du Pin Calmon",
+        "Felix Krahmer"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CL",
+        "eess.SP"
+      ],
+      "published": "2026-08-14T11:08:01+00:00",
+      "link": "https://arxiv.org/pdf/2608.14191v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression via transform coding for long-context inference",
+      "llm_evidence_cn": "基于变换编码的长上下文KV缓存压缩",
+      "llm_evidence": "基于变换编码的长上下文KV缓存压缩",
+      "canonical_evidence": "基于变换编码的长上下文KV缓存压缩",
+      "llm_tldr_en": "This paper treats KV cache compression as a transform coding problem, proving attention-aware distortion decomposition and introducing Attention-Aware Transform Coding to reduce long-context inference memory with quantized caches.",
+      "llm_tldr_cn": "长上下文推理中KV缓存是主要内存瓶颈，现有量化方法仅考虑重建误差而忽略注意力的传播。本文将KV缓存压缩建模为变换编码问题，证明在白噪声量化模型下注意力感知失真可分解为键和值的独立贡献。基于变换编码与反向注水原理，提出注意力感知变换压缩方法，在理论上保障压缩质量。该方法为KV缓存压缩提供了信号处理视角，有利于长上下文LLM的高效部署。",
+      "llm_tldr": "长上下文推理中KV缓存是主要内存瓶颈，现有量化方法仅考虑重建误差而忽略注意力的传播。本文将KV缓存压缩建模为变换编码问题，证明在白噪声量化模型下注意力感知失真可分解为键和值的独立贡献。基于变换编码与反向注水原理，提出注意力感知变换压缩方法，在理论上保障压缩质量。该方法为KV缓存压缩提供了信号处理视角，有利于长上下文LLM的高效部署。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14379v1",
+      "source": "arxiv",
+      "title": "Reflex: Enabling Fast and Predictive Vision-Language-Action Models for Reaction-Critical Manipulation",
+      "abstract": "Vision-Language-Action (VLA) models have recently achieved promising performance in robotic manipulation. However, existing benchmarks mainly evaluate generalization on static manipulation tasks and largely overlook dynamic interaction scenarios. To address this gap, we present ReflexBench, a benchmark for reaction-critical manipulation. ReflexBench contains six dynamic tasks and introduces an evaluation framework that decouples simulator stepping from robot control while supporting configurable latency under synchronous and asynchronous inference. Building upon ReflexBench, we propose ReflexVLA, an efficient VLA model designed for reaction-critical manipulation without large-scale robot-data pretraining. ReflexVLA enhances temporal reasoning through latent future prediction and multi-frame temporal fusion within the vision backbone, while reducing deployment latency through batched visual encoding and CUDA Graph replay. Experiments show that ReflexVLA consistently improves dynamic manipulation performance while maintaining competitive accuracy on standard static manipulation benchmarks, and real-world experiments further demonstrate its effectiveness under practical deployment conditions. Project website: https://reflexvla.github.io",
+      "authors": [
+        "Yuxuan Chen",
+        "Wanruo Zhang",
+        "Xiao Li"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-08-14T15:19:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.14379v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "fast and predictive vision-language-action models for reaction-critical manipulation",
+      "llm_evidence_cn": "面向反应关键操作的快速可预测视觉-语言-动作模型",
+      "llm_evidence": "面向反应关键操作的快速可预测视觉-语言-动作模型",
+      "canonical_evidence": "面向反应关键操作的快速可预测视觉-语言-动作模型",
+      "llm_tldr_en": "Introduces ReflexBench for reaction-critical manipulation and ReflexVLA, an efficient vision-language-action model that enables fast, predictive control in dynamic tasks without large-scale robot data pretraining.",
+      "llm_tldr_cn": "现有视觉-语言-动作（VLA）模型基准主要评估静态操作泛化，很少关注动态交互场景，导致反应关键操控能力无法得到有效衡量。为解决这一问题，作者提出ReflexBench基准，包含六个动态任务，并引入将仿真器步进与机器人控制解耦、支持可配置延迟的同步/异步评估框架。进一步提出ReflexVLA，一种面向反应关键操控的高效VLA模型，无需大规模机器人数据预训练即可实现快速、可预测的控制。实验证明了其优越性，为VLA模型在动态交互任务中的部署提供了新方向。",
+      "llm_tldr": "现有视觉-语言-动作（VLA）模型基准主要评估静态操作泛化，很少关注动态交互场景，导致反应关键操控能力无法得到有效衡量。为解决这一问题，作者提出ReflexBench基准，包含六个动态任务，并引入将仿真器步进与机器人控制解耦、支持可配置延迟的同步/异步评估框架。进一步提出ReflexVLA，一种面向反应关键操控的高效VLA模型，无需大规模机器人数据预训练即可实现快速、可预测的控制。实验证明了其优越性，为VLA模型在动态交互任务中的部署提供了新方向。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14047v1",
+      "source": "arxiv",
+      "title": "Evolve Vision-Language-Action Model into an Agent with On-the-fly Tool-use",
+      "abstract": "This paper integrates end-to-end Visual-Language-Action (VLA) models with agentic tool-use to propose Agentic Robot with Tool-use (ART). ART is a tool-injection framework that tunes any VLA model to leverage off-the-shelf tool modules for low-level vision, high-level affordance, and embodiment enhancement. Compared to vanilla VLA models with a whole continuous action solution space, ART reduces the complexity of the action solution space through tool-use, which not only improves generalizability across different tasks but also reduces data dependency. To demonstrate the advantages (high generalizability and low data dependency) of this framework, we first built a dataset of 30K tool-use trajectories and action demonstrations, which is much smaller than those used by baseline methods. We then designed a training regimen for long-trajectory tool-use reasoning in challenging environments. Experiments show that ART achieves a 20% higher success rate than mainstream baselines on simulation and real-world tasks, such as pick-and-place in the dark at novel viewpoints. Empirical results highlight the benefits of an agent-based approach: modular tool utilization enables more efficient training, lightweight deployment, and scalable integration of new tools. This design fosters robustness, adaptability, and extensibility, paving the way for the practical deployment of VLA systems in complex real-world scenarios.",
+      "authors": [
+        "Yi Ding",
+        "Yanzhao Yu",
+        "Xili Dai",
+        "Xianbiao Qi",
+        "Peiwen Sun",
+        "Xueqian Wang",
+        "Xiangyu Yue",
+        "Jianan Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-08-14T07:53:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.14047v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "tool-injection framework for VLA models reduces action solution space and data dependency",
+      "llm_evidence_cn": "面向VLA模型的工具注入框架，降低动作解空间与数据依赖",
+      "llm_evidence": "面向VLA模型的工具注入框架，降低动作解空间与数据依赖",
+      "canonical_evidence": "面向VLA模型的工具注入框架，降低动作解空间与数据依赖",
+      "llm_tldr_en": "Integrates VLA models with tool-use to propose ART, a tool-injection framework reducing action solution space complexity and data dependency, boosting generalizability. Built a 30K tool-use trajectory dataset.",
+      "llm_tldr_cn": "针对端到端视觉-语言-动作（VLA）模型动作解空间大且依赖大量数据的问题，该文提出Agentic Robot with Tool-use（ART）框架。ART将VLA模型与即插即用的工具模块结合，在推理时利用工具缩小动作解空间，从而提升跨任务泛化性并显著降低数据依赖。作者构建了包含3万条工具使用轨迹与动作演示的数据集，实验表明该方法以较小的数据规模取得较好效果。",
+      "llm_tldr": "针对端到端视觉-语言-动作（VLA）模型动作解空间大且依赖大量数据的问题，该文提出Agentic Robot with Tool-use（ART）框架。ART将VLA模型与即插即用的工具模块结合，在推理时利用工具缩小动作解空间，从而提升跨任务泛化性并显著降低数据依赖。作者构建了包含3万条工具使用轨迹与动作演示的数据集，实验表明该方法以较小的数据规模取得较好效果。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14085v1",
+      "source": "arxiv",
+      "title": "CoDS: Robust Collaborative Perception via Expert-driven Detection and BEV Segmentation",
+      "abstract": "Collaborative perception breaks through single-view limitations via multi-agent information exchange. However, multi-source noise such as pose errors and communication delays degrades fusion feature quality, constraining perception performance. Joint training of detection and BEV segmentation provides a natural remedy, where segmented road regions help constrain target distributions and detection bounding boxes help recover ambiguous segmentation boundaries. To this end, we propose a robust Collaborative perception framework with expert-driven Detection and bev Segmentation (CoDS). To address spatial inconsistency in fusion quality, we first introduce the Collaborative Reliability Map (CoRM) to explicitly quantify feature quality distribution. Based on CoRM, we design the Semantic Mixture-of-Experts (S-MoE) module to extract differentiated features for inconsistent feature demands. Finally, to further mitigate feature noise degradation, the Bidirectional Task Complementary Interaction (BTCI) refines task-aware features through bidirectional injection. Extensive experiments on OPV2V and V2V4Real datasets show that our CoDS surpasses existing baselines on both tasks and maintains stable robustness under multi-source noise. Code: https://github.com/JinlongW128/CoDS and https://openi.pcl.ac.cn/OpenAIDriving/CoDS.",
+      "authors": [
+        "Jinlong Wang",
+        "Yuang Jia",
+        "Junhong Lin",
+        "Nannan Li",
+        "Wei Gao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-14T08:47:28+00:00",
+      "link": "https://arxiv.org/pdf/2608.14085v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "collaborative perception with detection and BEV segmentation for driving scenes",
+      "llm_evidence_cn": "基于多智能体协作的检测与BEV分割，用于驾驶场景感知",
+      "llm_evidence": "基于多智能体协作的检测与BEV分割，用于驾驶场景感知",
+      "canonical_evidence": "基于多智能体协作的检测与BEV分割，用于驾驶场景感知",
+      "llm_tldr_en": "Proposes CoDS, a robust collaborative perception framework using expert-driven detection and BEV segmentation to counter multi-source noise; introduces Collaborative Reliability Map to improve fusion for autonomous driving.",
+      "llm_tldr_cn": "协作感知通过多智能体信息交换突破单视角局限，但位姿误差和通信延迟等噪声会降低融合特征质量。本文提出CoDS框架，将检测与BEV分割联合训练，并引入协作可靠性图显式建模特征质量分布，以约束目标分布并恢复分割边界。实验表明该方法在噪声条件下显著提升协作感知的检测与分割鲁棒性，为自动驾驶场景理解提供有效方案。",
+      "llm_tldr": "协作感知通过多智能体信息交换突破单视角局限，但位姿误差和通信延迟等噪声会降低融合特征质量。本文提出CoDS框架，将检测与BEV分割联合训练，并引入协作可靠性图显式建模特征质量分布，以约束目标分布并恢复分割边界。实验表明该方法在噪声条件下显著提升协作感知的检测与分割鲁棒性，为自动驾驶场景理解提供有效方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.12843v1",
+      "source": "arxiv",
+      "title": "Heterogeneous Vision-Language Ensemble with Disagreement-Aware Reranking for Text-Based Person Anomaly Retrieval",
+      "abstract": "Text-based person anomaly retrieval aims to retrieve pedestrians exhibiting anomalous behaviors from a large image gallery using natural language descriptions. Compared with conventional text-based person retrieval, this task requires fine-grained reasoning over pedestrian appearance, behaviors, object interactions, and scene context, making robust cross-modal matching significantly more challenging. This paper presents the GENAI4E team's solution to AI City Challenge 2026 Track 4. Our framework builds upon a strong retrieval backbone and progressively integrates heterogeneous vision-language embedding models through score alignment and iterative ensemble fusion, followed by disagreement-aware VLM reranking for ambiguous queries. On the official Pedestrian Anomaly Behavior (PAB) benchmark, our approach achieves 90.92% mAP, 85.13% Recall@1, 97.72% Recall@5, and 98.68% Recall@10, demonstrating the effectiveness of combining complementary vision-language representations with selective multimodal reasoning for large-scale text-based person anomaly retrieval.",
+      "authors": [
+        "Huu-An Vu",
+        "Cam Tu Tran Thi",
+        "Thanh Toan Le Ngo",
+        "Hoang Vo",
+        "Do Trung Hieu",
+        "Hieu Dinh Trung Pham",
+        "Khang Minh Le",
+        "Huy Minh Nhat Nguyen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-13T05:28:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.12843v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "VLM-based text-to-person anomaly retrieval in traffic surveillance",
+      "llm_evidence_cn": "基于多模态大模型的行人异常检索，应用于交通监控",
+      "llm_evidence": "基于多模态大模型的行人异常检索，应用于交通监控",
+      "canonical_evidence": "基于多模态大模型的行人异常检索，应用于交通监控",
+      "llm_tldr_en": "Uses heterogeneous VLM ensemble plus disagreement-aware reranking for text-based pedestrian anomaly retrieval in traffic scenes; strong performance on AI City Challenge.",
+      "llm_tldr_cn": "针对文本描述的行人异常检索任务，现有方法难以处理外观、行为、物体交互与场景上下文的细粒度跨模态匹配。本文提出异构视觉语言模型集成与不一致感知重排序框架，通过分数对齐和迭代融合多个VLM嵌入，再经重排序提升检索精度。方法应用于AI City Challenge 2026赛道4，在复杂交通监控场景中显著改善行人异常检索效果。",
+      "llm_tldr": "针对文本描述的行人异常检索任务，现有方法难以处理外观、行为、物体交互与场景上下文的细粒度跨模态匹配。本文提出异构视觉语言模型集成与不一致感知重排序框架，通过分数对齐和迭代融合多个VLM嵌入，再经重排序提升检索精度。方法应用于AI City Challenge 2026赛道4，在复杂交通监控场景中显著改善行人异常检索效果。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-25",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.14003v1",
+      "source": "arxiv",
+      "title": "Batch-wise Adaptive Pruning: Periodic Neuron Activation-Aware Weight Pruning for Language Reasoning Model",
+      "abstract": "Large Reasoning Models (LRMs) achieve strong performance on complex tasks through extended chain-of-thought generation, but incur substantial computational costs during inference. In production settings, batched inference is essential for high throughput, yet the existing training-free adaptive pruning methods we evaluate severely degrade in this regime. Because a batch must share a single pruning mask, these methods aggregate activations across samples and then apply threshold-based selection; the threshold, calibrated offline on unaggregated activations, no longer matches the aggregated distribution, so the realized sparsity ratio drifts and accuracy on reasoning tasks collapses under batched inference.   In this work, we propose a training-free adaptive pruning method designed specifically for batched inference in LRMs, built on two components. First, we replace threshold-based selection with periodic top-k selection over the aggregated importance scores, which is unaffected by the shift that aggregation induces in the activation distribution, and which runs selection once per update period rather than at every token, preserving the speedup. Second, based on the observation that important neurons re-fire periodically during long reasoning generation, we introduce an activation memory that accumulates importance across update phases so that recurring neurons are retained.   Experiments on diverse reasoning benchmarks demonstrate that our method outperforms the previous state-of-the-art adaptive pruning method by 39.7 percentage points in average accuracy at batch size 4 with 50% target sparsity on DeepSeek-R1-Distill-Qwen-7B, and reaches 1.40x speedup over dense inference at 50% actual sparsity.",
+      "authors": [
+        "Yongmin Kim",
+        "Shota Takashiro",
+        "Yusuke Iwasawa",
+        "Takeshi Kojima",
+        "Yutaka Matsuo"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-14T06:46:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.14003v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive weight pruning for efficient LLM inference under batched settings",
+      "llm_evidence_cn": "批量推理下面向语言模型推理效率的自适应权重剪枝",
+      "llm_evidence": "批量推理下面向语言模型推理效率的自适应权重剪枝",
+      "canonical_evidence": "批量推理下面向语言模型推理效率的自适应权重剪枝",
+      "llm_tldr_en": "Prevents performance collapse of adaptive pruning in batched inference for Large Reasoning Models via periodic neuron activation-aware weight pruning, maintaining sparsity and accuracy and enabling efficient deployment.",
+      "llm_tldr_cn": "针对大推理模型在批量推理场景下现有自适应剪枝方法因阈值漂移导致稀疏度失真与准确率崩溃的问题，提出批量自适应剪枝，利用周期神经元激活感知的权重剪枝策略。该方法在共享剪枝掩码的批处理条件下保持期望稀疏度与推理精度，显著降低推理成本，为大模型高效部署提供实用方案。",
+      "llm_tldr": "针对大推理模型在批量推理场景下现有自适应剪枝方法因阈值漂移导致稀疏度失真与准确率崩溃的问题，提出批量自适应剪枝，利用周期神经元激活感知的权重剪枝策略。该方法在共享剪枝掩码的批处理条件下保持期望稀疏度与推理精度，显著降低推理成本，为大模型高效部署提供实用方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.14024v1",
+      "source": "arxiv",
+      "title": "SSP: An Event-Matched Syn2Sim2Phy Cross-Domain Evaluation Framework for Autonomous Driving VLA Models",
+      "abstract": "Vision-language-action (VLA) models for autonomous driving jointly produce scene interpretation, language-based reasoning, and driving trajectories. Existing evaluations often use independently selected synthetic, simulated, and physical data, so measured performance gaps can be confounded by changes in scenario content rather than genuine domain sensitivity. We propose SSP (Synthetic-Simulation-Physical), an event-matched Syn2Sim2Phy evaluation framework that anchors cross-domain comparison to the same safety-critical interaction. Starting from a synthetic long-tail video, SSP builds a validated event specification that preserves road topology, participant roles, relative motion, conflict evolution, passing order, response constraints, and event phases. Platform-specific realizations are then constructed in CARLA and on a closed proving ground and are evaluated only after transfer audits confirm preservation of mandatory event properties. SSP maps heterogeneous outputs from OpenEMMA, LLaViDA, and Alpamayo-R1 into common semantic slots and a 1 s trajectory window to assess output validity, semantic accuracy, critical-interaction recognition, trajectory quality, and risk response. Across Cut-in and vulnerable-road-user crossing cases, the macro-averaged Integrated VLA Capability Scores are 0.259, 0.291, and 0.325 in the Synthetic, Simulation, and Physical domains, respectively, while the best domain varies by scenario. Alpamayo-R1, OpenEMMA, and LLaViDA obtain scores of 0.405, 0.338, and 0.131. SSP provides a reproducible scene-transfer chain and an evidence-qualified evaluation of VLA behavior without assuming that the Physical domain is universally superior.",
+      "authors": [
+        "Haojie Feng",
+        "Peizhi Zhang",
+        "Xinrui Zhang",
+        "Zhuoren Li",
+        "Junpeng Huang",
+        "Xiurong Wang",
+        "Dongxiao Yin",
+        "Yuxiang Zhang",
+        "Junfan Zhu",
+        "Lu Xiong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-14T07:15:16+00:00",
+      "link": "https://arxiv.org/pdf/2608.14024v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Cross-domain evaluation framework for autonomous driving VLA models",
+      "llm_evidence_cn": "面向自动驾驶VLA模型的事件匹配跨域评估框架",
+      "llm_evidence": "面向自动驾驶VLA模型的事件匹配跨域评估框架",
+      "canonical_evidence": "面向自动驾驶VLA模型的事件匹配跨域评估框架",
+      "llm_tldr_en": "This paper presents SSP, an event-matched Synthetic-Simulation-Physical evaluation framework for VLA models in autonomous driving, anchoring domain comparisons to the same safety-critical interaction to isolate genuine domain sensitivity.",
+      "llm_tldr_cn": "自动驾驶的视觉-语言-动作（VLA）模型需要跨合成、仿真与物理数据评估，但现有评估使用独立选择的数据，导致性能差异混杂场景内容变化。本文提出SSP框架，以事件规格匹配的方式锚定同一安全关键交互。该方法从合成长尾视频出发构建验证事件规格，保留道路拓扑、参与者角色和相对运动等要素。该框架能更可靠地度量VLA模型对真实域变化的敏感程度，为自动驾驶评测提供方法支撑。",
+      "llm_tldr": "自动驾驶的视觉-语言-动作（VLA）模型需要跨合成、仿真与物理数据评估，但现有评估使用独立选择的数据，导致性能差异混杂场景内容变化。本文提出SSP框架，以事件规格匹配的方式锚定同一安全关键交互。该方法从合成长尾视频出发构建验证事件规格，保留道路拓扑、参与者角色和相对运动等要素。该框架能更可靠地度量VLA模型对真实域变化的敏感程度，为自动驾驶评测提供方法支撑。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.14428v1",
+      "source": "arxiv",
+      "title": "GhostPoint: Self-Supervised Representation Learning by Hallucinating Occluded LiDAR Structure",
+      "abstract": "3D object detection from LiDAR point clouds is a core problem in autonomous driving. Recent advances in self-supervised learning (SSL) enable scalable pretraining and transfers well to per-point tasks such as semantic and panoptic segmentation, but transfer to 3D detection remains weaker. We analyze recent SSL methods and find that most objectives are defined only on measured LiDAR returns from visible surfaces, leaving occluded and unobserved regions unconstrained. This visible-surface bias can be sufficient for point-wise prediction, but 3D detection requires robustness to missing structure. To address this gap, we propose GhostPoint, an SSL framework that hallucinates latent features in local neighborhoods around discovered instances, generated via a novel instance voxel dilation. In GhostPoint, an encoder processes observed returns, and an additional predictor infers neighborhood representations from observed context. In addition to standard encoder-level supervision, we introduce a predictor-level supervision scheme on sampled voxels from generated neighborhoods. Specifically, observed (visible/masked) voxels match teacher-encoder targets, while unobserved voxels match teacher-predictor hallucinations. This design encourages the learned representation to explicitly model structure beyond observed returns. Extensive evaluations on nuScenes and Waymo demonstrate that our method achieves state-of-the-art performance, consistently improving downstream 3D detection, especially under sparse scans and limited labels.",
+      "authors": [
+        "Mohamed Abdelsamad",
+        "Bin Yang",
+        "Michael Ulrich",
+        "Miao Zhang",
+        "Yakov Miron",
+        "Alexandru Paul Condurache",
+        "Abhinav Valada"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-14T16:10:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.14428v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "self-supervised LiDAR representation learning for 3D detection in autonomous driving traffic scenes",
+      "llm_evidence_cn": "面向自动驾驶交通场景3D检测的激光雷达自监督表示学习",
+      "llm_evidence": "面向自动驾驶交通场景3D检测的激光雷达自监督表示学习",
+      "canonical_evidence": "面向自动驾驶交通场景3D检测的激光雷达自监督表示学习",
+      "llm_tldr_en": "GhostPoint addresses visible-surface bias in LiDAR self-supervised learning by hallucinating latent features in local neighborhoods, improving transfer to 3D detection for autonomous driving.",
+      "llm_tldr_cn": "现有激光雷达自监督学习只在可见表面点定义目标，导致对遮挡和未观测结构缺少约束，向3D检测迁移时性能较弱。GhostPoint提出在发现的局部邻域中幻觉化潜在特征，模拟遮挡结构，从而弥补可见表面偏差。实验表明该方法能增强自监督预训练对3D检测的迁移能力，为自动驾驶等交通场景感知提供更鲁棒的表示基础。",
+      "llm_tldr": "现有激光雷达自监督学习只在可见表面点定义目标，导致对遮挡和未观测结构缺少约束，向3D检测迁移时性能较弱。GhostPoint提出在发现的局部邻域中幻觉化潜在特征，模拟遮挡结构，从而弥补可见表面偏差。实验表明该方法能增强自监督预训练对3D检测的迁移能力，为自动驾驶等交通场景感知提供更鲁棒的表示基础。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

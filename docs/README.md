@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-16</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-17</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 13 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>6</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>4</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-16 19:28:59 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-17 19:46:52 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读4篇、速读9篇，重点关注自动驾驶跨模态融合与视觉Transformer高效推理两个方向。最值得看的是9.0分的《CRUISE》——用视觉语言模型引导不确定性感知融合，提升自动驾驶鲁棒性；以及9.0分的寄存器token剪枝方法，显著降低ViT计算成本。建议普通读者优先关注这两项技术如何平衡精度与效率，后续可留意3D占用预测和单目深度细化的速读论文。</p>
+<p>今日精读2篇高分论文，速读3篇，覆盖视觉编码、事件相机与跨域评估等方向。最值得关注的是视觉Token编码利用空间冗余提升ViT特征效率，以及事件相机的语义引导特征提取。建议普通读者优先精读这两篇9.0分工作，再按需浏览速读列表中的模型评估与剪枝方法。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">4 篇</strong>
+    <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="CRUISE: Vision-Language Model-Guided Uncertainty-Aware Cross-Modal Sensor Fusion for Robust Autonomous Driving">CRUISE: Vision-Language Model-Guided Uncertainty-Aware Cross-Modal Sensor Fusion for Robust Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="Putting Registers to Work: Task Registers for Token Pruning in Vision Transformers">Putting Registers to Work: Task Registers for Token Pruning in Vision Transformers</span></li><li><span class="dpr-home-dashboard-paper-title" title="Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding">Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding">Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding</span></li><li><span class="dpr-home-dashboard-paper-title" title="E-S2Feat:Semantic-Guided Spiking Local Feature Detection and Description for Event Cameras">E-S2Feat:Semantic-Guided Spiking Local Feature Detection and Description for Event Cameras</span></li><li><span class="dpr-home-dashboard-paper-title" title="KV Cache Compression Through the Lens of Transform Coding">KV Cache Compression Through the Lens of Transform Coding</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">9 篇</strong>
+    <strong class="dpr-home-dashboard-count">4 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="OccAnyScene: Towards Unified Indoor-Outdoor 3D Occupancy Prediction">OccAnyScene: Towards Unified Indoor-Outdoor 3D Occupancy Prediction</span></li><li><span class="dpr-home-dashboard-paper-title" title="RefineAny3D: Depth Refinement as Semantic Alignment for Monocular 3D Detection">RefineAny3D: Depth Refinement as Semantic Alignment for Monocular 3D Detection</span></li><li><span class="dpr-home-dashboard-paper-title" title="Scaling Representation Diversity: Modulated Attention and Reconstructive Regularization for Visual Grounding">Scaling Representation Diversity: Modulated Attention and Reconstructive Regularization for Visual Grounding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Heterogeneous Vision-Language Ensemble with Disagreement-Aware Reranking for Text-Based Person Anomaly Retrieval">Heterogeneous Vision-Language Ensemble with Disagreement-Aware Reranking for Text-Based Person Anomaly Retrieval</span></li><li><span class="dpr-home-dashboard-paper-title" title="SSP: An Event-Matched Syn2Sim2Phy Cross-Domain Evaluation Framework for Autonomous Driving VLA Models">SSP: An Event-Matched Syn2Sim2Phy Cross-Domain Evaluation Framework for Autonomous Driving VLA Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Batch-wise Adaptive Pruning: Periodic Neuron Activation-Aware Weight Pruning for Language Reasoning Model">Batch-wise Adaptive Pruning: Periodic Neuron Activation-Aware Weight Pruning for Language Reasoning Model</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>4</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
 </section>
 </div>
 
