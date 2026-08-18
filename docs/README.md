@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-17</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-18</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 22 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>6</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>4</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>9</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>13</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-17 19:46:52 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-18 21:00:47 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读2篇高分论文，速读3篇，覆盖视觉编码、事件相机与跨域评估等方向。最值得关注的是视觉Token编码利用空间冗余提升ViT特征效率，以及事件相机的语义引导特征提取。建议普通读者优先精读这两篇9.0分工作，再按需浏览速读列表中的模型评估与剪枝方法。</p>
+<p>今日精读9篇、速读13篇，共22篇论文，覆盖SLAM、Tokenizer、边缘-云推理等方向。最值得关注的是《MotionGS-SLAM》将事件相机与高斯溅射结合解决运动模糊，以及《Autocompleting Tokenizers》对分词器自动补全的探索。建议优先精读这两篇高分论文，并速读《Risk-Adaptive Edge--Cloud Visual Reasoning》以了解自动驾驶通信优化思路。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">6 篇</strong>
+    <strong class="dpr-home-dashboard-count">9 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding">Visual Token Codec: Unleashing Spatial Redundancy for ViT Feature Coding</span></li><li><span class="dpr-home-dashboard-paper-title" title="E-S2Feat:Semantic-Guided Spiking Local Feature Detection and Description for Event Cameras">E-S2Feat:Semantic-Guided Spiking Local Feature Detection and Description for Event Cameras</span></li><li><span class="dpr-home-dashboard-paper-title" title="KV Cache Compression Through the Lens of Transform Coding">KV Cache Compression Through the Lens of Transform Coding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="MotionGS-SLAM: Event-Modulated Gaussian Splatting for Motion-Blur Robust SLAM">MotionGS-SLAM: Event-Modulated Gaussian Splatting for Motion-Blur Robust SLAM</span></li><li><span class="dpr-home-dashboard-paper-title" title="A Pilot Study of Autocompleting Tokenizers">A Pilot Study of Autocompleting Tokenizers</span></li><li><span class="dpr-home-dashboard-paper-title" title="Remember Smarter: Visual History Compressor and Hyperbolic Experience Space for Robotic Memory">Remember Smarter: Visual History Compressor and Hyperbolic Experience Space for Robotic Memory</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>2</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">4 篇</strong>
+    <strong class="dpr-home-dashboard-count">13 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Heterogeneous Vision-Language Ensemble with Disagreement-Aware Reranking for Text-Based Person Anomaly Retrieval">Heterogeneous Vision-Language Ensemble with Disagreement-Aware Reranking for Text-Based Person Anomaly Retrieval</span></li><li><span class="dpr-home-dashboard-paper-title" title="SSP: An Event-Matched Syn2Sim2Phy Cross-Domain Evaluation Framework for Autonomous Driving VLA Models">SSP: An Event-Matched Syn2Sim2Phy Cross-Domain Evaluation Framework for Autonomous Driving VLA Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Batch-wise Adaptive Pruning: Periodic Neuron Activation-Aware Weight Pruning for Language Reasoning Model">Batch-wise Adaptive Pruning: Periodic Neuron Activation-Aware Weight Pruning for Language Reasoning Model</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Risk-Adaptive Edge--Cloud Visual Reasoning for Communication-Efficient Autonomous Driving">Risk-Adaptive Edge--Cloud Visual Reasoning for Communication-Efficient Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="SEER: Long-Context Reasoning via Selective Visual-Text Compression">SEER: Long-Context Reasoning via Selective Visual-Text Compression</span></li><li><span class="dpr-home-dashboard-paper-title" title="SparkVLA: Stop-Aware Hierarchical VLA with Adaptive Action Chunking for Long-Horizon Manipulation">SparkVLA: Stop-Aware Hierarchical VLA with Adaptive Action Chunking for Long-Horizon Manipulation</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>6</strong></span></div>
 </section>
 </div>
 
