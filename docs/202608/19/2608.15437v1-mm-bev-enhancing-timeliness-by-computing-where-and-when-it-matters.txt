@@ -1,0 +1,763 @@
+Title: MM-BEV: Enhancing Timeliness by Computing Where and When it Matters
+
+URL Source: https://arxiv.org/pdf/2608.15437v1
+
+Published Time: Tue, 18 Aug 2026 00:51:46 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# MM-BEV: Enhancing Timeliness by Computing Where and When it Matters 
+
+Liangkai Liu ∗ and Kang G. Shin †∗Department of Computer Science, Texas Tech University, USA 
+
+> †
+
+Department of Computer Science and Engineering, University of Michigan, USA 
+
+Abstract —Multi-modality Bird’s-Eye-View (MM-BEV) percep-tion, which combines LiDAR’s depth precision with cameras’ dense semantics, is essential for autonomous vehicles (AVs) but difficult to run in real time due to its high compute cost and non-ideal sensing conditions. State-of-the-art (SOTA) approaches compress single-modality detectors and fail to account for three key aspects: (1) structured intra-modality sparsity of camera and LiDAR inputs, (2) the inter-modal timing misalignment between them, and (3) most detected objects are not relevant to the planner’s immediate control action. We present MM-BEV , a real-time MM-BEV system organized around a fundamental principle: compute where and when it matters . MM-BEV decomposes perception into a mandatory part— safety-critical objects within the ego’s braking distance and short time-to-collision (TTC)—and an optional part, prioritizing the mandatory part for fast completion while down-sampling or shedding optional work if the compute budget is tight. It combines four mechanisms: (i) a criticality-ranked temporal-ROI selector driven by motion-extrapolated previous-frame detections; (ii) sparse ROI-aware feature extraction with a shared-shape camera crop at context-adaptive resolution and ROI-aware Li-DAR voxelization; (iii) a latency-aware coordinator that schedules LiDAR sweeps, image resolution, and keyframes from scene dynamics and TTC; and (iv) an asynchronous scheduler that decouples sensing from inference and skips stale frames to keep end-to-end (e2e) latency low. On the nuScenes dataset, MM-BEV reduces inference latency by 1.96 × and e2e latency by 2.93 ×, preserving geometry-critical 
+
+recall exactly and dropping safety-critical recall by only 0.2 pp. On a Clearpath Husky A300 robot with an Ouster-128 LiDAR, BEV cameras, and a Jetson AGX Orin, MM-BEV achieves a further 2.11 × mean-latency reduction, corroborating its potential for real-world autonomy. 
+
+I. I NTRODUCTION 
+
+An autonomous vehicle (AV) must perceive its surroundings in real time—planner cannot use late sensor frames. Bird’s-Eye-View (BEV) perception has become the dominant rep-resentation for this task: by projecting onboard camera and LiDAR data into a unified 360° top-down view [1], [2], it blends LiDAR’s precise depth with the cameras’ dense seman-tic cues for robust detection across diverse conditions [3], [4]. However, on a resource-limited platform aboard AVs, accuracy and the real-time constraint pull against each other: fusing two high-rate, high-resolution sensor streams is expensive, and multi-modality BEV perception is notoriously hard to run in real time [3], [5]–[10]. Prior work has approached this real-time/latency challenge along three axes, each of which captures only a slice of the problem. The standard solution is to make the detector cheaper—compressing dense models into sparse ones [6], [11]–[14]—but this still treats every region of the input uniformly. Region-of-Interest (ROI) heuristics come closer, yet have been explored almost entirely on camera images and within a single modality [15], [16]; they never allocate compute across camera and LiDAR explicitly. On the timing axis, most pipelines assume pre-synchronized inputs or absorb worst-case delays without exploiting the detection task’s struc-ture [17], [18]. The two efforts closest to ours each capture only one slice: RT-BEV [9] couples ROI-based detection with synchronization but is camera-only and ignores cross-modal redundancy and asynchronous fusion; FLEX [19] adapts the LiDAR sweep count per view under a global time budget, but at coarse per-view granularity and without exploiting frame-to-frame temporal coherence. Moreover, every one of these systems is judged by all-object accuracy—the metric that mislabels a planning-safe speedup as an accuracy loss. To understand where on-board compute is actually redun-dant, we profiled the multi-modality BEV pipeline (§III). The inefficiency is structured , with the two modalities incurring redundant work in complementary dimensions. Cameras are 
+
+spatially sparse : only a small, stable fraction of image regions ever contains an object, yet a dense backbone pays for ev-ery pixel. LiDAR is temporally redundant : aggregating more sweeps yields quickly diminishing the accuracy gain while latency grows steadily. Compounding both, the sensors are 
+
+asynchronous —running at different rates with non-negligible communication delays, so their timestamps are rarely aligned and the inter-modal offsets silently degrade fusion [20], [21]. These findings frame our research problem. Existing BEV perception systems ignore this structure—they spend compute uniformly across input they could route, and across sweeps they could shed—and they are evaluated by a metric that hides whether the spared compute would have mattered for the planner. For a real-time safety system, the metric is wrong: as in imprecise computation , the perception task has a mandatory part—the safety-critical objects within the ego’s braking distance and short time-to-collision (TTC), which the planner must act on within TTC—and an optional part. The right question is, therefore, not “how fast can the model be,” but which work is mandatory, and how do we prioritize it for fast completion? 
+
+We answer this questionby developing MM-BEV , a real-time multi-modality BEV perception system organized around a fundamental principle: compute where and when it mat-arXiv:2608.15437v1 [cs.RO] 15 Aug 2026 ters . MM-BEV routes both modalities’ compute by the pre-vious frame’s motion-extrapolated detections ( temporal-ROI 
+
+routing), and co-designs per-frame workload reduction with pipeline scheduling so that the mandatory detections are always processed first and with the lowest possible latency. 
+
+MM-BEV consists of four parts. (i) A criticality-ranked temporal-ROI selector projects the previous frame’s motion-padded detections into per-modality ROIs and ranks them by geometry and safety criticality, so the mandatory set is always covered. (ii) Sparse ROI-aware feature extraction confines the camera backbone to a shared-shape ROI crop at a context-adaptive resolution, and confines LiDAR voxelization to the ROI point set. (iii) A latency-aware coordinator holds the per-frame budget by scheduling the LiDAR sweep window, image resolution, and periodic full-scene keyframes from scene dynamics and TTC. (iv) An asynchronous streaming scheduler decouples sensing from inference and processes only the freshest synchronized sensor data, so the pipeline stays responsive instead of falling behind on a growing queue. We implement MM-BEV and evaluate it e2e in ROS on the nuScenes dataset [3], [22], [23] on a single NVIDIA RTX 3080 GPU. Temporal-ROI routing with adaptive resolu-tion cuts mean inference latency 1.96 × (202 → 103 ms) for the LiDAR+camera detector and 1.93 × (136 → 70 ms) for the LiDAR-only detector; the asynchronous scheduler cuts e2e la-tency 2.93 × (1006 → 344 ms) and raises processed frames per scene from ∼10 to 60 . Most importantly, this does not cost the mandatory work: geometry-critical recall is preserved exactly 
+
+and safety-critical recall drops only 0.2 points. A deployment on a Clearpath Husky A300 with a Jetson AGX Orin reaches a further 2.11 × mean-latency reduction, confirming the gains transfer to real-world autonomous systems. This paper makes four contributions:  
+
+> •
+
+Criticality-aware perception. A mandatory/optional de-composition of BEV detection from ego state, and a criticality-bucketed metric that scores latency–accuracy trade-offs against the objects a planner must act on.  
+
+> •
+
+Cross-modal temporal-ROI routing. A previous-frame-driven selector that focuses both modalities’ compute— shared-shape camera ROI, motion-padded LiDAR ROI, adaptive sweeps and resolution—prioritized so the mandatory set is always covered.  
+
+> •
+
+A latency-aware coordinator with asynchronous scheduling that keeps e2e latency low by always running inference on the freshest synchronized sensor data and adapting the keyframe schedule, LiDAR sweep window, and image resolution to scene dynamics.  
+
+> •
+
+An e2e evaluation on nuScenes in ROS quantifying which sparsity levers pay off, plus a real-world validation on a Husky A300 with a Jetson AGX Orin. II. BEV P ERCEPTION PIPELINE 
+
+State-of-the-art (SOTA) Bird’s-Eye View (BEV) perception typically relies on indiscriminate processing of large-scale input data from both LiDARs and cameras [2], [3], [5]–[7], [12], [24]. Fig. 1 present a detailed BEV perception pipeline with both LiDAR and surrounding cameras. The pipeline usually consists of two critical stages: communication and detec-tion [9]. The communication stage involves two subprocesses: capturing and synchronization. In the former, multiple cameras (typically including front, front-right, front-left, back, back-left, and back-right) and LiDAR sensors independently acquire environmental data [22], [25]–[28]. The latter (synchroniza-tion) ensures temporal alignment across these data streams by matching timestamps associated with each sensor’s data, maintaining the coherence required for precise perception. Once synchronized, the detection stage begins by processing the sensor data via two parallel branches—one for camera-based images and another for LiDAR point clouds. Multiple lidar sweeps are usually accumulated for a richer point cloud as input [22]. Each branch independently extracts meaningful spatial features from its respective sensor modality. These separate features are then converted into a unified BEV rep-resentation, creating aligned BEV feature maps. A detection head is then employed on these fused BEV features to effec-tively detect and localize relevant objects in the environment, ultimately outputting accurate and timely detection results essential for AV operation. III. E MPIRICAL STUDY 
+
+We derive MM-BEV ’s design principles from empirical stud-ies of the SOTA BEV perception pipeline with LiDAR and camera sensors. We identify three key insights for accuracy and real-time capability in BEV perception with LiDAR and cameras: 1) fine-grained ROIs are necessary; 2) asynchronous sensor timing leads to misalignment; and 3) most detected objects are safety-noncritical, so accuracy must be measured against the safety-relevant subset. 
+
+A. Why Fine-Grained ROIs? 
+
+Camera inputs are spatially sparse. Surround-view camera inputs used for BEV exhibit strong spatial sparsity : most pixels (or image regions) rarely overlap with any object, while informative signal concentrates in a small, stable subset of regions (e.g., road lanes, horizon near traffic flow). To quantify this, we compute a per-pixel object-presence probability for each camera using nuScenes keyframes. For every frame, all annotated 3D boxes are projected to the image plane via calibrated intrinsics/extrinsics into a binary mask (1 if inside any projected box, 0 otherwise). Summing over N frames and normalizing yields: 
+
+P (x, y ) = 1
+
+N
+
+> N
+
+X
+
+> t=1
+
+1
+
+"
+
+(x, y ) ∈ [
+
+> k
+
+Proj(Box k,t )
+
+#
+
+.
+
+We apply a light Gaussian blur to reduce aliasing, and then average within a regular grid to obtain per-region probabilities 
+
+¯P . Regions with ¯P < τ (we use τ =0 .1) are labeled low-saliency . As shown in Fig. 2, large, structured low-saliency areas persist across views, revealing that coarse, frame-level pruning cannot exploit where the signal actually lies. This mo-tivates fine-grained ROIs that (i) activate computation only on 2preprocess point cloud branch image branch fusion detection head 
+
+> Combined lidar sweeps batched images BEV features
+> Cam1 Cam2 Cam6 Cam3 Cam4 Cam5 LiDAR pivot
+> front front right front left back back left back right
+> LiDAR Point cloud Cameras
+
+Synchronization BEV Perception 
+
+message queue 
+
+End-to-end delay Fig. 1. End-to-end pipeline for BEV perception. 52% Pixels with P<0.1 
+
+CAM_FRONT_LEFT 
+
+> 67% Pixels with P<0.1
+
+CAM_FRONT 
+
+> 42% Pixels with P<0.1
+
+CAM_FRONT_RIGHT 
+
+> 42% Pixels with P<0.1
+
+CAM_BACK_RIGHT 
+
+> 35% Pixels with P<0.1
+
+CAM_BACK 
+
+> 44% Pixels with P<0.1
+
+CAM_BACK_LEFT 
+
+0.0 0.2 0.4 0.6 0.8 1.0 P(object present) 
+
+Fig. 2. Object-presence probability heatmaps across the six nuScenes cameras. Dark areas indicate regions with low per-region probability ¯P ; percentages (if shown) denote the share of regions with ¯P < 0.1.
+
+high-saliency regions, (ii) reduce fusion and synchronization costs by aligning far fewer spatial elements, and (iii) preserve accuracy by retaining a few regions that contain objects. 
+
+LiDAR sweeps are temporally redundant. In addition, we observe substantial redundancy when combining multiple sweeps to enrich the LiDAR’s point cloud. For LiDAR-only BEV perception, we adjust the number of temporal sweeps from 1 to 9 (default in nuScenes) to examine how additional point cloud data affects accuracy and latency [22], [29]. 1 2 3 4 5 6 7 8 9            
+
+> Combined Sweeps
+> 0.60 0.62 0.64 0.66 0.68 0.70 0.72 0.74
+> mAP
+> 0.65 0.69 0.70 0.71 0.72 0.73 0.73 0.73 0.73
+> 123456789
+> Combined Sweeps
+> 120 140 160 180 200 220 240
+> Inference Latency (ms)
+> 146 155 166 176 186 199 211 224 238
+
+Fig. 3. mAP and inference latency with different LiDAR sweeps. 
+
+Fig. 3 quantifies the trade-off between accuracy and latency as a function of the number of aggregated LiDAR sweeps. Increasing the number of sweeps from 1 to 9 results in a steady rise in mean Average Precision (mAP) from 0.65 to 0.73, but the accuracy gain plateaus beyond 5 sweeps. In contrast, inference latency increases almost linearly, from 146 ms with a single sweep to 238 ms with 9 sweeps. This observation reveals temporal redundancy in LiDAR input— additional sweeps provide a diminishing return of accuracy while incurring a substantial latency overhead. These findings motivate an adaptive sweep selection and downsampling mechanism that dynamically balances between sensing richness and compu-tational efficiency based on scene motion or environmental complexity. 
+
+Insight 1. Spatial sparsity in cameras and temporal redun-dancy in LiDAR together call for fine-grained, context-aware ROI selection : activate only the camera regions (and LiDAR sweeps) that matter, reducing compute and fusion overheads without sacrificing accuracy. B. Why Co-Optimize Sync and Detection? 
+
+Asynchronous sensor timing is the norm, not an exception. 
+
+Most BEV perception pipelines assume perfectly synchronized LiDAR and camera inputs [22], [25], yet real systems run sensors on separate clocks and at different rates, introducing unavoidable temporal offsets [9], [20], [30]. In nuScenes, LiDAR samples at 20 Hz while the surround cameras run at 12 Hz; the official dataset exposes only 2 Hz keyframes 
+
+for training/evaluation. Even when an ApproximateTime 
+
+policy in message_filters is used for synchronization, residual offsets on the order of 50 –125 ms are common due to sampling-rate mismatch and bus jitter. When multi-sweep LiDAR aggregation is enabled to densify the point cloud, the effective sensing window can span up to ∼ 500 ms (keyframe at 2 Hz + several preceding non-keyframe sweeps), further widening inter-modal misalignment. 
+
+Misalignment measurably degrades fusion. Figure 5 illus-trates two synchronization groups produced by the default ROS ApproximateTime : (i) {camera @ T1, LiDAR @ T2}
+
+and (ii) {camera @ T2, LiDAR @ T3}, where ∆t1,2 = 350 ms and ∆t2,3 = 150 ms. Between T1 and T2, the lead vehicle moves closer and a traffic light goes out of the camera’s FOV; fused with LiDAR @ T2, the appearance/geometry no longer exists, creating a feature conflict. Between T2 and T3,LiDAR captures three vehicles while the camera sees two ,3LiDAR (20Hz) BEV Cameras (12Hz) Sync group theoretically 50ms difference Fig. 4. Timestamp distributions of LiDAR (20 Hz) and BEV cameras (12 Hz) in nuScenes. Sampling-rate mismatch and asynchronous publication create inherent offsets ( ≳ 50 ms) even before bus/jitter effects. 
+
+causing ghosting/duplication or misses during fusion. These disagreements do not stem from model capacity, but from 
+
+time —–na¨ ıvely aligned features describe different physical states of the world. T1 T2
+
+T2 T3
+
+misalignment misalignment Sync group 1: (Cam 𝑇 !
+
+, LiDAR 𝑇 "
+
+) Sync group 2: (Cam 𝑇 "
+
+, LiDAR 𝑇 #
+
+)
+
+Fig. 5. An example of camera–LiDAR misalignment. Two sync groups are formed: {T cam  
+
+> 1
+
+, T lidar  
+
+> 2
+
+} and {T cam  
+
+> 2
+
+, T lidar  
+
+> 3
+
+} with ∆t1,2=350 ms and 
+
+∆t2,3=150 ms. Objects move and FOV content changes across these offsets, leading to conflicting cross-modal evidence. 
+
+Aligning to low-rate keyframes is not enough. A common workaround is to downsample all inputs to low-rate keyframes. While this reduces the nominal offset, it sacrifices temporal resolution and reaction time, and still leaves residual mis-alignment once multi-sweep aggregation and real bus jitter are considered. Moreover, coarse, frame-level synchronization ignores where the informative content actually lies (Fig. 2): most camera pixels are low-saliency, so forcing strict frame-level alignment wastes bandwidth and compute on uninforma-tive regions. 
+
+Insight 2. Asynchronous sampling routinely introduces 50 –
+
+500 ms offsets between camera and LiDAR. Naively aligned features describe different physical states of the world, pro-ducing feature conflicts (ghosting, mismatched object sets) that degrade fusion accuracy. C. Why Criticality? 
+
+Most detected objects are safety-noncritical. Standard BEV evaluation measures recall over all annotated objects— pedestrians 50 m behind the ego, traffic cones on the opposite shoulder, parked vehicles far outside any plausible collision path. These objects contribute equally to mAP, yet a planner would not alter its immediate control action for any of them. To quantify this structure, we classify each annotated object as mandatory or optional based on the ego’s driving state: an object is mandatory if it lies inside the ego’s forward braking distance or its time-to-collision falls below a per-class threshold, and optional otherwise (formalized in §IV-C). Applying this classifier to all 18 ,364 annotations across the nuScenes v1.0-mini scenes, Fig. 6 shows that only 11 .0%
+
+of all annotations are mandatory; the remaining 89 .0% are optional. The mandatory fraction varies by class—motorcycles (30 .4% ) and construction vehicles ( 17 .3% ) are most likely to be in the ego’s path, while barriers ( 3.0% ) and traffic cones ( 5.5% ) rarely are—but no class exceeds one third of its annotations being mandatory. 11.0% 89.0% (a) Mandatory vs Optional               
+
+> Mandatory Optional 020 40 60 80 100
+> Mandatory fraction (%)
+> Car Ped. Bicycle Moto. Truck Bus Trailer Const. Veh. Barrier Cone
+> 12% 14% 6% 30% 10% 7% 10% 17% 3% 6%
+> (b) Mandatory Fraction per Class
+> Overall (11%)
+> 020 40 60
+> Distance from ego (m)
+> 0500 1000 1500 2000
+> Object count
+> (c) Object Distance Distribution
+> Optional Mandatory
+> 40 20 020 40
+> Lateral (m)
+> 20
+> 020 40 60
+> Forward (m)
+> (d) Ego-frame Object Positions (BEV)
+> Optional Mandatory
+
+Fig. 6. Criticality analysis on nuScenes v1.0-mini ( 18 ,364 annotations). (a) Only 11% of objects are mandatory (safety-critical); 89% are optional. (b) Per-class mandatory fractions. (c) Critical objects concentrate at close range; optional ones span the full detection envelope. (d) In BEV, mandatory objects (red) cluster in the ego’s forward path while optional objects (blue) populate the periphery. 
+
+Insight 3. An overwhelming majority of annotated objects (≈ 89% on nuScenes) fall outside the ego’s braking envelope and short-TTC window, so they are irrelevant to the planner’s immediate control action. All-object recall therefore conflates two very different costs: dropping an optional far-field object is safety-neutral, while dropping a mandatory in-path object is not. Real-time BEV perception must be designed and measured 
+
+against the mandatory subset. 
+
+IV. S YSTEM DESIGN 
+
+This section details the design of MM-BEV . Building on the three insights of Section III, MM-BEV routes both modal-ities’ compute through fine-grained ROIs (addressing the spa-tial/temporal redundancy of Insight 1), treats synchronization and detection as a joint problem to mitigate the inter-modal timing offsets we measured (Insight 2), and decomposes per-ception into a mandatory part — the safety-critical detections 4a planner must act on this cycle — and an optional part (Insight 3), prioritizing the mandatory part for low-latency completion and shedding optional work when the compute budget is tight. We first give an overview, then state the technical challenges, then detail each component. 
+
+A. System Overview ROI-aware Voxelization Sparse Feature Extractor Fusion Detection Head    
+
+> BEV features
+> ROIs Selector LiDAR + Camera Publisher Coordinator
+> sync params camera ROIs ttc 3d objects odometry
+> 1345
+> lidar ROIs
+> Synchronization
+> 2
+> Fig. 7. MM-BEV system overview.
+
+Fig. 7 depicts the architecture of MM-BEV . Unlike the conventional pipeline of Fig. 1, which densely extracts features from every frame, MM-BEV routes compute by where it matters and when it matters . It begins with a criticality-ranked temporal-ROI selector 1 : rather than re-scanning each frame, it projects the previous frame’s motion-extrapolated detections into per-modality regions of interest (ROIs) and ranks them by criticality, so the mandatory set is always covered while redundant coverage is dropped. A synchronization module 2assembles the raw sensor data for the selected ROIs from a buffer and motion-compensates multi-sweep LiDAR to a common reference time. The camera branch performs sparse ROI-aware feature extraction 3 , running the backbone only on a shared-shape ROI crop at a context-adaptive resolution; the LiDAR branch uses ROI-aware voxelization 4 , voxeliz-ing only the ROI point set. At the core, a latency-aware coordinator 5 holds the per-frame budget — scheduling the LiDAR sweep window, the image resolution, and periodic full-scene keyframes from scene dynamics and time-to-collision (TTC) — and runs the whole pipeline under an asynchronous producer/consumer scheduler so the model always consumes the freshest synchronized sensor bundle. 
+
+B. Technical Challenges 
+
+MM-BEV is designed to address four challenges in achieving efficient and accurate BEV perception with real-time latency. 
+
+C1: Modeling where compute matters. How can the scene be modeled to route compute to the regions that matter, without missing safety-critical objects? MM-BEV exploits temporal coherence — the previous frame’s detections, constrained by physical motion, localize this frame’s objects — and ranks the resulting ROIs by criticality derived from ego state, so the mandatory set is never dropped. 
+
+C2: Mitigating sensor misalignment. How can tempo-ral misalignment across asynchronous sensors be mini-mized? MM-BEV forms ROI-guided synchronization groups and motion-compensates multi-sweep LiDAR to a common reference time before fusion. 
+
+C3: Processing sparse, variable-sized inputs. How can feature extraction handle sparse ROIs efficiently on encoders built for dense inputs? MM-BEV runs the camera backbone on a shared-shape ROI crop at a context-adaptive resolution and confines LiDAR voxelization to the ROI point set — limiting computation to informative regions without padding waste. 
+
+C4: Keeping latency low. How can the latency–accuracy trade-off be managed so the pipeline sustains real-time rates? 
+
+A latency-aware coordinator schedules keyframes, the LiDAR sweep window, and image resolution from scene dynamics and TTC, and an asynchronous scheduler keeps end-to-end latency low by always running on the freshest sensor bundle. 
+
+C. Criticality-Ranked Temporal-ROI Selector 
+
+The selector reduces redundant computation by extracting sparse, semantically critical regions from raw sensor data. It rests on two ideas: temporal localization — the previous frame tells us where objects are — and criticality ranking — which of those regions are mandatory. 
+
+Temporal ROI localization. Object motion between consec-utive frames is physically bounded, so the previous frame’s detections are a reliable prior for the current frame. Let Bt−1
+
+be the set of boxes detected at frame t − 1, each carrying an estimated velocity vi. MM-BEV projects every box forward by vi ∆t and forms per-modality ROIs from the union of current and motion-extrapolated box footprints. For the LiDAR branch, ROIs are axis-aligned BEV bounds buffered by a margin r:
+
+ROI L = [
+
+> bi∈B t−1
+
+ (bi ∪ (bi + vi ∆t)) ⊕ r. (1) For the camera branch, the same box set is projected to each image plane and expanded by ϵ pixels for localization uncertainty: 
+
+ROI C = [
+
+> bi∈B t−1
+
+
+
+Proj 2D (bi + vi ∆t) ⊕ ϵ
+
+
+
+. (2) The image ROIs across all cameras are normalized to a single 
+
+shared shape (§IV-E) so the backbone forward is batched without padding waste; cameras with no projected box receive a small fallback crop. When the cache is empty (first frame, or after a keyframe), the selector falls back to the full-frame pipeline. 
+
+Criticality model. Not every detected object carries equal real-time value. MM-BEV scores each object from the ego state — speed vego and heading — and the object’s geometry, into two classes. For an object with relative position pi = ( xi, y i)
+
+(xi forward of the ego, yi lateral) and class c(i), the object is geometry-critical if it lies within the ego’s forward braking cone: 
+
+Geom( i) ⇔ xi ≥ 0 ∧ ∥ pi∥ ≤ dmax (vego ) ∧ arctan yi 
+
+> xi
+
+≤ θ(vego ),
+
+(3) with braking distance 
+
+dmax (vego ) = max dmin , v2ego 
+
+2 abrake 
+
+!
+
+, (4) 5where θ(vego ) is the forward-cone half-angle at the current ego speed, abrake is a nominal deceleration, and dmin a floor for low-speed proximity. The object is safety-critical if its time-to-collision (§IV-G, Eq. 8) falls below a per-class threshold 
+
+τc(i):
+
+Safety( i) ⇔ TTC i ≤ τc(i), (5) with τc tighter for vulnerable road users than for static objects. The mandatory set is the union M = {i : Geom( i) ∨
+
+Safety( i)}; the rest is optional . Criticality ranks the ROIs: the selector guarantees coverage of mandatory ROIs at full fidelity and is free to shrink, down-sample, or drop optional ROIs to hold the latency budget (§IV-G). The criticality model is also the basis of the evaluation metric (§VI), which measures accuracy on the mandatory set M rather than over all objects. 
+
+Criticality thresholds. The forward-cone half-angle θ(vego )
+
+is a piecewise-linear function of ego speed: it widens at low speed (where lateral maneuvers are still possible) and narrows at highway speed (where the relevant corridor is forward and narrow), bounded between 15 ◦ and 60 ◦. Per-class TTC thresh-olds τc are set conservatively: 1.5 s for vulnerable road users (pedestrians, cyclists) and 2.5 s for motorized objects; static infrastructure (barriers, cones) is treated as geometry-critical only, since their relative velocity is zero and TTC is undefined. These values are tunable deployment parameters matched to typical highway-code reaction-distance requirements. 
+
+D. Synchronization 
+
+Synchronization integrates sensor data across time and space. MM-BEV treats synchronization and fusion as one module, aligning data temporally and spatially before fusion. 
+
+ROI-guided sync groups. Not all sensor data is equally informative at every timestep [6]. MM-BEV adapts the synchro-nization group from ROI information rather than always fusing all six cameras and LiDAR [9], and occasionally promotes a comprehensive keyframe involving all sensors (§IV-G). The synchronization window is set from the ego speed and TTC. 
+
+Motion compensation. Aggregating multiple LiDAR sweeps introduces time differences that misalign points [30], as shown in Figs. 3 and 5. MM-BEV compensates with the ego motion between sweep timestamps: a point from an earlier sweep at 
+
+t − ∆t is transformed to the current frame as 
+
+p′ 
+
+> t−∆t
+
+= Rtt−∆tpt−∆t + Ttt−∆t, (6) and the current sweep is aggregated with n motion-compensated previous sweeps, 
+
+Pt =
+
+> n
+
+[
+
+> i=0
+
+Rtt−ipt−i + Ttt−i pt−i ∈ P t−i , (7) where n is the sweep count chosen by the coordinator (§IV-G). Fig. 8 illustrates the effect on a nuScenes scene with ego motion across the sweep window: without compensation, static structures appear as several ghost copies offset along the direction of travel; with compensation, the same structures collapse to a single coherent position. −10 0 10 20 30             
+
+> x (m, forward)
+> −15 −10 −5 0510 15
+> y (m)
+> ghost offset
+> (a) Without ego-motion compensation
+> sweep timestamp current sweep
+> t− 0.05 s
+> t− 0.10 s
+> t− 0.15 s
+> t− 0.20 s
+> −10 010 20 30
+> x (m, forward)
+> (b) With ego-motion compensation
+> Fig. 8. Aggregation of LiDAR sweeps from a nuScenes scene without (a) and with (b) ego-motion compensation, above-ground returns only. Color encodes sweep age (red = current sweep, blue = oldest).
+
+E. Sparse ROI-Aware Camera Feature Extraction 
+
+Image ROIs occupy only a small fraction of the dense image, so the camera backbone should not process every pixel. 
+
+Shared-shape ROI crop. MM-BEV crops each camera to its ROI window and normalizes all crops to a single shared shape 
+
+(target h, target w), sized from the largest projected ROI and snapped to the backbone stride. Per-camera offsets place each crop; cameras with no ROI get a small center crop. Because all crops share a shape, the backbone forward is a single batched pass with no padding waste. After the backbone and neck, the cropped features are pasted onto a full-image feature canvas at the correct stride, and a binary ROI mask marks the pasted region. The mask is carried into the view transform and zeroes the BEV contribution of canvas regions that held no real features, removing the camera-side accuracy floor that a zero-padded canvas would otherwise introduce. 
+
+Context-adaptive resolution. The camera backbone is the dominant cost in the image branch. MM-BEV runs it at a context-adaptive resolution: when the scene is slow and sparse, the ROI crop is downsampled before the backbone and the features are upsampled back, halving the image backbone cost; when the scene is fast and dense, full resolution is kept. The resolution choice is made per frame by the coordinator (§IV-G). 
+
+F. ROI-Aware Voxelization 
+
+LiDAR point clouds are sparse, yet conventional pipelines voxelize the whole space and run sparse convolutions over every non-empty voxel, including regions of little semantic value [3]. MM-BEV confines LiDAR processing to the ROIs. Voxel Feature Encoder (VFE)    
+
+> BEV Feature Encoder Point Cloud Voxelization
+> BEV Feature Map
+> LiDAR ROIs: [x 0, y 0, z 0], …… [x n, y n, z n]
+> Fig. 9. ROI-aware voxelization and feature extraction.
+
+As in Fig. 9 and Alg. 1, MM-BEV keeps points by their position relative to ROI L: points inside the (motion-padded) ROI box union are kept in full, and points outside are kept at a reduced rate, so most of the background is dropped 6while the ROI neighborhood — including localization slack — is preserved. The retained points are voxelized and passed through the Voxel Feature Encoder; features are scattered into a zero-initialized BEV map by voxel coordinate. The result has the same BEV shape as a dense pipeline but is computed from a focused subset of points, cutting LiDAR cost without sacrificing coverage of critical regions. 
+
+Algorithm 1 ROI-Aware Voxelization  
+
+> 1:
+
+function ROIA WARE VOXELIZATION (points , ROI L) 
+
+> 2:
+
+kept ← []  
+
+> 3:
+
+for each point in points do  
+
+> 4:
+
+if point inside any box in ROI L then  
+
+> 5:
+
+keep point ▷ inside-ROI rate  
+
+> 6:
+
+else  
+
+> 7:
+
+keep point with probability ρout  
+
+> 8:
+
+end if  
+
+> 9:
+
+end for  
+
+> 10:
+
+voxels, coords ← Voxelize (kept ) 
+
+> 11:
+
+f eatures ← VoxelFeatureEncoder (voxels ) 
+
+> 12:
+
+return ScatterToBEV (f eatures , coords ) 
+
+> 13:
+
+end function 
+
+LiDAR latency scales with voxel count. We confirm that reducing the voxel count translates directly into inference-time savings. We profile the BEVFusion LiDAR-only branch on 
+
+12 nuScenes scenes, sub-sampling each point cloud at rates 
+
+{1.0, 0.75 , 0.5, 0.25 , 0.10 , 0.05 , 0.02 } to generate a range of voxel counts after hard voxelization, and time each LiDAR stage on the RTX 3080. Across 84 runs (Fig. 10), the total LiDAR latency is well-modeled by a linear fit t ≈ 0.72 nv +14 .3 ms ( R2=0 .99 ), where nv is the non-empty voxel count in thousands. The breakdown shows that voxelization and the sparse encoder grow nearly linearly with nv , while the SECOND backbone and FPN neck stay constant at ∼ 7 ms. A full-resolution sweep yields ∼ 17 k voxels and 26 ms; restricting compute to the ROI brings nv to ∼ 5 k and the LiDAR cost to 18 ms—a 1.4× saving on this stage alone. 0 5 10 15                       
+
+> non-empty voxels per frame ( ×10 3)
+> 14 16 18 20 22 24 26
+> LiDAR latency (ms)
+> (a) LiDAR latency vs voxel count
+> per (sample, rate) run OLS: t= 0.72 nv+ 14.3 ms, R2= 0.99
+> 0.5 1.3 2.5 5.6 10.0 13.7 16.9
+> non-empty voxels per frame ( ×10 3)
+> 0510 15 20 25 30
+> mean latency (ms)
+> (b) stage breakdown vs voxel count
+> voxelize sparse encoder SECOND backbone FPN neck
+> Fig. 10. LiDAR latency vs. non-empty voxel count, profiled on the BEVFu-sion LiDAR-only branch over 84 runs ( 12 nuScenes scenes ×7sub-sample rates). (a) Total LiDAR latency is linear in nv(R2=0 .99 ). (b) Voxelize and the sparse encoder scale with nv.
+
+G. Latency-Aware Coordinator 
+
+The coordinator holds the per-frame latency budget. It does so along two axes: compute scaling — adjusting how much work each frame does — and pipeline scheduling — ensuring the model always runs on fresh data. 
+
+Time-to-collision. The coordinator’s signals come from ego/object motion. Given an obstacle’s relative position p =[x1, y 1] and velocity v = [ vx − vego , v y ], the time of closest approach is 
+
+t∗ = − p · v
+
+∥v∥2 , (8) and TTC = t∗ if t∗ > 0 and ∥p + t∗v∥ ≤ Rcoll , else TTC = 
+
+∞. The minimum TTC over the scene drives both the safety-criticality test (§IV-C) and the coordinator’s budget decisions. 
+
+Priority-based budget management. The coordinator has two compute knobs—the LiDAR sweep count n and the image 
+
+resolution —and applies them in priority order. Mandatory-ROI coverage is fixed first and cannot be shed. The sweep count is reduced next, from n=10 at high ego speed down to n=5 
+
+when the ego is slow or the scene is dense (recent frames already carry the needed context). Image resolution is dropped last, to half when the scene is slow and sparse and kept full otherwise. If the minimum configuration still risks running long, the coordinator falls back to LiDAR-only inference for that frame, preserving the mandatory LiDAR-ROI path while shedding the camera branch entirely. Both knobs trade optional fidelity for latency and never touch the mandatory ROIs; on the evaluation platform, the half-resolution n=5 ROI path consistently fits within the ∼100 ms per-frame target. 
+
+Keyframes. ROI-based perception risks error accumulation and stale context, since newly appearing objects have no tem-poral precedent. MM-BEV periodically inserts a keyframe — a full-scene pass that refreshes the detection cache and bounds the worst-case staleness of the temporal prior. The keyframe interval may be fixed or triggered by scene dynamics: MM-BEV 
+
+estimates the per-frame ROI change 
+
+∆ROI L = 1
+
+> NL
+> NL
+
+X
+
+> i=1
+
+|AtL,i − At−1 
+
+> L,i
+
+|, (9) 
+
+∆ROI C = 1
+
+> NC
+> NC
+
+X
+
+> i=1
+
+|(ctC,i − ct−1 
+
+> C,i
+
+) − vego ∆t|, (10) where A is a LiDAR-ROI area and c an ego-motion-compensated camera-ROI centroid; a keyframe is forced when either exceeds a profiled threshold. 
+
+Asynchronous scheduling. Compute scaling reduces per-frame work, but in a live pipeline it does not by itself bound end-to-end latency: if inference is invoked synchronously inside the sensor callback, frames queue and the detector consumes ever-staler data. MM-BEV runs the pipeline as a 
+
+producer/consumer pair: the sensor callback only buffers the latest synchronized bundle and returns immediately, while a separate inference thread always consumes the freshest buffered bundle and discards stale ones. With a single-slot buffer, an unbounded backlog becomes a bounded queue and end-to-end latency becomes predictable. Algorithm 2summarizes the per-frame coordination. 7Algorithm 2 Coordination 
+
+1: function COORDINATE (bundle , Bt−1, vego )
+
+2: bundle ← LatestBuffered () ▷ freshest-wins 
+
+3: if keyframe due or ∆ROI > τ then 
+
+4: return FullScenePass (bundle )
+
+5: end if 
+
+6: ROI L, ROI C ← TemporalROI (Bt−1)
+
+7: TTC ← ComputeTTC (Bt−1, vego )
+
+8: n, res ← ScaleCompute (vego , density, TTC )
+
+9: BEV C ← SparseCamera (ROI C, res )
+
+10: BEV L ← ROIVoxelize (ROI L, n sweeps) 
+
+11: return Detect (Fuse (BEV C , BEV L)) 
+
+12: end function 
+
+V. I MPLEMENTATION 
+
+We integrate MM-BEV ’s implementation into BEVFusion’s perception pipeline using ROS on a resource-limited GPU desktop [3], [23]. BEVFusion is a widely deployed baseline for multi-modality BEV perception [3], [5], [12], [24], [31]. /front, /front_left, /front_right, /back_left /back, /back_right /lidar     
+
+> ROS Parameters slop, keyframe, sync_group, ROI C, ROI L
+> Sweep Buffer Sensor Publisher
+> /metas bboxes ttc regions ROI C
+> ROI Selector Coordinator Sparse Feature Extractor ROI-aware Voxelization Sync Callback Fusion Detection Head
+> Synchronizer Detection
+> Transform
+> ROI L
+
+Fig. 11. ROS framework for MM-BEV .
+
+ROS framework. To emulate real-time streaming process-ing similarly to actual AVs, we implement MM-BEV using ROS [23], [32], as depicted in Fig. 11. Specifically, we develop three ROS nodes: Sensor Publisher , Synchronizer ,and Detector . The Sensor Publisher publishes ROS bags generated from nuScenes dataset, incorporating raw sensor data (6 cameras and 1 LiDAR) alongside CAN bus information from the ego vehicle. Camera frames are pub-lished at 12 Hz, while LiDAR data is published at 20 Hz. The 
+
+Synchronizer node consists of a Sweep Buffer that caches previous LiDAR sweeps, a Transform module for precomputing metadata containing sensor coordinate transfor-mations (rotation and translation), and a Sync Callback ,which serves as the entry point for synchronizing sensor data based on the ROIs within a configurable slop threshold. The Detector node closely follows the design structure of MM-BEV , with minor adaptations for ROS-based inter-module communication using ROS parameters. Specifically, parameters like slop and sync_group are employed by the Coordinator to dynamically adjust synchronization set-tings. The keyframe parameter also indicates the keyframe mode, and ROI C and ROI L parameters are used for real-time updates of ROIs for cameras and LiDAR, respectively. 
+
+Asynchronous scheduling. The Synchronizer publishes each synchronized bundle to a single-slot topic and returns im-mediately; the Detector subscribes with queue_size=1 
+
+and an overwrite-on-arrival callback, so a bundle arriving 
+
+TABLE I EVALUATED CONFIGURATIONS .                                
+
+> Config Sensors Temporal ROI Adaptive res. Async sched.
+> BEVFusion [3] L+C ×××Scheduler Only L+C ××✓
+> ROI L+C ✓××ROI+LowRes L+C ✓fixed-low ×ROI+Adapt+LowRes L+C ✓adaptive ×
+> MM-BEV L+C ✓adaptive ✓
+> MM-BEV+LowRes L+C ✓fixed-low ✓
+
+while inference is busy replaces the queued one rather than being appended. The Detector thus always consumes the freshest available bundle. VI. E VALUATION 
+
+We evaluate MM-BEV end-to-end on the nuScenes dataset replayed through ROS and via a controlled offline timing benchmark, then deploy the system on a real robot. 
+
+A. Experimental Setup 
+
+Hardware. Offline timing benchmarks run on a desktop with a 12th-Gen Intel® Core™ i9-12900K (3.3 GHz) and an NVIDIA GeForce RTX 3080 (29.8 TFLOPS FP32, 10 GB GDDR6). End-to-end ROS experiments run on the same ma-chine. Libraries: CUDA 12.3, PyTorch 2.4.1, mmdet3d 1.2.0, 
+
+ROS Noetic .
+
+Dataset. We use the nuScenes dataset [22]: 11,628 images (1600 ×928, 6 cameras) plus 20-sweep LiDAR, covering 10 driving scenes. In the ROS experiments, camera frames are published as sensor_msgs/Image at 12 Hz and LiDAR as sensor_msgs/PointCloud2 at 20 Hz. 
+
+Baselines and configurations. Table I lists all evaluated con-figurations. BEVFusion [3] is the primary baseline (dense, full-resolution, synchronous pipeline). Scheduler Only 
+
+adds the asynchronous streaming scheduler alone, without ROI or adaptive resolution. Ablation variants progressively add ROI routing, adaptive sweep count, and adaptive (or fixed low) image resolution. MM-BEV is the full proposed system. 
+
+Metrics. We report inference latency (mean over non-warmup frames, split by keyframe vs. ROI-frame mode), end-to-end latency (sensor exposure to detection output, measured in ROS), processed frames per scene , and criticality-bucketed recall : all-object recall, geometry-critical recall (objects inside the ego braking cone), and safety-critical recall. 
+
+B. Inference Latency 
+
+Fig. 12 compares per-frame inference latency for the fusion and LiDAR-only detectors. MM-BEV classifies every frame as either a keyframe (full inference, triggered periodically or by high scene dynamics) or a ROI frame (inference restricted to the temporal ROI). 
+
+Fusion detector. The baseline must run full-resolution, full-sweep inference on every frame: 202 ms per keyframe and 
+
+118 ms per “ROI frame” (the baseline uses adaptive sweeps 8Fusion Baseline Fusion MM-BEV 050 100 150 200 250        
+
+> Inference latency (ms)
+> 202 216 118 104
+> LiDAR + Camera (Fusion)
+> LiDAR Baseline LiDAR MM-BEV 050 100 150
+> Inference latency (ms)
+> 136 130 70 70
+> LiDAR-Only
+> Baseline MM-BEV Keyframe ROI frame
+
+Fig. 12. Per-frame inference latency split by keyframe and ROI-frame mode, for the LiDAR+Camera (fusion) and LiDAR-only detectors. Baseline must run full inference every cycle; MM-BEV runs fast ROI inference on most frames and full inference only on keyframes. 0 50 100 150 200 
+
+> Per-frame inference latency (ms)
+> BEVFusion ROI+Adapt+LowRes MM-BEV MM-BEV+LowRes BEVFusion (LiDAR) MM-BEV (LiDAR)
+> 202 ms 95 ms 104 ms 92 ms 136 ms 70 ms
+> Image feat. Point feat. Pts backbone Pts neck Fusion BBox head
+
+Fig. 13. Per-stage breakdown of inference time. 
+
+but no ROI crop). MM-BEV cuts the ROI-frame cost to 104 ms 
+
+(a 1.96 × speedup over the baseline keyframe), while keyframe cost stays at 216 ms due to the shared-shape crop overhead. With a keyframe interval of N =5 (the default), the ROI frames are the common case and dominate the average. 
+
+LiDAR-only detector. The baseline keyframe costs 136 ms ;
+
+MM-BEV ROI frames cost 70 ms (1.94 ×). The LiDAR path benefits less from ROI-based voxelization because point clouds are already sparse; the main gain comes from the adaptive sweep window. Fig. 13 shows the stage-level breakdown for the fusion detector. Image feature extraction is the dominant lever: the full-resolution backbone takes 57 ms; temporal ROI with low-resolution input cuts it to 21 ms (2.7 ×). LiDAR feature ex-traction (84 ms baseline) contracts only modestly under ROI voxelization (83–91 ms), consistent with its already-sparse structure. The BBox head and fusion stage together account for only 12 ms and are invariant across configurations. 
+
+C. Criticality-Bucketed Accuracy 
+
+Fig. 14 shows all-object, geometry-critical, and safety-critical recall for the key configurations. 
+
+Geometry-critical recall is preserved exactly. Every ROI-based configuration matches the baseline at 100% 
+
+on geometry-critical objects. This is by construction: the criticality-ranked selector (§IV-C) always covers the manda-tory set derived from the ego’s braking cone, so no object inside that zone is skipped. 
+
+Safety-critical recall degrades minimally. Safety-critical re-call (objects below the per-class TTC threshold) drops 0.2 pp 
+
+for MM-BEV (94 .7% vs. baseline 94 .9% ) and at most 0.7 pp 
+
+for MM-BEV +LowRes ( 94 .2% ). The small loss reflects the part BEVFusion ROI+Adapt+LowRes MM-BEV MM-BEV+LowRes 70 80 90 100            
+
+> Recall (%)
+> 79.9 78.4 79.5 77.6 100.0 100.0 100.0 100.0 94.9 95.2 94.7 94.2
+> All-object Geom-critical Safety-critical
+
+Fig. 14. Recall by criticality bucket. Geometry-critical recall is preserved exactly at 100% across all configurations; safety-critical recall drops at most 0.7 pp and all-object recall at most 2.3 pp, under the most aggressive compression. TABLE II ACCURACY VS . PER -FRAME INFERENCE LATENCY .                            
+
+> Config Per-frame lat. (ms) All-obj R (%) Geom-crit R (%) Safety-crit R (%)
+> BEVFusion 202 79.9 100.0 94.9 ROI+Adapt+LowRes 95 78.4 100.0 95.2 MM-BEV 104 79.5 100.0 94.7 MM-BEV+LowRes 92 77.6 100.0 94.2 LiDAR Baseline 136 76.8 100.0 93.5 LiDAR MM-BEV 70 76.8 100.0 93.1
+
+of the safety-critical set that lies just outside the braking cone and is therefore not covered by the geometry ROI. 
+
+All-object recall drops only on optional objects. All-object recall falls 0.4 pp for MM-BEV and 2.3 pp for 
+
+MM-BEV +LowRes; in both cases the lost detections are en-tirely in the optional set (distant, low-TTC background traffic), so the conventional all-object mAP exaggerates the safety impact of these ROI/resolution trade-offs. Table II summarizes the latency–accuracy trade-off. 
+
+MM-BEV +LowRes achieves the best per-frame latency ( 92 ms, 
+
+2.20 × faster than the 202 ms full-inference baseline) while holding geometry-critical recall at 100% and dropping safety-critical recall by only 0.7 points. 
+
+D. Ablation Study 
+
+Latency–accuracy trade-off. Fig. 15 places all ablation configurations in the latency–recall plane, with each system at its per-frame cost in the common-case operating mode (full inference for the baseline; ROI-frame inference for ROI/MM-BEV variants). Three conclusions follow. (i) ROI alone provides limited camera savings (ROI: 148 ms ROI-frame vs. baseline: 202 ms full-inference)—the ROI crop re-shapes computation but does not reduce image resolution, so the backbone still pays for full-resolution features. (ii) Low resolution is the primary camera lever (ROI+LowRes: 110 ms; 
+
+MM-BEV +LowRes: 92 ms ROI-frame): cutting image input from 1600 ×928 to 800 ×464 slashes image feature extraction from 57 ms to 21 ms. (iii) Adaptive resolution (MM-BEV :
+
+104 ms ROI-frame) keeps full resolution when scene dynamics demand it but drops to half-res on slow/sparse scenes, main-taining all-object recall 1.9 points above the always-low-res variant at the cost of 12 ms higher ROI-frame latency. 980 100 120 140 160 180 200 220        
+
+> Per-frame inference latency (ms)
+> 77.5 78.0 78.5 79.0 79.5 80.0
+> All-object recall (%)
+> 80 100 120 140 160 180 200 220
+> Per-frame inference latency (ms)
+> 93.5 94.0 94.5 95.0 95.5
+> Safety-critical recall (%)
+> Baseline ROI ROI+LowRes ROI+Adapt ROI+Adapt+LowRes MM-BEV MM-BEV+LowRes MM-BEV (kf=3) MM-BEV (kf=5) MM-BEV (kf=10)
+
+Fig. 15. Per-frame latency vs. recall for all ablation configurations (geom-critical preserved at 100% ; right panel shows safety-critical). Baseline ROI ROI+Adapt MM-BEV 050 100 150            
+
+> Inference latency (ms)
+> 136 129 129 130 70 85 70 70
+> LiDAR-Only: Inference Latency
+> Keyframe ROI frame Baseline ROI ROI+Adapt MM-BEV 020 40 60 80
+> All-object recall (%)  76.8 77.0 76.8 76.8
+> LiDAR-Only: Detection Accuracy
+
+Fig. 16. LiDAR-only detector ablation. ROI-based voxelization alone slightly increases keyframe cost; adaptive sweep selection reduces it. Accuracy is stable throughout. 
+
+LiDAR ablation. Fig. 16 sweeps LiDAR-only variants. ROI-based voxelization alone marginally increases the keyframe cost (from 136 to 129 ms for LiDAR-ROI), since the region selection adds a preprocessing step without proportionally reducing the point set on keyframes. Adaptive sweep count (ROI+Adapt and MM-BEV ) recovers this overhead, settling at 100 ms mean—a modest 1.03 × improvement. All-object and safety-critical recall are stable across all LiDAR configurations (76.8% and ∼93%, respectively), confirming that the sweep-count reduction does not degrade detection quality. 
+
+E. End-to-End Pipeline Performance 
+
+Fig. 17 evaluates the full pipeline in ROS, including com-munication, synchronization, inference, and queuing. 
+
+Scheduler dominates the e2e gain. The baseline pipeline stalls on its synchronous queue: camera and LiDAR messages pile up while the detector runs at 1006 ms e2e latency, pro-cessing only 10 frames per scene. Scheduler Only —which adds the asynchronous producer/consumer pipeline but no ROI—already cuts e2e latency to 371 ms and raises throughput to 56 frames . This confirms that backlog growth behind the synchronous detector is the main bottleneck in the baseline. 
+
+Full MM-BEV. Adding temporal ROI and adaptive resolution (MM-BEV ) reduces e2e latency further to 344 ms (a 2.93 ×
+
+reduction over baseline) and processes 60 frames per scene (a 
+
+6× improvement). The per-frame detection contribution drops from 199 ms (baseline model) to 95 ms ( MM-BEV model), consistent with the offline benchmarks in §VI-B. Table III provides the full numbers. The 95th-percentile e2e latency shrinks from 1455 ms to 434 ms, confirming that the long tail of the backlog—not just the average—is reduced. The Baseline Scheduler Only MM-BEV 0250 500 750 1000 1250 1500 1750   
+
+> E2E latency (ms)
+> 1006 371 344
+> End-to-End Latency
+> Baseline Scheduler Only MM-BEV 010 20 30 40 50 60
+> Frames processed per scene
+> 10 56 60
+> Processed Frames per Scene
+
+Fig. 17. End-to-end ROS pipeline results. Left : mean e2e latency per processed frame (bars show mean, error bars show ±1 s.d., jitter shows all individual frames). Right : total frames processed per scene. The asynchronous scheduler is the dominant contributor to both gains. TABLE III END -TO -END ROS PIPELINE SUMMARY .                
+
+> Config Frames/scene E2E lat. mean (ms) E2E lat. p95 (ms) Speedup
+> BEVFusion 10 1006 1455 –Scheduler Only 56 371 498 2.71 ×
+> MM-BEV 60 344 434 2.93 ×
+
+residual gain from ROI on top of the scheduler alone (371 to 344 ms) reflects faster per-frame model execution translating to a shorter queue wait time. 
+
+F. Real-World Deployment 
+
+Platform. We validate MM-BEV on a Clearpath Husky A300 mobile robot [33] equipped with six e-con AR0234 GMSL2 wide-angle cameras ( 1920 ×1080 , ∼ 86 ◦ HFOV) [34] and an Ouster OS1-128 LiDAR [35]; all perception runs on the onboard NVIDIA Jetson AGX Orin with the BEVFusion backbone compiled to TensorRT int8. We collect a 22 .6-minute drive ( 3,391 frames) across outdoor plazas, parking lots, and indoor corridors. The dense baseline runs full inference every frame at a mean 91 .0 ms; a lightweight voxel-grid connected-component proposer identifies object clusters in 10 .5 ms ( 21 ×
+
+faster than sklearn DBSCAN at 217 ms). 
+
+Adaptive scheduler. The scheduler picks a per-frame keyframe interval K ∈ [1 , 10] from the robot’s odometry speed and the inter-frame BEV cluster shift (Fig. 20): K=10 
+
+when stationary (trigger “speed”), and K=1 when the cluster set changes between frames during active driving (trigger “cluster-shift”). Across the drive the scheduler selects ¯K=2 .83 
+
+with 40 .6% of frames as keyframes, yielding a mean per-frame inference latency of 43 .2 ms —a 2.11 × reduction over the dense baseline. By comparison, fixed K=3 and K=5 
+
+reach 32 .9 ms ( 2.77 ×) and 20 .9 ms ( 4.35 ×) but cannot react to scene changes. Fig. 19 shows a representative frame: forward-path vehicles and a crossing pedestrian are all detected on-device, confirming that the temporal-ROI and adaptive-resolution gains transfer from desktop GPU to the constrained Jetson Orin compute budget. 10 Ouster 128 LiDAR Husky Robot BEV Cameras      
+
+> Rear Left Rear Right Mid Left Mid Right Front Right Front Left Jetson AGX Orin Fig. 18. Deployment platform: Clearpath Husky A300 with Ouster OS1-128 LiDAR and e-consystems AR0234 FHD GMSL2 BEV-view camera, running
+> MM-BEV on a NVIDIA Jetson AGX Orin.
+> Fig. 19. Representative deployment frame: six on-robot cameras (surrounding tiles) and the live BEV (center) with detected objects (orange) around the ego (green). MM-BEV runs on-device on the Jetson AGX Orin and detects the row of parked vehicles and the pedestrian crossing the robot’s forward path.
+
+VII. R ELATED WORK 
+
+BEV perception has become mainstream for AVs, thanks to its comprehensive view understanding, which guides their planning and navigation [1], [2]. Compared to vision-centric BEV perception that utilizes only camera inputs [8], [36], [37], multi-modality BEV perception combining LiDAR and cameras is more practical and widely deployed, primarily due to its superior accuracy and reliability across diverse traffic scenarios [3], [24]. However, achieving real-time BEV perception remains chal-lenging due mainly to the high computational demands from high-frequency and high-resolution multi-modality sensors [3]. SOTA research has primarily approached this challenge by either designing lightweight models or compressing dense models into sparse structures to improve computational ef-ficiency [5], [6], [12]. For instance, BEVFusion [3] utilizes dense camera and LiDAR feature maps to perform sensor fusion within a shared BEV space. Transfusion [5] maintains dense features for the camera branch but uses sparse projection for LiDAR inputs. SparseFusion [12] employs sparse features and fusion to reduce overhead. Cross-Modality Transformer (CMT) [6] further explores efficient multi-modal integration by designing a transformer-based feature transformation. Yet, 0123                   
+
+> speed (m/s)  stationary driving
+> (a) robot speed
+> 050 100 150 200
+> time (s)
+> 135710
+> K (keyframe interval)
+> K= 2.83
+> (b) selected interval K(dots: keyframes)
+> speed-driven cluster-shift
+> Fig. 20. Adaptive keyframe selection over a 240 s drive segment. (a) Robot speed from odometry. (b) Selected interval K(gray step); colored dots mark emitted keyframes by trigger reason. Mean ¯K=2 .83 across the full run.
+
+these methods ignore the inherent sparsity in input sensor data — not all pixels are equally important — or consider redundancy only intra-modality. Remix and Elf recognize the variable importance of regions and but only apply to one camera, not applied directly to multi-modality sensors [15], [16]. FLEX considers BEV cameras but only focuses on frame-level ROIs [19]. MMEdge [38] pipelines on-device mul-timodal inference by overlapping sensing and encoding into fine-grained units with cross-modal speculative skipping, but operates on classification-style fusion tasks rather than dense BEV detection. Another challenge is cross-modal synchro-nization: LiDAR and cameras operate at different frequencies, and poor alignment of their data can degrade performance. RT-BEV [9] tackles the ROI and synchronization issues of cameras only. MM-BEV extends it to a more practical LiDAR– camera combination, leveraging both input sparsity and robust alignment for efficient BEV perception. VIII. C ONCLUSION 
+
+We presented MM-BEV , a real-time multi-modality BEV perception system organized around the principle of computing 
+
+where and when it matters . MM-BEV decomposes BEV detec-tion into a mandatory part—the critical objects inside the ego’s braking distance and short time-to-collision—and an optional 
+
+part, and combines four mechanisms (a criticality-ranked temporal-ROI selector, sparse ROI-aware feature extraction, a latency-aware coordinator, and an asynchronous streaming scheduler). On nuScenes—where only 11% of annotated ob-jects are mandatory under the criticality model— MM-BEV 
+
+cuts inference latency by 1.96 × and end-to-end latency by 
+
+2.93 ×, preserves geometry-critical recall exactly, and drops safety-critical recall by only 0.2 percentage points. On a Clearpath Husky A300 robot with Jetson AGX Orin, MM-BEV 
+
+reaches a further 2.11 × mean-latency reduction under an adaptive keyframe schedule, confirming that the gains transfer to embedded hardware. These results show that criticality-aware scheduling is a practical foundation for real-time multi-modality perception on resource-limited AVs. 11 REFERENCES [1] Y. Ma, T. Wang, X. Bai, H. Yang, Y. Hou, Y. Wang, Y. Qiao, R. Yang, D. Manocha, and X. Zhu, “Vision-centric bev perception: A survey,” 2023. [2] H. Li, C. Sima, J. Dai, W. Wang, L. Lu, H. Wang, J. Zeng, Z. Li, J. Yang, H. Deng, H. Tian, E. Xie, J. Xie, L. Chen, T. Li, Y. Li, Y. Gao, X. Jia, S. Liu, J. Shi, D. Lin, and Y. Qiao, “Delving into the devils of bird’s-eye-view perception: A review, evaluation and recipe,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 46, no. 4, pp. 2151– 2170, 2024. [3] Z. Liu, H. Tang, A. Amini, X. Yang, H. Mao, D. L. Rus, and S. Han, “Bevfusion: Multi-task multi-sensor fusion with unified bird’s-eye view representation,” in 2023 IEEE international conference on robotics and automation (ICRA) . IEEE, 2023, pp. 2774–2781. [4] A. W. Harley, Z. Fang, J. Li, R. Ambrus, and K. Fragkiadaki, “Simple-bev: What really matters for multi-sensor bev perception?” in 2023 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2023, pp. 2759–2765. [5] X. Bai, Z. Hu, X. Zhu, Q. Huang, Y. Chen, H. Fu, and C.-L. Tai, “Transfusion: Robust lidar-camera fusion for 3d object detection with transformers,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2022, pp. 1090–1099. [6] J. Yan, Y. Liu, J. Sun, F. Jia, S. Li, T. Wang, and X. Zhang, “Cross modal transformer: Towards fast and robust 3d object detection,” in 
+
+Proceedings of the IEEE/CVF international conference on computer vision , 2023, pp. 18 268–18 278. [7] J. Huang, Y. Ye, Z. Liang, Y. Shan, and D. Du, “Detecting as labeling: Rethinking lidar-camera fusion in 3d object detection,” in European Conference on Computer Vision . Springer, 2024, pp. 439–455. [8] Y. Hu, J. Yang, L. Chen, K. Li, C. Sima, X. Zhu, S. Chai, S. Du, T. Lin, W. Wang et al. , “Planning-oriented autonomous driving,” in 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 17 853–17 862. [9] L. Liu, J. Lee, and K. G. Shin, “Rt-bev: Enhancing real-time bev perception for autonomous vehicles,” in 2024 IEEE Real-Time Systems Symposium (RTSS) . IEEE, 2024, pp. 267–279. [10] L. Liu, Z. Dong, Y. Wang, and W. Shi, “Prophet: Realizing a predictable real-time perception pipeline for autonomous vehicles,” in 2022 IEEE Real-Time Systems Symposium (RTSS) . IEEE, 2022, pp. 305–317. [11] H. Liu, Y. Teng, T. Lu, H. Wang, and L. Wang, “Sparsebev: High-performance sparse 3d object detection from multi-camera videos,” in 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 18 580–18 590. [12] Y. Xie, C. Xu, M.-J. Rakotosaona, P. Rim, F. Tombari, K. Keutzer, M. Tomizuka, and W. Zhan, “Sparsefusion: Fusing multi-modal sparse representations for multi-sensor 3d object detection,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2023, pp. 17 591–17 602. [13] M. Ren, A. Pokrovsky, B. Yang, and R. Urtasun, “Sbnet: Sparse blocks network for fast inference,” in Proceedings of the IEEE conference on Computer Vision and Pattern Recognition , 2018, pp. 8711–8720. [14] S. Chen, Y. Ma, Y. Qiao, and Y. Wang, “M-bev: Masked bev perception for robust autonomous driving,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 38, no. 2, 2024, pp. 1183–1191. [15] W. Zhang, Z. He, L. Liu, Z. Jia, Y. Liu, M. Gruteser, D. Raychaudhuri, and Y. Zhang, “Elf: accelerate high-resolution mobile deep vision with content-aware parallel offloading,” in Proceedings of the 27th Annual International Conference on Mobile Computing and Networking , 2021, pp. 201–214. [16] S. Jiang, Z. Lin, Y. Li, Y. Shu, and Y. Liu, “Flexible high-resolution object detection on edge devices with tunable latency,” in Proceedings of the 27th Annual International Conference on Mobile Computing and Networking , 2021, pp. 559–572. [17] R. Li, X. Jiang, Z. Dong, J.-M. Wu, C. J. Xue, and N. Guan, “Worst-case latency analysis of message synchronization in ros,” in 2023 IEEE Real-Time Systems Symposium (RTSS) . IEEE, 2023, pp. 185–197. [18] J. Sun, T. Wang, Y. Li, N. Guan, Z. Guo, and G. Tan, “Seam: An optimal message synchronizer in ros with well-bounded time disparity,” in 2023 IEEE Real-Time Systems Symposium (RTSS) . IEEE, 2023, pp. 172–184. [19] Y. Xu, Z. Liu, X. Fu, S. Liu, F. Wu, and G. Chen, “Flex: Adaptive task batch scheduling with elastic fusion in multi-modal multi-view machine perception,” in 2024 IEEE Real-Time Systems Symposium (RTSS) . IEEE, 2024, pp. 294–307. [20] Z. Song, L. Peng, J. Hu, D. Yao, and Y. Zhang, “Timealign: Amulti-modal object detection method for time misalignment fusing in autonomous driving,” arXiv preprint arXiv:2412.10033 , 2024. [21] M. Li, Y.-X. Wang, and D. Ramanan, “Towards streaming perception,” in Computer Vision–ECCV 2020: 16th European Conference, Glasgow, UK, August 23–28, 2020, Proceedings, Part II 16 . Springer, 2020, pp. 473–488. [22] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Krishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuscenes: Amultimodal dataset for autonomous driving,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2020, pp. 11 621–11 631. [23] M. Quigley, K. Conley, B. Gerkey, J. Faust, T. Foote, J. Leibs, R. Wheeler, and A. Y. Ng, “ROS: an open-source robot operating system,” in ICRA workshop on open source software , vol. 3, no. 3.2. Kobe, Japan, 2009, p. 5. [24] T. Liang, H. Xie, K. Yu, Z. Xia, Z. Lin, Y. Wang, T. Tang, B. Wang, and Z. Tang, “Bevfusion: A simple and robust lidar-camera fusion frame-work,” Advances in Neural Information Processing Systems , vol. 35, pp. 10 421–10 434, 2022. [25] P. Sun, H. Kretzschmar, X. Dotiwalla, A. Chouard, V. Patnaik, P. Tsui, J. Guo, Y. Zhou, Y. Chai, B. Caine et al. , “Scalability in perception for autonomous driving: Waymo open dataset,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2020, pp. 2446–2454. [26] J. Geyer, Y. Kassahun, M. Mahmudi, X. Ricou, R. Durgesh, A. S. Chung, L. Hauswald, V. H. Pham, M. M¨ uhlegg, S. Dorn et al. , “A2d2: Audi autonomous driving dataset,” arXiv preprint arXiv:2004.06320 , 2020. [27] B. Wilson, W. Qi, T. Agarwal, J. Lambert, J. Singh, S. Khandelwal, B. Pan, R. Kumar, A. Hartnett, J. K. Pontes et al. , “Argoverse 2: Next generation datasets for self-driving perception and forecasting,” arXiv preprint arXiv:2301.00493 , 2023. [28] J. Houston, G. Zuidhof, L. Bergamini, Y. Ye, L. Chen, A. Jain, S. Omari, V. Iglovikov, and P. Ondruska, “One thousand and one hours: Self-driving motion prediction dataset,” in Conference on Robot Learning .PMLR, 2021, pp. 409–418. [29] Motional, “nuscenes detection task,” https://www.nuscenes.org/ object-detection?externalData=all&mapData=all&modalities=Any, 2020, accessed: 2025-05-04. [30] Z.-X. Xia, S. Fadadu, Y. Shi, and L. Foucard, “Robust long-range perception against sensor misalignment in autonomous vehicles,” in 
+
+2025 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) . IEEE, 2025, pp. 5761–5770. [31] Z. Liu, Y. Lin, Y. Cao, H. Hu, Y. Wei, Z. Zhang, S. Lin, and B. Guo, “Swin transformer: Hierarchical vision transformer using shifted windows,” in Proceedings of the IEEE/CVF international conference on computer vision , 2021, pp. 10 012–10 022. [32] “message filters,” http://wiki.ros.org/message_filters .[33] Clearpath Robotics, “Husky A300 Outdoor Robot,” https: //clearpathrobotics.com/husky-a300-mobile-robot/, 2025, accessed: 2026-05-25. [34] e-con Systems, “AR0234 Full-HD Global Shutter GMSL2 Camera for NVIDIA Jetson AGX Orin,” https://www. e-consystems.com/nvidia-cameras/jetson-agx-orin-cameras/ ar0234-fhd-gmsl2-global-shutter-camera.asp, 2025, accessed: 2026-05-25. [35] Ouster, Inc., “OS1 Mid-Range Lidar Sensor (128 channels),” https: //ouster.com/products/hardware/os1-lidar-sensor, 2025, accessed: 2026-05-25. [36] Z. Li, W. Wang, H. Li, E. Xie, C. Sima, T. Lu, Y. Qiao, and J. Dai, “Bevformer: Learning bird’s-eye-view representation from multi-camera images via spatiotemporal transformers,” in European conference on computer vision . Springer, 2022, pp. 1–18. [37] C. Yang, Y. Chen, H. Tian, C. Tao, X. Zhu, Z. Zhang, G. Huang, H. Li, Y. Qiao, L. Lu et al. , “Bevformer v2: Adapting modern image backbones to bird’s-eye-view recognition via perspective supervision,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 17 830–17 839. [38] R. Huang, M. Yu, M. Tsoi, and X. Ouyang, “MMEdge: Accelerating On-device Multimodal Inference via Pipelined Sensing and Encoding,” in Proceedings of the 24th ACM Conference on Embedded Networked Sensor Systems (SenSys) , 2026. 
+
+12

@@ -1,0 +1,366 @@
+Title: Privacy-Preserving Dataset Curation for Kuala Lumpur Urban Traffic: Grounded Vision-Language Detection with Spatial Vehicle-Context Filtering
+
+URL Source: https://arxiv.org/pdf/2608.14724v1
+
+Published Time: Tue, 18 Aug 2026 00:06:34 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Privacy-Preserving Dataset Curation for Kuala Lumpur Urban Traffic: Grounded Vision-Language Detection with Spatial Vehicle-Context Filtering 
+
+Mohammed Abdul Al Arafat Tanzin, a, ∗, Rudzidatul Akmam Dziyauddin a
+
+> aFaculty of Artificial Intelligence, Universiti Teknologi Malaysia, Kuala Lumpur, Malaysia
+
+Abstract 
+
+The rapid advancement of intelligent transportation systems and autonomous driving relies heavily on multi-modal urban traffic datasets. However, curat-ing high-fidelity video imagery in complex tropical urban environments—specifically Kuala Lumpur, Malaysia—presents severe challenges for Personally Iden-tifiable Information (PII) anonymization due to high motorcycle density, dark acrylic license plates, dynamic camera tilt, and extreme tropical glare. We propose an automated anonymization framework tailored for the Kuala Lumpur Road Dataset, captured via a mobile cycling platform at 2 FPS. We document how legacy Haar cascades and YOLOv8 fail under these con-ditions—generating false positives on background elements while missing rotated or occluded targets. Our architecture resolves this by integrating Grounding DINO—a zero-shot open-set vision-language transformer—with a novel Spatial Vehicle Region of Interest (ROI) Containment Engine. By re-quiring license plate centroids to reside within validated vehicle boundaries, the pipeline suppresses environmental false positives while automatically ob-fuscating faces, heads, and license plates. An initial evaluation on 1,266 frames demonstrates a 95% success rate, with remaining failures restricted to small, heavily occluded, oblique, or ambiguous targets. Coupled with temporal persistence mechanisms and an automated quality-control audi-tor, the framework minimizes privacy-related false negatives while preserving    
+
+> ∗Corresponding author.
+> Email address: mohammedabdul@graduate.utm.my (Mohammed Abdul Al Arafat Tanzin, )arXiv:2608.14724v1 [cs.CV] 12 Aug 2026
+
+scene context for downstream vision tasks. While formal legal compliance depends on broader governance procedures, this publicly available pipeline and demonstration notebook provide an auditable preprocessing stage for privacy-aware dataset curation. 
+
+Keywords: Dataset Anonymization, Privacy Preservation, Vision-Language Models, Grounding DINO, Kuala Lumpur Road Dataset, Intelligent Transportation Systems 
+
+1. Introduction 
+
+Developing robust perception stacks for Advanced Driver Assistance Sys-tems (ADAS) and autonomous navigation requires diverse training footage captured across varied geographical and structural driving environments. Open-sourcing raw driving sequences is essential for scientific reproducibil-ity; however, exposing Personally Identifiable Information (PII)—specifically human faces and vehicle registration plates—creates significant legal liabil-ities and ethical concerns. Legislative frameworks, such as the European General Data Protection Regulation (GDPR) and Malaysia’s Personal Data Protection Act 2010 (PDPA), strictly regulate the processing and public dis-semination of unblurred public imagery [1]. While automated anonymization pipelines have been deployed effectively on Western driving benchmarks (such as nuScenes [2] and Waymo [3]), di-rectly transferring these architectures to Southeast Asian traffic streams re-veals severe failure modes. The Kuala Lumpur Road Dataset considered in this study was collected using an iPhone 14 Pro optical sensor mounted on a mobile bicycle platform while navigating through urban traffic in Kuala Lumpur, Malaysia. Video sequences were sampled at 2 frames per second (FPS) to generate image frames for dataset curation. The initial anonymiza-tion experiment reported in this paper comprises 1,266 extracted frames representing diverse traffic and environmental conditions. The mobile ac-quisition platform introduces time-varying pitch ( θ), roll ( ϕ), vibration, and perspective changes, resulting in substantial variation in the apparent scale, orientation, and visibility of privacy-sensitive objects such as faces and ve-hicle registration plates. The dynamic motion profile of a cycling platform introduces time-varying pitch ( θ), roll ( ϕ), and vibration, generating severe rotational variation and perspective shearing across image frames. 2In this paper, we detail the engineering evolution and mathematical for-mulation of the Kuala Lumpur Road Dataset Anonymizer 1. Readers are di-rected to the project repository’s interactive Jupyter Notebook ( .ipynb ) for step-by-step pipeline execution, cross-modal prompt configurations, and vi-sual output demonstrations. We investigate how combining language-grounded object detection with spatial vehicle-context filtering can improve automated PII anonymization in challenging urban traffic imagery [4]. In an initial qualitative assessment of 1,266 extracted frames, the proposed pipeline suc-cessfully anonymized the targeted privacy-sensitive regions in approximately 95% of the examined frames, while the remaining cases revealed characteris-tic failure modes involving small objects, severe occlusion, extreme viewing angles, and ambiguous visual structures. The contributions of this work are summarized as follows: 1. We present a privacy-preserving image curation pipeline designed specif-ically for urban traffic imagery acquired from a mobile bicycle-mounted camera in Kuala Lumpur, with particular emphasis on faces, heads, and vehicle registration plates. 2. We investigate the use of a language-grounded vision transformer for open-set detection of privacy-sensitive objects under challenging con-ditions including small object scale, occlusion, oblique viewing angles, helmets, and complex urban backgrounds. 3. We introduce a Spatial Vehicle ROI Containment Engine that uses the spatial relationship between candidate license plates and detected vehicle regions to suppress detections that are inconsistent with the expected topology of a vehicle. 4. We incorporate temporal persistence and automated quality-control auditing to identify potential detection failures and reduce the proba-bility of undetected privacy-sensitive objects remaining in the curated dataset. 5. We provide an initial qualitative evaluation on 1,266 extracted frames and document the observed success cases and failure modes to establish a reproducible basis for subsequent quantitative evaluation.       
+
+> 1Project Repository and Interactive Jupyter Notebook: https://github.com/ TanzinAbdul/Kuala-Lumpur-Road-Dataset-Anonymizer
+
+32. Environmental Challenges in Kuala Lumpur Traffic Imagery 
+
+Southeast Asian traffic landscapes differ fundamentally from Western driving environments. The primary operational domain complexities encoun-tered in Kuala Lumpur include: 1. High Motorcycle Presence and Helmet Occlusions: Motorcycles constitute a visually prominent component of urban traffic in Kuala Lumpur. Their compact dimensions, variable viewing angles, and fre-quent use of helmets create additional challenges for privacy-sensitive detection, particularly when facial regions are partially or completely occluded. Motorcyclists wear diverse headwear ranging from open-face to modular full-face helmets with dark visors, rendering conventional facial landmark detectors ineffective. 2. Custom Non-Standard Acrylic Plates: Unlike standardized metal reflective plates, Malaysian registration plates predominantly feature custom black acrylic backings with non-standard white typography, variable spacing, and non-conforming mounting profiles on modified vehicles. 3. Dynamic Sensor Tilt and Perspective Shearing: The mobile bicycle mount induces transient camera pitch and roll, causing extreme rotational angles ( θ > 30 ◦) for observed registration plates, breaking axis-aligned bounding box assumptions. 4. High-Contrast Background Visual Noise: Equatorial sunlight creates intense specular reflections, while complex street environments, speed bump patterns, and vehicle grilles frequently mimic alphanumeric character arrangements. To quantify these domain differences, Table 1 compares standard Western benchmark characteristics against the Kuala Lumpur road environment. 
+
+Table 1: Domain comparison between Western benchmark datasets and Kuala Lumpur urban traffic imagery.                        
+
+> Parameter Western Datasets Kuala Lumpur Traffic Impact on Detection
+> Plate Material Standard Retro-Reflective Metal Custom Black Acrylic Low contrast; edge detectors fail Motorcycle Ratio <5% of traffic stream 30% −50% of traffic stream Oblique rear mounting profiles Rider Headwear Infrequent / Unobstructed Helmets, Visors, Balaclavas Facial landmarks unavailable Camera Rig Rigid Vehicle Roof Mount Mobile Bicycle Mount High pitch, roll, and vibration Background Noise Uniform pavement textures High-contrast grilles & patterns False positives on background noise
+
+4Mathematically, the image projection process under dynamic cycling mo-tion is defined by mapping a 3D world point Pw = [ Xw, Y w, Z w, 1] T to a 2D pixel coordinate p = [ u, v, 1] T via camera intrinsic matrix K and dynamic rotation matrix R(θ, ϕ, ψ ):
+
+p ∼ K [Rz (ψ)Ry(θ)Rx(ϕ) ; t] Pw (1) where pitch ( θ) and roll ( ϕ) variations degrade axis-aligned bounding box representations used in closed-set CNN architectures. 
+
+3. Evolution of Anonymization Architectures and Failure Modes 
+
+3.1. Legacy Approaches: Haar Cascades 
+
+Initial iterations utilized OpenCV Haar feature-based cascade classifiers [5]. Haar cascades compute feature values fH (x) across adjacent rectangular sub-windows using integral images: 
+
+fH (x) = X
+
+> r∈Rwhite
+
+wr · I(r) − X
+
+> r∈Rblack
+
+wr · I(r) (2) Haar cascades completely failed on dark acrylic Malaysian plates due to rigid intensity gradient assumptions. Furthermore, perspective shearing caused by camera tilt prevented feature activation, while helmeted riders bypassed facial cascades entirely. 
+
+3.2. Closed-Set Deep CNNs: YOLOv8 
+
+Transitioning to deep single-stage convolutional networks improved fea-ture extraction speeds. We employed YOLOv8 [6], which optimizes bounding box coordinates b = [ xc, y c, w, h ]T and class distributions using a composite loss: 
+
+LYOLO = λbox LCIoU + λcls LBCE + λdfl LDFL (3) Despite impressive inference throughput, fine-tuned YOLOv8 models ex-hibited critical domain limitations: 1. Local Grid Constraints: Local receptive fields failed to detect dis-tant or highly rotated motorcycle plates occupying small pixel foot-prints ( < 16 × 16 pixels). 2. Environmental False Positives: Feature maps at deeper strides blurred fine details, causing non-vehicle textures, road markings, speed bumps, and vehicle grilles to trigger false plate detections. 5Figure 1: End-to-end architecture of the proposed Spatial-Semantic Anonymization Framework for the Kuala Lumpur Road Dataset. License plate candidates ( P) undergo spatial containment validation against macro vehicle ROIs ( V), while faces and helmeted heads ( F) bypass spatial filtering and route directly to the obfuscation module. 
+
+3.3. Proposed Architecture: Grounding DINO Vision-Language Transformer 
+
+To achieve zero-shot open-set generalization, we integrated Grounding DINO [4], a transformer architecture marrying DINO with grounded visual-language pre-training. Grounding DINO processes multi-scale visual features 
+
+Fv extracted via a Swin Transformer backbone [7] and text prompt features 
+
+Ft extracted via BERT [1]. Cross-modal interaction is governed by bi-directional feature enhance-ment: 
+
+F(l) 
+
+> v
+
+= CrossAttention (F(l−1)  
+
+> v
+
+, F(l−1)  
+
+> t
+
+, F(l−1)  
+
+> t
+
+) (4) 
+
+F(l) 
+
+> t
+
+= CrossAttention (F(l−1)  
+
+> t
+
+, F(l−1)  
+
+> v
+
+, F(l−1)  
+
+> v
+
+) (5) Object queries are dynamically initialized by computing the vision-language alignment score matrix Salign = FvFTt . Prompting the transformer with lo-calized natural language terms— “vehicle, car, motorcycle, bus, truck, license plate, number plate, human face, head” —enables multi-head self-attention across the frame, detecting custom acrylic plates and helmeted heads re-gardless of rotational orientation. 
+
+4. Spatial Vehicle ROI Containment Engine 
+
+4.1. Pipeline System Architecture 
+
+Figure 1 illustrates the complete end-to-end framework, detailing text encoding, cross-modal vision-language fusion, macro/micro box partitioning, spatial containment filtering, dynamic obfuscation, and automated quality control auditing. The implementation details are fully executable via the project repository’s Jupyter Notebook ( .ipynb ). 64.2. Containment Logic and Topology Formulation 
+
+To eliminate environmental background false positives generated by low-threshold transformer detection on non-vehicle surfaces, we engineered the Spatial Vehicle ROI Containment Engine. The foundational spatial axiom dictates that a valid license plate must reside inside the spatial boundary of a vehicle .Given output detection set D = {(bk, s k, ℓ k)}Kk=1 , detections are parti-tioned into three disjoint sets: 
+
+V = {bv | (bv, s v, ℓ v) ∈ D , ℓ v ∈ { vehicle, car, motorcycle, bus, truck }} (6) 
+
+P = {(bp, s p) | (bp, s p, ℓ p) ∈ D , ℓ p ∈ { license plate, number plate }} (7) 
+
+F = {bf | (bf , s f , ℓ f ) ∈ D , ℓ f ∈ { human face, head }} (8) For each candidate plate box bp = [ x1,p , y 1,p , x 2,p , y 2,p ] ∈ P , its geometric centroid cp = ( xc,p , y c,p ) is calculated as: 
+
+xc,p = x1,p + x2,p 
+
+2 , yc,p = y1,p + y2,p 
+
+2 (9) To accommodate tail-fenders and wide vehicle bumpers, macro vehicle boxes bv = [ x1,v , y 1,v , x 2,v , y 2,v ] are dynamically expanded by expansion factor 
+
+ϵ = 0 .10 (10%): 
+
+˜x1,v = max(0 , x 1,v − ϵw v), ˜y1,v = max(0 , y 1,v − ϵh v) (10) 
+
+˜x2,v = min( W, x 2,v + ϵw v), ˜y2,v = min( H, y 2,v + ϵh v) (11) The containment indicator function Ivalid (bp) evaluates candidate validity: 
+
+Ivalid (bp) = 
+
+
+
+1 if ∃bϵv s.t. (˜ x1,v ≤ xc,p ≤ ˜x2,v ∧ ˜y1,v ≤ yc,p ≤ ˜y2,v )1 else if (V = ∅ ∧ sp > 0.35) 0 otherwise (Discard as Non-Vehicle Background Noise) (12) Algorithm 1 details the complete spatial containment filtering process. 7Algorithm 1 Spatial Vehicle ROI Containment Filtering Algorithm 
+
+Require: Frame I ∈ RH×W ×3, Detection Set D, Expansion Tolerance ϵ =0.10 
+
+Ensure: Validated Anonymization Mask Map M ∈ { 0, 1}H×W 
+
+> 1:
+
+Initialize M ← 0H×W 
+
+> 2:
+
+Partition D → Macro Vehicles V, Candidate Plates P, Faces/Heads F 
+
+> 3:
+
+for each candidate plate (bp, s p) ∈ P do  
+
+> 4:
+
+Compute centroid cp ←  x1,p +x2,p  
+
+> 2
+
+, y1,p +y2,p 
+
+> 2
+
+ 
+
+> 5:
+
+is _valid ← False  
+
+> 6:
+
+for each vehicle box bv ∈ V do  
+
+> 7:
+
+Compute expanded boundary bϵv = [˜ x1,v , ˜y1,v , ˜x2,v , ˜y2,v ] 
+
+> 8:
+
+if ˜x1,v ≤ xc,p ≤ ˜x2,v and ˜y1,v ≤ yc,p ≤ ˜y2,v then  
+
+> 9:
+
+is _valid ← True; break  
+
+> 10:
+
+end if  
+
+> 11:
+
+end for  
+
+> 12:
+
+if is _valid or (V = ∅ and sp > 0.35) then  
+
+> 13:
+
+Apply Asymmetric Padding Expansion to bp → b∗ 
+
+> p
+> 14:
+
+Update Mask Map M[b∗
+
+> p
+
+] ← 1 
+
+> 15:
+
+end if  
+
+> 16:
+
+end for  
+
+> 17:
+
+for each face/head box bf ∈ F do  
+
+> 18:
+
+Expand bf → b∗ 
+
+> f
+
+; Update Mask Map M[b∗ 
+
+> f
+
+] ← 1 
+
+> 19:
+
+end for  
+
+> 20:
+
+return M
+
+4.3. Asymmetric Mask Expansion and Dynamic Gaussian Blurring 
+
+Raw predicted bounding boxes often fit tightly around central charac-ters, leaving plate margins or ear profiles exposed. Validated boxes undergo asymmetric expansion: horizontal bounds expand by αx = 0 .25 (25%) and vertical bounds by αy = 0 .15 (15%) for plates, while faces undergo uniform expansion αface = 0 .20 (20%). Dynamic Gaussian blurring is executed across expanded regions IROI us-ing a 2D kernel G(x, y ; σx, σ y):
+
+G(x, y ; σx, σ y) = 12πσ xσy
+
+exp 
+
+
+
+−
+
+ x2
+
+2σ2
+
+> x
+
++ y2
+
+2σ2
+
+> y
+
+ 
+
+(13) 8Kernel dimensions (kw, k h) scale dynamically with ROI resolution to pre-vent boundary artifacts: 
+
+kw = max 
+
+
+
+3, 2
+
+jwROI 
+
+2
+
+k
+
++ 1 
+
+
+
+, kh = max 
+
+
+
+3, 2
+
+hROI 
+
+2
+
+
+
++ 1 
+
+
+
+(14) 
+
+5. Qualitative Analysis and Scenario Evaluation 
+
+Evaluating anonymization performance across complex Kuala Lumpur traffic imagery requires analyzing qualitative behavior across challenging op-erational scenarios encountered in the dataset. 
+
+5.1. Qualitative Analysis across Traffic Scenarios 
+
+Figure 2 illustrates qualitative outputs generated by the proposed frame-work across key challenge scenarios in Kuala Lumpur traffic. 1. Scenario 1: Dense Motorcycle Traffic and Helmeted Riders: 
+
+In raw imagery capturing dense lane-filtering motorcycles, conventional face detectors fail because riders wear full-face helmets or face away from the camera. Legacy plate detectors miss small, oblique tail-mounted plates. By prompting Grounding DINO [4] with “head, hel-met, motorcycle license plate” , the pipeline captures helmeted rider profiles and angled rear plates simultaneously. 2. Scenario 2: High-Contrast Background Noise Suppression: 
+
+Specular reflections and high-contrast street elements often trigger false positive activations in unconstrained object detectors. The Spatial Ve-hicle ROI Containment Engine evaluates the centroid cp of each candi-date plate box and verifies whether it lies within an expanded vehicle boundary bϵv. Detections outside vehicle hulls are discarded, preserving surrounding environmental context. 3. Scenario 3: Dynamic Bicycle Camera Roll and Angled Plates: 
+
+Cycling motion generates variable pitch and roll ( ϕ, θ ), causing ob-served license plates to appear at acute rotational angles. Cross-modal attention maps in Grounding DINO attend to global plate bound-aries regardless of axis alignment, while 25% horizontal mask expansion guarantees full character coverage. 9(a) Scenario 1: High-density motorcycle stream with helmeted riders. 
+
+> (b) Scenario 2: Background false positive suppression via vehicle ROI containment.
+> (c) Scenario 3: Angled vehicle plates under dynamic bicycle camera roll.
+
+Figure 2: Qualitative anonymization results on raw extracted frames (left) versus obfus-cated outputs (right) from the Kuala Lumpur Road Dataset. Row (a): Helmeted motor-cyclists and oblique tail plates. Row (b): Background noise rejection. Row (c): Rotated plates under sensor motion. 
+
+6. Temporal Persistence and Quality Control Auditing 
+
+6.1. Temporal Persistence Tracking 
+
+To bridge single-frame detection dropouts in extracted 2 FPS video se-quences, the framework executes a temporal linear interpolation pass. For frame sequence It−1, It, It+1 , if a target box is detected at t − 1 (bt−1) and 
+
+t + 1 (bt+1 ) but missing at frame t, the missing coordinate is interpolated: 10 bt = bt−1 + bt+1 
+
+2 (15) 
+
+6.2. Automated Quality Control (QC) Audit Architecture 
+
+To eliminate manual review across thousands of frames, an automated context-aware auditor evaluates two spatial consistency rules using a large secondary context model (YOLOv8l [6]): 1. Vehicle-Plate Audit Rule: If a vehicle box bv occupies an area 
+
+≥ 3000 pixels 2 but contains no validated plate mask ( M ∩ bϵv = ∅), the frame is flagged. 2. Person-Face Audit Rule: If a pedestrian/rider box bperson exceeds a height threshold ≥ 40 pixels but contains no face mask ( M ∩ bperson =
+
+∅), the frame is flagged. Passed frames route directly to high_confidence/ , while flagged frames isolate into review_required/ alongside an automated audit summary (saved as qc_summary_report.json ). This context audit reduces manual review requirements significantly, providing a defensible audit trail for privacy com-pliance under legal frameworks like the Malaysian PDPA 2010 and GDPR. 
+
+7. Conclusion and Code Availability 
+
+Curating open-source urban traffic datasets in complex tropical environ-ments requires specialized computer vision pipelines capable of handling non-standard vehicle modifications, high motorcycle density, and dynamic sensor motion. We demonstrated that traditional rigid object detectors and stan-dard CNNs are insufficient for the extreme variability of Kuala Lumpur traffic imagery. By pairing Grounding DINO vision-language transformers with a Spatial Vehicle ROI Containment Engine, our framework achieves accurate anonymization of faces, helmeted heads, and custom license plates while sup-pressing environmental false positives. To support reproducible research and open science, the complete source code, spatial ROI engine implementation, and interactive demonstration notebook (.ipynb) are open-sourced at https://github.com/TanzinAbdul/ Kuala-Lumpur-Road-Dataset-Anonymizer .11 References 
+
+[1] J. Devlin, M.-W. Chang, K. Lee, K. Toutanova, Bert: Pre-training of deep bidirectional transformers for language understanding (2019). arXiv: 1810.04805 .URL https://arxiv.org/abs/1810.04805 
+
+[2] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Kr-ishnan, Y. Pan, G. Baldan, O. Beijbom, nuscenes: A multimodal dataset for autonomous driving (2020). arXiv:1903.11027 .URL https://arxiv.org/abs/1903.11027 
+
+[3] P. Sun, H. Kretzschmar, X. Dotiwalla, A. Chouard, V. Patnaik, P. Tsui, J. Guo, Y. Zhou, Y. Chai, B. Caine, V. Vasudevan, W. Han, J. Ngiam, H. Zhao, A. Timofeev, S. Ettinger, M. Krivokon, A. Gao, A. Joshi, S. Zhao, S. Cheng, Y. Zhang, J. Shlens, Z. Chen, D. Anguelov, Scalabil-ity in perception for autonomous driving: Waymo open dataset (2020). 
+
+arXiv:1912.04838 .URL https://arxiv.org/abs/1912.04838 
+
+[4] S. Liu, Z. Zeng, T. Ren, F. Li, H. Zhang, J. Yang, Q. Jiang, C. Li, J. Yang, H. Su, J. Zhu, L. Zhang, Grounding dino: Marrying dino with grounded pre-training for open-set object detection (2024). arXiv:2303.05499 .URL https://arxiv.org/abs/2303.05499 
+
+[5] P. Viola, M. Jones, Rapid object detection using a boosted cascade of simple features, in: Proceedings of the 2001 IEEE Computer Society Conference on Computer Vision and Pattern Recognition. CVPR 2001, Vol. 1, 2001, pp. I–I. doi:10.1109/CVPR.2001.990517 .[6] G. Jocher, A. Chaurasia, J. Qiu, Ultralytics yolov8 (2023). URL https://github.com/ultralytics/ultralytics 
+
+[7] Z. Liu, Y. Lin, Y. Cao, H. Hu, Y. Wei, Z. Zhang, S. Lin, B. Guo, Swin transformer: Hierarchical vision transformer using shifted windows (2021). arXiv:2103.14030 .URL https://arxiv.org/abs/2103.14030 
+
+12

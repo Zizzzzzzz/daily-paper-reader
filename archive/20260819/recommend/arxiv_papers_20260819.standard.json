@@ -1,0 +1,550 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-19T19:15:30.456896+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 6,
+    "deep_cap": 8,
+    "deep_selected": 6,
+    "quick_candidates": 6,
+    "quick_skim_target": 13,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2608.17402v1",
+      "source": "arxiv",
+      "title": "MoE-ViE: Mixture of Experts Vision Encoder for Efficient Image and Video Understanding",
+      "abstract": "Vision encoders are a critical component of vision-language models, and scaling their capacity effectively improves performance. However, dense scaling increases compute cost and inference latency. Mixture-of-Experts (MoE) architectures offer a compelling alternative, having enabled efficient scaling in LLMs, yet the MoE design space for CLIP-style vision encoders remains underexplored at State-of-the-Art (SOTA) levels. In this work, we systematically study MoE designs for vision encoder scaling and find that fine-grained MoE topologies yield substantial gains over both dense and standard MoE counterparts. We further propose an auxiliary-loss-free balancing variant for better expert utilization, and design a specialized MoE kernel to mitigate inference latency overhead. To enhance video capabilities while preserving image knowledge, we introduce frame-level distillation paired with a novel freezing mechanism. We pretrain a series of Mixture-of-Experts Vision Encoders (MoE-ViE) across a range of sizes, all consistently outperforming their dense counterparts. Our largest model matches the zero-shot performance of a SOTA encoder 1.7x its size at 76% of its latency. When aligned with an LLM, MoE-ViE surpasses all compared encoders on image and video benchmarks, including those with up to 5x more activated parameters. Code is available at https://github.com/facebookresearch/moe_vie.",
+      "authors": [
+        "Bonan Zhang",
+        "Shiyu Dong",
+        "Quan Hung Tran",
+        "Katharina Gschwind",
+        "Shuqi Yang",
+        "Sijia Chen",
+        "Adel Ahmadyan",
+        "Seungwhan Moon",
+        "Lu Zhang",
+        "Ahmed Kirmani",
+        "Babak Damavandi",
+        "Anuj Kumar"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-18T05:58:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.17402v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "efficient vision encoder for vision-language models via mixture-of-experts",
+      "llm_evidence_cn": "面向视觉语言模型的高效视觉编码器，采用专家混合架构",
+      "llm_evidence": "面向视觉语言模型的高效视觉编码器，采用专家混合架构",
+      "canonical_evidence": "面向视觉语言模型的高效视觉编码器，采用专家混合架构",
+      "llm_tldr_en": "MoE-ViE systematically explores mixture-of-experts designs for CLIP-style vision encoders, showing fine-grained MoE topologies improve efficiency and performance. It also proposes an auxiliary-loss-free balancing variant and a specialized MoE kernel.",
+      "llm_tldr_cn": "论文针对视觉语言模型中视觉编码器密集扩展导致计算成本和推理延迟上升的问题，系统研究了CLIP风格视觉编码器的专家混合设计。作者发现细粒度MoE拓扑相比密集结构和标准MoE带来显著收益，并提出无辅助损失的专家均衡变体和专用MoE核。实验表明该方法在保持性能的同时提升了图像与视频理解的效率，为高效视觉语言模型架构提供了新方向。",
+      "llm_tldr": "论文针对视觉语言模型中视觉编码器密集扩展导致计算成本和推理延迟上升的问题，系统研究了CLIP风格视觉编码器的专家混合设计。作者发现细粒度MoE拓扑相比密集结构和标准MoE带来显著收益，并提出无辅助损失的专家均衡变体和专用MoE核。实验表明该方法在保持性能的同时提升了图像与视频理解的效率，为高效视觉语言模型架构提供了新方向。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17787v1",
+      "source": "arxiv",
+      "title": "ETHEREAL: A 25.6-$μ$s/inf. Low-latency Event-driven Graph-neural-network Processor for High-resolution Vision at the Edge",
+      "abstract": "Dynamic vision sensors (DVS) are enticing candidates to reach the low-latency, sub-ms target of edge-vision applications, as they generate events with a $μ$s-level time resolution. However, using DVS front ends also calls for novel algorithm/hardware back ends capable of efficiently handling streams of sparse spatiotemporal events. While event-driven graph neural networks (EV-GNNs) have emerged as a solution on the algorithmic side that is both accurate and efficient, there is no dedicated hardware to date capable of efficiently supporting their mixed requirements of dense-regular compute operations and sparse-irregular memory accesses. We therefore introduce ETHEREAL, the first EV-GNN processor chip, capable of bridging this gap by means of a neighbor-parallel spline-convolution engine combined with a split-2D/3D memory hierarchy that introduces a novel spatiotemporal event-caching mechanism. Measurement results demonstrate a 25.6$μ$s latency and a 1.6$μ$J energy per end-to-end event-wise inference on the state-of-the art DAGr-GNN workload and VGA-resolution (640x480 pixels) DSEC dataset.",
+      "authors": [
+        "Adrian Kneip",
+        "Martin Lefebvre",
+        "Daniel Gehrig",
+        "Victoria Catalán Pastor",
+        "Davide Scaramuzza",
+        "Marian Verhelst",
+        "Charlotte Frenkel"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR",
+        "cs.CV"
+      ],
+      "published": "2026-08-18T13:49:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.17787v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "query:EV-CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "DVS-based event-driven graph neural network processor hardware",
+      "llm_evidence_cn": "基于动态视觉传感器的事件驱动图神经网络处理器硬件",
+      "llm_evidence": "基于动态视觉传感器的事件驱动图神经网络处理器硬件",
+      "canonical_evidence": "基于动态视觉传感器的事件驱动图神经网络处理器硬件",
+      "llm_tldr_en": "Presents ETHEREAL, the first event-driven graph-neural-network processor chip for low-latency edge vision with DVS frontends.",
+      "llm_tldr_cn": "动态视觉传感器（DVS）具备微秒级时间分辨率，适合边缘视觉应用，但缺乏高效的算法/硬件后端。该论文提出ETHEREAL，这是首个事件驱动图神经网络处理器芯片，能够高效处理稀疏时空事件流，并兼顾密集规则计算与稀疏不规则访存需求。该芯片实现25.6微秒/样本的低延迟推理，为高速视觉边缘应用提供了专用硬件支持。",
+      "llm_tldr": "动态视觉传感器（DVS）具备微秒级时间分辨率，适合边缘视觉应用，但缺乏高效的算法/硬件后端。该论文提出ETHEREAL，这是首个事件驱动图神经网络处理器芯片，能够高效处理稀疏时空事件流，并兼顾密集规则计算与稀疏不规则访存需求。该芯片实现25.6微秒/样本的低延迟推理，为高速视觉边缘应用提供了专用硬件支持。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "dynamic vision sensor DVS technology and applications",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17512v1",
+      "source": "arxiv",
+      "title": "Embodied-Navigator: Point, Think, Memorize, and Align for Efficient Navigation",
+      "abstract": "Although Large Vision-Language Models (VLMs) have significantly advanced embodied navigation, their direct deployment remains challenging, as existing methods often force VLMs into unnatural action spaces that misalign with their 2D pre-training priors, compounded by rigid reasoning schedules and inefficient memory management. To overcome these limitations, we propose TAMP-Nav, a unified framework for efficient embodied navigation. First, we introduce a Pixel-to-3D Action Formulation (Point) that reformulates navigation into 2D visual prompting. Specifically, the VLM merely selects 2D pixels, which are then projected into 3D coordinates for a low-level SLAM controller. This design naturally aligns embodied execution with the VLM's inherent 2D visual capabilities. Second, we propose an integrated Selective Reasoning and Anchor-Trajectory Memory mechanism (Think and Memorize), which dynamically triggers Chain-of-Thought and retains high-fidelity memory only at critical nodes, compressing redundant trajectories into lightweight Space-Time Indicators, thereby preserving critical historical information and enhancing spatio-temporal perception. Finally, we design an efficient Two-Level Alignment Paradigm (Align) via Group Relative Policy Optimization (GRPO). By superimposing global outcome rewards with fine-grained process rewards, this dense supervision tightly aligns the agent's cognitive planning with physical environmental feedback, endowing the model with adaptive reasoning capabilities. Experiments demonstrate that TAMP-Nav achieves state-of-the-art performance (e.g., 66.2% SR on R2R-CE) with high runtime and sample efficiency (requiring only 90k training trajectories).",
+      "authors": [
+        "Hongyan Feng",
+        "Sunlai Chen",
+        "Xuanyu Liu",
+        "Miao Pan",
+        "Yangfan Xie",
+        "Yuxiang Cui",
+        "Zhongxiang Zhou",
+        "Rong Xiong",
+        "Wenqi Zhang",
+        "Jianwei Yin",
+        "Yueting Zhuang",
+        "Xuhong Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-18T08:37:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.17512v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient embodied navigation using VLMs, aligning with VLA robotics",
+      "llm_evidence_cn": "基于视觉语言模型的高效具身导航，与机器人VLA相关",
+      "llm_evidence": "基于视觉语言模型的高效具身导航，与机器人VLA相关",
+      "canonical_evidence": "基于视觉语言模型的高效具身导航，与机器人VLA相关",
+      "llm_tldr_en": "TAMP-Nav unifies efficient embodied navigation by reformulating navigation as 2D visual prompting (pixel-to-3D projection), introducing point-think-memorize-align for efficient memory and reasoning with VLMs.",
+      "llm_tldr_cn": "该论文针对大型视觉语言模型在具身导航中部署难题，提出TAMP-Nav统一框架。通过像素到3D的动作表示将导航转化为二维视觉提示，使VLM天然适配其预训练先验，并设计思考、记忆与对齐机制以优化推理调度和记忆管理。实验表明该方法在减少计算开销的同时提升了导航效率，为机器人高效决策提供了可行方案。",
+      "llm_tldr": "该论文针对大型视觉语言模型在具身导航中部署难题，提出TAMP-Nav统一框架。通过像素到3D的动作表示将导航转化为二维视觉提示，使VLM天然适配其预训练先验，并设计思考、记忆与对齐机制以优化推理调度和记忆管理。实验表明该方法在减少计算开销的同时提升了导航效率，为机器人高效决策提供了可行方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.14724v1",
+      "source": "arxiv",
+      "title": "Privacy-Preserving Dataset Curation for Kuala Lumpur Urban Traffic: Grounded Vision-Language Detection with Spatial Vehicle-Context Filtering",
+      "abstract": "The rapid advancement of intelligent transportation systems and autonomous driving relies heavily on multi-modal urban traffic datasets. However, curating high-fidelity video imagery in complex tropical urban environments---specifically Kuala Lumpur, Malaysia---presents severe challenges for Personally Identifiable Information (PII) anonymization due to high motorcycle density, dark acrylic license plates, dynamic camera tilt, and extreme tropical glare. We propose an automated anonymization framework tailored for the Kuala Lumpur Road Dataset, captured via a mobile cycling platform at 2 FPS. We document how legacy Haar cascades and YOLOv8 fail under these conditions---generating false positives on background elements while missing rotated or occluded targets. Our architecture resolves this by integrating Grounding DINO---a zero-shot open-set vision-language transformer---with a novel Spatial Vehicle Region of Interest (ROI) Containment Engine. By requiring license plate centroids to reside within validated vehicle boundaries, the pipeline suppresses environmental false positives while automatically obfuscating faces, heads, and license plates. An initial evaluation on 1,266 frames demonstrates a $\\sim$95\\% success rate, with remaining failures restricted to small, heavily occluded, oblique, or ambiguous targets. Coupled with temporal persistence mechanisms and an automated quality-control auditor, the framework minimizes privacy-related false negatives while preserving scene context for downstream vision tasks. While formal legal compliance depends on broader governance procedures, this publicly available pipeline and demonstration notebook provide an auditable preprocessing stage for privacy-aware dataset curation.",
+      "authors": [
+        "Mohammed Abdul Al Arafat Tanzin",
+        "Rudzidatul Akmam Dziyauddin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-08-12T13:45:23+00:00",
+      "link": "https://arxiv.org/pdf/2608.14724v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "urban traffic dataset curation with grounded vision-language detection and spatial filtering",
+      "llm_evidence_cn": "城市交通数据集构建，采用接地视觉-语言检测与空间车辆上下文过滤",
+      "llm_evidence": "城市交通数据集构建，采用接地视觉-语言检测与空间车辆上下文过滤",
+      "canonical_evidence": "城市交通数据集构建，采用接地视觉-语言检测与空间车辆上下文过滤",
+      "llm_tldr_en": "An automated anonymization framework for Kuala Lumpur urban traffic video, combining grounded vision-language detection with spatial vehicle-context filtering to handle complex tropical road conditions.",
+      "llm_tldr_cn": "在复杂热带城市环境下，交通视频数据集的PII匿名化因摩托车密集、深色车牌和强光等问题而困难重重。本文针对吉隆坡道路数据集提出自动化匿名化框架，采用接地视觉-语言检测与空间车辆上下文过滤，改进车辆检测和隐私保护。相比Haar级联和YOLOv8，新方法能更好处理动态视角和极端光照下的误检漏检，为智能交通研究提供高质量且隐私安全的城市道路数据。该工作兼顾检测精度与匿名化需求，具有实际部署价值。",
+      "llm_tldr": "在复杂热带城市环境下，交通视频数据集的PII匿名化因摩托车密集、深色车牌和强光等问题而困难重重。本文针对吉隆坡道路数据集提出自动化匿名化框架，采用接地视觉-语言检测与空间车辆上下文过滤，改进车辆检测和隐私保护。相比Haar级联和YOLOv8，新方法能更好处理动态视角和极端光照下的误检漏检，为智能交通研究提供高质量且隐私安全的城市道路数据。该工作兼顾检测精度与匿名化需求，具有实际部署价值。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.18009v1",
+      "source": "arxiv",
+      "title": "Memory Tree Guided Key Frame Querying for Efficient 3D Question Answering",
+      "abstract": "Answering questions accurately and efficiently in embodied scenarios presents significant challenges due to limited computational and memory resources for Vision Language Model (VLM) inference. Existing methods adopt visual search key frame retrieval method to select critical question-related key frames for VLM input. However, visual search methods are inefficient because they require visual search among thousands of video frames for each individual user query. In this work, we propose a memory tree guided key frame selection paradigm for efficient 3D question answering in embodied scenarios. Our method leverages a compact and reusable 3D scene representation, termed MemTree3D, which supports real-time online construction leveraging camera 6-DoF poses. MemTree3D captures multi-level 3D scene information, enabling a Large Language Model to efficiently query and retrieve question-relevant key frames through our scoring-based frame selection without reprocessing the entire video stream. On OpenEQA, our method improves the LLM-Match of GPT-4o by 17.4%, LLaVA-OneVision-7B by 5.8%, outperforms existing visual search methods. Our code is available at https://github.com/hsiangwei0903/MemTree3D",
+      "authors": [
+        "Hsiang-Wei Huang",
+        "Fu-Chen Chen",
+        "Li-Wu Tsao",
+        "Cheng-Han Lee",
+        "Che-Chun Su",
+        "Lu Xia",
+        "Ronghui Peng",
+        "Jenq-Neng Hwang",
+        "Min Sun",
+        "Cheng-Hao Kuo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-18T16:56:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.18009v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Improves efficiency of VLM inference by selecting key frames with a reusable 3D memory, directly addressing multimodal LLM efficiency optimization",
+      "llm_evidence_cn": "通过可复用的3D记忆选择关键帧以提升VLM推理效率，直接面向多模态大模型的效率优化",
+      "llm_evidence": "通过可复用的3D记忆选择关键帧以提升VLM推理效率，直接面向多模态大模型的效率优化",
+      "canonical_evidence": "通过可复用的3D记忆选择关键帧以提升VLM推理效率，直接面向多模态大模型的效率优化",
+      "llm_tldr_en": "Proposes a memory-tree-guided key frame selection method for efficient 3D question answering, using a compact reusable 3D scene representation (MemTree3D) to reduce VLM input frames.",
+      "llm_tldr_cn": "针对具身场景中视觉语言模型推理受计算与内存限制、逐查询视觉搜索键帧效率低的问题，论文提出记忆树引导的键帧选择方法。其利用紧凑可复用的3D场景表示MemTree3D在线构建场景记忆，从而只向VLM输入与问题相关的少量关键帧。实验显示该方法在保持三维问答准确性的同时大幅减少推理所需帧数，为高效VLM推理提供了新的思路。",
+      "llm_tldr": "针对具身场景中视觉语言模型推理受计算与内存限制、逐查询视觉搜索键帧效率低的问题，论文提出记忆树引导的键帧选择方法。其利用紧凑可复用的3D场景表示MemTree3D在线构建场景记忆，从而只向VLM输入与问题相关的少量关键帧。实验显示该方法在保持三维问答准确性的同时大幅减少推理所需帧数，为高效VLM推理提供了新的思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.15437v1",
+      "source": "arxiv",
+      "title": "MM-BEV: Enhancing Timeliness by Computing Where and When it Matters",
+      "abstract": "Multimodal bird's-eye-view (BEV) perception combines LiDAR depth accuracy with dense camera semantics, but its high computational cost and imperfect sensing conditions make real-time deployment challenging. Existing methods largely compress individual detectors and overlook three opportunities: structured sparsity within camera and LiDAR inputs, timing misalignment between modalities, and the fact that many detected objects do not affect the planner's immediate action. We present MM-BEV, a real-time multimodal BEV system guided by a simple principle: compute where and when it matters. MM-BEV divides perception into mandatory work for safety-critical objects within braking distance of the ego vehicle and with short time-to-collision (TTC), and optional work for less urgent regions. It prioritizes mandatory work and reduces or sheds optional work under tight compute budgets. MM-BEV integrates four mechanisms: (1) a criticality-ranked temporal ROI selector based on motion-extrapolated detections from prior frames; (2) sparse, ROI-aware feature extraction using shared-shape camera crops at context-adaptive resolution and ROI-aware LiDAR voxelization; (3) a latency-aware coordinator that adapts LiDAR sweeps, image resolution, and keyframes according to scene dynamics and TTC; and (4) an asynchronous scheduler that decouples sensing from inference and skips stale frames. On nuScenes, MM-BEV reduces inference latency by 1.96x and end-to-end latency by 2.93x, with no loss in geometry-critical recall and only a 0.2 percentage-point drop in safety-critical recall. On a Clearpath Husky A300 equipped with an Ouster-128 LiDAR, BEV cameras, and a Jetson AGX Orin, MM-BEV further reduces mean latency by 2.11x, demonstrating its potential for real-world autonomous systems.",
+      "authors": [
+        "Liangkai Liu",
+        "Kang G. Shin"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV",
+        "cs.DC",
+        "eess.SY"
+      ],
+      "published": "2026-08-15T22:42:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.15437v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Multimodal bird's-eye-view perception for comprehensive traffic scene understanding in autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶综合交通场景理解的多模态鸟瞰感知",
+      "llm_evidence": "面向自动驾驶综合交通场景理解的多模态鸟瞰感知",
+      "canonical_evidence": "面向自动驾驶综合交通场景理解的多模态鸟瞰感知",
+      "llm_tldr_en": "MM-BEV achieves real-time multimodal BEV perception by computing where and when it matters, prioritizing safety-critical objects and exploiting sparsity and timing alignment.",
+      "llm_tldr_cn": "MM-BEV针对多模态BEV感知计算成本高、实时性差的问题，提出只在重要地点和重要时刻计算的原则。系统区分安全关键目标与可选目标，利用相机与激光雷达输入的结构化稀疏性以及模态间时间错位，在保证安全的前提下大幅降低计算量。实验表明该方法在自动驾驶场景中实现了实时性能，同时保持感知质量。这项工作为交通场景的高效综合感知提供了新思路。",
+      "llm_tldr": "MM-BEV针对多模态BEV感知计算成本高、实时性差的问题，提出只在重要地点和重要时刻计算的原则。系统区分安全关键目标与可选目标，利用相机与激光雷达输入的结构化稀疏性以及模态间时间错位，在保证安全的前提下大幅降低计算量。实验表明该方法在自动驾驶场景中实现了实时性能，同时保持感知质量。这项工作为交通场景的高效综合感知提供了新思路。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.10864v1",
+      "source": "arxiv",
+      "title": "Multi-View Relational Distillation for Spatial Reasoning with Vision-Language Models",
+      "abstract": "Vision-language models (VLMs) have achieved strong image and video understanding, yet their visual-spatial representations remain geometrically fragile, leading to failures in spatial reasoning needed for embodied AI, robotics, and autonomous driving. Prior approaches to geometry grounding either fine-tune VLMs on spatial question answering, which can perpetuate spurious visual representations, or fuse features from large geometry-grounded vision models, which substantially increases model size at inference. Knowledge distillation from geometry-grounded vision models offers an alternative, but directly matching multi-view teacher features can disrupt the pretrained alignment between visual and textual representations, degrading object- and language-semantic capabilities. We propose multi-view relational distillation (MVRD), which distills patch-wise cosine similarities across views instead of the teacher features themselves. These relations encode geometric correspondences adequate for spatial understanding, while leaving the student representation underdetermined, allowing it to remain close to its pretrained vision- language space. Across representative VLMs, MVRD improves visual-spatial reasoning, outperforming supervised fine-tuning and feature distillation while approaching feature fusion methods with considerably fewer added parameters and lower latency. We show that MVRD makes visual representations more geometric while retaining language alignment, and generalizes to 3D scene understanding tasks such as object grounding, dense captioning, and question answering.",
+      "authors": [
+        "Kiet T. Nguyen",
+        "Hanbo Shim",
+        "Jinwoo Kim",
+        "Seunghoon Hong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-11T12:34:41+00:00",
+      "link": "https://arxiv.org/pdf/2608.10864v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Knowledge distillation for spatial reasoning in VLMs, avoiding model size increase at inference",
+      "llm_evidence_cn": "针对VLM空间推理的知识蒸馏方法，避免推理时模型规模增大",
+      "llm_evidence": "针对VLM空间推理的知识蒸馏方法，避免推理时模型规模增大",
+      "canonical_evidence": "针对VLM空间推理的知识蒸馏方法，避免推理时模型规模增大",
+      "llm_tldr_en": "Proposes multi-view relational distillation to improve VLM spatial reasoning without adding inference-time modules, avoiding the model size increase of feature fusion.",
+      "llm_tldr_cn": "视觉语言模型在处理空间推理时几何表征脆弱，已有方法要么微调导致表征偏差，要么融合大模型特征导致推理规模膨胀。该文提出多视图关系蒸馏，从几何基础模型蒸馏空间知识到VLM，并设计避免破坏视觉-文本对齐的蒸馏目标。实验显示该方法在空间推理任务上提升性能，同时保持推理效率。这对于自动驾驶和机器人等空间敏感应用具有重要意义。",
+      "llm_tldr": "视觉语言模型在处理空间推理时几何表征脆弱，已有方法要么微调导致表征偏差，要么融合大模型特征导致推理规模膨胀。该文提出多视图关系蒸馏，从几何基础模型蒸馏空间知识到VLM，并设计避免破坏视觉-文本对齐的蒸馏目标。实验显示该方法在空间推理任务上提升性能，同时保持推理效率。这对于自动驾驶和机器人等空间敏感应用具有重要意义。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.11167v1",
+      "source": "arxiv",
+      "title": "MultiModal Code-Switching: Interleaving Visual Objects into Language for Explicit Object-Level Alignment",
+      "abstract": "Existing Multimodal Large Language Models (MLLMs) predominantly rely on image-text pairs for modality alignment pretraining, mapping global image representations to long textual descriptions. However, this image-level alignment suffers from referential ambiguity: models struggle to infer the correspondences between multiple visual objects and textual entities from the global representation, leading to data inefficiency and suboptimal semantic grounding. To address this, we propose MultiModal Code-Switching (MMCS), a novel pretraining paradigm that provides explicit object-level supervision. Inspired by the linguistic phenomenon of code-switching, MMCS interleaves vision and language by replacing textual entities with their corresponding visual objects, enforcing local vision-language grounding. We further develop a scalable data synthesis pipeline to generate a pretraining dataset of 773K samples with accurate object-entity correspondences. Experiments show that MMCS is highly data-efficient: with only 50K samples, it matches or surpasses models trained on 600K image-text pairs. Furthermore, MMCS consistently improves visual grounding and perception capabilities across varying model scales.",
+      "authors": [
+        "Changhao Xiang",
+        "Shangyu Xing",
+        "Zhen Wu",
+        "Jianbing Zhang",
+        "Xinyu Dai"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-11T17:28:52+00:00",
+      "link": "https://arxiv.org/pdf/2608.11167v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Object-level alignment method for multimodal large models, applicable to event-camera MLLMs",
+      "llm_evidence_cn": "面向多模态大模型的显式对象级对齐方法，可迁移至事件相机大模型",
+      "llm_evidence": "面向多模态大模型的显式对象级对齐方法，可迁移至事件相机大模型",
+      "canonical_evidence": "面向多模态大模型的显式对象级对齐方法，可迁移至事件相机大模型",
+      "llm_tldr_en": "MultiModal Code-Switching interleaves visual objects into language to provide explicit object-level supervision, reducing referential ambiguity in MLLM pretraining.",
+      "llm_tldr_cn": "多模态大模型常依赖图像-文本全局对齐，导致多目标与文本实体间存在指代歧义。受语码转换启发，本文提出多模态语码转换预训练范式，将视觉对象插入语言序列替换对应文本实体，从而提供显式对象级监督。该范式可缓解数据低效和语义接地不足问题，为包括事件相机在内的多模态模型的预训练对齐提供了新思路。",
+      "llm_tldr": "多模态大模型常依赖图像-文本全局对齐，导致多目标与文本实体间存在指代歧义。受语码转换启发，本文提出多模态语码转换预训练范式，将视觉对象插入语言序列替换对应文本实体，从而提供显式对象级监督。该范式可缓解数据低效和语义接地不足问题，为包括事件相机在内的多模态模型的预训练对齐提供了新思路。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Event Cameras Based Multimodal Large Model",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.17514v1",
+      "source": "arxiv",
+      "title": "SE-MoLoRA: Shared-Expert LoRA Adapters for Domain-Specific Photographic Assessment",
+      "abstract": "Vision-language models can describe images fluently, but they often fail to provide actionable photographic critique because semantic content and aesthetic judgment remain entangled. We propose SE-MoLoRA, a modular parameter-efficient adaptation framework for domain-specific photographic assessment. The method separates general photographic knowledge from specialist residual judgments using an always-active shared LoRA expert and routed adapters for composition, lighting, and technical quality. A lightweight query router selects the relevant specialist, enabling targeted critique without training separate full models. A rank-64 shared adapter captures broad photographic vocabulary, while rank-32 specialists learn domain-specific residuals with an orthogonal regularization penalty that encourages disentangled representations. Training data is obtained by distilling the Reddit Photo Critique Dataset into domain-labeled critique samples. On held-out critique generation, SE-MoLoRA improves BERTScore-F1 from 0.2317 to 0.4215 over monolithic LoRA and is preferred in 84.6\\% of pairwise comparisons, while using fewer active parameters than separate specialist models. SVD-based ablation study shows that shared-specialist decomposition and orthogonal regularization reduce expert overlap. These results demonstrate that modular adaptation improves controllability and specificity in multimodal photographic critique.",
+      "authors": [
+        "Bishwash Khanal",
+        "Anlan Zhang",
+        "Sasu Tarkoma",
+        "Tommi Mikkonen",
+        "Abhishek Kumar"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.MM"
+      ],
+      "published": "2026-08-18T08:40:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.17514v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "parameter-efficient LoRA adaptation for multimodal large language models",
+      "llm_evidence_cn": "面向多模态大语言模型的参数高效LoRA适配",
+      "llm_evidence": "面向多模态大语言模型的参数高效LoRA适配",
+      "canonical_evidence": "面向多模态大语言模型的参数高效LoRA适配",
+      "llm_tldr_en": "SE-MoLoRA separates general photographic knowledge from specialist residuals using a shared LoRA expert plus routed adapters, enabling domain-specific critique without training full VLM models.",
+      "llm_tldr_cn": "视觉语言模型能流利描述图像，但常因语义与美学判断纠缠而缺乏可操作的摄影批评。SE-MoLoRA提出共享专家LoRA与路由适配器的参数高效框架，将通用摄影知识领域特定判断分离。轻量查询路由按构图、光线和技术质量选择专家，避免为每个领域训练完整模型。实验表明该方法能以更少参数实现领域特定摄影评估的精准批评。",
+      "llm_tldr": "视觉语言模型能流利描述图像，但常因语义与美学判断纠缠而缺乏可操作的摄影批评。SE-MoLoRA提出共享专家LoRA与路由适配器的参数高效框架，将通用摄影知识领域特定判断分离。轻量查询路由按构图、光线和技术质量选择专家，避免为每个领域训练完整模型。实验表明该方法能以更少参数实现领域特定摄影评估的精准批评。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.14767v1",
+      "source": "arxiv",
+      "title": "NARRATE: A Multimodal Real-World Australian Driving Dataset for Human-Centred Explanations in Automated Driving",
+      "abstract": "Automated vehicles must explain their decisions in ways that passengers can understand, monitor, and trust. Existing language-annotated driving datasets are mostly observer-written, post-hoc, simulation-based, or generated from sensor inputs, rather than elicited from the driver performing the action. We introduce NARRATE, a multimodal real-world Australian driving dataset comprising 2,050 annotated events from 35 experienced drivers and driving instructors on public roads. Each event is grounded in synchronised visual, localisation, motion, and LiDAR streams and paired with in-vehicle and/or post-drive free-text explanations. NARRATE provides action labels, scenario-context labels spanning six high-level and 32 fine-grained categories, and span-level Situational Awareness (SA) annotations over driver explanations for Perception, Comprehension and Projection. Four benchmark tasks (SA, scenario-context, driver-action classification, and explanation generation) show that this structure is learnable from driver language, while fine-grained context recognition and explanation generation remain challenging. NARRATE paves a path towards more human-centred and domain-aware explanation models for automated driving.",
+      "authors": [
+        "Ashkan Yousefi Zadeh",
+        "Zishuo Zhu",
+        "Xiaomeng Li",
+        "Andry Rakotonirainy",
+        "Sebastien Glaser",
+        "Ronald Schroeter",
+        "Patricia Delhomme",
+        "Zahra Mehraban"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL",
+        "cs.RO"
+      ],
+      "published": "2026-08-14T12:35:24+00:00",
+      "link": "https://arxiv.org/pdf/2608.14767v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal driving dataset with driver explanations for human-centred automated driving",
+      "llm_evidence_cn": "含驾驶员解释的多模态驾驶数据集，支持以人为中心的自动驾驶",
+      "llm_evidence": "含驾驶员解释的多模态驾驶数据集，支持以人为中心的自动驾驶",
+      "canonical_evidence": "含驾驶员解释的多模态驾驶数据集，支持以人为中心的自动驾驶",
+      "llm_tldr_en": "NARRATE provides 2,050 multimodal driving events on public roads, pairing synchronized visual, LiDAR, localization, and motion data with in-drive and post-drive driver explanations for automated driving.",
+      "llm_tldr_cn": "现有带语言标注的驾驶数据集多为旁观者事后编写或仿真生成，缺乏真实驾驶员在执行动作时的解释。NARRATE收集35位经验驾驶员和教练在公共道路上的2050个事件，同步视觉、定位、运动和LiDAR流，并提供车内与事后自由文本解释。动作标签和场景上下文标签共覆盖6大类32种。该数据集为以人为中心的可解释自动驾驶和语言模型研究提供了宝贵资源。",
+      "llm_tldr": "现有带语言标注的驾驶数据集多为旁观者事后编写或仿真生成，缺乏真实驾驶员在执行动作时的解释。NARRATE收集35位经验驾驶员和教练在公共道路上的2050个事件，同步视觉、定位、运动和LiDAR流，并提供车内与事后自由文本解释。动作标签和场景上下文标签共覆盖6大类32种。该数据集为以人为中心的可解释自动驾驶和语言模型研究提供了宝贵资源。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.16632v1",
+      "source": "arxiv",
+      "title": "DRAFE: Domain-Robust Asymmetric Fusion of Heterogeneous Detection Transformers for Cross-City Fine-Grained Traffic Object Detection",
+      "abstract": "Deep learning-based object detectors are fundamental to intelligent transportation systems, enabling traffic monitoring, vehicle analytics, and infrastructure management. However, achieving both fine-grained vehicle recognition and robust cross-city domain generalization remains challenging. We present the Domain-Robust Asymmetric Fusion Ensemble (DRAFE), which combines independently trained LW-DETR and RF-DETR detectors for cross-city fine-grained traffic object detection. DRAFE employs a two-stage training strategy that first pretrains complementary detectors on diverse public traffic datasets using pseudo-label expansion and human-in-the-loop annotation refinement, producing a curated corpus of 6,049 images and 203,619 annotations, before challenge-compliant fine-tuning on the Project Hafnia Track 6 dataset. At inference, DRAFE applies anchor-conditioned class-consistent matching, reliability-weighted coordinate fusion, agreement-aware confidence recalibration, and complementary hypothesis recovery. On AI City Challenge 2026 Track 6, DRAFE achieves 0.4022 mAP, ranks sixth among 25 participating teams, and improves by 0.0553 mAP over a preliminary ensemble evaluated under identical benchmark conditions.",
+      "authors": [
+        "Divine Yao Agbobli",
+        "Geoffery Eyram Agorku",
+        "Israel Afriyie",
+        "Kwadwo Amankwah-Nkyi",
+        "Marvin Osei-Kuffour",
+        "Richmond Owusu Duah",
+        "Bright Seglah",
+        "Kelvin Asamoah Terkper",
+        "Kwabena Amoako Adjei"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-17T14:32:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.16632v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Focuses on cross-city fine-grained traffic object detection, contributing to comprehensive traffic scene understanding and perception",
+      "llm_evidence_cn": "聚焦跨城市细粒度交通目标检测，服务于综合交通场景理解与感知",
+      "llm_evidence": "聚焦跨城市细粒度交通目标检测，服务于综合交通场景理解与感知",
+      "canonical_evidence": "聚焦跨城市细粒度交通目标检测，服务于综合交通场景理解与感知",
+      "llm_tldr_en": "Presents DRAFE, an asymmetric fusion ensemble of heterogeneous detection transformers for cross-city fine-grained traffic object detection, using pseudo-label expansion and human-in-the-loop refinement.",
+      "llm_tldr_cn": "针对交通场景中细粒度车辆识别与跨城市域泛化难以兼顾的问题，论文提出DRAFE，一种由异构检测Transformer构成的非对称融合集成框架。其两阶段训练策略先在多样化公开交通数据集上预训练互补检测器，再经伪标签扩展与人机协同标注精炼。实验表明融合后的检测器在跨城市细粒度交通目标检测上表现更优，为智能交通感知提供了域鲁棒的解决方案。",
+      "llm_tldr": "针对交通场景中细粒度车辆识别与跨城市域泛化难以兼顾的问题，论文提出DRAFE，一种由异构检测Transformer构成的非对称融合集成框架。其两阶段训练策略先在多样化公开交通数据集上预训练互补检测器，再经伪标签扩展与人机协同标注精炼。实验表明融合后的检测器在跨城市细粒度交通目标检测上表现更优，为智能交通感知提供了域鲁棒的解决方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.17178v1",
+      "source": "arxiv",
+      "title": "Mask What Matters: Saliency-Guided Video Self-Supervised Learning for Autonomous Driving",
+      "abstract": "Video self-supervised learning through masked spatiotemporal prediction has emerged as a promising paradigm for learning feature representations from unlabeled data. However, existing methods typically rely on random masking, which indiscriminately removes regions irrespective of their semantic or temporal relevance. In ego-centric driving videos, this can weaken the pretext signal since safety-critical cues such as pedestrians, vehicles, lane boundaries, and dynamic interactions often occupy only a small portion of the frame, yet are central to downstream perception. We introduce V-JEPA4A, a domain-specialized variant of V-JEPA for autonomous driving that is pre-trained on publicly available driving videos with a novel saliency-driven masking policy. It accounts for semantically and temporally relevant context. The proposed policy preserves and predicts context according to semantic importance and temporal relevance, yielding more informative representation learning while retaining the efficiency of masked prediction. We evaluate the resulting encoders on four driving benchmarks spanning tracking, semantic segmentation, and depth estimation. The results demonstrate that V-JEPA4A reduces identity switches on BDD100k MOT by 25% over V-JEPA with random masking, achieves 73.2 mIoU on Cityscapes, and 3.75 RMSE on KITTI-2015 depth, while incurring only ~14% additional pre-training iteration overhead.",
+      "authors": [
+        "Christopher Lang",
+        "Alexander Braun",
+        "Abhinav Valada"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-17T22:39:49+00:00",
+      "link": "https://arxiv.org/pdf/2608.17178v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Saliency-guided video self-supervised learning for autonomous driving scene understanding",
+      "llm_evidence_cn": "面向自动驾驶场景理解的显著性引导视频自监督学习",
+      "llm_evidence": "面向自动驾驶场景理解的显著性引导视频自监督学习",
+      "canonical_evidence": "面向自动驾驶场景理解的显著性引导视频自监督学习",
+      "llm_tldr_en": "This paper proposes V-JEPA4A, a domain-specialized video self-supervised learning method for autonomous driving, which replaces random masking with saliency-driven masking to focus on safety-critical objects such as pedestrians, vehicles, lane boundaries, and dynamic interactions. Experiments show improved downstream perception.",
+      "llm_tldr_cn": "视频自监督学习通常采用随机掩码，但在自动驾驶第一视角视频中，行人、车辆等安全关键目标只占画面小部分，随机掩码会削弱预训练信号。该文提出V-JEPA4A，使用显著性引导的掩码策略，使模型重点预测语义和时序上重要的区域。在公开驾驶视频上预训练后，下游感知任务性能得到提升。该方法为利用无标注驾驶视频学习高效表征提供了新方向。",
+      "llm_tldr": "视频自监督学习通常采用随机掩码，但在自动驾驶第一视角视频中，行人、车辆等安全关键目标只占画面小部分，随机掩码会削弱预训练信号。该文提出V-JEPA4A，使用显著性引导的掩码策略，使模型重点预测语义和时序上重要的区域。在公开驾驶视频上预训练后，下游感知任务性能得到提升。该方法为利用无标注驾驶视频学习高效表征提供了新方向。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
