@@ -1,0 +1,568 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-20T21:10:18.333421+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 3,
+    "deep_cap": 8,
+    "deep_selected": 3,
+    "quick_candidates": 10,
+    "quick_skim_target": 13,
+    "quick_selected": 10
+  },
+  "deep_dive": [
+    {
+      "id": "2608.18410v1",
+      "source": "arxiv",
+      "title": "Role-Conditioned Sub-Token Routing for Efficient Vision-Language-Action Policies",
+      "abstract": "Vision-Language-Action (VLA) models process long multimodal token sequences, making inference expensive in both memory and computation. Existing efficiency methods mainly reduce visual tokens, but aggressive token pruning becomes fragile because removing a token discards its entire representation. Sub-token compression provides a complementary alternative by retaining more tokens while reducing their value width. However, directly applying sub-token compression to VLA policies is less effective because information important for perception, language understanding, and control is distributed differently across the multimodal representation.   We introduce Role-Conditioned Sub-Token Routing (RoleSub), which learns how to compress the value representations of retained tokens. After visual token reduction, RoleSub partitions each retained value representation into groups in an orthogonal space and uses a lightweight router to determine which groups should be preserved. The routing decision is conditioned on the token representation, a learned latent role representation, and language context. The same mechanism can also be applied to language values, allowing visual and language representations to be compressed without removing additional tokens.   We evaluate RoleSub on OpenVLA-OFT-7B across the four LIBERO suites. At matched visual-KV budgets, RoleSub outperforms a trained token-only control in 33 of 36 settings, with the largest gains under aggressive compression. Combining visual and language compression reduces total KV to 9.2--11.3% of the original while retaining strong control performance on most tasks. These results show that reducing the representation within retained tokens provides an effective complement to token pruning for aggressive VLA compression.",
+      "authors": [
+        "Wei Jiang",
+        "Wei Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-08-19T00:38:23+00:00",
+      "link": "https://arxiv.org/pdf/2608.18410v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Sub-token compression for efficient VLA policies",
+      "llm_evidence_cn": "面向高效VLA政策的子词元压缩",
+      "llm_evidence": "面向高效VLA政策的子词元压缩",
+      "canonical_evidence": "面向高效VLA政策的子词元压缩",
+      "llm_tldr_en": "Proposes RoleSub for sub-token compression in VLA policies, reducing inference cost by compressing value representations while preserving control performance.",
+      "llm_tldr_cn": "针对视觉-语言-动作策略处理长多模态词元序列导致推理开销大的问题，本文提出角色条件子词元路由（RoleSub），根据感知、语言与控制在表示中的差异学习压缩值表示，在保留更多词元的同时降低表示宽度。实验表明该方法在保持控制性能的前提下显著降低内存和计算开销，为VLA高效推理提供新思路。",
+      "llm_tldr": "针对视觉-语言-动作策略处理长多模态词元序列导致推理开销大的问题，本文提出角色条件子词元路由（RoleSub），根据感知、语言与控制在表示中的差异学习压缩值表示，在保留更多词元的同时降低表示宽度。实验表明该方法在保持控制性能的前提下显著降低内存和计算开销，为VLA高效推理提供新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.18486v1",
+      "source": "arxiv",
+      "title": "WhiteMatter: All-to-All Cross-Layer Connections via KV Mixing",
+      "abstract": "In a Transformer, each layer attends to past tokens only through KV produced at its own depth, despite the presence of deeper representations during autoregressive decoding. Feedback architectures allow shallow consumer layers to attend to KV produced by deeper past-token representations, but give all consumer layers the same fixed connection patterns to source layers. We propose WhiteMatter, which connects every attention layer to the representations from all layers of each past token, with connection weights that can vary across consumer layers and adapt to the source token. For each token, a router implements these connections by mixing its $L$ layer states into $k$ KV channels that are cached for subsequent tokens; each consumer layer attends to one of the channels. The number of channels $k$ controls the KV-cache size. Setting $k<L$ reduces the cache's memory footprint. In our pretraining experiments, WhiteMatter outperforms a vanilla Transformer with 50% more layers and retains most of this gain with a 50% KV-cache compression.",
+      "authors": [
+        "Wenbo Zhang",
+        "Xiang Ren"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-19T03:24:51+00:00",
+      "link": "https://arxiv.org/pdf/2608.18486v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV mixing compresses layer states into k KV channels for efficient long-context attention",
+      "llm_evidence_cn": "将层状态混合压缩为k个KV通道，实现高效长上下文注意力",
+      "llm_evidence": "将层状态混合压缩为k个KV通道，实现高效长上下文注意力",
+      "canonical_evidence": "将层状态混合压缩为k个KV通道，实现高效长上下文注意力",
+      "llm_tldr_en": "Fixing the limitation that each Transformer layer only attends to its own-depth KV, WhiteMatter mixes L layer states into k cached KV channels, giving every layer adaptive access to full representations while cutting KV cache size.",
+      "llm_tldr_cn": "针对Transformer各层仅能使用自身深度KV、无法利用深层表示的问题，本文提出WhiteMatter，将每个历史token的L层状态混合为k个KV通道并缓存，使所有注意力层都能按需访问全层信息。实验验证了该设计在提升表示能力的同时压缩KV缓存，为高效长上下文建模提供了新思路。",
+      "llm_tldr": "针对Transformer各层仅能使用自身深度KV、无法利用深层表示的问题，本文提出WhiteMatter，将每个历史token的L层状态混合为k个KV通道并缓存，使所有注意力层都能按需访问全层信息。实验验证了该设计在提升表示能力的同时压缩KV缓存，为高效长上下文建模提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.19066v1",
+      "source": "arxiv",
+      "title": "GS-VLA: Plug-and-Play Viewpoint Canonicalization for Frozen VLA Policies via Gaussian Splatting",
+      "abstract": "This paper proposes a lightweight, plug-and-play framework that improves robustness to viewpoint shifts in Vision-Language-Action (VLA) policies without policy retraining. To our knowledge, this is the first approach to directly leverage 3D Gaussian-based novel-view synthesis for observation-space adaptation in VLA policies. Current VLA performance relies on the implicit assumption that training and deployment camera configurations are identical. Our experiments show that even a small displacement of the camera mount can reduce the success rate on the LIBERO benchmark from about 90% to about 10% in the worst case. Prior approaches, such as large-scale fine-tuning or generative data augmentation, are computationally expensive and risk catastrophic forgetting. To address this, viewpoint shifts are reformulated as a localized novel-view synthesis problem. Under a Locality assumption, that camera perturbations remain within a small bounded region relative to the workspace, viewpoint normalization reduces to a scene- and policy-independent disocclusion task. Our work implements this idea with a 4M-parameter 3D-Gaussian canonicalizer prepended to a frozen VLA policy. Without modifying policy weights, GS-VLA improves performance across three orthogonal axes: (1) Policy architectures, (2) Unseen task suites, and (3) Perturbation scales. These results show that a lightweight visual module can recover a large fraction of the performance lost under viewpoint shift, without policy retraining.",
+      "authors": [
+        "Yechan Park",
+        "HyunJin Kim"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-19T16:08:10+00:00",
+      "link": "https://arxiv.org/pdf/2608.19066v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLA policies robustness via plug-and-play Gaussian splatting viewpoint canonicalization without retraining",
+      "llm_evidence_cn": "通过高斯泼溅实现VLA策略即插即用视角规范化，无需重训练",
+      "llm_evidence": "通过高斯泼溅实现VLA策略即插即用视角规范化，无需重训练",
+      "canonical_evidence": "通过高斯泼溅实现VLA策略即插即用视角规范化，无需重训练",
+      "llm_tldr_en": "GS-VLA is a lightweight plug-and-play framework that uses 3D Gaussian novel-view synthesis to canonicalize observations for frozen VLA policies, drastically improving viewpoint-shift robustness without policy retraining.",
+      "llm_tldr_cn": "本文针对VLA策略对相机视角变化高度敏感的问题，提出GS-VLA，一种即插即用的3D高斯泼溅视角规范化框架，在无需重新训练策略的前提下对观测空间进行适配。实验显示相机安装位置的小幅位移可使LIBERO成功率从约90%骤降至约10%，而GS-VLA能显著恢复性能，为部署鲁棒的VLA系统提供了低成本方案。",
+      "llm_tldr": "本文针对VLA策略对相机视角变化高度敏感的问题，提出GS-VLA，一种即插即用的3D高斯泼溅视角规范化框架，在无需重新训练策略的前提下对观测空间进行适配。实验显示相机安装位置的小幅位移可使LIBERO成功率从约90%骤降至约10%，而GS-VLA能显著恢复性能，为部署鲁棒的VLA系统提供了低成本方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.15796v1",
+      "source": "arxiv",
+      "title": "Emergent 3D Instance Segmentation from Self-Supervised Point Transformers",
+      "abstract": "Unsupervised 3D instance segmentation of outdoor LiDAR scans has traditionally relied on handcrafted geometric priors such as density-based clustering, motion cues, or projected 2D detections. In this work, we investigate whether a frozen, self-supervised point transformer already contains the structural information required to isolate object instances without any handcrafted geometric prior. Using this transformer purely as a feature extractor, we probe its internal representations across the SemanticKITTI, nuScenes, and Waymo Perception datasets. Our analysis yields four core insights: (1) the instance signal concentrates in the attention queries and keys rather than in the values or final output features; (2) output features semantically collapse, merging adjacent same-class objects that the queries and keys keep distinct; (3) this instance signal is bimodal in depth, strongest at the shallowest and deepest encoder stages; and (4) this signal is driven predominantly by the rotary position encoding (RoPE), whose removal collapses its advantage. We put these findings into our method TokenGraph3D, a training-free segmenter that groups points via connected components on a key-similarity graph, using neither density-based clustering nor proximity priors. Under identical prior-free conditions, we substantially outperform output-feature baselines, making the emergent 3D instance structure visible.",
+      "authors": [
+        "Ted Lentsch",
+        "Santiago Montiel-Marín",
+        "Holger Caesar",
+        "Julian F. P. Kooij"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-16T15:20:57+00:00",
+      "link": "https://arxiv.org/pdf/2608.15796v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "outdoor LiDAR instance segmentation for autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶户外LiDAR的三维实例分割",
+      "llm_evidence": "面向自动驾驶户外LiDAR的三维实例分割",
+      "canonical_evidence": "面向自动驾驶户外LiDAR的三维实例分割",
+      "llm_tldr_en": "A frozen self-supervised point transformer can isolate object instances in outdoor LiDAR scans, with instance signal concentrated in attention queries and keys.",
+      "llm_tldr_cn": "传统无监督三维实例分割依赖密度聚类、运动线索等手工几何先验，难以适应户外场景。论文研究冻结的自监督点云Transformer能否直接提供实例结构信息，并在 SemanticKITTI、nuScenes 和 Waymo 等数据集上分析内部表示。结果发现实例信号主要集中在注意力查询和键中，而非输出特征，据此可无需手工先验地实现三维实例分割，为自动驾驶点云感知提供了新视角。",
+      "llm_tldr": "传统无监督三维实例分割依赖密度聚类、运动线索等手工几何先验，难以适应户外场景。论文研究冻结的自监督点云Transformer能否直接提供实例结构信息，并在 SemanticKITTI、nuScenes 和 Waymo 等数据集上分析内部表示。结果发现实例信号主要集中在注意力查询和键中，而非输出特征，据此可无需手工先验地实现三维实例分割，为自动驾驶点云感知提供了新视角。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.14783v1",
+      "source": "arxiv",
+      "title": "MegaParts: Scaling Part-Aware 3D Object Generation to 300 Parts via Token-Efficient Autoregressive Modeling",
+      "abstract": "Part-aware 3D object generation is essential for graphics applications such as controllable modeling, editing, and articulation, where objects are represented as coherent assemblies of semantic parts. However, existing part-aware generation methods, do not scale well to highly complex objects. As the number of parts increases, generating detailed geometry becomes prohibitively expensive in token length and memory. We introduce MegaParts, a scalable autoregressive 3D generation framework to address this challenge by combining structured sequence modeling with a token-efficient vector-quantized shape tokenizer. Our tokenizer learns discrete latent representations for part-level geometry by minimizing token usage subject to high-fidelity reconstruction, enabling adaptive-length tokenization based on geometric complexity. On top of this compact representation, we train a large language model to generate object bounding boxes, part bounding boxes, and part shape tokens within a unified structured sequence. Combined with efficient long-context training strategy, our token-efficient formulation scales to objects with up to 300 parts and sequence lengths up to 256k tokens. This substantially extends the scale of part-aware 3D generation while preserving compositional structure and enabling fine-grained part-level control. Our method achieves higher mesh quality than baseline autoregressive and diffusion models, showing that compressed discrete part tokens improve not only scalability but also the achievable fidelity of generated geometry. These results suggest that LLM native token-efficient autoregressive modeling is a compelling alternative to diffusion for large-scale part-aware 3D generation. The project page is available at https://expmaster.github.io/megaparts_webpage.",
+      "authors": [
+        "Manwen Liao",
+        "Xinyu Lian",
+        "Jian Mao",
+        "Kaixu Chen",
+        "Li Luo",
+        "Jinghao Yan",
+        "Wanshui Gan",
+        "Qiao Yu",
+        "Weitian Zhang",
+        "Chunhua Shen",
+        "Guang Chen",
+        "Bo Dai",
+        "Xudong Xu",
+        "Zhaoyang Lyu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.GR"
+      ],
+      "published": "2026-08-14T18:00:02+00:00",
+      "link": "https://arxiv.org/pdf/2608.14783v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "token-efficient vector-quantized tokenizer for autoregressive 3D generation; transferable to token compression techniques",
+      "llm_evidence_cn": "面向三维生成的令牌高效量化编码器可减少令牌数量，对令牌压缩技术具有方法论借鉴价值",
+      "llm_evidence": "面向三维生成的令牌高效量化编码器可减少令牌数量，对令牌压缩技术具有方法论借鉴价值",
+      "canonical_evidence": "面向三维生成的令牌高效量化编码器可减少令牌数量，对令牌压缩技术具有方法论借鉴价值",
+      "llm_tldr_en": "MegaParts combines structured sequence modeling with a token-efficient VQ tokenizer to generate complex 3D objects with up to 300 parts while minimizing token usage and memory.",
+      "llm_tldr_cn": "现有部分感知三维生成方法在部件数量增多时，几何建模的令牌长度和内存开销急剧增长，难以扩展到高复杂度物体。本文提出MegaParts框架，结合结构化序列建模与令牌高效的向量量化形状分词器，在保证生成质量的同时最小化令牌使用，从而将部件感知生成扩展到300个部件。实验证明该方法能高效生成复杂三维物体，为大规模令牌高效建模提供了新途径。",
+      "llm_tldr": "现有部分感知三维生成方法在部件数量增多时，几何建模的令牌长度和内存开销急剧增长，难以扩展到高复杂度物体。本文提出MegaParts框架，结合结构化序列建模与令牌高效的向量量化形状分词器，在保证生成质量的同时最小化令牌使用，从而将部件感知生成扩展到300个部件。实验证明该方法能高效生成复杂三维物体，为大规模令牌高效建模提供了新途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.16338v1",
+      "source": "arxiv",
+      "title": "SIGMA-Lane: Scale-pyramId Gated MAmba for Temporally Consistent Video Lane Detection",
+      "abstract": "Video lane detection requires predictions that remain stable across frames, yet severe vehicle occlusions can break temporal cues. In streaming recurrent models, corrupted observations may enter the hidden state and produce errors that persist into later frames. Existing occlusion-aware refinements usually provide obstacle masks as auxiliary inputs, so the state-update path is only indirectly protected. We propose SIGMA-Lane, which treats this failure mode as state contamination in State Space Model (SSM)-based temporal modeling. SIGMA-Lane places occlusion-aware gates on the SSM write and residual-fusion paths, controlling how current observations enter temporal memory and are fused back after temporal propagation. After coordinate-consistent affine alignment, the model combines two complementary paths: SSM-consistent dual-gating for temporal filtering and Structural Spatial Retrieval (SSR) for recovering missing lane structure from aligned historical priors. Experiments on VIL-100 and OpenLane-V show improved temporal stability under heavy occlusion, with competitive F1 and mIoU scores.",
+      "authors": [
+        "Tiancheng Zhang",
+        "Mengmeng Wang",
+        "Yan Gao",
+        "Xiangjie Kong",
+        "Guojiang Shen",
+        "Jiaxin Du"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-17T09:44:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.16338v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Temporally consistent video lane detection for traffic perception",
+      "llm_evidence_cn": "面向交通感知的时序一致视频车道线检测",
+      "llm_evidence": "面向交通感知的时序一致视频车道线检测",
+      "canonical_evidence": "面向交通感知的时序一致视频车道线检测",
+      "llm_tldr_en": "SIGMA-Lane applies occlusion-aware gating to SSM write and fusion paths for stable video lane detection under occlusions, ensuring temporally consistent predictions in traffic scenes.",
+      "llm_tldr_cn": "视频车道线检测要求跨帧预测稳定，但车辆遮挡会破坏时序线索，并使循环模型状态受到污染。本文提出SIGMA-Lane，在状态空间模型的写入和残差融合路径上加入遮挡感知门控，控制当前观测进入时序记忆的方式，从而抑制状态污染。实验表明该方法在遮挡场景下实现更稳定的车道线预测，提升时序一致性，为复杂交通环境感知提供新的时序建模方案。",
+      "llm_tldr": "视频车道线检测要求跨帧预测稳定，但车辆遮挡会破坏时序线索，并使循环模型状态受到污染。本文提出SIGMA-Lane，在状态空间模型的写入和残差融合路径上加入遮挡感知门控，控制当前观测进入时序记忆的方式，从而抑制状态污染。实验表明该方法在遮挡场景下实现更稳定的车道线预测，提升时序一致性，为复杂交通环境感知提供新的时序建模方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.14868v1",
+      "source": "arxiv",
+      "title": "Beam-Wise Statistical Background Subtraction for Static Roadside LiDAR: A Cross-Sensor Benchmark Study",
+      "abstract": "Background subtraction is a key preprocessing step for infrastructure-based LiDAR perception, enabling efficient isolation of dynamic traffic participants without semantic annotations. However, systematic cross-sensor evaluations and reproducible studies for static roadside LiDAR are missing. This paper presents a comparative benchmark of beam-wise statistical background subtraction for statically mounted LiDAR sensors. We formulate background estimation as a per-beam temporal modeling problem and investigate complementary statistical strategies that capture dominant as well as multi-modal background structures, combined with spatial filtering in the angular and 3D domain. To enable reproducible evaluation, we introduce HighwayScene, a new multi-LiDAR dataset recorded in a static roadside setup, and extend the public CoopScenes dataset with static/dynamic point-wise annotations. Across multiple scenes and heterogeneous sensing technologies, we demonstrate that beam-wise statistical modeling provides a robust and transferable solution. Combining lightweight per-beam models with spatial consistency filtering substantially improves precision while maintaining high recall and real-time capability. All datasets, annotations, and implementations are publicly released.",
+      "authors": [
+        "Alexander Baumann",
+        "Marcel Vosshans",
+        "Thao Dang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-14T20:15:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.14868v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "roadside LiDAR background subtraction for dynamic traffic isolation",
+      "llm_evidence_cn": "路边LiDAR背景减除用于动态交通隔离",
+      "llm_evidence": "路边LiDAR背景减除用于动态交通隔离",
+      "canonical_evidence": "路边LiDAR背景减除用于动态交通隔离",
+      "llm_tldr_en": "Benchmark of beam-wise statistical background subtraction for static roadside LiDAR, enabling efficient dynamic object isolation without annotations.",
+      "llm_tldr_cn": "针对静态路边激光雷达缺少跨传感器基准的问题，提出波束统计背景减除对比研究。将背景估计视为逐波束时间建模，结合统计策略与空间滤波；引入可复现基准，能免标注分离动态交通参与者，为基础设施激光雷达感知提供高效预处理。",
+      "llm_tldr": "针对静态路边激光雷达缺少跨传感器基准的问题，提出波束统计背景减除对比研究。将背景估计视为逐波束时间建模，结合统计策略与空间滤波；引入可复现基准，能免标注分离动态交通参与者，为基础设施激光雷达感知提供高效预处理。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.16785v1",
+      "source": "arxiv",
+      "title": "Calibration-Free Vehicle Speed Estimation: A Monocular Keypoint-Template Approach",
+      "abstract": "This paper proposes a calibration-free framework for reliably and effectively estimating vehicle speeds from monocular videos, without relying on roadway features, camera calibration, or roadway-feature-based reference objects. The proposed framework estimates vehicle speeds using a 36-keypoint vehicle template and a homography matrix updated at each frame. A YOLO-based keypoint detection module is trained on diverse datasets, and two estimation strategies are compared: keypoint-only tracking and warped optical flow with dense spatial aggregation. Speed is estimated by projecting displacements into metric space using the homography, with validation conducted on over 400 video clips from roadside and overhead datasets, covering speeds from 30 to 100 mph. The method achieves reliable speed estimation on the VS13 and BrnoCompSpeed datasets, with the warped optical flow method delivering MAEs of 15.0% and 9.7%, respectively, and 77.9% and 93.1% of estimates falling within +/-20% error. After applying a 10% trim to remove edge-of-frame outliers, performance improves to MAEs of 11.7% and 7.6%, with within-+/-20% accuracy increasing to 85.3% and 95.4%. This work addresses key limitations of existing vision-based approaches and enables low-cost and efficient speed enforcement using portable devices such as dashcams and smartphones, thereby supporting citizen-based enforcement programs for traffic safety.",
+      "authors": [
+        "Gaofeng Su",
+        "Keya Li",
+        "Raja Sengupta",
+        "Kara M. Kockelman"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-17T16:39:06+00:00",
+      "link": "https://arxiv.org/pdf/2608.16785v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "monocular vehicle speed estimation for traffic perception",
+      "llm_evidence_cn": "单目车辆测速用于交通感知",
+      "llm_evidence": "单目车辆测速用于交通感知",
+      "canonical_evidence": "单目车辆测速用于交通感知",
+      "llm_tldr_en": "Calibration-free monocular vehicle speed estimation using a 36-keypoint template and per-frame homography, validated on roadside and overhead datasets.",
+      "llm_tldr_cn": "提出免标定的单目车辆速度估计框架，利用36关键点车辆模板和逐帧单应矩阵在度量空间投影位移。不依赖道路特征或相机标定，结合YOLO关键点检测与光流聚合；在400余段路边与俯拍视频上验证，为交通场景感知提供可靠速度估计工具。",
+      "llm_tldr": "提出免标定的单目车辆速度估计框架，利用36关键点车辆模板和逐帧单应矩阵在度量空间投影位移。不依赖道路特征或相机标定，结合YOLO关键点检测与光流聚合；在400余段路边与俯拍视频上验证，为交通场景感知提供可靠速度估计工具。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.15816v1",
+      "source": "arxiv",
+      "title": "ViTaR: Visuo-Tactile Residual Adaptation for Foundation VLA Manipulation",
+      "abstract": "As Vision-Language-Action (VLA) models scale toward real-world deployment, contact-rich manipulation exposes a critical blind spot: these policies encode broad visual-semantic priors yet remain unaware of local contact events, producing identical actions whether contact is established, lost, or destabilized. Existing remedies either modify VLA internals, risking catastrophic forgetting, or demand online reinforcement under near-failure contact conditions. Both grant tactile unbounded influence over action generation, conflicting with the priors that make VLAs generalizable. We introduce ViTaR, which reframes tactile feedback from an action-generating perceptual input to an execution modulator that selects and scales bounded residual corrections atop a frozen VLA, preserving pretrained capabilities by construction. ViTaR decomposes adaptation into two stages: Effect-Guided Modeling determines whether and which correction is locally justified via outcome-grounded preference evidence, and Residual Action Modulation converts this evidence into a residual choice with continuously scaled gain from real-time visuotactile observations. On the UniVTAC benchmark spanning seven contact-rich tasks, ViTaR achieves 61.3% average success, a 30.6 percentage-point improvement over its frozen VLA base that also surpasses purpose-built tactile baselines. Physical-robot experiments confirm that bounded tactile modulation transfers to real sensor noise and dynamics.",
+      "authors": [
+        "Yi Wang",
+        "Renjun Wu",
+        "Jinyan Liu",
+        "Xuesong Li"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-16T15:46:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.15816v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VLA manipulation method with tactile residual adaptation, relevant to VLA robotics",
+      "llm_evidence_cn": "面向VLA机器人操作的技术方法，与高效VLA模型直接相关",
+      "llm_evidence": "面向VLA机器人操作的技术方法，与高效VLA模型直接相关",
+      "canonical_evidence": "面向VLA机器人操作的技术方法，与高效VLA模型直接相关",
+      "llm_tldr_en": "Reframes tactile feedback as an execution modulator in VLA policies, adding bounded residual corrections without modifying VLA internals, improving contact-rich manipulation while preserving generalization.",
+      "llm_tldr_cn": "基础视觉-语言-动作模型在接触丰富操作中缺乏局部接触感知，容易在接触建立、丢失或失稳时输出相同动作。现有方法要么改动VLA内部结构导致灾难性遗忘，要么依赖近乎失败的在线强化学习，且过度让触觉影响动作生成。ViTaR将触觉反馈作为执行调制器，选择并缩放有界残差修正叠加到原有动作上。实验显示该方法显著改善接触操作的稳定性和成功率，同时保持VLA的语义泛化先验。该工作与高效VLA推理优化可结合，为机器人操作提供轻量适配策略。",
+      "llm_tldr": "基础视觉-语言-动作模型在接触丰富操作中缺乏局部接触感知，容易在接触建立、丢失或失稳时输出相同动作。现有方法要么改动VLA内部结构导致灾难性遗忘，要么依赖近乎失败的在线强化学习，且过度让触觉影响动作生成。ViTaR将触觉反馈作为执行调制器，选择并缩放有界残差修正叠加到原有动作上。实验显示该方法显著改善接触操作的稳定性和成功率，同时保持VLA的语义泛化先验。该工作与高效VLA推理优化可结合，为机器人操作提供轻量适配策略。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.16589v1",
+      "source": "arxiv",
+      "title": "Ultra: Unsupervised Cross-Task Optimization for Reliable Restoration Segmentation Collaboration under Adverse Weather",
+      "abstract": "Unsupervised Domain Adaptation for Adverse Weather Semantic Segmentation (UDA-ASS) aims to transfer semantic knowledge from labeled normal-weather images to unlabeled adverse environments. Existing approaches implicitly assume that restoration and segmentation provide mutually beneficial guidance. However, under severe degradation and without target-domain supervision, the validity of cross-task optimization directions becomes fundamentally unidentifiable, leading to hallucination-driven error propagation. In this work, we propose a novel Unsupervised Restoration-Segmentation Collaborative Learning Framework (Ultra), which reframes cross-task interaction as direction selection under uncertainty and causal effect estimation, enabling reliable collaboration through candidate direction generation and intervention-based filtering. In detail, we propose CTDN and CMIL. The former exploits complementary visual structures and semantic information to generate candidate optimization directions and performs cooperative direction selection between restoration and segmentation. The latter reformulates cross-task information transfer from correlation-based propagation into causal effect assessment, suppressing hallucination propagation. Extensive experiments on three widely used UDA-ASS benchmarks demonstrate state-of-the-art segmentation performance. Beyond segmentation, our framework achieves better unsupervised restoration results than existing UDA-ASS restoration methods and generalizes to unsupervised restoration and object detection collaboration tasks. Code and models will be available at https://github.com/Wang-Shiqin/Ultra.",
+      "authors": [
+        "Shiqin Wang",
+        "Zhiqian Li",
+        "Haoyuan Du",
+        "Junming Chen",
+        "Jiayuan Li",
+        "Tianrun Xu",
+        "Haoyang Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-17T13:49:10+00:00",
+      "link": "https://arxiv.org/pdf/2608.16589v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adverse weather semantic segmentation for reliable visual perception",
+      "llm_evidence_cn": "恶劣天气下的可靠语义分割与无监督优化",
+      "llm_evidence": "恶劣天气下的可靠语义分割与无监督优化",
+      "canonical_evidence": "恶劣天气下的可靠语义分割与无监督优化",
+      "llm_tldr_en": "Ultra reframes cross-task restoration-segmentation collaboration as direction selection under uncertainty, reducing hallucination-driven error propagation for adverse weather semantic segmentation.",
+      "llm_tldr_cn": "现有无监督域适应方法假设图像恢复与语义分割能互相提供可靠指导，但在恶劣天气和缺少目标域监督下容易产生错误传播。Ultra 将跨任务交互转化为不确定性下的方向选择与因果建模，避免恢复阶段幻觉误导分割。实验证明该方法提升了恶劣天气语义分割的可靠性与泛化能力，为复杂环境感知提供了更稳健的无监督优化框架。",
+      "llm_tldr": "现有无监督域适应方法假设图像恢复与语义分割能互相提供可靠指导，但在恶劣天气和缺少目标域监督下容易产生错误传播。Ultra 将跨任务交互转化为不确定性下的方向选择与因果建模，避免恢复阶段幻觉误导分割。实验证明该方法提升了恶劣天气语义分割的可靠性与泛化能力，为复杂环境感知提供了更稳健的无监督优化框架。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.17475v1",
+      "source": "arxiv",
+      "title": "S$^3$AM: A Single-Stream SAM with Reliability-Calibrated Frequency Adapter for Multi-modal Salient Object Detection",
+      "abstract": "Vision foundation models have recently advanced multi-modal salient object detection (MSOD) through parameter-efficient tuning and prompt learning. However, existing Segment Anything Model (SAM)-adapted MSOD methods often rely on dual-stream encoders or auxiliary prompt generators, leading to redundant computation. Although a single-stream alternative can reduce this cost, early fusion may also propagate noisy or misaligned auxiliary high-frequency cues through the backbone. In this paper, we propose a novel single-stream framework that integrates reliability-calibrated frequency adaptation into the adopted SAM backbone for MSOD. It avoids duplicated foundation backbones while explicitly controlling auxiliary frequency injection. Specifically, we design a mixture of frequency experts module, which uses the stationary wavelet transform to decompose each modality and aggregate cross-modal frequency information. We further introduce a reliability-calibrated frequency adapter with a dual-gate calibration mechanism, which selectively propagates the calibrated residual across transformer stages while jointly controlling its injection strength and cross-modal reliability. A hypernetwork-guided semantic-structural decoder then combines semantic mask features from the adopted backbone with Mamba-based structural detail recovery. Comprehensive experiments on RGB-D, RGB-T, and RGB-NIR salient object detection benchmarks validate that the proposed framework achieves competitive performance with only 12.20M trainable parameters, accounting for 5.4\\% of the total parameters. The code will be available at https://github.com/xuboyue1999/SSSAM.",
+      "authors": [
+        "Ruichao Hou",
+        "Boyue Xu",
+        "Tongwei Ren",
+        "Dongming Zhou",
+        "Gangshan Wu",
+        "Jinde Cao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-18T08:05:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.17475v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "single-stream SAM architecture for efficient multimodal salient object detection",
+      "llm_evidence_cn": "单流SAM架构，用于高效多模态显著目标检测",
+      "llm_evidence": "单流SAM架构，用于高效多模态显著目标检测",
+      "canonical_evidence": "单流SAM架构，用于高效多模态显著目标检测",
+      "llm_tldr_en": "Proposes a single-stream SAM with reliability-calibrated frequency adapter to avoid duplicated backbones and reduce computation for multi-modal salient object detection while controlling noisy auxiliary cues.",
+      "llm_tldr_cn": "现有基于SAM的多模态显著目标检测方法常使用双流编码器或辅助提示生成器，导致计算冗余。本文提出单流框架S3AM，将可靠性校准的频率适配集成到SAM骨干中，避免重复基础模型并显式控制噪声高频线索。实验表明该方法在降低计算成本的同时保持性能，为高效多模态融合提供了可迁移的架构思路。",
+      "llm_tldr": "现有基于SAM的多模态显著目标检测方法常使用双流编码器或辅助提示生成器，导致计算冗余。本文提出单流框架S3AM，将可靠性校准的频率适配集成到SAM骨干中，避免重复基础模型并显式控制噪声高频线索。实验表明该方法在降低计算成本的同时保持性能，为高效多模态融合提供了可迁移的架构思路。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; KV cache compression and management for long context; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.18656v1",
+      "source": "arxiv",
+      "title": "FlashAttention for Scalable Vector Architectures",
+      "abstract": "Inference with transformer models on CPUs is increasingly important, especially for Small Language Models (SLMs), where vector architectures are emerging as a promising execution substrate. The attention module is a major bottleneck due to high memory bandwidth requirements; FlashAttention mitigates this by fusing operations to improve data locality and reduce intermediate memory traffic. In this paper, we present FlashAttention-V, a blocked FlashAttention for scalable vector architectures that adapts efficiently from short to very long vectors by exploiting parallelism across attention heads, inter-head packing to enable efficient utilization of vector lengths beyond the head dimension, and improving vector register utilization and memory access locality. We integrate FlashAttention-V into ggml within llama.cpp and evaluate it on TinyLlama, Llama 3.2, Qwen2.5, and Pythia-410M using gem5 and a Banana Pi BPI-F3. On the Banana Pi BPI-F3, we confirm that loop reordering and loop unrolling across attention heads are effective optimization principles, scaling performance gains with larger models and most pronounced with short contexts and during decoding. Simulation-based analysis shows that FlashAttention-V achieves 22x-42x speedup over scalar FlashAttention at 512-bit VL in prefill, with an additional 2x-2.5x gain scaling to 64 lanes and 4096-bit VL. During decode, FlashAttention-V achieves 8x-11x speedup using 512-bit vector lengths over scalar FlashAttention, with performance showing diminishing sensitivity to vector width and lane count due to single-token, memory-bound execution. We further identify structural bottlenecks in Q8_0 quantized linear layers that limit arithmetic amortization under long-vector execution, consistent across RVV and Arm SVE, indicating that current quantization formats pose a fundamental challenge to long-vector scalability.",
+      "authors": [
+        "Sonia Rani Gupta",
+        "Nikela Papadopoulou",
+        "Miquel Pericàs"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.PF"
+      ],
+      "published": "2026-08-19T08:02:17+00:00",
+      "link": "https://arxiv.org/pdf/2608.18656v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "efficient attention for transformer inference on CPUs",
+      "llm_evidence_cn": "面向CPU向量架构的高效注意力实现，可用于实时大模型推理",
+      "llm_evidence": "面向CPU向量架构的高效注意力实现，可用于实时大模型推理",
+      "canonical_evidence": "面向CPU向量架构的高效注意力实现，可用于实时大模型推理",
+      "llm_tldr_en": "FlashAttention-V adapts FlashAttention to scalable vector architectures for CPUs, improving data locality and vector register utilization to speed up transformer inference.",
+      "llm_tldr_cn": "Transformer 推理在小语言模型和向量架构上受注意力模块高内存带宽需求制约。论文提出 FlashAttention-V，通过跨注意力头并行、跨头打包和向量寄存器的优化，将 FlashAttention 适配到可扩展向量架构。实验表明该方法能适应从短到长向量，显著提升 CPU 上 Transformer 推理的效率，为资源受限设备上的实时 VLA 推理提供了底层加速支持。",
+      "llm_tldr": "Transformer 推理在小语言模型和向量架构上受注意力模块高内存带宽需求制约。论文提出 FlashAttention-V，通过跨注意力头并行、跨头打包和向量寄存器的优化，将 FlashAttention 适配到可扩展向量架构。实验表明该方法能适应从短到长向量，显著提升 CPU 上 Transformer 推理的效率，为资源受限设备上的实时 VLA 推理提供了底层加速支持。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.19036v1",
+      "source": "arxiv",
+      "title": "USR-Drive: Unified Driving Scene Representation via Joint Denoising of 3D Gaussians and Boxes",
+      "abstract": "Spatial representation learning for autonomous driving aims to map raw visual signals into structured 3D scene representations, where object-centric bounding boxes and rendering-oriented 3D primitives (\\eg, 3D Gaussians) serve as two distinct yet highly complementary levels for scene understanding. Existing methods typically treat dynamic reconstruction and instance-level perception as separate tasks, despite their shared goal of estimating the underlying 3D world state. As a result, dynamic reconstruction is under-constrained while 3D detection lacks geometric grounding. To address this gap, we propose USR-Drive, a unified conditional generative framework that, given only posed multi-view driving videos, jointly recovers dense dynamic geometry and instance-level object layouts within a shared scene representation. Specifically, USR-Drive represents dense Gaussian primitives and sparse 3D bounding boxes as two aligned latent token streams and jointly denoises them with a unified multi-modal diffusion Transformer. Unlike prior paradigms that use boxes as external conditions or predict them with detached modules, USR-Drive treats them as mutually constrained state variables with a Unified Positional Encoding (UPE) that aligns heterogeneous tokens within a shared metric spatiotemporal coordinate. Via such unified representation and generative framework, the two modalities reinforce each other: geometry supplies dense metric evidence for box prediction, while boxes provide instance-level structural priors that help preserve spatial consistency and reduce ambiguity in sequential 3D geometric representation. Our approach successfully delivers state-of-the-art results for both dynamic reconstruction and 3D detection on the nuScenes and VKitti datasets.",
+      "authors": [
+        "Li-Heng Chen",
+        "Haokai Pang",
+        "Chengye Su",
+        "Jiarun Liu",
+        "Qifeng Chen",
+        "Ziqian Ni",
+        "Jianxin Huang",
+        "Shi-Sheng Huang",
+        "Hongbo Fu",
+        "Sheng Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-19T15:29:06+00:00",
+      "link": "https://arxiv.org/pdf/2608.19036v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Unified driving scene representation with 3D Gaussians and boxes, relevant to traffic perception",
+      "llm_evidence_cn": "统一的驾驶场景表征，融合3D高斯与目标框，与交通场景理解直接相关",
+      "llm_evidence": "统一的驾驶场景表征，融合3D高斯与目标框，与交通场景理解直接相关",
+      "canonical_evidence": "统一的驾驶场景表征，融合3D高斯与目标框，与交通场景理解直接相关",
+      "llm_tldr_en": "Proposes a unified generative framework that jointly denoises 3D Gaussians and boxes from posed multi-view driving videos, coupling dynamic reconstruction with instance-level perception for improved 3D scene understanding.",
+      "llm_tldr_cn": "自动驾驶场景的表征学习需要同时获得目标边界框和渲染用3D原语，但现有方法将动态重建与实例级感知分开处理。本文提出USR-Drive，一个统一的条件生成框架，仅用多视角驾驶视频联合去噪3D高斯和边界框，使重建获得检测约束、检测获得几何支撑。实验表明该框架在动态重建与3D检测任务上互补提升，统一了同一世界状态的两种表示。该工作为交通场景理解提供更强的基础表征，但不涉及大语言模型。",
+      "llm_tldr": "自动驾驶场景的表征学习需要同时获得目标边界框和渲染用3D原语，但现有方法将动态重建与实例级感知分开处理。本文提出USR-Drive，一个统一的条件生成框架，仅用多视角驾驶视频联合去噪3D高斯和边界框，使重建获得检测约束、检测获得几何支撑。实验表明该框架在动态重建与3D检测任务上互补提升，统一了同一世界状态的两种表示。该工作为交通场景理解提供更强的基础表征，但不涉及大语言模型。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

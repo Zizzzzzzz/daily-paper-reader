@@ -1,0 +1,235 @@
+Title: Calibration-Free Vehicle Speed Estimation: A Monocular Keypoint-Template Approach
+
+URL Source: https://arxiv.org/pdf/2608.16785v1
+
+Published Time: Tue, 18 Aug 2026 02:31:00 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# Calibration-Free Vehicle Speed Estimation: A Monocular Keypoint-Template Approach 
+
+Gaofeng Su 
+
+Department of Civil & Environmental Engineering The University of California, Berkeley Email: koufongso@berkeley.edu 
+
+Keya Li 
+
+Department of Civil, Architectural and Environmental Engineering The University of Texas, Austin Email: keya_li@utexas.edu 
+
+Raja Sengupta, Ph.D. 
+
+Department of Civil & Environmental Engineering The University of California, Berkeley Email: rajasengupta@berkeley.edu 
+
+Kara M. Kockelman, Ph.D., P.E *
+
+Department of Civil, Architectural and Environmental Engineering The University of Texas, Austin 512-471-0210 Email: kkockelm@mail.utexas.edu 
+
+> *
+
+Corresponding author arXiv:2608.16785v1 [cs.CV] 17 Aug 2026 Su, Li, Sengupta, and Kockelman 2
+
+ABSTRACT 
+
+This paper proposes a calibration-free framework for reliably and effectively estimating vehi-cle speeds from monocular videos, without relying on roadway features, camera calibration, or roadway-feature-based reference objects. The proposed framework estimates vehicle speeds using a 36-keypoint vehicle template and a homography matrix updated at each frame. A YOLO-based keypoint detection module is trained on diverse datasets, and two estimation strategies are com-pared: keypoint-only tracking and warped optical flow with dense spatial aggregation. Speed is referred by projecting displacements into metric space using the homography, with validation con-ducted on over 400 video clips from road-side and over-head datasets, covering speeds from 30 to 100 mph. The method achieves reliable speed estimation on the V13 and BrnoCompSpeed datasets, with the warped optical flow method delivering MAEs of 15.0% and 9.7%, respectively, and 77.9% and 93.1% of estimates within ±20% error. After applying a 10% trim to remove edge-of-frame outliers, performance improves to 11.7% and 7.6% MAE, with within-±20% accuracy rising to 85.3% and 95.4%. This work addresses key limitations of existing vision-based approaches and enables low-cost and efficient speed enforcement using portable devices such as dashcams and smartphones, thereby supporting citizen-based enforcement programs for traffic safety. Su, Li, Sengupta, and Kockelman 3
+
+INTRODUCTION 
+
+Estimating vehicle speed accurately is a fundamental topic in Intelligent Transportation Systems (ITS) and plays a critical role in traffic enforcement and improving road safety. Active and automated enforcement of speed limits can lower speeds, crash counts, and injuries (Sadeghi-Bazargani and Saadati 2016; Shin et al. 2009). For example, fixed speed cameras can reduce 47% of fatal and injury crashes on urban principal arterials (Shin et al. 2009). Common speed measurement methods include intrusive technologies (e.g., inductive loop detectors) and non-intrusive technologies (e.g., overhead-mounted and side-fired sensors) (Sangsuwan and Ekpanyapong 2024; Odat et al. 2017; Martin et al. 2003). Intrusive detectors are installed within or across the roadway; for example, inductive loop detectors estimate vehicle speeds by detecting vehicle presence within the loop area through changes in oscillator frequency (Martin et al. 2003). Such technologies are expensive to install and can cause disruptions to traffic flow. For instance, a loop system with 40-cm ducts and three chambers costs approximately $9,000 per approach (Webb 2020). Non-intrusive technologies include active detectors (such as active infrared, microwave radar, and ultrasonic sensors) and passive detectors (such as passive infrared, acoustic, and video image processing systems). Active detectors transmit energy (e.g., radar waves or LiDAR) toward vehicles and calculate speeds based on the returned signal, while passive detectors measure energy emitted by vehicles (Javadi et al. 2019). Active sensors generally provide longer detection ranges and greater robustness, but require external power sources and are more complex. In contrast, passive sensors are simpler and require lower power consumption but are more susceptible to environmental conditions (Hovhannisyan 2021). Recently, vision-based speed estimation methods have emerged as a more cost-effective and scalable alternative (Martínez et al. 2024). Over the past decade, computer vision (CV) technologies have been widely used for vehicle detection and tracking (Zhang et al. 2022; Zuraimi and Zaman 2021; Maity et al. 2021), license plate recognition (Xu et al. 2018; Montazzolli and Jung 2017; Parsa et al. 2025), and speed estimation (Hua et al. 2018; Liu et al. 2020). Most state-of-the-art CV-based speed estimation methods typically rely on camera videos and scaling factors derived from road features to estimate travel distances in a two-dimensional (2D) domain using vanishing points (VP) and bounding boxes (Lu et al. 2017; Kim et al. 2018; Chang et al. 2018; Li et al. 2025). Despite their effectiveness, these approaches often require prior knowledge or strong assumptions about roadway geometry, fixed roadway features, or camera calibration, which limits their scalability and applicability. This work introduces a novel and calibration-free framework for vehicle speed estimation that does not rely on roadway features. The proposed approach iteratively updates the homography matrix derived from at least four non-collinear points in the planar video frame, to estimate vehicle speeds and can be readily applied to both overhead- and side-view camera videos. This framework enables speed estimation under flexible deployment conditions and is adaptable to a wide range of roadway environments and camera configurations. The remainder of this paper is organized as follows. Section II reviews related work on CV-based speed estimation. Section III describes the proposed methodology for vehicle speed estimation. Section IV presents the experimental results on overhead and side-view public datasets. Finally, Section V concludes the paper and discusses future work. Su, Li, Sengupta, and Kockelman 4
+
+RELATED WORK 
+
+CV techniques to estimate vehicle speeds typically begin with video recordings and scene parame-ters (such as image-to-world scaling factors) as inputs, then use detection and tracking algorithms to estimate traveled distances in the 2D image domain. Speeds are calculated using real-world distances derived from scale factors and the time intervals between consecutive frames (Gunawan et al. 2019; Abdel-Aziz et al. 2015). One critical component of vision-based speed estimation is camera calibration (Zhang 2021; Weng et al. 1992), which enables accurate mapping of 2D image coordinates to 3D real-world motion. Calibration involves estimating both intrinsic parameters (sensor size, resolution, focal length) and extrinsic parameters (camera position and orientation). Traditional methods rely on reference objects with known dimensions, such as lane markings or width, but these require manual measurement and are often impractical for large-scale deployment. To address this, VP-based calibration has emerged as a widely used approach. VPs occur where parallel lines in the 3D world (e.g., lane boundaries, building edges) appear to converge in the image. VP-based methods are classified into geometry-based and learning-based methods. Geometry-based methods use line intersections, clustering techniques, or Gaussian sphere representations to estimate VPs (Feng et al. 2010; Barinova et al. 2010; Collins and Weiss 1990). For instance, Song et al. (2021) adopted an improved Direct Linear Transform (DLT) method by obtaining two VPs from vehicle trajectory lines and car body edge lines, combined with a third VP derived from geometric relationships, to calculate speeds. Results show that the error of the proposed method under different conditions was less than 2.5%. Learning-based methods, instead, use deep neural networks trained on large-scale datasets with VP annotations to infer VPs directly from image context (Zhai et al. 2016; Chang et al. 2018). Hua et al. (2018) combined deep learning-based object detection with optical flow tracking on the NVIDIA AI City Challenge dataset, which contains over 20 hours of traffic videos from multiple camera angles. Their best results achieved a detection rate score of 1.0 and a root mean square error (RMSE) of 12.109 mph. They also pointed out that performance was particularly poor in locations where camera movement due to wind or bridge vibrations degraded video quality. Rani et al. (2024) proposed a deep learning-based framework combining U-Net segmentation with an LV-YOLO network to detect logistic vehicles and estimated their speeds from highway CCTV footage. Results indicate that the method achieved a 2.63% improvement in speed prediction accuracy over the 1D-CNN speed estimation model. Based on estimated VPs and standard camera placement assumptions (zero skew, overhead), in-trinsic and extrinsic parameters can be derived, enabling transformation between camera and real-world coordinates. Notably, most existing methods are applied to fixed traffic cameras and standard roadway features, which makes speed estimation particularly challenging in environments where roadway features is unclear or unavailable. 
+
+PROPOSED METHODOLOGY 
+
+This section presents the methodology for estimating vehicle speeds from monocular video, based on semantic keypoints, optical flow, and adaptive homography-based mapping. The following subsections outline the problem statement, describe the dynamic homography estimation procedure, derive the speed estimation formulation, analyze errors, and present the complete system pipeline. Su, Li, Sengupta, and Kockelman 5
+
+Problem Statement 
+
+Given two consecutive images 𝐼 𝑘 and 𝐼 𝑘 +1 capturing 𝑁 moving vehicles, the objective is to estimate the set of linear speeds V𝑘 = {𝑣 𝑖,𝑘 }𝑁 𝑖 =1, where 𝑣 𝑖,𝑘 denotes the instantaneous speed for vehicle instance 𝑖 at time step 𝑘 . A fundamental challenge in vision-based speed estimation arises from perspective effects, whereby identical pixel displacements do not correspond to equal physical distances in the scene. To resolve this, we utilized homography, a projective transformation that maps points between two planar coordinate frames (Hartley and Zisserman 2003). A key advantage of this technique is that it does not require prior camera calibration, provided that at least four non-collinear correspondences between the coordinate frames are identified (Song et al. 2021). Vehicles can be approximated as rigid bodies composed of locally planar surfaces, as illustrated in Figure 1. The red and yellow shaded regions highlight the distinct lateral and upper planar faces modeled, respectively, with an independent coordinate frame established for each plane. Furthermore, it is assumed that the vehicle undergoes longitudinal motion only, with negligible lateral displacement and rotation between consecutive frames. Under this assumption, the motion of each planar surface can be represented by a 2D homography. 
+
+FIGURE 1 : Piecewise planar approximation of a vehicle body. (Frame sampled and modified from the VS13 dataset (Djukanović et al. 2022)). 
+
+Notation and Preliminaries 
+
+Let 𝑖 ∈ { 1, . . . , 𝑁 } denote a specific tracked vehicle instance and 𝑘 denote the discrete time step. Each vehicle is modeled as a collection of planar facets 𝑐 ∈ C , where C = {top, left, right }.Although this work is targeting a multi-vehicle environment, their speeds can be estimated inde-pendently through an identical process. Moreover, since the homography transformation applies independently to facets, the subsequent derivation focuses on a single lateral plane of a single vehicle without loss of generality and maintain a clean and understandable notation. For a tracked vehicle 𝑖 at time step 𝑘 , we define: 1) 𝐼 𝑘 : The image coordinate frame at time 𝑘 .2) 𝑉 𝑘 : The metric planar coordinate frame attached to a vehicle facet, and is established based on the vehicle’s pose at time 𝑘 .3) p𝑘 ∈ 𝐼 𝑘 : The pixel coordinates [𝑢, 𝑣 ]⊤ of a physical point captured at time 𝑘 .4) s𝑉 𝑘  
+
+> 𝑘
+
+: The metric coordinates [𝑥, 𝑦 ]⊤ of a point captured at time 𝑘 , expressed in the metric Su, Li, Sengupta, and Kockelman 6frame 𝑉 𝑘 .5) M𝑘 : The set of detected semantic keypoints belonging to a facet at time 𝑘 .6) F𝑘 : The dense optical flow field, where p𝑘 +1 = p𝑘 + F𝑘 (p𝑘 ) represents the correspondence of the same physical point across consecutive image frames. 7) 𝑣 𝑘 : The final estimated scalar speed of the vehicle at time 𝑘 .
+
+Dynamic Image-Template Homography Estimation 
+
+The projective relationship between frame 𝐼 𝑘 and 𝑉 𝑘 is modeled by a homography matrix H𝑘 ∈ R3×3.Using homogeneous coordinates, the mapping from image space to the metric vehicle plane is given by: 
+
+𝑤 
+
+
+
+𝑥 𝑦 
+
+1
+
+
+
+= H𝑘 
+
+
+
+𝑢 𝑣 
+
+1
+
+
+
+(1) or equivalently, 
+
+𝑤 ˜s𝑉 𝑘  
+
+> 𝑘
+
+= H𝑘 ˜p𝑘 (2) where 𝑤 ≠ 0 is a projective scale factor. The corresponding Euclidean coordinates on the vehicle plane are recovered by normalizing the homogeneous representation with respect to the third component, and we expressed it as: 
+
+s𝑉 𝑘  
+
+> 𝑘
+
+= 𝜎 (H𝑘 ˜p𝑘 ) (3) The homography matrix H𝑘 can be estimated from at least four non-collinear correspondences between the semantics keypoint 𝑝 𝑘 ∈ M 𝑘 , and their corresponding locations on a physical vehicle metric template. When more than four correspondences are available, H𝑘 is estimated by solving an overdetermined system, with Random Sample Consensus (RANSAC) algorithm to reject outliners (Fischler and Bolles 1981). The mathematical formulation of homography estimation is well established and is therefore omitted here (Hartley and Zisserman 2003). We defined a vehicle metric template represented by a 2D mechanical drawing labeled with 36 semantic keypoints. Each keypoint is associated with 2D coordinates in meters. Figure 4 illustrates the sedan-based metric template used in our experiments. To preserve the planar assumption underlying Equation (1), we selected subsets of approximately co-planar keypoints corresponding to a specific vehicle facet, for example, wheels center, doors, door handle, side window corners. By associating detected image keypoints p𝑘 with their corresponding metric template coordinates 
+
+s𝑉 𝑘  
+
+> 𝑘
+
+, an instantaneous homography matrix H𝑘 for each frame 𝑘 was estimated. Because the metric scale is enforced by known dimensions of the canonical template, H𝑘 provides an image-to-metric mapping that adapts to the vehicle’s current position within the field of view. While homography-based methods can theoretically accommodate viewpoint changes, their accu-racy relies on the assumption that the observed motion on a vehicle surface can be represented by a single rigid plane. In practice, vehicle surfaces are only approximately planar, and vehicle motion introduces deviations due to suspension dynamics, minor rotations, and depth variations across keypoints. These effects cause the true image-to-plane transformation to gradually deviate Su, Li, Sengupta, and Kockelman 7from the estimated homography, resulting in persistent metric errors. Moreover, the homography is estimated from keypoint correspondences at a specific vehicle pose and is therefore only valid for that reference configuration. As the vehicle moves, the tracked keypoints may undergo increasingly large image displacements relative to their original positions, while the fixed homography cannot account for the resulting changes in projection. Consequently, planar approximation errors and temporal homography mismatch accumulate over time, leading to drift in displacement and speed estimates. To address this limitation, this paper models the homography as a dynamic, time-varying transfor-mation. By re-estimating the homography at each time step using keypoints associated with the same vehicle planar facet, the proposed approach continuously adapts the planar approximation to the vehicle’s current pose. This dynamic estimation reduces the accumulation of projection bias and improves the consistency of displacement and speed estimates over time. 
+
+Speed Estimation via Warped Optical Flow 
+
+At time step 𝑘 , a planar metric coordinate frame 𝑉 𝑘 is defined for each tracked vehicle facet. Given a homography H𝑘 between the image frame 𝐼 𝑘 and the metric planar frame 𝑉 𝑘 , the metric displacement of an arbitrary point on the facet can be recovered if its image correspondence between consecutive frames is known. Specifically, for a point p𝑖,𝑘 and its corresponding location p𝑖,𝑘 +1 at the next time step, the instantaneous speed is computed as 
+
+𝑣 𝑠 𝑖,𝑘 = 𝜎 (H𝑘 ˜p𝑖,𝑘 +1) − 𝜎 (H𝑘 ˜p𝑖,𝑘 )
+
+Δ𝑡 , (4) where ˜ p represents the point in homogeneous coordinates, 𝜎 (·) denotes the homogeneous normal-ization operator, and 𝑣 𝑠 𝑖,𝑘 represents the metric speed of the tracked point. Note that H𝑘 is only valid for points belonging to the same planar facet used during its estimation. The required point correspondence can be obtained using either dense or sparse tracking strategies. For dense correspondence, the optical flow field F𝑘 is used to obtain the subsequent image location: 
+
+p𝑖,𝑘 +1 = p𝑖,𝑘 + F𝑘 (p𝑖,𝑘 ). (5) Alternatively, sparse correspondence can be obtained by detecting and matching semantic keypoints that appear in both consecutive frames. This provides direct correspondences between p𝑖,𝑘 and 
+
+p𝑖,𝑘 +1 without relying on dense optical flow estimation. For the optical flow strategy, a convex hull S𝑘 is constructed from the detected semantic keypoints 
+
+p𝑘 ∈ M 𝑘 to restrict the queried points to the same planar facet. Optical flow is then evaluated only for points within this convex hull, ensuring that the resulting correspondences remain valid under the facet-specific homography H𝑘 . Moreover, this constraint increases the number of available tracking points beyond the sparse semantic keypoints, enabling robust aggregation over multiple measurements and reducing the influence of individual optical flow outliers. The final vehicle speed estimate is obtained by aggregating the point-wise speed estimates over all tracked points in S𝑘 :Su, Li, Sengupta, and Kockelman 8
+
+𝑣 𝑘 = RobustAgg  {𝑣 𝑠 𝑖,𝑘 | 𝑠 𝑖,𝑘 ∈ S 𝑘 } , (6) where RobustAgg (·) denotes a robust aggregation function used to reduce the influence of optical flow outliers and keypoint localization errors. 
+
+FIGURE 2 : Illustration of speed estimation via warped optical flow for a tracked vehicle’s right facet. The vehicle graphic was generated using AI tools. 
+
+Error Analysis 
+
+The speed estimate in (4) depends on the accuracy of the estimated homography matrix, which is recovered from image keypoint correspondences, and the accuracy of the optical flow. To quantify this effect, we analyzed the first-order sensitivity of the proposed speed estimation method to homography estimation errors. For notation simplicity, the subscript 𝑘 is dropped in the following analysis. Let 𝐻 ∗ denote the true homography matrix, and Δ𝐻 denote the homography matrix estimation error, yielding: 
+
+𝐻 = 𝐻 ∗ + Δ𝐻 (7) Similarly, let 𝑠 1 = 𝑠 0 + 𝑣 ∗ 
+
+> 𝑂𝐹
+
+represents the true correspondence between two frames, where 𝑣 ∗ 
+
+> 𝑂𝐹
+
+is the true optical flow vector. Accounting for optical flow error Δ𝑣 𝑂𝐹 , we have: 
+
+𝑣 𝑂𝐹 = 𝑣 ∗ 
+
+> 𝑂𝐹
+
++ Δ𝑣 𝑂𝐹 (8) Using Equation (4), the true velocity 𝑣 ∗ satisfies: 
+
+𝑣 ∗Δ𝑡 = 𝜎 (𝐻 ∗𝑠 ∗
+
+> 1
+
+) − 𝜎 (𝐻 ∗𝑠 ∗
+
+> 0
+
+) (9) Su, Li, Sengupta, and Kockelman 9While the estimated velocity 𝑣 is computed as: 
+
+𝑣 = Δ 𝑡 −1 (𝜎 (𝐻𝑠 1) − 𝜎 (𝐻𝑠 0)) (10) 
+
+= Δ 𝑡 −1 (𝜎 (( 𝐻 ∗ + Δ𝐻 )𝑠 1) − 𝜎 (( 𝐻 ∗ + Δ𝐻 )𝑠 0)) (11) The first-order approximation of the normalization function 𝜎 gives: 
+
+𝜎 (( 𝐻 ∗ + Δ𝐻 )𝑠 ) ≈ 𝜎 (𝐻 ∗𝑠 ) + 𝐽 𝜎 (𝐻 ∗𝑠 )Δ𝐻𝑠 (12) where 𝐽 𝜎 is the Jacobian of the normalization operator 𝜎 . Consequently, 
+
+𝑣 − 𝑣 ∗ ≈ Δ𝑡 −1  𝐽 𝜎 (𝐻 ∗𝑠 1)Δ𝐻𝑠 1 − 𝐽 𝜎 (𝐻 ∗𝑠 0)Δ𝐻𝑠 0
+
+ (13) Assuming small inter-frame motion such that 𝐽 𝜎 (𝐻 ∗𝑠 1) ≈ 𝐽 𝜎 (𝐻 ∗𝑠 0) = 𝐽 , it follows that: 
+
+𝑣 − 𝑣 ∗ ≈ Δ𝑡 −1𝐽 Δ𝐻 (𝑠 1 − 𝑠 0) = Δ 𝑡 −1𝐽 Δ𝐻𝑣 𝑂𝐹 (14) The error is bounded by: 
+
+∥Δ𝑣 ∥ = ∥𝑣 − 𝑣 ∗ ∥ ≤ Δ𝑡 −1 ∥𝐽 ∥∥ Δ𝐻 ∥∥ 𝑣 𝑂𝐹 ∥ (15) The bound in (15) indicates that the speed estimation error is affected by three components: the perspective sensitivity ∥𝐽 𝜎 ∥, the homography estimation error ∥Δ𝐻 ∥, and the magnitude of the optical flow ∥𝑣 𝑂𝐹 ∥. The first term reflects geometric amplification driven by the viewing angle between the vehicle facet and the image plane. The second term depends on the conditioning of the linear system used to solve for the homography. The third term shows that larger image motions linearly scale the propagation of homography errors into the final metric velocity. 
+
+Integrated System Pipeline 
+
+Building upon the theoretical framework established in the previous section, the architecture of the proposed integrated system is illustrated in Figure 3. The pipeline processes a sequence of video frames to simultaneously extract dense motion features and semantic vehicle attributes. For each incoming frame pair {𝐼 𝑘 , 𝐼 𝑘 +1}, a dense optical flow field F𝑘 is computed to capture pixel-level displacements. In parallel, a Multi-Object Tracking (MOT) module identifies, localizes and generate bounding boxes for each vehicle. Based on these bounding boxes, the image is cropped to generate vehicle-specific Regions of Interest (ROIs). This spatial isolation ensures that keypoints are detected exclusively within the context of the target vehicle, thereby minimizing background noise and enhancing the accuracy of the detection model. The core component of the proposed system is the Estimate Speed and Update Homography module, which integrates semantic keypoints, optical flow, and adaptive homography estimation for metric speed recovery. At each iteration, the module executes a three-step procedure: 1) Keypoint Detection and Classification: First, a specialized keypoint detection network iden-tifies semantic keypoints within the vehicle ROI and classifies them according to predefined vehicle facets (e.g., the left wheel center keypoint belongs to the left facet). 2) Speed Estimation: For each facet, the system retrieves the associated keypoints and con-Su, Li, Sengupta, and Kockelman 10 
+
+FIGURE 3 : Proposed System Architecture. structs the convex hull S𝑘 , employing the homography matrix H𝑘 established at the previous time step. Using the inter-frame time interval Δ𝑡 and the optical flow vectors, the metric speed for each point 𝑠 𝑖,𝑘 ∈ S 𝑘 is calculated via Equation 4. To determine the final vehicle speed, we aggregate the individual point speeds using an arithmetic mean. Note that more robust aggregation functions (e.g., RANSAC or median filtering) may be employed here to mitigate the influence of outliers. 3) Geometric Calibration (Homography Update): Finally, the homography matrix is updated for the next iteration. For any facet containing a sufficient number of valid keypoints (specif-ically, 𝑁 ≥ 4 non-collinear points), the homography is recomputed to account for changes in the vehicle’s perspective or road geometry. This recursive estimate-then-update strategy ensures that the metric scaling remains tightly coupled to the vehicle’s evolving perspective and distance. By continuously refining the homography matrices based on new keypoint detections, the system effectively resets accumulated tracking error for every frame in the sequence, mitigating drift over long tracking durations. It is important to note that this design introduces a deterministic one-frame latency, as the speed estimate for time step 𝑘 relies on the optical flow derived from the arrival of the subsequent frame 
+
+𝐼 𝑘 +1. While technically acausal with respect to the instantaneous frame 𝐼 𝑘 , this forward-looking dependency is inherent to dense optical flow algorithms, which require temporal displacement to compute motion. However, given the high temporal resolution of modern camera hardware, typically ≥ 30 frames per second (FPS), this results in a negligible latency of approximately 33 ms. This delay is well within the acceptable operational bounds for real-time applications such as traffic flow analysis and automated speed enforcement. 
+
+EXPERIMENT RESULT AND DISCCUSION 
+
+Experiments were conducted to evaluate the effectiveness of the proposed vehicle speed estimation framework. The evaluation focuses on the accuracy of the recovered vehicle speeds, the robustness of the proposed homography-based metric mapping, and the performance of the system under varying vehicle poses and camera viewpoints. A sedan model consisting of 36 semantic keypoints was used as the metric template, as shown in Figure 4. Each keypoint was assigned a 2D (image) coordinates in meters, assuming a wheelbase (horizontal) distance of 3 meters. The keypoint detection module was trained using the Ultralytics Su, Li, Sengupta, and Kockelman 11 YOLO framework with the YOLO-11s backbone (Jocher et al. 2026). The training dataset consists of 756 images for training and 247 images for validation, collected from the Waymo Open Dataset (Sun et al. 2020), Roundabout HD dataset (Lin et al. 2025), and BoxCar dataset (Sochor et al. 2018a). 
+
+FIGURE 4 : 36 semantic keypoints for the sedan are marked with blue circles (symmetric on the other side). Assuming a wheelbase of approximately 3 meters. Car graphics were adapted from Wikipedia. (842U 2010) The validation experiments were conducted using video sequences from the VS13 (resolution 1920 
+
+× 1080, 30FPS) (Djukanović et al. 2022) and BrnoCompSpeed datasets (resolution 1920 × 1080, 50FPS) (Sochor et al. 2018b), with total 443 video clips across 208 unique vehicles and speed ranging from 30 mph to 100 mph. None of these evaluation sequences were part of the keypoint detection model’s training data. The two datasets offer two different camera viewpoints: VS13 provides pedestrian-level angles of approaching traffic, while BrnoCompSpeed provides overhead surveillance views. This allows us to test the framework across different viewing geometries and motion profiles. Figure 5 shows sample processed frames from each dataset, with tracked cars marked by green bounding boxes and detected semantic keypoints highlighted as blue circles. We also compare two distinct speed estimation strategies: a Keypoint-only (KP) approach that tracks sparse semantic features, and our proposed Warped Optical Flow (OF) method, which leverages a keypoint-defined convex hull to achieve robust, dense spatial aggregation. All errors are presented as relative percentages for comparison across different speeds. 
+
+FIGURE 5 : Sample image from the VS13 dataset (left) and BrnoCompSpeed dataset (right), annotated using the speed estimation framework. Table 1 presents the overall accuracy of speed estimation in both datasets. For the VS13 dataset, the optical flow method achieves a Mean Absolute Error (MAE) of 15.0% with a median error of–6.0% and 77.9% of estimates within ±20% error, compared to the keypoint method which Su, Li, Sengupta, and Kockelman 12 
+
+TABLE 1 : Summary of speed estimation accuracy for VS13 and BrnoCompSpeed datasets. 
+
+Data Method Group N Med. MAE RMSE Thresholds 
+
+±5% ±10% ±20% >50% 
+
+VS13 KP All 4,317 -0.9% 20.8% 178.4% 46.7% 72.5% 87.6% 4.4% Sedan 2,055 -0.7% 24.3% 243.0% 46.0% 73.3% 89.7% 3.2% NoSed 2,262 -1.0% 17.7% 84.2% 47.3% 71.7% 85.7% 5.6% OF All 4,578 -6.0% 15.0% 53.5% 37.3% 58.8% 77.9% 5.3% Sedan 2,195 -6.1% 14.3% 22.1% 35.4% 56.8% 76.1% 4.8% NoSed 2,383 -6.0% 15.6% 71.1% 39.1% 60.7% 79.6% 5.7% BC KP All 17,085 6.5% 12.8% 46.9% 28.3% 54.3% 87.9% 1.2% Sedan 3,361 6.9% 11.1% 28.8% 32.0% 58.9% 89.0% 0.6% NoSed 13,724 6.3% 13.2% 50.4% 27.3% 53.1% 87.6% 1.3% OF All 17,600 3.0% 9.7% 66.1% 41.4% 70.6% 93.1% 1.0% Sedan 3,452 3.9% 11.0% 141.0% 47.5% 75.1% 93.9% 0.7% NoSed 14,148 2.7% 9.3% 24.2% 39.9% 69.5% 92.9% 1.0% 
+
+> Note: KP = Keypoints; OF = Optical Flow. Med. = Median; MAE = Mean Absolute Error; RMSE = Root Mean Square Error; N = Number of frames with valid estimation.
+
+(a) VS13 Keypoints (b) VS13 Optical Flow 
+
+(c) BrnoCompSpeed Keypoints (d) BrnoCompSpeed Optical Flow 
+
+FIGURE 6 : Error Percentage vs. Frame Index for VS13 and BrnoCompSpeed datasets Su, Li, Sengupta, and Kockelman 13 achieves an MAE of 20.8% with a median error of -0.9% and 87.6% within ±20%. Although the keypoint method achieves higher within-threshold accuracy, which is particularly relevant for speed limit enforcement, the optical flow method yields significantly lower MAE and RMSE, indicating more consistent and accurate estimates overall. For the BrnoCompSpeed dataset, both methods perform significantly better, with optical flow achieving an MAE of 9.7% and 93.1% within ±20%, compared to 12.8% MAE and 87.9% within ±20% for the keypoint method. The optical flow method consistently outperforms the keypoint approach across all metrics on this dataset. Across both datasets, optical flow demonstrates higher within-threshold accuracy. Performance differences between sedans and non-sedans are very small, with sedans generally achieving slightly lower MAE with optical flow, likely due to the dataset being more trained on sedans. To investigate the temporal behavior of estimation errors, the error percentage was analyzed as a function of the normalized frame index. Specifically, frame indices were scaled to a range of 0 to 1 based on the first and last frames containing a valid speed estimation. Figure 6 displays heatmaps of error percentage versus normalized frame index for both methods and datasets. The heatmaps indicate that errors were significantly higher at the beginning and the end of each video sequence, when vehicles were either too far from the camera—resulting in a small pixel footprint—or too close, partially leaving the frame and making feature tracking unreliable. This directly increased homography estimation error. Furthermore, the OF method became particularly unstable at extreme vehicle-to-camera distances. This vulnerability is more obvious in the VS13 scenario where vehicles move directly toward the camera, resulting in dramatic scale changes. Consequently, OF exhibits a much wider error spread in Figure 6(b) compared to BrnoCompSpeed, where the camera is positioned overhead and the relative distance change remains minimal across the frames. To mitigate the effects of unreliable detections at the very first and last frame, a 10% trim was applied to each tail of the error distribution. Table 2 summarizes the results after this trimming. For the VS13 dataset, the keypoint method’s MAE improved from 20.8% to 14.3%, while its within ±20% accuracy increased from 87.6% to 94.0%. The optical flow method also improved from 15.0% to 11.7% in MAE, with within ±20% rising from 77.9% to 85.3%. In terms of the BrnoCompSpeed dataset, the optical flow method’s MAE dropped from 9.7% to 7.6%, and the keypoint method’s MAE dropped from 12.8% to 11.4%. The trimming also significantly reduced outlier rates. For example, for the VS13 dataset, the keypoint method’s outlier rate decreased from 4.4% to 2.1%, while the optical flow method’s outlier rate decreases from 5.3% to 2.3%. Both method also showed enhanced performance on BrnoCompSpeed dataset after trimming. Figure 7 compares the speed estimation errors across different methods and datasets, with ground truth speeds ranging from 20 to 70 mph. The most accurate estimations occur in the 40 to 60 mph speed range, where both optical flow-based methods achieve errors below 5%. In contrast, estimation errors are largest at low speeds (20 to 30 mph), particularly for keypoint-based methods, where errors exceed 20%, possibly due to increased sensitivity to noise. 
+
+CONCLUSION 
+
+This paper demonstrates that monocular camera-based vehicle speed estimation can be effectively achieved using a vehicle metric template, a lightweight vehicle keypoint detection module, and Su, Li, Sengupta, and Kockelman 14 a homography technique. Crucially, the proposed method operates without requiring camera calibration (intrinsic or extrinsic) or pre-existing roadway features, relying only on a relatively stationary camera view. The approach achieves reliable and accurate speed estimation, with 87 .6% and 87 .9% of estimates falling within the ±20% error threshold across the evaluated datasets, demonstrating its effectiveness under diverse viewpoints and driving conditions. 
+
+TABLE 2 : Summary of speed estimation accuracy for VS13 and BrnoCompSpeed datasets with 10% trimming. 
+
+Data Method Group N Med. MAE RMSE Thresholds 
+
+±5% ±10% ±20% >50% 
+
+VS13 KP All 3,334 -1.2% 14.3% 170.6% 54.0% 81.0% 94.0% 2.1% Sedan 1,584 -1.2% 18.5% 240.9% 52.0% 79.9% 94.1% 1.8% NoSed 1,750 -1.3% 10.5% 54.1% 55.7% 82.0% 93.9% 2.3% OF All 3,555 -5.1% 11.7% 57.4% 43.0% 66.2% 85.3% 2.3% Sedan 1,692 -5.4% 11.6% 17.7% 40.1% 62.4% 81.7% 2.4% NoSed 1,863 -4.8% 11.7% 77.4% 45.6% 69.7% 88.5% 2.1% BC KP All 13,822 6.0% 11.4% 28.4% 28.5% 55.0% 89.4% 0.6% Sedan 2,738 6.8% 9.5% 11.9% 32.8% 60.3% 90.8% 0.0% NoSed 11,084 5.7% 11.8% 31.2% 27.4% 53.6% 89.1% 0.8% OF All 14,198 2.3% 7.6% 11.4% 43.9% 73.9% 95.4% 0.5% Sedan 2,794 3.4% 6.5% 8.9% 50.9% 79.1% 96.7% 0.1% NoSed 11,404 1.9% 7.9% 12.0% 42.2% 72.7% 95.1% 0.6% 
+
+> Note: KP = Keypoints; OF = Optical Flow. Med. = Median; MAE = Mean Absolute Error; RMSE = Root Mean Square Error; N = Number of frames with valid estimation.
+
+Su, Li, Sengupta, and Kockelman 15   
+
+> (a) VS13 Keypoints (b) VS13 Optical Flow
+> (c) BrnoCompSpeed Keypoints (d) BrnoCompSpeed Optical Flow
+
+FIGURE 7 : Error Percentage vs. Speed for VS13 and BrnoCompSpeed datasets Experimental results also indicate that correspondence computation via the proposed warped optical flow method is more reliable and robust against outliers. In contrast, purely keypoint-based correspondence can offer high peak accuracy but remains sensitive to keypoint detection jitter. Additionally, this work has significant practical implications for traffic enforcement and public safety. Unlike traditional speed measurement systems that rely on roadway features, the proposed method is deployable and cost-effective. This facilitates citizen-based enforcement, where the public can use portable devices, such as dashcams or smartphones, to document speeding events (Li et al. 2025). Nowadays, many cities have piloted citizen-based enforcement programs. For example, New York City has empowered citizens to enforce diesel-truck idling laws by submitting video evidence; those who provide at least three minutes of footage receive 25% of any fine collected, amounting to about $87.50 per violation (Hollis 2026). As vision-based enforcement becomes increasingly popular due to budget constraints and the rapid growth of camera-equipped devices, the proposed approach delivers a solution that can complement existing enforcement mechanisms while reducing the cost of camera installation. However, the current implementation has certain limitations. It relies on a generalized sedan metric template, which can introduce minor errors due to keypoint detection inaccuracies and homography transformations. Although experiments show that the framework maintains decent accuracy on non-sedan vehicles, future work will focus on expanding the template library to include diverse vehicle classes and geometries. Additionally, while the warped optical flow approach mitigates individual Su, Li, Sengupta, and Kockelman 16 outliers, achieving even higher accuracy will likely require more robust and reliable correspondence tracking methods to handle challenging conditions such as illumination changes or vehicles in close proximity to the camera. 
+
+ACKNOWLEDGMENTS 
+
+The authors thank Helena Chandy for her valuable insights and edits. 
+
+DECLARATION OF CONFLICTING INTERESTS 
+
+All authors declare no potential conflicts of interest with respect to the research, authorship, and publication of this article. Su, Li, Sengupta, and Kockelman 17 
+
+REFERENCES 
+
+Sadeghi-Bazargani, H. and M. Saadati, Speed management strategies; a systematic review. Bulletin of Emergency & Trauma , Vol. 4, No. 3, 2016, p. 126. Shin, K., S. P. Washington, and I. van Schalkwyk, Evaluation of the Scottsdale Loop 101 automated speed enforcement demonstration program. Accident Analysis & Prevention , Vol. 41, No. 3, 2009, pp. 393–403. Sangsuwan, K. and M. Ekpanyapong, Video-based vehicle speed estimation using speed measure-ment metrics. IEEE Access , Vol. 12, 2024, pp. 4845–4858. Odat, E., J. S. Shamma, and C. Claudel, Vehicle classification and speed estimation using combined passive infrared/ultrasonic sensors. IEEE transactions on intelligent transportation systems ,Vol. 19, No. 5, 2017, pp. 1593–1606. Martin, P. T., Y. Feng, X. Wang, et al., Detector technology evaluation . Mountain-Plains Consortium Fargo, ND, USA, 2003. Webb, C., The Economics of Inductive Loops vs. Radar Traffic Detection , 2020, accessed: 2026-01-04. Javadi, S., M. Dahl, and M. I. Pettersson, Vehicle speed measurement model for video-based systems. Computers & electrical engineering , Vol. 76, 2019, pp. 238–248. Hovhannisyan, T., Active vs Passive Sensing: Is One Better Than the Other? , 2021, updated: Aug. 2, 2023; Jul. 22, 2024. Accessed: 2026-01-05. Martínez, A. H., I. G. Daza, C. F. López, and D. F. Llorca, Digital twins to alleviate the need for real field data in vision-based vehicle speed detection systems. In 2024 IEEE 27th International Conference on Intelligent Transportation Systems (ITSC) , IEEE, 2024, pp. 2536–2541. Zhang, Y., Z. Guo, J. Wu, Y. Tian, H. Tang, and X. Guo, Real-time vehicle detection based on improved yolo v5. Sustainability , Vol. 14, No. 19, 2022, p. 12274. Zuraimi, M. A. B. and F. H. K. Zaman, Vehicle detection and tracking using YOLO and DeepSORT. In 2021 IEEE 11th IEEE symposium on computer applications & industrial electronics (ISCAIE) , IEEE, 2021, pp. 23–29. Maity, M., S. Banerjee, and S. S. Chaudhuri, Faster r-cnn and yolo based vehicle detection: A survey. In 2021 5th international conference on computing methodologies and communication (ICCMC) , IEEE, 2021, pp. 1442–1447. Xu, Z., W. Yang, A. Meng, N. Lu, H. Huang, C. Ying, and L. Huang, Towards end-to-end license plate detection and recognition: A large dataset and baseline. In Proceedings of the European conference on computer vision (ECCV) , 2018, pp. 255–271. Montazzolli, S. and C. Jung, Real-time brazilian license plate detection and recognition using deep convolutional neural networks. In 2017 30th SIBGRAPI conference on graphics, patterns and images (SIBGRAPI) , IEEE, 2017, pp. 55–62. Parsa, P., K. Li, K. M. Kockelman, and S. Choi, Video-based Vehicle Surveillance in the Wild: License Plate, Make, and Model Recognition with Self Reflective Vision-Language Models. 
+
+arXiv preprint arXiv:2508.01387 , 2025. Hua, S., M. Kapoor, and D. C. Anastasiu, Vehicle tracking and speed estimation from traffic videos. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops , 2018, pp. 153–160. Liu, C., D. Q. Huynh, Y. Sun, M. Reynolds, and S. Atkinson, A vision-based pipeline for vehicle Su, Li, Sengupta, and Kockelman 18 counting, speed estimation, and classification. IEEE transactions on intelligent transporta-tion systems , Vol. 22, No. 12, 2020, pp. 7547–7560. Lu, X., J. Yaoy, H. Li, Y. Liu, and X. Zhang, 2-line exhaustive searching for real-time vanishing point estimation in manhattan world. In 2017 IEEE Winter Conference on Applications of Computer Vision (WACV) , IEEE, 2017, pp. 345–353. Kim, J.-H., W.-T. Oh, J.-H. Choi, and J.-C. Park, Reliability verification of vehicle speed estimate method in forensic videos. Forensic science international , Vol. 287, 2018, pp. 195–206. Chang, C.-K., J. Zhao, and L. Itti, Deepvp: Deep learning for vanishing point detection on 1 million street view images. In 2018 IEEE International Conference on Robotics and Automation (ICRA) , IEEE, 2018, pp. 4496–4503. Li, K., J. Malagavalli, L. Goel, T. Wang, and K. Kockelman, Smartphone-based Method for Automated Speed Enforcement. In 2025 Transportation Research Board Annual Meeting, National Academy of Sciences , 2025. Gunawan, A. A., D. A. Tanjung, and F. E. Gunawan, Detection of vehicle position and speed using camera calibration and image projection methods. Procedia Computer Science , Vol. 157, 2019, pp. 255–265. Abdel-Aziz, Y. I., H. M. Karara, and M. Hauck, Direct linear transformation from comparator coordinates into object space coordinates in close-range photogrammetry. Photogrammetric engineering & remote sensing , Vol. 81, No. 2, 2015, pp. 103–107. Zhang, Z., Camera calibration. In Computer vision: a reference guide , Springer, 2021, pp. 130–131. Weng, J., P. Cohen, M. Herniou, et al., Camera calibration with distortion models and accuracy evaluation. IEEE Transactions on pattern analysis and machine intelligence , Vol. 14, No. 10, 1992, pp. 965–980. Feng, C., F. Deng, and V. R. Kamat, Semi-automatic 3d reconstruction of piecewise planar building models from single image. CONVR (Sendai:) , Vol. 2, No. 5, 2010, p. 6. Barinova, O., V. Lempitsky, E. Tretiak, and P. Kohli, Geometric image parsing in man-made environments. In European conference on computer vision , Springer, 2010, pp. 57–70. Collins, R. T. and R. S. Weiss, Vanishing point calculation as a statistical inference on the unit sphere. In ICCV , 1990, Vol. 90, pp. 400–403. Song, J., H. Song, and S. Wang, PTZ camera calibration based on improved DLT transformation model and vanishing Point constraints. Optik , Vol. 225, 2021, p. 165875. Zhai, M., S. Workman, and N. Jacobs, Detecting vanishing points using global image context in a non-manhattan world. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2016, pp. 5657–5665. Rani, N. G., N. H. Priya, A. Ahilan, and N. Muthukumaran, LV-YOLO: logistic vehicle speed detection and counting using deep learning based YOLO network. Signal, Image and Video Processing , Vol. 18, No. 10, 2024, pp. 7419–7429. Hartley, R. and A. Zisserman, Multiple view geometry in computer vision . Cambridge university press, 2003. Djukanović, S., N. Bulatović, and I. Čavor, A dataset for audio-video based vehicle speed estimation. In 2022 30th Telecommunications Forum (TELFOR) , IEEE, 2022, pp. 1–4. Fischler, M. A. and R. C. Bolles, Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography. Communications of the ACM ,Vol. 24, No. 6, 1981, pp. 381–395. Su, Li, Sengupta, and Kockelman 19 Jocher, G., J. Qiu, M. Liu, S. Lyu, F. C. Akyon, and M. E. Kalfaoglu, Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models, 2026. Sun, P., H. Kretzschmar, X. Dotiwalla, A. Chouard, V. Patnaik, P. Tsui, J. Guo, Y. Zhou, Y. Chai, B. Caine, et al., Scalability in perception for autonomous driving: Waymo open dataset. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2020, pp. 2446–2454. Lin, Y., S. Lockyer, M. Sui, L. Gan, F. Stanek, M. Zarbock, W. Li, A. Evans, and N. Zhang, RoundaboutHD: High-Resolution Real-World Urban Environment Benchmark for Multi-Camera Vehicle Tracking. arXiv preprint arXiv:2507.08729 , 2025. Sochor, J., J. Špaňhel, and A. Herout, Boxcars: Improving fine-grained recognition of vehicles using 3-d bounding boxes in traffic surveillance. IEEE transactions on intelligent transportation systems , Vol. 20, No. 1, 2018a, pp. 97–108. 842U, Three body styles with pillars and boxes.png. Wikimedia Commons. https:// commons. wikimedia.org/ wiki/File:Three_body_styles_with_pillars_and_boxes.png. Accessed: 2026-07-29 , 2010. Sochor, J., R. Juránek, J. Špaňhel, L. Maršík, A. Širok` y, A. Herout, and P. Zemčík, Comprehensive data set for automatic single camera visual speed measurement. IEEE Transactions on Intelligent Transportation Systems , Vol. 20, No. 5, 2018b, pp. 1633–1643. Hollis, D., Trucking association sues New York City over idling law, citizen videos. Truckers News ,2026, updated July 14, 2026.
