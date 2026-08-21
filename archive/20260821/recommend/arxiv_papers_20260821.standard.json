@@ -1,0 +1,330 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-21T20:52:53.951330+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 7,
+    "deep_cap": 8,
+    "deep_selected": 7,
+    "quick_candidates": 1,
+    "quick_skim_target": 13,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2608.19662v1",
+      "source": "arxiv",
+      "title": "ReCache: Efficient KV Cache Reuse and Compression for Tool-Augmented LLM Agents",
+      "abstract": "Agentic language models repeatedly encode tool and skill schemas that recur across requests in different combinations and orders, preventing standard prefix caching from reusing their key--value (KV) states. We introduce \\textbf{ReCache}, a framework for independently caching resource representations while reducing their inference-time computational and memory overhead. Resource-wise attention removes cross-resource interactions and assigns resource-local positions, producing composition-invariant KV blocks. ReCache then restricts resource visibility to contribution-selected layer--KV-head-group routes and retains only invocation-critical fields through structural and semantic pruning. We evaluate ReCache on a benchmark assembled from seven public tool- and skill-use datasets, including resource-disjoint tests. Resource-wise attention matches dense invocation performance (82.3\\% versus 82.4\\% Inv-F1) while providing a 3.655$\\times$ time-to-first-token speedup. The complete framework reduces allocated KV-tensor memory by 92.43\\% and accelerates attention by 1.423$\\times$. These results show that separating reusable schema encoding from selective resource access substantially reduces agentic inference costs with limited effectiveness loss. The code is available at https://github.com/EIT-NLP/ReCache.",
+      "authors": [
+        "Yichu Fang",
+        "Sitong Wei",
+        "Haozhe Hu",
+        "Xiaoyu Shen"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-20T05:57:24+00:00",
+      "link": "https://arxiv.org/pdf/2608.19662v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Efficient KV cache reuse and compression for tool-augmented LLM agents",
+      "llm_evidence_cn": "面向工具增强型LLM智能体的高效KV缓存复用与压缩",
+      "llm_evidence": "面向工具增强型LLM智能体的高效KV缓存复用与压缩",
+      "canonical_evidence": "面向工具增强型LLM智能体的高效KV缓存复用与压缩",
+      "llm_tldr_en": "ReCache independently caches composition-invariant KV blocks for tool schemas, restricts visibility via contribution-selected heads, and prunes invocation-critical fields, substantially cutting memory and computation in agentic inference.",
+      "llm_tldr_cn": "工具增强型LLM智能体会反复编码工具模式，传统前缀缓存难以复用其KV状态。ReCache提出资源级注意力，使KV块与资源组合顺序无关，并通过贡献选择限制层与注意力头可见性，以及结构化和语义剪枝保留关键字段，从而压缩推理时的内存与计算开销。在多个公开基准上的实验验证了该方法能显著提升工具调用型代理场景的KV缓存复用效率。",
+      "llm_tldr": "工具增强型LLM智能体会反复编码工具模式，传统前缀缓存难以复用其KV状态。ReCache提出资源级注意力，使KV块与资源组合顺序无关，并通过贡献选择限制层与注意力头可见性，以及结构化和语义剪枝保留关键字段，从而压缩推理时的内存与计算开销。在多个公开基准上的实验验证了该方法能显著提升工具调用型代理场景的KV缓存复用效率。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17826v1",
+      "source": "arxiv",
+      "title": "Bounded-State Restoration: Decoupling Local Restore Capacity from External LLM State",
+      "abstract": "Hierarchical KV-cache systems can retain long-context LLM execution state beyond GPU memory, but retention capacity does not determine the local memory required to make that state executable again. We isolate this second resource as the restoration working set (RWS): the peak local staging state whose lifetimes overlap during restoration. In the pinned upstream LMCache whole-plan path, measured full-reuse points for 1.956, 7.823, and 15.646 GiB/rank states first succeed at 2, 8, and 16 GiB L1 rungs, with successful L1 peaks of 1.956, 7.824, and 15.648 GiB/rank.   We introduce Bounded-State Restoration (BSR), which separates complete discovery from local residency. BSR probes the complete reusable prefix without materializing the whole hit in L1, then installs confirmed state through a reusable window of at most $W$ chunks. Under bounded auxiliary state, peak restoration capacity is $O(W)$ while total transfer and installation work remains $Θ(|S|)$. Because reusable state spans heterogeneous allocator groups and tensor-parallel ranks, BSR uses a request-level commit rule: partial installation is never exposed as a valid reusable prefix; failures invalidate the advertised prefix and fall back to a lower valid tier or deterministic recomputation.   On DeepSeek-V4-Flash with TP=2 across two DGX Spark nodes, a clean no-resume sweep grows external state from 1.956 to 31.277 GiB/rank while measured L1 RWS remains exactly 500.75 MiB/rank at $W=32$, a 63.959x largest-state external-to-live-staging ratio. A second fresh 524K-token run repeats the largest-state acceptance result. Evaluated tier and rank-asymmetric failures expose either complete reuse or zero external reuse before fallback. A matched SSD optimization reduces 512K restore TTFT from 43.1 to 17.6 seconds without changing RWS.",
+      "authors": [
+        "Zixuan Li"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC"
+      ],
+      "published": "2026-08-18T14:26:15+00:00",
+      "link": "https://arxiv.org/pdf/2608.17826v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache management and bounded restoration for long-context LLM execution",
+      "llm_evidence_cn": "面向长上下文大模型执行的KV缓存管理与有界恢复",
+      "llm_evidence": "面向长上下文大模型执行的KV缓存管理与有界恢复",
+      "canonical_evidence": "面向长上下文大模型执行的KV缓存管理与有界恢复",
+      "llm_tldr_en": "Introduces restoration working set (RWS) and Bounded-State Restoration (BSR) to decouple local restore capacity from external LLM state, enabling more efficient hierarchical KV-cache restoration.",
+      "llm_tldr_cn": "层次化KV缓存系统可以在GPU内存之外保留长上下文LLM执行状态，但保留容量并不决定本地可执行所需内存。论文将恢复工作集RWS确定为恢复期间生命周期重叠的本地暂存状态峰值，并提出有界状态恢复BSR，将完整发现与本地驻留分离。BSR无需物化全部命中即可探测完整可复用前缀，从而降低恢复所需本地内存。测量表明该方案在不同状态规模下均能成功恢复，提升长上下文推理可用性。",
+      "llm_tldr": "层次化KV缓存系统可以在GPU内存之外保留长上下文LLM执行状态，但保留容量并不决定本地可执行所需内存。论文将恢复工作集RWS确定为恢复期间生命周期重叠的本地暂存状态峰值，并提出有界状态恢复BSR，将完整发现与本地驻留分离。BSR无需物化全部命中即可探测完整可复用前缀，从而降低恢复所需本地内存。测量表明该方案在不同状态规模下均能成功恢复，提升长上下文推理可用性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.19285v1",
+      "source": "arxiv",
+      "title": "Clustering and Token Denoising for Faster and More Robust VLMs",
+      "abstract": "Recent Visual-Language Models (VLMs) have enhanced the capabilities of pre-trained LLMs by adding vision tokens alongside text, with approaches like LLaVA showing impressive results. However, the computational burden of processing up to 576 or 729 visual tokens makes edge deployment challenging. While various token pruning techniques require retraining, some are training-free and thus can easily adapt to architecture changes. We introduce ClustRS, a two-part, training-free algorithm for robust token pruning. Its first component is an attention-weighted, clustering algorithm that selects representative tokens from each semantic cluster. The second component, Residual Shrinkage, is a one-pass denoising step on the selected tokens. These training-free lightweight steps make LLaVA ready for real-world data, improving robustness to a wide range of image-noise types and intensities. Experimental results on the ScienceQA-IMG and MM-VET benchmarks show our method outperforms attention- and diversity-based methods by up to 20\\% under extreme noise and token conditions (reducing tokens by 97\\%, down to 16 tokens) on LLaVA 1.5 7b and achieves exceptional results on LLaVA-OneVision, where we match baseline performance with fewer than one-third of their tokens under mild noise conditions. Our study demonstrates a simple yet powerful alternative to both score-only and diversity-only pruning rules, paving the way for compute-efficient and noise-resilient VLM deployment.",
+      "authors": [
+        "Baptiste Rossigneux",
+        "Inna Kucher",
+        "Vincent Lorrain",
+        "Emmanuel Casseau"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-19T11:20:26+00:00",
+      "link": "https://arxiv.org/pdf/2608.19285v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Training-free token pruning for VLMs via clustering and residual shrinkage",
+      "llm_evidence_cn": "通过聚类与残差收缩实现VLM的免训练Token剪枝",
+      "llm_evidence": "通过聚类与残差收缩实现VLM的免训练Token剪枝",
+      "canonical_evidence": "通过聚类与残差收缩实现VLM的免训练Token剪枝",
+      "llm_tldr_en": "Introduces ClustRS, a training-free algorithm that prunes visual tokens in VLMs via attention-weighted clustering and residual shrinkage denoising, improving speed and robustness.",
+      "llm_tldr_cn": "针对VLM如LLaVA中数百个视觉Token导致边缘部署计算负担大的问题，本文提出免训练的ClustRS算法，先利用注意力加权聚类从各语义簇中选取代表性Token，再通过残差收缩单遍去噪，显著降低视觉Token数量。该方法无需重训练即可适应架构变化，在保持模型鲁棒性的同时提升推理速度，为VLM边缘部署提供了轻量高效的Token剪枝方案。",
+      "llm_tldr": "针对VLM如LLaVA中数百个视觉Token导致边缘部署计算负担大的问题，本文提出免训练的ClustRS算法，先利用注意力加权聚类从各语义簇中选取代表性Token，再通过残差收缩单遍去噪，显著降低视觉Token数量。该方法无需重训练即可适应架构变化，在保持模型鲁棒性的同时提升推理速度，为VLM边缘部署提供了轻量高效的Token剪枝方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.19891v1",
+      "source": "arxiv",
+      "title": "EXIMO: VLM Guided Exploration of VLA Policies",
+      "abstract": "How to efficiently finetune robot policies to learn new tasks on the fly? State of the art robotic manipulation policies are based on behaviour cloning of large vision-language-action (VLA) models with billions of parameters on huge teleoperation datasets. While this simple approach has enabled significant advances for robotic manipulation, finetuning of VLA policies for learning new tasks still remains an open problem. In particular, collecting teleoperation datasets requires hundreds of hours of expensive human labour and the alternative, reinforcement learning (RL), can be notoriously sample-inefficient especially for long-horizon tasks. In addition, RL with VLAs imposes several challenges due to the model's size and architectural design. In this work, we propose EXIMO, an efficient algorithm for finetuning of VLA policies. EXIMO operates in three stages: explore, imitate, and optimize. During the explore phase, EXIMO equips the VLA with a vision language model (VLM) that acts as a planner. The VLM thinks and breaks down challenging long-horizon problems into shorter ones for the VLA. The VLM, together with the VLA, is used to collect an orchestrated dataset on new tasks. During the imitate phase, the VLA is finetuned with the orchestrated data. Finally, during the optimize stage, we use residual off-policy RL to further finetune the policy. In our experiments, we ablate all three stages of EXIMO and show that it outperforms existing approaches significantly in terms of sample-efficiency and final performance.",
+      "authors": [
+        "Bhavya Sukhija",
+        "Oliver Groth",
+        "Mohit Shridhar",
+        "Tim Hertweck",
+        "Michael Bloesch",
+        "Markus Wulfmeier",
+        "Abbas Abdolmaleki",
+        "Martin Riedmiller"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-20T10:58:45+00:00",
+      "link": "https://arxiv.org/pdf/2608.19891v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Efficient finetuning/exploration of large VLA policies for robotics, directly matches efficient vision-language-action models for robotics.",
+      "llm_evidence_cn": "面向机器人VLA策略的高效微调与探索，直接匹配高效视觉-语言-动作模型需求。",
+      "llm_evidence": "面向机器人VLA策略的高效微调与探索，直接匹配高效视觉-语言-动作模型需求。",
+      "canonical_evidence": "面向机器人VLA策略的高效微调与探索，直接匹配高效视觉-语言-动作模型需求。",
+      "llm_tldr_en": "EXIMO targets the costly finetuning of large VLA robot policies, using a VLM to guide exploration and reduce teleoperation data needs, enabling more efficient learning of new manipulation tasks.",
+      "llm_tldr_cn": "大规模视觉-语言-动作（VLA）策略微调新任务需要大量人工遥操作数据，强化学习又往往样本效率低下。EXIMO提出利用视觉-语言模型引导策略探索，在保持VLA模型规模优势的同时降低新任务微调开销。该方法面向机器人操作场景，可减少对昂贵数据集的依赖，提升策略学习效率。相关工作为低成本、可扩展的机器人技能学习提供了新途径。",
+      "llm_tldr": "大规模视觉-语言-动作（VLA）策略微调新任务需要大量人工遥操作数据，强化学习又往往样本效率低下。EXIMO提出利用视觉-语言模型引导策略探索，在保持VLA模型规模优势的同时降低新任务微调开销。该方法面向机器人操作场景，可减少对昂贵数据集的依赖，提升策略学习效率。相关工作为低成本、可扩展的机器人技能学习提供了新途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.19920v1",
+      "source": "arxiv",
+      "title": "Learning how to Forget: Fine-tuning for Long-Context Sparse Attention",
+      "abstract": "A lot of prior work addressed key-value (KV) cache selection and compression by sparse attention to enable long-context inference for transformer language models without excessive hardware budgets. We provide a new method for fine-tuning models with sparse attention. It works for any KV cache policy, runs on a moderate hardware budget (e.g., a single Nvidia A100 GPU with 40 GB RAM), and allows the model to co-adapt with the policy, often outperforming models trained with exact attention (sequence parallelism). We also provide an efficient implementation of H2O sparse attention (the leading policy in our experiments) with dedicated scaled dot product attention kernel support. KeysAndValues (https://github.com/awslabs/keys_values), a new open source library for long-context inference and fine-tuning, provides easy-to-use and performant code for all methods discussed here.",
+      "authors": [
+        "Matthias Seeger",
+        "Zeyu Zhang",
+        "Vihang Patil",
+        "Konstantinos Benidis",
+        "Sebastian Schelter"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-20T11:37:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.19920v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression and sparse attention fine-tuning for efficient long-context inference.",
+      "llm_evidence_cn": "KV缓存压缩与稀疏注意力微调，实现高效长上下文推理。",
+      "llm_evidence": "KV缓存压缩与稀疏注意力微调，实现高效长上下文推理。",
+      "canonical_evidence": "KV缓存压缩与稀疏注意力微调，实现高效长上下文推理。",
+      "llm_tldr_en": "Presents a fine-tuning method for sparse attention that co-adapts with any KV cache policy, often outperforming exact attention training while running on moderate hardware, plus an efficient H2O sparse attention implementation.",
+      "llm_tldr_cn": "为在有限硬件下支持Transformer长上下文推理，本文提出一种适用于任意KV缓存策略的稀疏注意力微调方法。该方法能在单个A100等中等硬件上运行，让模型与策略协同适应，通常优于使用精确注意力训练的模型。同时提供了H2O稀疏注意力的高效kernel实现和开源的KeysAndValues库。这一方法大幅降低了长上下文推断的资源开销，推进了KV缓存管理与压缩的实用化。",
+      "llm_tldr": "为在有限硬件下支持Transformer长上下文推理，本文提出一种适用于任意KV缓存策略的稀疏注意力微调方法。该方法能在单个A100等中等硬件上运行，让模型与策略协同适应，通常优于使用精确注意力训练的模型。同时提供了H2O稀疏注意力的高效kernel实现和开源的KeysAndValues库。这一方法大幅降低了长上下文推断的资源开销，推进了KV缓存管理与压缩的实用化。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.19589v1",
+      "source": "arxiv",
+      "title": "OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation",
+      "abstract": "Pretrained Vision-Language-Action models provide a strong foundation for robot learning, but sequentially adapting them to diverse skills can perturb the representations and velocity mappings used by previous skills, leading to catastrophic forgetting. Architecture-based approaches improve retention by isolating skills but lead to increased inference footprint. Recent subspace-constrained methods restrict parameter updates in an orthogonal subspace to minimize interference but impose a unified constraint on the entire model. We analyze the distinct roles of internal VLA components and identify two VLA-specific challenges. First, the VLM maintains broad semantic representations, making it vulnerable to capacity exhaustion, whereas the ActionHead refines semantics into localized velocity patterns that are highly sensitive to perturbations. Second, the final velocity decoder serves as a readout layer. Freezing it forms an output-stage expressivity bottleneck, while updating it risks overwriting previous velocity mappings. To this end, we propose OrthoSkillVLA, a parameter-efficient framework for continual skill learning in pretrained VLA models without demonstration replay. Given the representation heterogeneity, we impose separate subspace constraints on the VLM and ActionHead, preserving reusable semantic capacity while protecting localized velocity patterns. For the output layer, we introduce a lightweight feature-aware MoE decoder, where each skill is allocated a compact expert and a training-free router selects the expert according to feature-space affinity. Extensive simulated and real-world evaluations, together with ablations, demonstrate that OrthoSkillVLA better preserves prior skills while acquiring new ones.",
+      "authors": [
+        "Jiaqi Wang",
+        "Zhou Fang",
+        "Qiongfeng Shi",
+        "Yi Zhou"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-20T03:10:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.19589v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLA continual learning with efficient inference footprint via skill subspace adaptation",
+      "llm_evidence_cn": "通过技能子空间自适应提升VLA持续学习并避免推理开销增大",
+      "llm_evidence": "通过技能子空间自适应提升VLA持续学习并避免推理开销增大",
+      "canonical_evidence": "通过技能子空间自适应提升VLA持续学习并避免推理开销增大",
+      "llm_tldr_en": "OrthoSkillVLA addresses catastrophic forgetting in VLA models by gradient-informed skill subspace adaptation, avoiding increased inference footprint of architecture-based approaches.",
+      "llm_tldr_cn": "针对预训练视觉-语言-动作VLA模型在持续适应多技能时容易灾难性遗忘的问题，本文提出OrthoSkillVLA，利用梯度引导的技能子空间自适应来隔离不同技能的参数更新，在保留旧技能表征的同时控制推理开销。该方法分析VLM与动作组件的不同角色，避免统一约束带来的容量耗竭与干扰，在机器人技能学习中实现更稳定的持续演进。",
+      "llm_tldr": "针对预训练视觉-语言-动作VLA模型在持续适应多技能时容易灾难性遗忘的问题，本文提出OrthoSkillVLA，利用梯度引导的技能子空间自适应来隔离不同技能的参数更新，在保留旧技能表征的同时控制推理开销。该方法分析VLM与动作组件的不同角色，避免统一约束带来的容量耗竭与干扰，在机器人技能学习中实现更稳定的持续演进。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.20069v1",
+      "source": "arxiv",
+      "title": "V-REX: Efficient Specialist VLM Training for Veterinary X-Rays",
+      "abstract": "While generalist VLMs are expensive to train, creating domain experts is widely assumed to require fine-tuning increasingly large foundation models. We show that, in veterinary radiology, this assumption is misguided. By rethinking the entire VLM pipeline - from text tokenisation and pre-training to grounding and inference - we demonstrate that careful engineering can yield models that outperform much larger foundation models from scratch, without relying on any other data. Our approach introduces new strategies for generative pre-training and grounding that improve training efficiency, increasing data utilisation and downstream performance. Using only a fraction of the parameters, data, and compute of contemporary generalist models, we develop the first VLM capable of generating diagnostic reports for veterinary radiographs, surpassing open foundation models on this task by significant margin.",
+      "authors": [
+        "Tim Elsner",
+        "Nicole McNally",
+        "Andre Dourson",
+        "Michael Fitzke"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-20T14:02:59+00:00",
+      "link": "https://arxiv.org/pdf/2608.20069v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient specialist VLM training and inference pipeline",
+      "llm_evidence_cn": "高效专业视觉语言模型的训练与推理流程",
+      "llm_evidence": "高效专业视觉语言模型的训练与推理流程",
+      "canonical_evidence": "高效专业视觉语言模型的训练与推理流程",
+      "llm_tldr_en": "Shows careful engineering can build specialized VLMs that outperform much larger foundation models from scratch, covering tokenisation, pre-training, grounding and inference.",
+      "llm_tldr_cn": "该论文指出通用视觉语言模型训练昂贵且需要大型基础模型微调。作者重新设计整个视觉语言模型流水线，从文本分词、预训练到接地和推理，在兽医学X光领域用更少的参数、数据和计算训练出超越更大基础模型的专家模型。其策略提高了训练效率和下游性能，为领域专用视觉语言模型的高效构建提供了新思路。",
+      "llm_tldr": "该论文指出通用视觉语言模型训练昂贵且需要大型基础模型微调。作者重新设计整个视觉语言模型流水线，从文本分词、预训练到接地和推理，在兽医学X光领域用更少的参数、数据和计算训练出超越更大基础模型的专家模型。其策略提高了训练效率和下游性能，为领域专用视觉语言模型的高效构建提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.18979v1",
+      "source": "arxiv",
+      "title": "When Simplicity Wins: Bottleneck-Aware Context Modeling for Lightweight Semantic Segmentation",
+      "abstract": "Semantic segmentation demands a careful balance between accuracy, efficiency, and scalability, which remains difficult to achieve for high-resolution imagery. Convolutional networks effectively model local patterns but struggle with long-range dependencies, whereas Vision Transformers capture global context at a high computational cost. While recent work largely focuses on encoder design, the bottleneck stage, central to contextual aggregation and information flow, has been relatively overlooked. We propose SiConMo, a lightweight yet effective framework, implemented in two variants: an RGB-only model (SiConMo) and a GME-enhanced variant (SiConMo$_\\dagger$). We show that simplicity arises from a key design principle: at very low computational budgets, the bottleneck is the most efficient stage to integrate local and global context. SiConMo integrates three complementary components: a Token Pyramid Extraction Module for hierarchical multi-scale representation, a Transformer-Branched Depthwise Convolution block for bottleneck-aware context modeling, and a Feature Merging Module that preserves spatial structure while enhancing semantic consistency. Extensive experiments on ADE20K, PASCAL Context, Cityscapes, and COCO-Stuff demonstrate that SiConMo achieves a state-of-the-art accuracy-efficiency trade-off among lightweight semantic segmentation models, highlighting simplicity as a powerful design principle.",
+      "authors": [
+        "Mian Muhammad Naeem Abid",
+        "Nancy Mehta",
+        "Zongwei Wu",
+        "Radu Timofte"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-19T14:47:07+00:00",
+      "link": "https://arxiv.org/pdf/2608.18979v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Lightweight semantic segmentation method with bottleneck-aware context modeling, applicable to traffic scene perception.",
+      "llm_evidence_cn": "轻量语义分割方法，瓶颈感知上下文建模，可应用于交通场景感知。",
+      "llm_evidence": "轻量语义分割方法，瓶颈感知上下文建模，可应用于交通场景感知。",
+      "canonical_evidence": "轻量语义分割方法，瓶颈感知上下文建模，可应用于交通场景感知。",
+      "llm_tldr_en": "SiConMo proposes a lightweight semantic segmentation framework that emphasizes bottleneck-aware context modeling, enabling efficient global context capture at very low computational cost, suitable for resource-limited perception tasks.",
+      "llm_tldr_cn": "高分辨率语义分割需要在精度、效率和可扩展性之间平衡，现有方法多关注编码器而忽略瓶颈阶段的上下文聚合。本文提出SiConMo轻量框架，通过瓶颈感知的上下文建模和GME增强变体，在极低计算开销下改善全局依赖建模。实验证明，该设计在低成本下取得了有竞争力的分割性能，并为资源受限场景（如交通场景理解）提供了高效的解决方案。",
+      "llm_tldr": "高分辨率语义分割需要在精度、效率和可扩展性之间平衡，现有方法多关注编码器而忽略瓶颈阶段的上下文聚合。本文提出SiConMo轻量框架，通过瓶颈感知的上下文建模和GME增强变体，在极低计算开销下改善全局依赖建模。实验证明，该设计在低成本下取得了有竞争力的分割性能，并为资源受限场景（如交通场景理解）提供了高效的解决方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
