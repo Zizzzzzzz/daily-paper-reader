@@ -1,0 +1,371 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-22T20:41:22.884629+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 5,
+    "deep_cap": 8,
+    "deep_selected": 5,
+    "quick_candidates": 3,
+    "quick_skim_target": 13,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2608.15533v1",
+      "source": "arxiv",
+      "title": "DeltaLog: Deferred Materialization of Recurrent States for Linear Attention Decoding",
+      "abstract": "Linear attention models eliminate the quadratic prefix computation and context-growing KV cache of softmax attention by replacing pairwise token interactions with recurrent state updates. However, existing decoding implementations often materialize and write back the full recurrent state after every generated token, making state maintenance a major source of memory traffic, especially for models with large states and many heads. This paper presents DeltaLog, a recurrent-state decoding scheme that reduces this overhead without changing the model semantics. Specifically, DeltaLog represents the recurrent state as a dense base state together with a bounded log of recent compact updates. Most decode steps append only compact update factors to this log, while periodic merge steps fold the accumulated updates back into the dense base state. Thus, the model observes the same dense state as in eager decoding, but most full-state write-backs are replaced by lightweight append operations. We implement DeltaLog for GDN, KDA, and RWKV6 and integrate it into a prototype serving stack. Across these models, DeltaLog accelerates the recurrent-state update kernel by up to $1.86\\times$, reduces profiled recurrent-state write traffic by up to $7.83\\times$, and achieves $1.05$--$1.20\\times$ end-to-end serving speedups over dense recurrent baselines.",
+      "authors": [
+        "Junqing Lin",
+        "Jingwei Sun",
+        "Guangzhong Sun"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC",
+        "cs.LG"
+      ],
+      "published": "2026-08-16T05:04:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.15533v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Defers materialization of recurrent states to reduce memory traffic for linear attention decoding, related to KV cache/state management",
+      "llm_evidence_cn": "延迟物化循环状态以减少线性注意力解码的内存流量，与KV缓存/状态管理相关",
+      "llm_evidence": "延迟物化循环状态以减少线性注意力解码的内存流量，与KV缓存/状态管理相关",
+      "canonical_evidence": "延迟物化循环状态以减少线性注意力解码的内存流量，与KV缓存/状态管理相关",
+      "llm_tldr_en": "DeltaLog reduces recurrent-state memory traffic in linear attention decoding by representing the state as a dense base plus a bounded log of compact updates, deferring materialization to most decode steps without changing model semantics.",
+      "llm_tldr_cn": "本文针对线性注意力模型解码时每次生成后需完整读写循环状态、导致内存流量大的问题，提出DeltaLog方案。DeltaLog将循环状态表示为稠密基态与近期紧凑更新的有界日志，大多数解码步骤仅追加紧凑更新因子，只在必要时延迟物化完整状态。该方法在不改变模型语义的前提下显著降低内存访问开销，为长上下文高效推断提供了新的状态管理思路。",
+      "llm_tldr": "本文针对线性注意力模型解码时每次生成后需完整读写循环状态、导致内存流量大的问题，提出DeltaLog方案。DeltaLog将循环状态表示为稠密基态与近期紧凑更新的有界日志，大多数解码步骤仅追加紧凑更新因子，只在必要时延迟物化完整状态。该方法在不改变模型语义的前提下显著降低内存访问开销，为长上下文高效推断提供了新的状态管理思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17095v1",
+      "source": "arxiv",
+      "title": "Inference-Time Attention Steering for Vision-Language-Action Driving Models",
+      "abstract": "Vision-language-action (VLA) driving models couple a reasoning stage with a diffusion-based trajectory decoder, but do not give a direct way to redirect attention toward safety-critical actors at inference time without retraining. We studied a bounded additive pre-softmax attention bias on the visual tokens of detector localized traffic actors on Alpamayo-R1's Qwen3-VL backbone. It is applied as a fail open forward pre-hook with no weight changes. On 50 lane-change scenarios from the Physical AI World Model Synthetic dataset. The trajectory decoder shows a monotonic dose response in the bias magnitude, separate from a paired zero bias control at every tested magnitude. It reaches $\\approx 17$\\,cm mean displacement with lateral shifts up to $\\sim 140$\\ cm at the clamp. A layer ablation places the action-relevant signal in late layers, where the effect increases with the number of hooked layers (2.0cm for the first 8 layers; 67.6cm for all 36). A per call injection audit explains why the Chain-of-Causation text never changes. The mask based bias never reaches the reasoning pathway in this serving stack, so the invariance is verified exposure, not robustness. Steered trajectories tend to shift toward the attended actor, suggesting the bias governs where the model looks rather than encoding a target behavior.",
+      "authors": [
+        "Darshan Nagendra Prasad",
+        "Lars Ullrich",
+        "Knut Graichen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-17T20:03:38+00:00",
+      "link": "https://arxiv.org/pdf/2608.17095v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Inference-time attention steering for VLA driving models matches real-time VLA inference optimization",
+      "llm_evidence_cn": "面向VLA驾驶模型的推理时注意力引导，契合实时VLA推理优化需求",
+      "llm_evidence": "面向VLA驾驶模型的推理时注意力引导，契合实时VLA推理优化需求",
+      "canonical_evidence": "面向VLA驾驶模型的推理时注意力引导，契合实时VLA推理优化需求",
+      "llm_tldr_en": "Studies a bounded additive pre-softmax attention bias on visual tokens of traffic actors for VLA driving models, applied as a fail-open forward pre-hook with no weight changes, showing monotonic trajectory decoder response.",
+      "llm_tldr_cn": "本文针对视觉-语言-动作（VLA）驾驶模型无法在推理时直接引导注意力关注安全关键参与者的局限，提出一种有界加性softmax前注意力偏置，应用于检测到的交通参与者的视觉token。该偏置以前向预钩子形式注入，无需权重修改，在50个换道场景中显示出轨迹解码器对偏置强度的单调剂量响应，平均位移约17厘米。这项工作为VLA驾驶模型提供了无需重训练的推理时注意力引导手段，对交通安全具有实用价值。",
+      "llm_tldr": "本文针对视觉-语言-动作（VLA）驾驶模型无法在推理时直接引导注意力关注安全关键参与者的局限，提出一种有界加性softmax前注意力偏置，应用于检测到的交通参与者的视觉token。该偏置以前向预钩子形式注入，无需权重修改，在50个换道场景中显示出轨迹解码器对偏置强度的单调剂量响应，平均位移约17厘米。这项工作为VLA驾驶模型提供了无需重训练的推理时注意力引导手段，对交通安全具有实用价值。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17453v3",
+      "source": "arxiv",
+      "title": "EATR-Stereo: Embodiment-Aware Token Routing of Paired Stereo Evidence for Humanoid Vision-Language-Action Control",
+      "abstract": "Long-horizon humanoid vision--language--action (VLA) control with head-mounted stereo cameras requires visual interfaces that can exploit complementary views while maintaining compatibility with pretrained representations. Existing interfaces often discard complementary stereo evidence or fuse additional observations without preserving the native primary-view pathway and adapting auxiliary information to robot embodiment. We present EATR-Stereo, an embodiment-aware token-routing framework that retains primary-view tokens and constructs primary-aligned Cross-View Auxiliary Tokens (CVATs) by querying the synchronized auxiliary-view token sequence. A body-segmented proprioceptive encoder further conditions token-wise auxiliary usage on robot configuration history, enabling selective incorporation of stereo evidence during action generation. The routed auxiliary stream augments the language and primary-visual context of a pretrained VLA while keeping its vision--language model frozen. On a 33-DoF physical humanoid with a 37-D proprioceptive state, we evaluate nine configurations in over-100-s search--approach--grasp--place--return tasks. EATR-Stereo achieves 60.0% full-task success, 100.0% grasp success, and 80.0% stage success. Under severe asymmetric occlusion, it improves recovery to 80% compared with 30% for CVAT alone. Ablation studies further show the importance of preserving primary tokens and combining cross-view auxiliary features with structured proprioceptive routing. These results demonstrate that selectively routed paired stereo evidence improves spatial grounding for reliable long-horizon humanoid VLA control.",
+      "authors": [
+        "Songwei Wu",
+        "Rui Zhao",
+        "Fan Yang",
+        "Zhongqiang Nie",
+        "Zhiduo Jiang",
+        "Wandong Sun",
+        "Yuwei Li",
+        "Jian Hu",
+        "Yang Liu",
+        "Hong Liu"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-18T07:32:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.17453v3",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Embodiment-aware token routing of stereo evidence for humanoid VLA - direct match to efficient VLA architectures",
+      "llm_evidence_cn": "面向人形VLA的双目证据token路由，直接匹配高效VLA架构需求",
+      "llm_evidence": "面向人形VLA的双目证据token路由，直接匹配高效VLA架构需求",
+      "canonical_evidence": "面向人形VLA的双目证据token路由，直接匹配高效VLA架构需求",
+      "llm_tldr_en": "Presents EATR-Stereo, an embodied token-routing framework for humanoid VLA that retains primary-view tokens and constructs primary-aligned cross-view auxiliary tokens by querying synchronized auxiliary-view token sequences, with body-segmented proprioceptive conditioning.",
+      "llm_tldr_cn": "本文提出EATR-Stereo，一种面向人形VLA控制的具身感知token路由框架。它保留主视图token，并通过查询同步辅助视图token序列构造主视图对齐的跨视图辅助token（CVAT），同时用身体分段的本体感受编码器调节token条件。该方法在保持预训练表示兼容性的同时利用互补立体证据，避免了丢弃立体信息或破坏原生主视图通路，为长时程人形VLA控制提供高效的视觉接口。",
+      "llm_tldr": "本文提出EATR-Stereo，一种面向人形VLA控制的具身感知token路由框架。它保留主视图token，并通过查询同步辅助视图token序列构造主视图对齐的跨视图辅助token（CVAT），同时用身体分段的本体感受编码器调节token条件。该方法在保持预训练表示兼容性的同时利用互补立体证据，避免了丢弃立体信息或破坏原生主视图通路，为长时程人形VLA控制提供高效的视觉接口。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient architectures for vision language action models",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.15075v1",
+      "source": "arxiv",
+      "title": "SA-GEM: Scale-Adaptive and Geospatial Evidence-Modulated Token Pruning for Efficient Remote Sensing Large Vision-Language Models",
+      "abstract": "RS-LVLMs have advanced multimodal understanding of Earth observation imagery, yet their performance is fundamentally constrained by high-resolution processing, as visual token counts grow quadratically with linear input resolution while important visual evidence is inherently sparse and increasingly diluted across the expanded sequence. Existing token pruning methods largely rely on scale-agnostic resolution policies and isolated importance cues, limiting task-aligned granularity adaptation and holistic evidence preservation. To address this, we present Scale-Adaptive and Geospatial Evidence-Modulated Token Pruning (SA-GEM), a plug-and-play framework that unifies task-adaptive token granularity allocation with holistic geospatial token importance modulation. Specifically, a lightweight router selects the resolution based on query-dependent token granularity, while a token importance modulator jointly models task relevance, spatial structure, and local redundancy to preserve holistic geospatial evidence. We show that higher resolution is not universally beneficial and, once sufficient granularity is reached, token quality matters more than token quantity. Experiments across various benchmarks demonstrate that SA-GEM achieves consistent gains in both accuracy and efficiency over existing pruning methods. On XLRS-Bench, it surpasses GeoLLaVA-8K by 2.3% in accuracy with a 2.4 times total inference speedup.",
+      "authors": [
+        "Kexin Ma",
+        "Jing Xiao",
+        "Bowen Xing",
+        "Liang Liao",
+        "Chia-Wen Lin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-15T06:50:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.15075v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "scale-adaptive token pruning for remote sensing LVLMs",
+      "llm_evidence_cn": "面向遥感大视觉语言模型的尺度自适应Token剪枝",
+      "llm_evidence": "面向遥感大视觉语言模型的尺度自适应Token剪枝",
+      "canonical_evidence": "面向遥感大视觉语言模型的尺度自适应Token剪枝",
+      "llm_tldr_en": "SA-GEM presents a plug-and-play token pruning framework for remote sensing LVLMs that adapts token granularity to tasks and preserves sparse geospatial evidence, reducing quadratic visual token growth at high resolution.",
+      "llm_tldr_cn": "针对遥感大视觉语言模型高分辨率输入导致视觉token数二次增长、重要证据被稀释的问题，提出了即插即用的SA-GEM框架。该方法结合任务自适应的token粒度调整与地理空间证据调制，统一修剪过程以保留关键证据。实验表明，其在高分辨率遥感任务上能有效降低计算开销并维持任务性能。",
+      "llm_tldr": "针对遥感大视觉语言模型高分辨率输入导致视觉token数二次增长、重要证据被稀释的问题，提出了即插即用的SA-GEM框架。该方法结合任务自适应的token粒度调整与地理空间证据调制，统一修剪过程以保留关键证据。实验表明，其在高分辨率遥感任务上能有效降低计算开销并维持任务性能。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.17616v1",
+      "source": "arxiv",
+      "title": "MoNe: Modular Neural Memory for Efficient Long Context Inference",
+      "abstract": "We present MoNe, a lightweight modular neural memory that attaches to any frozen pretrained Transformer to enable long-context inference without retraining. MoNe reads context in fixed-size segments via test-time learning of fast-weight neural memory networks with layer-localized gradient updates; at inference, the memory generates keys and values from the query tokens alone, with no context tokens re-read. This two-phase design decouples inference cost from context length, achieving $O(N)$ preprocessing and $O(1)$ query cost with peak GPU memory that does not grow with $N$. At 128K tokens, MoNe reduces both compute and peak GPU memory by approximately 80% compared to ICL with only 6.4% parameter overhead. MoNe generalizes to context lengths far beyond the backbone's native window, achieving strong performance on needle-in-a-haystack and word extraction benchmarks from RULER, where ICL degrades sharply.",
+      "authors": [
+        "Wonguk Cho",
+        "Kyubyung Chae",
+        "Tribhuvanesh Orekondy",
+        "Sunghyun Park",
+        "Hyoungwoo Park",
+        "Jeongho Kim",
+        "Arash Behboodi",
+        "Kyuwoong Hwang",
+        "Sungrack Yun"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-18T10:28:23+00:00",
+      "link": "https://arxiv.org/pdf/2608.17616v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Modular neural memory for efficient long-context inference, generating keys and values to avoid re-reading context",
+      "llm_evidence_cn": "通过模块化神经记忆生成键值，避免重读上下文，优化长上下文推理的成本和显存",
+      "llm_evidence": "通过模块化神经记忆生成键值，避免重读上下文，优化长上下文推理的成本和显存",
+      "canonical_evidence": "通过模块化神经记忆生成键值，避免重读上下文，优化长上下文推理的成本和显存",
+      "llm_tldr_en": "MoNe attaches a lightweight modular neural memory to frozen transformers, reading context in fixed-size segments via test-time fast weights, and at inference generates keys and values from query tokens alone; this decouples cost from context length, cutting compute and GPU memory by about 80% at 128K tokens with only 6.4% parameter overhead.",
+      "llm_tldr_cn": "长上下文推理中KV缓存等状态随上下文长度增长，带来高计算和显存负担。该文提出MoNe，一种轻量模块化神经记忆，可附加到任意冻结预训练Transformer上：以固定分段读取上下文，通过测试时学习的快速权重网络构建记忆，推理时仅从查询token生成键值而不重读上下文。该设计将推理成本与上下文长度解耦，128K token下相比ICL减少约80%计算和GPU显存，且参数开销仅6.4%。",
+      "llm_tldr": "长上下文推理中KV缓存等状态随上下文长度增长，带来高计算和显存负担。该文提出MoNe，一种轻量模块化神经记忆，可附加到任意冻结预训练Transformer上：以固定分段读取上下文，通过测试时学习的快速权重网络构建记忆，推理时仅从查询token生成键值而不重读上下文。该设计将推理成本与上下文长度解耦，128K token下相比ICL减少约80%计算和GPU显存，且参数开销仅6.4%。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.17490v1",
+      "source": "arxiv",
+      "title": "When More Foundation Models Means Less: Diagnosing and Addressing Multi-View Fusion Failure",
+      "abstract": "Foundation-model hubs turn multi-view fusion into a selection problem: from a large heterogeneous encoder pool, which views should be fused, and how many? We show that downstream performance is non-monotonic in the number of fused encoders; later views can be redundant or task-misaligned, causing accuracy to saturate or decline. We formalise this setting as view-set composition and propose KAGES (Kernel-Alignment Greedy Encoder Selector), a label-aware method that orders frozen encoders by their marginal gain in centred kernel-target alignment. KAGES requires no downstream classifier training during selection, evaluates each candidate in $\\mathcal{O}(n^2)$ time independent of encoder dimension, and admits a conditional $(1-e^{-γ})$ prefix-wise guarantee under monotonicity and a positive submodularity ratio. Across five recognition regimes and low-shot, larger-pool, and full-data protocols, KAGES improves average AULC over full fusion by 3.9, 5.8, and 3.3 points, respectively, and exceeds DPP and facility-location selection in average AULC. Image retrieval exhibits later, task-dependent saturation along the KAGES ordering, while peak-then-decline reproduces in frozen-LLM fusion. These results show that effective large-pool fusion depends on selecting a compact, task-aligned set of views rather than indiscriminately fusing more encoders.",
+      "authors": [
+        "Yibo Liu",
+        "Bowen Jiang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-18T08:19:25+00:00",
+      "link": "https://arxiv.org/pdf/2608.17490v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Label-aware greedy encoder selection for efficient multi-view fusion in foundation-model hubs",
+      "llm_evidence_cn": "面向多视图融合的标签感知贪心编码器选择，降低基础模型推理成本",
+      "llm_evidence": "面向多视图融合的标签感知贪心编码器选择，降低基础模型推理成本",
+      "canonical_evidence": "面向多视图融合的标签感知贪心编码器选择，降低基础模型推理成本",
+      "llm_tldr_en": "KAGES diagnoses non-monotonic performance in multi-view fusion and selects frozen encoders by marginal kernel-target alignment, reducing fusion cost without training a downstream classifier.",
+      "llm_tldr_cn": "该论文发现拼接更多基础模型编码器并不总能提升性能，并提出KAGES方法，通过核-目标对齐度量各编码器边际增益，贪心挑选要融合的冻结编码器。KAGES无需训练下游分类器即可完成选择，计算复杂度为O(n^2)且与编码器维度无关，能够以更低开销获得更优或相当的融合效果，为多视图融合和多基础模型选择提供了高效的训练无关方案。",
+      "llm_tldr": "该论文发现拼接更多基础模型编码器并不总能提升性能，并提出KAGES方法，通过核-目标对齐度量各编码器边际增益，贪心挑选要融合的冻结编码器。KAGES无需训练下游分类器即可完成选择，计算复杂度为O(n^2)且与编码器维度无关，能够以更低开销获得更优或相当的融合效果，为多视图融合和多基础模型选择提供了高效的训练无关方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.16476v1",
+      "source": "arxiv",
+      "title": "Exposing the Long-tail in Embodied Urban Navigation via Scalable Learning from In-the-Wild Videos",
+      "abstract": "Learning embodied urban navigation policies from real-world data is constrained by the cost of task-specific data collection and the limited coverage of rare yet safety-critical scenarios. To address these challenges, we present a scalable framework for learning point-goal urban navigation from web-scale in-the-wild egocentric videos while systematically exposing its long tail. The framework automatically annotates uncurated web videos with metric trajectories and structured navigation semantics, which are then used to train a vision-language-action policy for interpretable navigation planning. We characterize the long tail based on model performance and the distribution of perception-motion patterns, and employ reflection-based analysis to diagnose recurring failure modes. Experiments on web-video data and real-world urban navigation tasks demonstrate effective knowledge transfer from unconstrained videos and reveal coherent long-tail structures beyond aggregate navigation performance.",
+      "authors": [
+        "Bingyi Xia",
+        "Han Bao",
+        "Zhewei Chen",
+        "Hanjing Ye",
+        "Jingwen Yu",
+        "Yuhan Pang",
+        "Wenjun Xu",
+        "Jiankun Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-17T12:15:59+00:00",
+      "link": "https://arxiv.org/pdf/2608.16476v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "vision-language-action policy for embodied urban navigation learned from web videos",
+      "llm_evidence_cn": "从野外视频学习视觉-语言-动作导航策略，与机器人VLA模型相关但非效率优化",
+      "llm_evidence": "从野外视频学习视觉-语言-动作导航策略，与机器人VLA模型相关但非效率优化",
+      "canonical_evidence": "从野外视频学习视觉-语言-动作导航策略，与机器人VLA模型相关但非效率优化",
+      "llm_tldr_en": "Presents a scalable framework to train a vision-language-action navigation policy from web-scale in-the-wild egocentric videos, automatically annotating trajectories and exposing long-tail safety-critical patterns.",
+      "llm_tldr_cn": "具身城市导航策略常受限于任务特定数据采集成本高、罕见安全场景覆盖不足。本文提出从网络海量第一视角视频中可扩展学习点目标导航策略，自动标注度量轨迹与结构化导航语义，并用于训练视觉-语言-动作模型。通过分析感知-运动模式分布刻画长尾，并利用反思式方法加以改进。该框架为城市导航策略的大规模泛化提供了数据与训练新途径。",
+      "llm_tldr": "具身城市导航策略常受限于任务特定数据采集成本高、罕见安全场景覆盖不足。本文提出从网络海量第一视角视频中可扩展学习点目标导航策略，自动标注度量轨迹与结构化导航语义，并用于训练视觉-语言-动作模型。通过分析感知-运动模式分布刻画长尾，并利用反思式方法加以改进。该框架为城市导航策略的大规模泛化提供了数据与训练新途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.16697v1",
+      "source": "arxiv",
+      "title": "FabriMAE I Trust Myself? Self-Evaluating VLA Action Generation with Markov Attention Entropy",
+      "abstract": "Vision-Language-Action models (VLAs) integrate visual perception, language instruction, and action generation into end-to-end policies across heterogeneous architectures. However, enabling VLAs to self-evaluate their action generation reliability without external supervision remains a major challenge. Existing methods either rely on expert annotations or estimate uncertainty only from output statistics, largely ignoring internal signals. In this work, we observe that internal visual modality entropy exhibits consistent distinctions between successful and failed tasks across heterogeneous VLAs. Although VLAs' architectures differ in their action generation, we show that they share a common latent action generation abstraction evolving under visual perception, language instruction, and state input, which we formulate as a Conditional Generative Markov Chain. Based on this formulation, we propose MAE (Markov Attention Entropy), a self-evaluation framework that directly converts internal attention signals into architecture-aware reliability scores, and introduce LIBERO-Reflect, a 4,000-episode benchmark combining 2,000 standard episodes and 2,000 challenging episodes across four subsets. Extensive experiments across heterogeneous VLA architectures and diverse scenarios show that MAE consistently outperforms state-of-the-art baselines on AUPR, AUROC, and FPR@95. We further instantiate FabriMAE for verifier-free test-time action selection, showing that MAE-guided multiple sampling improves PI-family robustness on LIBERO-Plus with small observed runtime overhead.",
+      "authors": [
+        "Aniri",
+        "Chen Yilin",
+        "Jinhe Bi",
+        "Junfei Guo",
+        "Donglai Ran",
+        "Xu Bian",
+        "Zengjie Jin",
+        "Yujun Wang",
+        "Yijun Tian",
+        "Volker Tresp",
+        "Fei Shen",
+        "Tat-Seng Chua",
+        "Yunpu Ma"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-17T15:14:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.16697v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "self-evaluation for VLA action generation with attention entropy",
+      "llm_evidence_cn": "利用注意力熵对VLA动作生成自评估",
+      "llm_evidence": "利用注意力熵对VLA动作生成自评估",
+      "canonical_evidence": "利用注意力熵对VLA动作生成自评估",
+      "llm_tldr_en": "FabriMAE observes that internal visual modality entropy distinguishes successful from failed VLA executions and proposes Markov attention entropy for self-evaluating action generation without external supervision.",
+      "llm_tldr_cn": "VLA模型虽然整合视觉、语言与动作生成，但缺乏无需外部监督的自评估机制。本文发现不同VLA架构的内部视觉模态熵在成功与失败任务间呈现一致区分，据此提出基于马尔可夫注意力熵的自我评估方法。该方法不依赖专家标注，仅通过内部信号估计动作生成可靠性，实验表明其能有效区分成功与失败执行，为异构VLA模型的可信部署提供了新的轻量自评估途径。",
+      "llm_tldr": "VLA模型虽然整合视觉、语言与动作生成，但缺乏无需外部监督的自评估机制。本文发现不同VLA架构的内部视觉模态熵在成功与失败任务间呈现一致区分，据此提出基于马尔可夫注意力熵的自我评估方法。该方法不依赖专家标注，仅通过内部信号估计动作生成可靠性，实验表明其能有效区分成功与失败执行，为异构VLA模型的可信部署提供了新的轻量自评估途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
