@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-23",
+  "date": "2026-08-23",
+  "generated_at": "2026-08-23T19:23:25",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/23/2608.15869v1-beyond-visual-cot-internalized-visual-thinking-for-proactive-video-reasoning",
+      "section": "deep",
+      "title_en": "Beyond Visual CoT: Internalized Visual Thinking for Proactive Video Reasoning",
+      "authors": "Xiaoyu Zhu, Xinke Deng, Suresh Taddewadikar, Arnab Kumar Mondal, Zhongyu Jiang, Ian Fasel, Joerg Liebelt",
+      "date": "2026-08-16",
+      "pdf": "https://arxiv.org/pdf/2608.15869v1",
+      "score": "8.0",
+      "evidence": "通过内化视觉思考降低多模态大语言模型推理开销",
+      "tldr": "多模态大模型日益采用视觉思维链（Visual CoT）生成中间推理图像来理解视频，但这种方式推理开销大。本文提出内部化视觉思维（IVT），在未标注视频上联合优化文本预测与未来帧嵌入预测，使模型在推理时无需显式生成图像即可直接作答。IVT在六种评估设置上均优于直接答案微调，相比显式Visual CoT性能相当或更好，端到端延迟降低超过5倍。研究表明，预测性世界建模可在训练中内化，无需推理时像素级生成，为高效视频推理提供了新路径。",
+      "tags": "query:evlm",
+      "abstract_en": "Multimodal large language models increasingly use visual chain-of-thought (Visual CoT) to reason about spatial, temporal, and embodied environments. By generating intermediate reasoning images, Visual CoT provides an intuitive mechanism for visual foresight but introduces substantial inference overhead, which is particularly problematic for proactive video reasoning. We ask whether models can learn to think visually during training while reasoning directly at inference. We introduce Internalized Visual Thinking (IVT), a post-training framework that jointly optimizes textual prediction and next-embedding prediction over unlabeled videos. Given a partially observed video, IVT predicts latent representations of future frames together with the target textual answer, encouraging the model to capture motion, object transitions, interactions, and latent intent. At inference, IVT generates the answer directly without synthesizing or re-encoding future frames. We conduct controlled studies across target representations, decoder designs, prediction horizons, data mixtures, training curricula, and predictive objectives. IVT improves over direct-answer fine-tuning on all six evaluation settings while retaining the same inference pathway. Compared with explicit Visual CoT, IVT achieves comparable or better performance and reduces average end-to-end latency by more than 5x. Together, our findings suggest that explicit pixel-space generation at inference time, as used in visual chain-of-thought, may not be necessary for effective proactive video reasoning. Predictive world modeling can be internalized during training to produce multimodal reasoners that are both more accurate and substantially more efficient.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/23/2608.17336v1-tilemix-tile-centric-mixed-precision-attention-for-llm-inference-acceleration",
+      "section": "quick",
+      "title_en": "TileMix: Tile-Centric Mixed-Precision Attention for LLM Inference Acceleration",
+      "authors": "Hanzhi Zhang, Qiao Zhang, Qinglei Cao, Heng Fan, Yan Huang, Kewei Sha, Yunhe Feng",
+      "date": "2026-08-18",
+      "pdf": "https://arxiv.org/pdf/2608.17336v1",
+      "score": "7.0",
+      "evidence": "以瓦片为中心的混合精度注意力加速LLM推理",
+      "tldr": "长上下文prefill中密集注意力的二次复杂度带来巨大计算和内存开销，现有低精度或剪枝方法缺乏对硬件对齐tile的空间精度分配。TileMix将注意力矩阵划分为硬件对齐score tile，用紧凑位掩码编码路由决策，令每个tile组经FP16或INT8路径计算并共享在线softmax状态，实现无需训练的可控混合精度注意力。在多个长上下文基准上，TileMix恢复统一INT8损失的质量，并相比FP16提升prefill吞吐，提供精度-效率可调前沿。",
+      "tags": "query:evlm",
+      "abstract_en": "Long-context prefill in large language models (LLMs) incurs substantial computation and memory traffic because dense self-attention computes quadratic query-key scores. Existing methods either use a uniform low-precision path or select token interactions, leaving spatial precision routing over hardware-aligned score tiles outside fused dense attention. We introduce TileMix, a tile-centric precision-routing kernel that makes numerical precision an executable spatial decision over score-tile groups within fused dense attention. TileMix partitions the attention matrix into hardware-aligned score tiles, packs routing decisions into compact bitmasks, and dispatches each tile group through FP16 or INT8 score computation while both paths update a shared online-softmax state. Scalable precision grouping lets each routing bit govern multiple adjacent key tiles, preserving hardware-aligned compute tiles and compact metadata at long contexts. By routing all legal tile groups, TileMix preserves dense token connectivity, requires no training, and supports grouped-query attention, variable-length batches, and INT8 key/value caches. Across LongEval, LV-Eval, and A100 prefill benchmarks on LLaMA, Qwen, and Vicuna, TileMix recovers long-context quality lost under uniform INT8 and improves prefill throughput over FP16, yielding a controllable accuracy-efficiency frontier across model families. The implementation is available at https://github.com/HanzhiZhang-Ulrica/TileMix.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/23/2608.15410v1-floodreasonbench-benchmarking-vlm-reasoning-segmentation-for-embodied-flood-response-at-the-edge",
+      "section": "quick",
+      "title_en": "FloodReasonBench: Benchmarking VLM Reasoning Segmentation for Embodied Flood Response at the Edge",
+      "authors": "Rajat Bhattacharjya, Yoomee Jung, Minwoo Kim, Sing-Yao Wu, Eli Bozorgzadeh, Nalini Venkatasubramanian, Nikil Dutt",
+      "date": "2026-08-15",
+      "pdf": "https://arxiv.org/pdf/2608.15410v1",
+      "score": "6.0",
+      "evidence": "面向边缘资源约束的VLM推理分割基准",
+      "tldr": "现有推理分割基准多针对通用场景，未考虑洪水响应的领域与边缘资源约束。为此提出FloodReasonBench，含洪水响应数据集，评估轻量编码、分层推理与压缩表示。结果显示通用预适应下准确率随划分差异大，洪水适应后范围更紧凑；在Jetson边缘端存在准确率与延迟、能耗、通信的权衡。该工作为资源受限边缘部署提供任务与系统级指导。",
+      "tags": "query:evlm",
+      "abstract_en": "Reasoning segmentation enables vision-language models (VLMs) to translate mission-relevant language requests into pixel-level visual grounding, offering a natural perception interface for embodied agents. However, existing benchmarks largely focus on generic visual scenes and overlook the domain and resource constraints encountered in flood-response platforms. We present FloodReasonBench, a benchmark for VLM reasoning segmentation for embodied flood response at the edge. At its core, FloodReasonBench introduces FloodResponseSeg, a flood-specific reasoning-segmentation dataset constructed from real-world scenes and response-relevant targets. Beyond task accuracy, the benchmark characterizes reasoning-segmentation pipelines under lightweight visual encoding, hierarchical split inference, and compressed intermediate representations. We observe strong partition-dependent accuracy variation in the generic pre-adaptation setting, while the flood-adapted target-workload design space exhibits a substantially more compact accuracy range across partitions. Evaluation on an NVIDIA Jetson AGX Xavier further exposes the tradeoffs among reasoning-segmentation accuracy, edge-side latency, energy, and communication footprint, enabling quality-constrained selection of edge operating points. Together, these results provide a task- and system-level characterization of reasoning segmentation for resource-constrained embodied flood response at the edge.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

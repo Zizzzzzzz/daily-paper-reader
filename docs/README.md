@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-22</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-23</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 8 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 3 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>5</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>1</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>2</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-22 20:47:56 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-23 19:23:22 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读聚焦线性注意力解码与VLA驾驶模型，速读覆盖多模态融合与具身导航，共评8篇论文。</p>
-<p>最值得关注两篇9分工作：DeltaLog用延迟物化优化线性注意力解码，以及推理时注意力引导提升视觉-语言-动作驾驶模型性能。</p>
-<p>建议优先精读这两篇高分论文，可结合速读中的多模态融合失败分析，理解注意力机制在长序列与具身场景中的共性挑战。</p>
+<p>今日精读1篇视频推理新作，另速读LLM加速与边缘洪水响应两项研究，共3篇。最值得关注的是《Beyond Visual CoT》提出的“内在视觉思维”主动推理框架（8.0分），以及《TileMix》的混合精度注意力加速思路（7.0分）。建议优先精读视频推理方向，再扫读其余两篇了解性能与边缘场景应用。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -73,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">5 篇</strong>
+    <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="DeltaLog: Deferred Materialization of Recurrent States for Linear Attention Decoding">DeltaLog: Deferred Materialization of Recurrent States for Linear Attention Decoding</span></li><li><span class="dpr-home-dashboard-paper-title" title="Inference-Time Attention Steering for Vision-Language-Action Driving Models">Inference-Time Attention Steering for Vision-Language-Action Driving Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="EATR-Stereo: Embodiment-Aware Token Routing of Paired Stereo Evidence for Humanoid Vision-Language-Action Control">EATR-Stereo: Embodiment-Aware Token Routing of Paired Stereo Evidence for Humanoid Vision-Language-Action Control</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Beyond Visual CoT: Internalized Visual Thinking for Proactive Video Reasoning">Beyond Visual CoT: Internalized Visual Thinking for Proactive Video Reasoning</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -86,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">2 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="When More Foundation Models Means Less: Diagnosing and Addressing Multi-View Fusion Failure">When More Foundation Models Means Less: Diagnosing and Addressing Multi-View Fusion Failure</span></li><li><span class="dpr-home-dashboard-paper-title" title="Exposing the Long-tail in Embodied Urban Navigation via Scalable Learning from In-the-Wild Videos">Exposing the Long-tail in Embodied Urban Navigation via Scalable Learning from In-the-Wild Videos</span></li><li><span class="dpr-home-dashboard-paper-title" title="FabriMAE I Trust Myself? Self-Evaluating VLA Action Generation with Markov Attention Entropy">FabriMAE I Trust Myself? Self-Evaluating VLA Action Generation with Markov Attention Entropy</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="TileMix: Tile-Centric Mixed-Precision Attention for LLM Inference Acceleration">TileMix: Tile-Centric Mixed-Precision Attention for LLM Inference Acceleration</span></li><li><span class="dpr-home-dashboard-paper-title" title="FloodReasonBench: Benchmarking VLM Reasoning Segmentation for Embodied Flood Response at the Edge">FloodReasonBench: Benchmarking VLM Reasoning Segmentation for Embodied Flood Response at the Edge</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
 </section>
 </div>
 
