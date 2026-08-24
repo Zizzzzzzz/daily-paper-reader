@@ -1,0 +1,536 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-24T20:15:05.647451+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 6,
+    "deep_cap": 8,
+    "deep_selected": 6,
+    "quick_candidates": 6,
+    "quick_skim_target": 13,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2608.21247v1",
+      "source": "arxiv",
+      "title": "Just Noticeable Difference Modeling for Token Compression in Vision-Language-Action Models",
+      "abstract": "Token compression has become a key technique for reducing the inference cost of large foundation models, with approaches such as token pruning and KV-cache reuse widely adopted in vision-language models and recently explored for embodied agents. In embodied agents, tokens not only support perception and semantic understanding but also directly affect latency-sensitive closed-loop robot action prediction. Existing schemes typically guide compression using redundancy or importance cues, such as visual similarity, attention scores, and saliency. However, these cues only indirectly measure the key factor for safe compression: how much a token can change before causing an unacceptable deviation in downstream actions. This receiver-dependent tolerance is closely related to the principle of just noticeable difference (JND). Classical JND characterizes signal tolerance in the human visual system, while machine-oriented JND extends this concept to downstream machine responses. Building on this progression, we introduce Action-JND, which extends JND modeling to embodied perception by defining noticeability through the language-conditioned action response of a vision-language-action (VLA) policy in closed-loop control. A token change is considered admissible only when the induced action deviation remains within a tolerated margin. To realize this concept, we develop a lightweight token-wise JND estimator in deep visual-feature space to predict the maximum tolerable perturbation while preserving policy responses. The resulting action-tolerance score serves as a plug-and-play criterion for VLA compression paradigms, including stale-KV reuse and token pruning, prioritizing action-tolerant tokens for compression. Experiments on the LIBERO benchmark with OpenVLA and OpenVLA-OFT demonstrate that Action-JND consistently improves compression reliability, especially under aggressive compression ratios.",
+      "authors": [
+        "Zhuoyuan Li",
+        "Rui Zhao",
+        "Jin Wang",
+        "Hanwei Zhu",
+        "Cong Zhang",
+        "Giuseppe Valenzise",
+        "Weisi Lin",
+        "Kin-Man Lam"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-21T15:59:37+00:00",
+      "link": "https://arxiv.org/pdf/2608.21247v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "token compression in Vision-Language-Action models",
+      "llm_evidence_cn": "视觉-语言-动作模型中的令牌压缩",
+      "llm_evidence": "视觉-语言-动作模型中的令牌压缩",
+      "canonical_evidence": "视觉-语言-动作模型中的令牌压缩",
+      "llm_tldr_en": "Existing token compression uses indirect heuristics; this paper models Just Noticeable Difference (JND) for VLA tokens, directly measuring safe compression limits before action deviation, yielding safer pruning and efficient robot inference.",
+      "llm_tldr_cn": "现有令牌压缩方案常依赖视觉相似性或注意力等间接线索，无法保证压缩后下游动作偏差在可接受范围内。本文面向视觉-语言-动作模型提出恰可觉察差异（JND）建模，直接度量令牌被压缩或改变对最终动作预测的影响，从而在减少推理开销的同时保持闭环控制稳健性。实验表明该方案在令牌裁剪和KV缓存复用等场景下优于基于冗余度或重要性的基线，并支持低延迟机器人动作预测。",
+      "llm_tldr": "现有令牌压缩方案常依赖视觉相似性或注意力等间接线索，无法保证压缩后下游动作偏差在可接受范围内。本文面向视觉-语言-动作模型提出恰可觉察差异（JND）建模，直接度量令牌被压缩或改变对最终动作预测的影响，从而在减少推理开销的同时保持闭环控制稳健性。实验表明该方案在令牌裁剪和KV缓存复用等场景下优于基于冗余度或重要性的基线，并支持低延迟机器人动作预测。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.20473v1",
+      "source": "arxiv",
+      "title": "Aggregating Visual Information with Optimal Transport for VideoLM Token Compression",
+      "abstract": "Video language models process videos as dense visual-token sequences with substantial representational redundancy. Compressing these sequences is therefore essential for reducing the visual-token burden on language-model decoding. The central challenge is to preserve visual information dispersed across frames under such compression. To this end, we introduce Aggregating Visual Information with Optimal Transport (AVIOT), which casts video token compression as transporting a dense empirical measure of frame observations onto a compact target measure. The resulting source-to-target coupling induces a distribution over source observations for each target support, directly specifying how the compressed video representation is constructed. We further adapt this construction along task and spatial axes. Question conditioning modulates the transport cost between source frames and target supports, while influencing how many supports are allocated to each temporal segment, thereby directing representation capacity toward question-relevant content. At multiple spatial granularities, AVIOT computes region-specific temporal transport plans and adaptively fuses the representations they yield, allowing different regions within the same compact representation to draw from different moments. Evaluations across varying compression ratios show that AVIOT matches or outperforms the uncompressed baseline on multiple video-understanding benchmarks while retaining strong performance at higher compression ratios.",
+      "authors": [
+        "Wenti Yin",
+        "Xiaotian Han",
+        "Junyuan Shang",
+        "Yuchen Ding",
+        "Shuohuan Wang",
+        "Dianhai Yu",
+        "Changxin Gao",
+        "Nong Sang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-20T18:05:42+00:00",
+      "link": "https://arxiv.org/pdf/2608.20473v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Aggregating visual tokens via optimal transport for video language model token compression",
+      "llm_evidence_cn": "利用最优传输聚合视觉令牌实现视频语言模型令牌压缩",
+      "llm_evidence": "利用最优传输聚合视觉令牌实现视频语言模型令牌压缩",
+      "canonical_evidence": "利用最优传输聚合视觉令牌实现视频语言模型令牌压缩",
+      "llm_tldr_en": "Proposes AVIOT, an optimal-transport-based method that compresses dense visual token sequences in video language models by transporting frame observations to a compact target measure, preserving dispersed visual information while reducing decoding burden.",
+      "llm_tldr_cn": "针对视频语言模型中视觉令牌序列冗余且压缩容易丢失帧间分散信息的问题，提出基于最优传输的AVIOT方法，将密集的帧观测度量传输到紧凑目标度量上，通过耦合显式构造压缩视频表示。实验证明该方法在减少解码负担的同时保留了跨帧的视觉信息，为视频多模态大模型的令牌效率提供了新途径。",
+      "llm_tldr": "针对视频语言模型中视觉令牌序列冗余且压缩容易丢失帧间分散信息的问题，提出基于最优传输的AVIOT方法，将密集的帧观测度量传输到紧凑目标度量上，通过耦合显式构造压缩视频表示。实验证明该方法在减少解码负担的同时保留了跨帧的视觉信息，为视频多模态大模型的令牌效率提供了新途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-17",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.20632v1",
+      "source": "arxiv",
+      "title": "Sparse Token Routing in Efficient Transformers",
+      "abstract": "Efficient-transformer research often motivates token pruning and adaptive computation with the claim that not all tokens require equal computational effort. We test this claim end to end using SEWN, a two-stream Transformer that routes tokens through either lightweight or full-capacity processing using a learned gate. Across our experiments, routing introduces negligible accuracy change relative to parameter-matched baselines, while the gate's token-importance signal depends critically on how it is learned. A static lexicon-seeded prior fails a counterfactual faithfulness test on BoolQ, whereas a fully contextual gate achieves highly significant separation ($p<10^{-10}$) on both evaluated tasks without changing task accuracy.",
+      "authors": [
+        "Sai Krishna Arthanari",
+        "JaeHyeong Chang",
+        "Chengzhe Sun",
+        "Siwei Lyu"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL"
+      ],
+      "published": "2026-08-21T00:15:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.20632v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "directly studies token pruning and routing in efficient transformers, testing token-importance gating",
+      "llm_evidence_cn": "直接研究高效Transformer中的token剪枝与路由，验证token重要性门控",
+      "llm_evidence": "直接研究高效Transformer中的token剪枝与路由，验证token重要性门控",
+      "canonical_evidence": "直接研究高效Transformer中的token剪枝与路由，验证token重要性门控",
+      "llm_tldr_en": "SEWN is a two-stream Transformer that routes tokens through lightweight or full-capacity paths with a learned gate; contextual gating yields significant token-importance separation on BoolQ without task accuracy loss, informing token pruning.",
+      "llm_tldr_cn": "该论文针对高效Transformer中并非所有token都需要相同计算的假设进行端到端检验。提出双流Transformer SEWN，通过可学习门控将token路由到轻量或全容量处理路径。实验表明，路由相对参数匹配基线几乎不损失准确率，而门控的token重要性信号取决于学习方式：静态词典先验在BoolQ反事实测试中失败，完全上下文门控则取得显著分离且不改变任务准确率。该工作为token剪枝和自适应计算提供了实证依据，与token压缩技术需求高度相关。",
+      "llm_tldr": "该论文针对高效Transformer中并非所有token都需要相同计算的假设进行端到端检验。提出双流Transformer SEWN，通过可学习门控将token路由到轻量或全容量处理路径。实验表明，路由相对参数匹配基线几乎不损失准确率，而门控的token重要性信号取决于学习方式：静态词典先验在BoolQ反事实测试中失败，完全上下文门控则取得显著分离且不改变任务准确率。该工作为token剪枝和自适应计算提供了实证依据，与token压缩技术需求高度相关。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.21032v1",
+      "source": "arxiv",
+      "title": "Roadside-Cooperative Autonomous Driving: From Data Platform to Vision-Language End-to-End Reasoning",
+      "abstract": "Vehicle-to-Everything (V2X) cooperation enables beyond-line-of-sight perception, mitigating occlusions in single-vehicle sensing. However, existing V2X benchmarks provide limited support for closed-loop evaluation and language-grounded supervision, hindering the development of vision-language models (VLMs) for end-to-end cooperative driving. To address these limitations, we introduce V2XBench, a simulation platform featuring synchronized ego--roadside sensing and closed-loop evaluation, together with Chat-V2XBench, a progressively structured VQA dataset for cooperative reasoning. Building upon this benchmark infrastructure, we propose AURORA, an end-to-end cooperative driving framework. Equipped with a dual-view perception architecture, AURORA mitigates spatial and semantic discrepancies across ego and roadside viewpoints through a query-level Cross-View Query Alignment and Fusion (CQAF) module. Leveraging the resulting unified tokens, a LoRA-adapted VLM bridges semantic reasoning and generative trajectory planning. Extensive closed-loop evaluations on V2XBench demonstrate that AURORA achieves state-of-the-art performance in heavily occluded scenarios, with a Route Completion rate of 98.21% and a Driving Score of 76.02, while requiring low roadside communication bandwidth. Ultimately, this work pioneers an extensible V2X--VLM paradigm, paving the way for next-generation cooperative autonomous driving.",
+      "authors": [
+        "Yitao Xu",
+        "Tong Wu",
+        "Yiyan Wu",
+        "Guoji Xu",
+        "Yanbo Jiang",
+        "Jiahao Wang",
+        "Zehong Ke",
+        "Junkai Jiang",
+        "Fang Zhang",
+        "Jianqiang Wang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-21T12:29:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.21032v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "V2X cooperative driving with vision-language models for traffic scene understanding",
+      "llm_evidence_cn": "面向路侧协同自动驾驶的视觉-语言模型交通场景理解",
+      "llm_evidence": "面向路侧协同自动驾驶的视觉-语言模型交通场景理解",
+      "canonical_evidence": "面向路侧协同自动驾驶的视觉-语言模型交通场景理解",
+      "llm_tldr_en": "Introduces V2XBench simulation platform and Chat-V2XBench VQA dataset, and proposes AURORA, an end-to-end cooperative driving framework with dual-view perception, pushing VLM-based traffic scene understanding.",
+      "llm_tldr_cn": "现有V2X自动驾驶基准缺乏闭环评估和语言监督，限制了端到端视觉语言模型的发展。为此构建V2XBench仿真平台和Chat-V2XBench渐进式VQA数据集，并提出AURORA端到端协同驾驶框架，配备双视角感知模块。实验表明该框架能利用路侧与自车同步感知进行协同推理，提升超视距场景理解能力，为基于多模态大模型的交通场景理解提供新平台与方法。",
+      "llm_tldr": "现有V2X自动驾驶基准缺乏闭环评估和语言监督，限制了端到端视觉语言模型的发展。为此构建V2XBench仿真平台和Chat-V2XBench渐进式VQA数据集，并提出AURORA端到端协同驾驶框架，配备双视角感知模块。实验表明该框架能利用路侧与自车同步感知进行协同推理，提升超视距场景理解能力，为基于多模态大模型的交通场景理解提供新平台与方法。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.20617v1",
+      "source": "arxiv",
+      "title": "Dual-Cache Latent Space Communication between Heterogeneous Language Models",
+      "abstract": "Multi-agent LLM systems split work across models, so answering often requires knowledge that sits in another agent's context: a Sharer has encoded information that a Receiver needs to complete its task. They usually communicate by exchanging text, which puts autoregressive decoding on the critical path and reduces the exchange to a discrete message written without sight of the receiver's state. Recent latent protocols instead translate the sharer's key-value (KV) cache into the receiver's: C2C supports heterogeneous models but requires both to read the same input, while LCF-X removes this shared-context requirement through position-free sharer-cache pooling. Three restrictions remain: LCF-X compresses the sharer alone, supplies the same layer-local summary to every receiver position with no joint cross-layer memory to retrieve from, and assumes matched layer count and KV geometry. We introduce XKV, which lifts all three: learned-query attention pools both caches; self-attention over receiver-aligned layer tokens, with a learned layer map reconciling different depths, mixes the pooled summaries into a compact joint memory; and a shared position decoder lets every raw receiver cache position retrieve its own per-head-gated residual in the receiver's native KV geometry. Both models stay frozen and may differ in family, depth, KV-head count, head dimension, and tokenizer; only the translator is trained. Across 45 dataset-model-pair settings (six heterogeneous and three same-model ordered pairings, five datasets), XKV attains the highest macro score and best average rank, improving on LCF-X on every dataset (by 4.6 exact-match and 4.2 F1 points on ROPES) and surpassing text communication on four of the five, while training 76% fewer parameters and translating a cache pair 10.3x faster (5.8 vs. 59.9 ms); end to end, XKV is 26% faster than LCF-X and 6.8x faster than text communication.",
+      "authors": [
+        "Jiyao Liu",
+        "Qi Zhang",
+        "Yaoyi Jia",
+        "Ziwen Kan",
+        "Song Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-08-20T23:35:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.20617v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "KV cache compression and cross-model latent communication",
+      "llm_evidence_cn": "KV缓存压缩与跨模型潜在空间通信",
+      "llm_evidence": "KV缓存压缩与跨模型潜在空间通信",
+      "canonical_evidence": "KV缓存压缩与跨模型潜在空间通信",
+      "llm_tldr_en": "Proposes dual-cache latent space communication that converts a sharer's KV cache into a receiver's representation, enabling heterogeneous LLMs to communicate without shared context or text decoding, reducing latency and redundancy.",
+      "llm_tldr_cn": "针对多智能体大语言模型间文本通信耗时且无法感知接收方状态的问题，提出双缓存潜在空间通信方法，将共享者的KV缓存直接转换为接收者可用的形式，免去共享上下文约束并支持异构模型。通过位置无关的缓存池化等机制改善已有潜在协议的压缩与层位置限制，降低通信开销并提升异构模型间信息传递效率，为高效多智能体协作提供新范式。",
+      "llm_tldr": "针对多智能体大语言模型间文本通信耗时且无法感知接收方状态的问题，提出双缓存潜在空间通信方法，将共享者的KV缓存直接转换为接收者可用的形式，免去共享上下文约束并支持异构模型。通过位置无关的缓存池化等机制改善已有潜在协议的压缩与层位置限制，降低通信开销并提升异构模型间信息传递效率，为高效多智能体协作提供新范式。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.21134v1",
+      "source": "arxiv",
+      "title": "Llama-Mobile: Efficient 2.7-Bit Quantization of VLMs",
+      "abstract": "Deploying vision-language models (VLMs) on mobile devices is challenging due to their significant memory and compute requirements. We present a framework for quantizing VLMs for efficient inference on resource-constrained hardware. Our approach combines a quantization pipeline that uses the model itself to generate training data and does not require access to the training setup, with a novel 2.7-bit-per-parameter format supporting efficient execution on Arm CPUs. We validate our approach by compressing the Llama 3.2 11B Vision Instruct model to 3.7 GB with 8-bit activations, preserving strong performance on a set of standard visual question answering tasks.",
+      "authors": [
+        "Luka Ribar",
+        "Jeevan Bhoot",
+        "Douglas Orr"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-21T14:10:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.21134v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient 2.7-bit quantization of VLMs for on-device inference",
+      "llm_evidence_cn": "面向设备端推理的视觉语言模型高效2.7位量化",
+      "llm_evidence": "面向设备端推理的视觉语言模型高效2.7位量化",
+      "canonical_evidence": "面向设备端推理的视觉语言模型高效2.7位量化",
+      "llm_tldr_en": "This paper proposes a quantization framework for VLMs using model-generated data and a 2.7-bit format, enabling efficient mobile inference. It compresses Llama 3.2 11B Vision Instruct to 3.7GB with strong VQA performance.",
+      "llm_tldr_cn": "视觉语言模型在移动设备上部署受限于内存和算力。本文提出一种无需训练数据的量化框架，利用模型自身生成数据并采用新的2.7位参数格式，在Arm CPU上实现高效执行。将Llama 3.2 11B视觉指令模型压缩至3.7GB，并在标准视觉问答任务上保持较强性能，为资源受限设备上的多模态大模型部署提供了实用方案。",
+      "llm_tldr": "视觉语言模型在移动设备上部署受限于内存和算力。本文提出一种无需训练数据的量化框架，利用模型自身生成数据并采用新的2.7位参数格式，在Arm CPU上实现高效执行。将Llama 3.2 11B视觉指令模型压缩至3.7GB，并在标准视觉问答任务上保持较强性能，为资源受限设备上的多模态大模型部署提供了实用方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.20556v1",
+      "source": "arxiv",
+      "title": "Logic-VLA: A Temporal Logic Conditioned Vision-Language-Action Model",
+      "abstract": "Vision-language-action (VLA) models can follow natural-language (NL) task instructions, but such instructions may not precisely specify safety-critical or spatiotemporal requirements on the resulting behavior. We introduce Logic-VLA, a formal-requirement-aware VLA that conditions on Signal Temporal Logic (STL) specifications supplied at inference time. Logic-VLA uses a syntax-graph-based STL encoder pre-trained to capture temporal logic semantics. Policy adaptation proceeds in two stages: STL-conditioned supervised fine-tuning on satisfying demonstrations is followed by trajectory-level preference optimization over matched satisfying-violating rollout pairs using a flow-matching surrogate for Identity Preference Optimization. This formulation improves formal requirement satisfaction while preserving the nominal NL task. We evaluate Logic-VLA in closed-loop quadcopter navigation simulation across randomized photorealistic environments and test generalization to STL formulas unseen during training. Across the evaluation benchmarks, Logic-VLA improves STL satisfaction rate over an STL-blind base policy by 24.8 to 40.7 percentage points (pp) while reducing nominal NL task success by at most 1.8 pp, showing that a single VLA can adapt its behavior to varying formal requirements without requiring a separate policy for each specification.",
+      "authors": [
+        "Celina Shiyu Wang",
+        "Yiqi Zhao",
+        "Junjie Ye",
+        "Yue Wang",
+        "Jyotirmoy V. Deshmukh"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.LO",
+        "eess.SY"
+      ],
+      "published": "2026-08-20T20:35:07+00:00",
+      "link": "https://arxiv.org/pdf/2608.20556v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "VLA model for robotics conditioned on temporal logic",
+      "llm_evidence_cn": "面向机器人的时序逻辑条件视觉-语言-动作模型",
+      "llm_evidence": "面向机器人的时序逻辑条件视觉-语言-动作模型",
+      "canonical_evidence": "面向机器人的时序逻辑条件视觉-语言-动作模型",
+      "llm_tldr_en": "Logic-VLA conditions a vision-language-action model on Signal Temporal Logic specifications. It pretrains a syntax-graph-based STL encoder and uses STL-conditioned supervised fine-tuning plus trajectory-level preference optimization with a flow-matching surrogate, improving compliance with formal spatiotemporal requirements.",
+      "llm_tldr_cn": "自然语言指令难以表达安全关键或时空约束，现有VLA模型无法严格遵循形式化规约。论文提出Logic-VLA，在推理时接收信号时序逻辑（STL）规格，利用基于语法图的编码器捕获时序语义，并通过STL条件监督微调和基于流匹配的轨迹级偏好优化实现策略适配。实验表明该方法能更好满足满足/违反轨迹对中的逻辑要求，提升VLA在安全关键任务中的可靠性。",
+      "llm_tldr": "自然语言指令难以表达安全关键或时空约束，现有VLA模型无法严格遵循形式化规约。论文提出Logic-VLA，在推理时接收信号时序逻辑（STL）规格，利用基于语法图的编码器捕获时序语义，并通过STL条件监督微调和基于流匹配的轨迹级偏好优化实现策略适配。实验表明该方法能更好满足满足/违反轨迹对中的逻辑要求，提升VLA在安全关键任务中的可靠性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.15580v1",
+      "source": "arxiv",
+      "title": "From Generalist to Specialist: A Context-Fusion Framework for Endoscopic Polyp Reporting with a Frozen VLM",
+      "abstract": "Reliable endoscopic polyp reporting requires integrating quantitative lesion sizing, standardized Paris classification, and clinically meaningful morphological description within a single record. General-purpose vision-language models (VLMs) offer a unified interface for image understanding and report generation. Existing specialization strategies, however, typically rely on task-specific models or model-weight adaptation, leaving unresolved how to introduce reliable specialist knowledge while preserving both this unified interface and the VLM's pretrained capabilities. We introduce a context-fusion framework that specializes a frozen general-purpose VLM through both implicit instruction context and explicit transduction context without modifying its pretrained weights. Specifically, a self-supervised polyp encoder retrieves related image-report pairs as explicit, query-specific evidence, while learned continuous specialist tokens provide implicit instruction context shared across cases. Experiments were conducted on 2,056 expert-annotated public endoscopic images. We compared the framework with general-purpose VLMs, task-specific predictors, and weight-adaptation methods to assess specialist performance, unified reporting, and adaptation efficiency. Across numerical, categorical, and report-generation metrics, the proposed framework substantially improved direct frozen-VLM inference and achieved the strongest overall performance among the evaluated methods. It added trainable parameters equal to only 0.006% of the frozen VLM's parameter count. When the top-1 retrieved case carried the correct target category, our framework corrected 70.5% of the errors made by a weight-adaptation baseline. These findings support the context-fusion framework as a lightweight and effective strategy for specialist adaptation of a frozen VLM.",
+      "authors": [
+        "Ruijie Yang",
+        "Yan Zhu",
+        "Peiyao Fu",
+        "Siyuan Li",
+        "Te Luo",
+        "Zhihua Wang",
+        "Quanlin Li",
+        "Pinghong Zhou",
+        "Xian Yang",
+        "Shuo Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-08-16T07:11:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.15580v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Frozen VLM context-fusion framework avoids model weight adaptation, an efficiency optimization for multimodal LLMs",
+      "llm_evidence_cn": "冻结视觉语言模型上下文融合框架，避免模型权重适配，是多模态大模型效率优化",
+      "llm_evidence": "冻结视觉语言模型上下文融合框架，避免模型权重适配，是多模态大模型效率优化",
+      "canonical_evidence": "冻结视觉语言模型上下文融合框架，避免模型权重适配，是多模态大模型效率优化",
+      "llm_tldr_en": "The paper presents a context-fusion framework that specializes a frozen general-purpose vision-language model for reliable endoscopic polyp reporting through implicit instruction and explicit transduction context, avoiding model-weight adaptation while preserving unified interface and pretrained capabilities.",
+      "llm_tldr_cn": "内镜息肉报告需整合定量测量、标准分类与形态描述，而通用视觉语言模型难以直接满足专科要求。该文提出上下文融合框架，通过隐式指令上下文和显式转导上下文，在不调整模型权重的前提下让冻结的通用VLM获得专科知识。实验表明该方法生成了专业报告且保留预训练能力，为多模态大模型的低开销专科化提供了有效方案。",
+      "llm_tldr": "内镜息肉报告需整合定量测量、标准分类与形态描述，而通用视觉语言模型难以直接满足专科要求。该文提出上下文融合框架，通过隐式指令上下文和显式转导上下文，在不调整模型权重的前提下让冻结的通用VLM获得专科知识。实验表明该方法生成了专业报告且保留预训练能力，为多模态大模型的低开销专科化提供了有效方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.20874v1",
+      "source": "arxiv",
+      "title": "Multi-Modal Traffic Sign Detection with Semantic Attributes for Autonomous Driving",
+      "abstract": "Reliable traffic sign detection is a prerequisite for the global deployment of autonomous driving systems, where regulatory compliance and road safety depend on perceiving signs correctly across regions, ranges, and weather conditions. Despite recent progress, vision-based methods continue to face three fundamental limitations: poor cross-regional generalization due to high diversity across countries, degraded performance on small-object detection at long ranges (traffic signs occupy as little as $10{\\times}10$ pixels at 200m), and fragile temporal tracking under the strongly non-linear perspective distortion that occurs as a vehicle approaches a sign. In this paper, we address the problem of robust, long-range, region-agnostic traffic sign perception by combining camera and Light Detection and Ranging (LiDAR) sensing. We present a multi-modal detection framework whose Intensity-Aware Deformable Fusion module aligns retro-reflective LiDAR cues with camera features, anchoring detection on geometric invariants rather than region-specific visual appearance. We further introduce a dual motion-model tracker that explicitly accounts for non-linear perspective transformations during vehicle approach, substantially improving temporal consistency over linear motion assumptions. Additionally, we develop a semantic attribute classification pipeline that estimates occlusion level, readability, sign embeddedness, and road relevance, providing actionable context to downstream planning. Extensive evaluation on our dataset, spanning 60+ countries and 2,500+ hours of driving data, shows that the proposed pipeline achieves an Object Miss Ratio (OMR) of 0.49% across 221,068 evaluation sequences, demonstrating globally generalizable traffic sign perception in commercial-grade autonomous driving systems.",
+      "authors": [
+        "Meda Lazar",
+        "Sourab Sridhar",
+        "Shashwata Gupta",
+        "Alexandra Tripcea",
+        "Varun Ravi",
+        "Senthil Yogamani"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-21T08:51:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.20874v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multi-modal traffic sign detection with semantic attributes for autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶的多模态交通标志检测与语义属性，直接相关于交通场景理解",
+      "llm_evidence": "面向自动驾驶的多模态交通标志检测与语义属性，直接相关于交通场景理解",
+      "canonical_evidence": "面向自动驾驶的多模态交通标志检测与语义属性，直接相关于交通场景理解",
+      "llm_tldr_en": "Traffic sign detection struggles with cross-region and long-range cases. This paper proposes multi-modal detection with semantic attributes, improving performance on distant small signs.",
+      "llm_tldr_cn": "交通标志检测是自动驾驶安全和法规合规的基础，但现有方法在跨区域泛化、远距离小目标以及复杂透视变形下的时序跟踪方面存在明显短板。本文提出一种多模态交通标志检测方法，引入语义属性信息，结合多模态特征增强对区域差异与极小目标的感知能力。实验表明，该方法在远距离小目标与复杂天气条件下检测性能显著提升，为自动驾驶的全局部署提供了更可靠的感知支撑。",
+      "llm_tldr": "交通标志检测是自动驾驶安全和法规合规的基础，但现有方法在跨区域泛化、远距离小目标以及复杂透视变形下的时序跟踪方面存在明显短板。本文提出一种多模态交通标志检测方法，引入语义属性信息，结合多模态特征增强对区域差异与极小目标的感知能力。实验表明，该方法在远距离小目标与复杂天气条件下检测性能显著提升，为自动驾驶的全局部署提供了更可靠的感知支撑。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.15605v1",
+      "source": "arxiv",
+      "title": "AlloEgo-VLM: Disambiguating Allocentric and Egocentric Reference Frames in Vision-Language Models",
+      "abstract": "This study investigates the challenge of ambiguity faced by Vision-Language Models (VLMs) in understanding spatial semantics. Spatial cognition, shaped by cognitive psychology, spatial science, and cultural context, often assigns directionality to objects. However, natural language descriptions of spatial relations frequently omit explicit reference frames, leading to semantic ambiguity and potentially serious errors for embodied AI robots. Existing VLMs, due to insufficient training on reference frames and object orientations, often produce inconsistent responses. To address this issue, we construct a new dataset, AlloEgo-View, comprising (image, query, view-specific answer) triplets that capture key object relations from both allocentric and egocentric perspectives. The view-specific descriptions follow a structured spatial representation that annotate detailed scene descriptions, reference and target objects, their orientations, reference frames, and view types. Building on AlloEgo-View, we develop AlloEgo-VLM, a framework to disambiguate allocentric and egocentric reference frames, even under ambiguous queries, and to be easily integrated into existing VLMs via supervised fine-tuning. Furthermore, we deploy our framework onto an embodied robotic platform within NVIDIA Isaac Sim to validate its real-world feasibility in open-ended object searching tasks. Experiments highlight the limitations of current VLMs in handling view-specific queries and demonstrate the strong disambiguation ability of AlloEgo-VLM.",
+      "authors": [
+        "Kuan-Lin Chen",
+        "Tzu-Ti Wei",
+        "Chao-Chi Liao",
+        "Yu-Chee Tseng",
+        "Jen-Jee Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-16T08:06:20+00:00",
+      "link": "https://arxiv.org/pdf/2608.15605v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Disambiguating allocentric/egocentric reference frames in VLMs supports semantic road scene analysis",
+      "llm_evidence_cn": "消解视觉语言模型中外部/自我参考框架歧义，有助于道路场景语义分析",
+      "llm_evidence": "消解视觉语言模型中外部/自我参考框架歧义，有助于道路场景语义分析",
+      "canonical_evidence": "消解视觉语言模型中外部/自我参考框架歧义，有助于道路场景语义分析",
+      "llm_tldr_en": "AlloEgo-VLM builds a new dataset to train VLMs to disambiguate allocentric and egocentric reference frames in spatial descriptions, reducing ambiguity and improving consistency for embodied AI.",
+      "llm_tldr_cn": "现有视觉语言模型描述空间关系时常省略参考框架，导致外部与自我方向歧义，影响具身AI的语义理解。该文构建AlloEgo-View数据集，用图像、查询与视角特定答案三元组训练模型，使其在回答空间关系问题时依据视角输出一致结果。实验显示该模型显著提升参考框架消歧能力，可为道路场景等需要空间语义的多模态理解提供支撑。",
+      "llm_tldr": "现有视觉语言模型描述空间关系时常省略参考框架，导致外部与自我方向歧义，影响具身AI的语义理解。该文构建AlloEgo-View数据集，用图像、查询与视角特定答案三元组训练模型，使其在回答空间关系问题时依据视角输出一致结果。实验显示该模型显著提升参考框架消歧能力，可为道路场景等需要空间语义的多模态理解提供支撑。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Semantic analysis of road scenes with multimodal models",
+      "matched_requirement_id": "req-22",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.20988v1",
+      "source": "arxiv",
+      "title": "Jacobian-guided Noise Injection for Quantization Robustness in Large Language Models",
+      "abstract": "Quantization of Large Language Models (LLMs) is often hindered by the sensitivity of the self-attention mechanism to discretization errors. We identify the softmax operator as a bottleneck for quantization stability due to its sensitivity to outliers and state-dependent Jacobian. We theoretically establish that suppressing the norm of this Jacobian helps in bounding quantization-induced performance degradation. Based on this, we propose Jacobian-Guided Noise Injection, a training strategy that injects zero-mean Gaussian noise into pre-attention logits, with variance derived directly from the Jacobian Frobenius norm. Unlike prior approaches that rely on heuristic or penalise jacobian directly, our method provides a way to identify the optimal noise variance based on the local attention sensitivity. We evaluate the method on SOTA LLM architectures, where it demonstrates improved robustness over popular PTQ methods. Empirical analysis reveals that the proposed method gives up to +37% relative gains on Top-1 accuracy on ImageNet-1K for SigLIP and improves relative perplexity by upto 40% on WikiText for language models in low bit quantisation settings, proving the efficacy of the approach.",
+      "authors": [
+        "Deepanshu Pandey",
+        "Arnav Chavan",
+        "Nahush Lele",
+        "Sankalp Dayal",
+        "Deepak Gupta"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-08-21T11:16:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.20988v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Jacobian-guided noise injection for quantization robustness in LLMs",
+      "llm_evidence_cn": "面向大语言模型量化鲁棒性的雅可比引导噪声注入",
+      "llm_evidence": "面向大语言模型量化鲁棒性的雅可比引导噪声注入",
+      "canonical_evidence": "面向大语言模型量化鲁棒性的雅可比引导噪声注入",
+      "llm_tldr_en": "Proposes Jacobian-guided noise injection to stabilize softmax under quantization, improving LLM quantization robustness.",
+      "llm_tldr_cn": "大语言模型量化常因自注意力对离散化误差敏感而性能下降，其中softmax对异常值和状态相关雅可比敏感是主要瓶颈。作者从理论上证明抑制softmax雅可比范数有利于约束量化损失，并提出雅可比引导噪声注入，在注意力前logits中加入由雅可比Frobenius范数决定方差的高斯噪声。实验显示该方法比启发式或直接惩罚雅可比的方法更能提升量化后模型的稳定性，为高精度低比特LLM部署提供了新思路。",
+      "llm_tldr": "大语言模型量化常因自注意力对离散化误差敏感而性能下降，其中softmax对异常值和状态相关雅可比敏感是主要瓶颈。作者从理论上证明抑制softmax雅可比范数有利于约束量化损失，并提出雅可比引导噪声注入，在注意力前logits中加入由雅可比Frobenius范数决定方差的高斯噪声。实验显示该方法比启发式或直接惩罚雅可比的方法更能提升量化后模型的稳定性，为高精度低比特LLM部署提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.21099v1",
+      "source": "arxiv",
+      "title": "A2DINOv3: Rethinking Multi-Modal Object Detection via Socialized Collaboration",
+      "abstract": "Multi-modal object detection is essential for robust scene understanding in challenging conditions, including low-light and adverse environments. Recent vision foundation models (e.g., DINOv3) have exhibited strong representation capabilities, yet adapting them to multi-modal scenarios remains challenging. Existing dense cross-modal fusion strategies often force heterogeneous modalities to interact indiscriminately, which may introduce redundant information and disrupt the valuable pre-trained representations. To address this issue, we revisit multi-modal fusion from the perspective of socialized learning and propose adapter to DINOv3 (A2DINOv3), a multi-expert collaboration framework with a Socialized Collaboration Protocol (SCP). Specifically, RGB and infrared branches are modeled as heterogeneous experts that independently preserve their specialized knowledge while exchanging complementary information through selective and constrained interactions. This design mitigates harmful cross-modal interference and prevents degradation of pre-trained priors during adaptation. Furthermore, a zero-initialization strategy is introduced to gradually activate cross-modal collaboration, enabling a smooth transition from modality-specific learning to cooperative representation learning. Extensive experiments on four multi-modal benchmarks, including aerial detection (GAIIC), autonomous driving (FLIR), low-light surveillance (LLVIP), and diverse real-world scenarios (M3FD), demonstrate that A2DINOv3 consistently achieves state-of-the-art performance in multi-modal object detection.",
+      "authors": [
+        "Jiekang Feng",
+        "Zhihe Fan",
+        "Yunqi Zhu",
+        "Xinjie Yao",
+        "Yueying Zhang",
+        "Yike Gao",
+        "Ranxin Li",
+        "Guanzuo Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-21T13:44:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.21099v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multi-modal object detection with vision foundation model adapters for robust scene understanding in adverse conditions",
+      "llm_evidence_cn": "基于视觉基础模型适配器的多模态目标检测，用于恶劣条件下的鲁棒场景理解",
+      "llm_evidence": "基于视觉基础模型适配器的多模态目标检测，用于恶劣条件下的鲁棒场景理解",
+      "canonical_evidence": "基于视觉基础模型适配器的多模态目标检测，用于恶劣条件下的鲁棒场景理解",
+      "llm_tldr_en": "A2DINOv3 adapts the DINOv3 vision foundation model to multi-modal object detection via a socialized collaboration protocol, preserving pretrained representations and achieving robust detection in low-light and adverse conditions.",
+      "llm_tldr_cn": "现有密集跨模态融合迫使异质模态无差别交互，易引入冗余并破坏视觉基础模型的预训练表示。本文提出A2DINOv3多专家协作框架，借助适配器与社交化协作协议，在适配DINOv3时选择性融合多模态信息。低光照和恶劣环境下实验证明该方法能保持预训练表示并显著提升目标检测鲁棒性，为复杂交通场景感知提供新范式。",
+      "llm_tldr": "现有密集跨模态融合迫使异质模态无差别交互，易引入冗余并破坏视觉基础模型的预训练表示。本文提出A2DINOv3多专家协作框架，借助适配器与社交化协作协议，在适配DINOv3时选择性融合多模态信息。低光照和恶劣环境下实验证明该方法能保持预训练表示并显著提升目标检测鲁棒性，为复杂交通场景感知提供新范式。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-21",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
