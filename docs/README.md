@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-25</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-26</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 20 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 12 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>12</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>6</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-25 21:14:26 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-26 21:20:43 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读20篇，聚焦MoE混合专家模型的压缩基准与边缘端事件视觉轻量自编码器。最值得看的是9.0分两项：MoE压缩技术对比，以及低延迟能量受限设备上的LiteEvent-AE方案。建议优先关注模型压缩方向，对实际部署效率提升最直接。</p>
+<p>今日精读12篇，重点聚焦事件相机运动估计与KV缓存压缩两大高分工作。最值得关注的是基于有向距离场的事件运动估计算法（10/10），以及保持单调等势分配的Geodesia-KV缓存优化（9/10）。建议优先复现高分论文核心方法，并留意速读中教育VQA与VLA自动驾驶的潜在应用价值。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +71,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">8 篇</strong>
+    <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Benchmarking Composable Compression Techniques in Mixture-of-Experts LLMs">Benchmarking Composable Compression Techniques in Mixture-of-Experts LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="LiteEvent-AE: Lightweight Autoencoder for Event-Based Vision on Low-Latency Energy-Constrained Edge Devices">LiteEvent-AE: Lightweight Autoencoder for Event-Based Vision on Low-Latency Energy-Constrained Edge Devices</span></li><li><span class="dpr-home-dashboard-paper-title" title="VIG: Visual Information Gain as a Reward Signal for Multimodal Chain-of-Thought Compression">VIG: Visual Information Gain as a Reward Signal for Multimodal Chain-of-Thought Compression</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Event-Based Motion Estimation via Oriented Distance Fields">Event-Based Motion Estimation via Oriented Distance Fields</span></li><li><span class="dpr-home-dashboard-paper-title" title="Squeezing the Cache, Preserving the Truth: Monotonic Equipotential Allocation with Geodesia-KV">Squeezing the Cache, Preserving the Truth: Monotonic Equipotential Allocation with Geodesia-KV</span></li><li><span class="dpr-home-dashboard-paper-title" title="Minima-KV: Retention-Preserving KV Cache Compression with Mixed-Format Paged Attention">Minima-KV: Retention-Preserving KV Cache Compression with Mixed-Format Paged Attention</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +84,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">12 篇</strong>
+    <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Geo-VLA: Geometry-Aware Vision-Language-Action Planning via Internalization of Map Semantics">Geo-VLA: Geometry-Aware Vision-Language-Action Planning via Internalization of Map Semantics</span></li><li><span class="dpr-home-dashboard-paper-title" title="OptiSight: Bridging Semantic Reasoning and Geometric Control for Embodied Navigation">OptiSight: Bridging Semantic Reasoning and Geometric Control for Embodied Navigation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Learning to Look Again: Loss-Gap Supervision for Free-form Crop Routing in Vision-Language Models">Learning to Look Again: Loss-Gap Supervision for Free-form Crop Routing in Vision-Language Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="GRACE: Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration for Educational Visual Question Answering">GRACE: Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration for Educational Visual Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="A Collaborative Multi-Modality Interaction for VLA-based End-to-End Autonomous Driving">A Collaborative Multi-Modality Interaction for VLA-based End-to-End Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="MoTE: Mixture of Task Experts for Multi-Task Video Understanding">MoTE: Mixture of Task Experts for Multi-Task Video Understanding</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>9</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span></div>
 </section>
 </div>
 

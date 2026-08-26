@@ -1,0 +1,524 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-26T21:10:46.736806+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 6,
+    "deep_cap": 8,
+    "deep_selected": 6,
+    "quick_candidates": 6,
+    "quick_skim_target": 13,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2608.24223v1",
+      "source": "arxiv",
+      "title": "Event-Based Motion Estimation via Oriented Distance Fields",
+      "abstract": "Event-based motion estimation is central to tasks that demand high temporal resolution and robustness to fast motion. Existing methods typically rely on iterative optimization or repeated hypothesis comparison, offsetting the sensor's low-latency advantage. We propose Oriented Distance Field Motion Estimation (ODF Motion Estimation), which replaces this optimization with a single averaging step over a precomputed field of event distance vectors, combined with an adaptive event-count selection strategy and a parameter-free trail filter. On public and self-collected datasets, ODF motion estimation reaches sub-pixel accuracy at the lowest latency among compared methods. We validate its generality on two downstream applications rather than treating them as separate contributions. First, the estimated trajectory is converted into a blur kernel and paired with a compact iterative-unfolding network, trained on simulated motion-estimation noise, for real-time non-blind image deblurring, attaining competitive or superior PSNR/SSIM with under 1M parameters. Second, the same precomputed field is repurposed for directional event filtering in a low-power asynchronous pupil and glint tracker, sustaining stable tracking for tens of seconds while lowering a near-eye module's power draw.",
+      "authors": [
+        "Lei Sun",
+        "Yuqin Ma",
+        "Weilun Li",
+        "Haoran Liang",
+        "Runyi Yang",
+        "Kaiwei Wang",
+        "Danda Pani Paudel",
+        "Luc Van Gool"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-25T08:27:42+00:00",
+      "link": "https://arxiv.org/pdf/2608.24223v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Event-based camera motion estimation using oriented distance fields",
+      "llm_evidence_cn": "基于事件相机的运动估计，使用有向距离场",
+      "llm_evidence": "基于事件相机的运动估计，使用有向距离场",
+      "canonical_evidence": "基于事件相机的运动估计，使用有向距离场",
+      "llm_tldr_en": "ODF Motion Estimation replaces iterative optimization in event-based motion estimation with a single averaging step over precomputed oriented distance fields, achieving sub-pixel accuracy at the lowest latency and generalizing to downstream applications.",
+      "llm_tldr_cn": "事件相机运动估计对高时间分辨率和快速运动鲁棒性要求很高，但现有迭代优化或假设比较抵消了低延迟优势。本文提出基于有向距离场的运动估计方法，将优化转换为对预计算事件距离向量场的单次平均，并配以自适应事件计数选择和参数无关的拖尾滤波。在公共和自采数据集上达到亚像素精度且延迟最低，并在两个下游应用中验证了通用性。",
+      "llm_tldr": "事件相机运动估计对高时间分辨率和快速运动鲁棒性要求很高，但现有迭代优化或假设比较抵消了低延迟优势。本文提出基于有向距离场的运动估计方法，将优化转换为对预计算事件距离向量场的单次平均，并配以自适应事件计数选择和参数无关的拖尾滤波。在公共和自采数据集上达到亚像素精度且延迟最低，并在两个下游应用中验证了通用性。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based vision",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.23599v1",
+      "source": "arxiv",
+      "title": "Squeezing the Cache, Preserving the Truth: Monotonic Equipotential Allocation with Geodesia-KV",
+      "abstract": "Current assessment of KV-cache compression performance confuses resident bits with read bandwidth and is affected by the artifacts of chunked teacher-forcing. We present Geodesia-KV, a family of training-free KV cache policies based on monotonic block-wise precision allocation, exact rate-distortion residuals, and query-sparse reading, enabling proper hardware-ready compression. With proper separation of resident and read bits and causal evaluation, we show that Geodesia-KV significantly outperforms other approaches. Specifically, on WikiText-2 with 16k context, the 5-bit operating point of Geodesia-KV results in lower perplexity at lower bitrate than KIVI-4 on Qwen. In addition, our compressed-Quest version delivers improved perplexity and reduces resident (9.83 vs 16.25 bits/value) and read rates (1.95 vs 2.32 bits/value) over baseline sparse methods on PG-19. As Geodesia-KV is implemented as native GeodesiaKVCacheManager plug-in of vLLM, Geodesia-KV fully removes the need for dense cache residency via monotonic bit demotion. With the full consumer hardware evaluation, Geodesia-KV leads to 1M-token context generation on a single 16 GiB GPU with up to 71.7% peak VRAM savings on all leading architectures (Qwen, Llama, DeepSeek).",
+      "authors": [
+        "Vincenzo Dentamaro",
+        "Pancrazio Auteri",
+        "Giuseppe Pirlo"
+      ],
+      "primary_category": "cs.AR",
+      "categories": [
+        "cs.AR",
+        "cs.CL"
+      ],
+      "published": "2026-08-19T08:04:29+00:00",
+      "link": "https://arxiv.org/pdf/2608.23599v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free KV cache compression policies for long-context LLM inference",
+      "llm_evidence_cn": "面向长上下文大模型推理的免训练KV缓存压缩",
+      "llm_evidence": "面向长上下文大模型推理的免训练KV缓存压缩",
+      "canonical_evidence": "面向长上下文大模型推理的免训练KV缓存压缩",
+      "llm_tldr_en": "Geodesia-KV is a family of training-free KV cache policies using monotonic block-wise precision allocation, exact rate-distortion residuals, and query-sparse reading; it achieves lower perplexity at lower bitrate than KIVI-4 on WikiText-2 16k context.",
+      "llm_tldr_cn": "现有KV缓存压缩评测常将驻留比特与读取带宽混为一谈，并受分块教师强制的评估伪影影响，难以反映真实推理效率。本文提出Geodesia-KV，一种免训练的KV缓存策略族，采用单调块级精度分配、精确率失真残差和查询稀疏读取，实现了硬件友好的压缩方案。在WikiText-2的16k上下文实验中，5比特工作点在更低码率下达到比KIVI-4更低的困惑度，验证了该策略在长上下文大模型推理中的有效性，为KV缓存管理提供了新基线。",
+      "llm_tldr": "现有KV缓存压缩评测常将驻留比特与读取带宽混为一谈，并受分块教师强制的评估伪影影响，难以反映真实推理效率。本文提出Geodesia-KV，一种免训练的KV缓存策略族，采用单调块级精度分配、精确率失真残差和查询稀疏读取，实现了硬件友好的压缩方案。在WikiText-2的16k上下文实验中，5比特工作点在更低码率下达到比KIVI-4更低的困惑度，验证了该策略在长上下文大模型推理中的有效性，为KV缓存管理提供了新基线。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.23834v1",
+      "source": "arxiv",
+      "title": "Minima-KV: Retention-Preserving KV Cache Compression with Mixed-Format Paged Attention",
+      "abstract": "The key-value (KV) cache is a primary capacity and bandwidth bottleneck in long-context LLM serving. We present Minima-KV, a retention-preserving hierarchy for mixed-format paged attention. Recent and protected Anchor pages remain in FP8, while older non-anchor pages move to packed TQ3; every live-request page remains addressable. Format-specific kernels compute partial attention states and combine them through a globally normalized online-softmax merge, enabling direct heterogeneous decode without a cache-sized dense shadow. Across separate, configuration-bound Qwen3.6-27B profiles on a single 96-GB NVIDIA RTX PRO 6000 Blackwell GPU, deployment accounting reports 18.3 KiB of attention KV per live token, corresponding to 3.50x compression relative to BF16 and 1.75x relative to FP8. A materializing quality profile matches its dense control on 16K RULER needle-in-a-haystack tasks. On the same 503-question LongBench v2 set, measured deltas are -0.80, -0.60, and -0.40 percentage points at 16K, 32K, and 64K. A separate single-pair direct-decode canary with two 59,008-token requests measures 3.625x active-KV compression and 0.9821x throughput relative to its control, routes all 16 full-attention layers without fallback, and retains no dense shadow. These results establish a practical mixed-format path for compressing long-context state without evicting live-request KV pages.",
+      "authors": [
+        "Sergii Kozyrev",
+        "Davyd Maiboroda"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-24T21:21:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.23834v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression and management for long context, retention-preserving mixed-format paged attention",
+      "llm_evidence_cn": "面向长上下文的KV缓存压缩与管理，保留保持的混合格式分页注意力",
+      "llm_evidence": "面向长上下文的KV缓存压缩与管理，保留保持的混合格式分页注意力",
+      "canonical_evidence": "面向长上下文的KV缓存压缩与管理，保留保持的混合格式分页注意力",
+      "llm_tldr_en": "Minima-KV introduces a retention-preserving mixed-format paged attention hierarchy: recent anchor pages stay FP8, older pages move to packed TQ3, achieving 3.50x KV cache compression with direct heterogeneous decode for long-context LLM serving.",
+      "llm_tldr_cn": "长上下文大模型服务中，KV缓存已成为容量与带宽的主要瓶颈。为此，Minima-KV提出一种保留保持的混合格式分页注意力层级：近期与受保护的Anchor页保持FP8格式，而较旧的非Anchor页转换为紧凑的TQ3格式，同时所有在线请求页保持可寻址。通过格式专用kernel与全局归一化在线softmax合并，实现异构解码。在Qwen3.6-27B的部署实验中，每Token注意力KV仅占用18.3 KiB，对应3.50倍压缩，显著降低缓存压力，验证了该压缩方案的有效性。",
+      "llm_tldr": "长上下文大模型服务中，KV缓存已成为容量与带宽的主要瓶颈。为此，Minima-KV提出一种保留保持的混合格式分页注意力层级：近期与受保护的Anchor页保持FP8格式，而较旧的非Anchor页转换为紧凑的TQ3格式，同时所有在线请求页保持可寻址。通过格式专用kernel与全局归一化在线softmax合并，实现异构解码。在Qwen3.6-27B的部署实验中，每Token注意力KV仅占用18.3 KiB，对应3.50倍压缩，显著降低缓存压力，验证了该压缩方案的有效性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.23843v1",
+      "source": "arxiv",
+      "title": "PuzzleKV: Page-Wise Low-Rank Decomposition for KV Cache Compression",
+      "abstract": "Long-context inference in large language models (LLMs) is increasingly limited by the memory required for the key-value (KV) cache. KV cache compression addresses this problem by reducing the storage cost of previous tokens. Among existing approaches, low-rank compression is particularly attractive because it represents every token in reduced dimensions. Previous low-rank methods typically derive fixed projection spaces from model weights, construct fixed spaces from calibration activations, or construct a shared basis over a broad cache region. Such representations may not capture detailed but important information. We partition each per-head KV cache into fixed-length logical pages and observe substantial low-rank structure within individual pages. Based on this observation, we propose PuzzleKV, a training- and calibration-free method that treats each completed page as an independent compression unit. PuzzleKV decomposes pages within each layer and KV head, computes attention directly over dense and factorized pages, and incrementally compresses newly eligible pages during autoregressive decoding. Experiments across models, context lengths, and benchmarks demonstrate the effectiveness of PuzzleKV under matched storage budgets. At approximately 60% of the original KV cache storage, PuzzleKV achieves more than 96% of Full KV performance across both evaluated models and all benchmark settings, with substantial gains over Global SVD on RULER and competitive performance on LongBench. To achieve a more aggressive compression ratio, PuzzleKV can be further combined with quantization while retaining more than 93% of Full KV performance using only 18.7% of the original storage.",
+      "authors": [
+        "Zizhong Wang",
+        "Jieying Wang",
+        "Zhao Zhang",
+        "Jiajia Li"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-08-24T21:30:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.23843v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "KV cache compression via page-wise low-rank decomposition for long-context LLM inference",
+      "llm_evidence_cn": "面向长上下文大模型的分页式低秩KV缓存压缩",
+      "llm_evidence": "面向长上下文大模型的分页式低秩KV缓存压缩",
+      "canonical_evidence": "面向长上下文大模型的分页式低秩KV缓存压缩",
+      "llm_tldr_en": "PuzzleKV compresses LLM KV caches by partitioning per-head caches into fixed-length logical pages and exploiting page-level low-rank structure, preserving detailed information that global or weight-based projections miss, and improving long-context inference efficiency.",
+      "llm_tldr_cn": "长上下文推理中KV缓存占用内存巨大，现有低秩压缩方法通常使用固定投影空间或全局共享基，难以保留细粒度重要信息。PuzzleKV将每个头的KV缓存划分为固定长度的逻辑页，并利用页内显著的低秩结构进行压缩。该方法能在更细的粒度上保留关键信息，相比既有低秩压缩方法更有效地降低缓存存储开销，同时维持或提升长上下文任务表现，为KV缓存管理提供了新思路。",
+      "llm_tldr": "长上下文推理中KV缓存占用内存巨大，现有低秩压缩方法通常使用固定投影空间或全局共享基，难以保留细粒度重要信息。PuzzleKV将每个头的KV缓存划分为固定长度的逻辑页，并利用页内显著的低秩结构进行压缩。该方法能在更细的粒度上保留关键信息，相比既有低秩压缩方法更有效地降低缓存存储开销，同时维持或提升长上下文任务表现，为KV缓存管理提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.23921v1",
+      "source": "arxiv",
+      "title": "HAP: Head-Adaptive Visual Token Pruning via Cross-Modal Alignment",
+      "abstract": "Recent Vision-Language Models encode high-resolution images into long visual token sequences, incurring prohibitive prefill costs. To compress them, existing methods score each visual token by averaging text-to-visual attention uniformly across all heads, which assumes every head matches the query. However, our empirical analysis shows that misaligned heads dominate the average, amplifying background tokens and drowning out fine-grained cues.   To address this, we propose PAQ (Prompt-Grounded Attention Quality), a metric quantifying how well each head aligns the prompt with image regions. Built on PAQ, our pruning proceeds in three stages. Given a target FLOPs budget, we first partition the transformer layers into groups and allocate a visual token budget to each. Within each group, we then aggregate per-head attention maps via PAQ-weighted softmax into a group-level matrix. Finally, we score visual tokens by this matrix's magnitude and retain the allocated budget per group. By weighting heads with PAQ, our method scores tokens by attention signals that more faithfully reflect prompt relevance, rather than diluting them through uniform averaging.   Across 18 benchmarks, our method delivers state-of-the-art trade-offs. Specifically, on LLaVA-1.5-7B (9 tasks), retaining only \\textbf{5.6\\%} tokens preserves \\textbf{99.1\\%} of the original performance, surpassing the strongest baseline AutoPrune by 4.2 points. Code is available in https://github.com/baokou-fw2/HAP.",
+      "authors": [
+        "Yuanhao Sun",
+        "Huawei Ji",
+        "Yuan Jin",
+        "Cheng Deng",
+        "Luoyi Fu",
+        "Xinbing Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-24T23:55:36+00:00",
+      "link": "https://arxiv.org/pdf/2608.23921v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Head-adaptive visual token pruning via cross-modal alignment in VLMs",
+      "llm_evidence_cn": "通过跨模态对齐实现视觉语言模型中的自适应头部视觉令牌剪枝",
+      "llm_evidence": "通过跨模态对齐实现视觉语言模型中的自适应头部视觉令牌剪枝",
+      "canonical_evidence": "通过跨模态对齐实现视觉语言模型中的自适应头部视觉令牌剪枝",
+      "llm_tldr_en": "HAP proposes PAQ, a prompt-grounded attention quality metric, and performs head-adaptive visual token pruning in VLMs under a FLOPs budget, reducing prefill cost while preserving fine-grained visual cues.",
+      "llm_tldr_cn": "视觉语言模型处理高分辨率图像时会产生长视觉令牌序列，导致预填充成本高昂。现有方法对所有注意力头均匀平均，错误地放大了背景令牌。本文提出PAQ指标，量化每个注意力头对提示与图像区域的匹配质量，并据此在给定FLOPs预算下分三阶段剪枝，为不同层组分配视觉令牌预算。实验表明该方法能有效压缩令牌并保留细粒度线索。",
+      "llm_tldr": "视觉语言模型处理高分辨率图像时会产生长视觉令牌序列，导致预填充成本高昂。现有方法对所有注意力头均匀平均，错误地放大了背景令牌。本文提出PAQ指标，量化每个注意力头对提示与图像区域的匹配质量，并据此在给定FLOPs预算下分三阶段剪枝，为不同层组分配视觉令牌预算。实验表明该方法能有效压缩令牌并保留细粒度线索。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.24063v1",
+      "source": "arxiv",
+      "title": "VisCache: Visual KV Cache Pruning for Efficient Vision Large Language Model Inference",
+      "abstract": "While Vision Large Language Models (VLLMs) have achieved remarkable success in multimodal reasoning, their long-context inference remains prohibitively expensive due to the massive computation and memory overhead of visual Key-Value (KV) caches. Existing KV compression methods often apply uniform pruning across visual tokens and layers, leading to substantial information loss and degraded performance.To address this challenge, we propose \\textbf{VisCache}, a plug-and-play framework for coarse-to-fine \\textbf{Vis}ual KV \\textbf{Cache} pruning without training, which consists of two synergistic stages. First, a lightweight VLM filters temporal redundancy by selectively forwarding semantically informative keyframes. Second, we introduce {PruneKV}, a surgical KV compression algorithm tailored to the attention dynamics of VLLMs. Unlike rigid pruning strategies, PruneKV adopts a parabolic layer-wise budget allocation together with an asymmetric update mechanism that selectively prunes keys while fusing values, thereby preserving critical contextual information. Extensive experiments demonstrate that VisCache substantially improves inference efficiency, achieving up to {2.35$\\times$ speedup} and significant memory reduction while maintaining competitive performance with only {19--28\\%} KV cache retention. VisCache consistently outperforms existing baselines, establishing a new Pareto frontier between efficiency and performance for long-context VLLM inference. Code is available at https://github.com/Wlklk/VisCache",
+      "authors": [
+        "Lyuke Wang",
+        "Zhuo Li",
+        "Guangxu Zhu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-25T04:52:05+00:00",
+      "link": "https://arxiv.org/pdf/2608.24063v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual KV cache pruning for efficient VLLM inference matches KV cache compression and token pruning requirements",
+      "llm_evidence_cn": "视觉KV缓存剪枝用于高效VLLM推理，契合KV缓存压缩与token剪枝需求",
+      "llm_evidence": "视觉KV缓存剪枝用于高效VLLM推理，契合KV缓存压缩与token剪枝需求",
+      "canonical_evidence": "视觉KV缓存剪枝用于高效VLLM推理，契合KV缓存压缩与token剪枝需求",
+      "llm_tldr_en": "VisCache proposes training-free coarse-to-fine visual KV cache pruning for efficient VLLM inference, combining keyframe selection and token pruning to cut memory and compute while keeping performance.",
+      "llm_tldr_cn": "视觉大语言模型(VLLM)长上下文推理中，视觉KV缓存带来巨大计算与内存开销，现有均匀剪枝方法信息损失严重。VisCache提出无需训练的由粗到细视觉KV缓存剪枝框架，先用轻量VLM筛选关键帧，再按跨层重要性对视觉token剪枝。实验显示其显著降低KV缓存占用与推理开销，同时保持甚至提升多模态任务性能。该框架为高效VLLM推理提供了即插即用的实用方案。",
+      "llm_tldr": "视觉大语言模型(VLLM)长上下文推理中，视觉KV缓存带来巨大计算与内存开销，现有均匀剪枝方法信息损失严重。VisCache提出无需训练的由粗到细视觉KV缓存剪枝框架，先用轻量VLM筛选关键帧，再按跨层重要性对视觉token剪枝。实验显示其显著降低KV缓存占用与推理开销，同时保持甚至提升多模态任务性能。该框架为高效VLLM推理提供了即插即用的实用方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "KV cache compression and management for long context",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.19355v1",
+      "source": "arxiv",
+      "title": "GRACE: Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration for Educational Visual Question Answering",
+      "abstract": "Educational visual question answering, or VQA, requires models to solve curriculum-oriented multiple-choice questions using both language and visual evidence. Compared with conventional open-ended VQA, educational examples often include structured assessment metadata, diagrams or image contexts, and semantically close answer options, creating strong opportunities for question-option shortcuts. We develop and evaluate a parameter-efficient adaptation framework for a frozen multimodal large language model in this setting. We introduce GRACE, Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration, a framework that uses the pedagogical state of each question to specialize lightweight language and vision adaptation. The state combines inference-visible subject, grouped skill, grade, visual-context, question-intent, and option-structure cues. GRACE uses factor-specific prompts and lightweight visual adapters, then applies evidence-aware option calibration to score all candidates under a shared multimodal context. On ScienceQA, GRACE improves a shared-adapter baseline from 90.5 percent to 93.1 percent overall accuracy and from 88.7 percent to 91.2 percent on image-context questions. Removing pedagogical composition, option calibration, or the visual adapter reduces overall accuracy by 1.4, 1.0, and 1.5 points, respectively. These controlled results show that structured educational state is an effective routing signal for parameter-efficient multimodal adaptation.",
+      "authors": [
+        "Xinjin Li",
+        "Yudi Xia",
+        "Xi Zhao",
+        "Yiliu Xu",
+        "Yining Liu",
+        "Cheng Lu",
+        "Yujian Long",
+        "Yu Ma",
+        "Jinghan Cao",
+        "Liang Fan",
+        "Yeyun Xu"
+      ],
+      "primary_category": "cs.MM",
+      "categories": [
+        "cs.MM",
+        "cs.CV"
+      ],
+      "published": "2026-08-19T18:20:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.19355v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "parameter-efficient adapter composition and evidence-aware calibration for frozen multimodal large language model",
+      "llm_evidence_cn": "面向冻结多模态大模型的参数高效适配器组合与证据校准",
+      "llm_evidence": "面向冻结多模态大模型的参数高效适配器组合与证据校准",
+      "canonical_evidence": "面向冻结多模态大模型的参数高效适配器组合与证据校准",
+      "llm_tldr_en": "Proposes GRACE, a parameter-efficient adaptation framework for educational visual question answering that composes lightweight adapters conditioned on pedagogical state and calibrates evidence for a frozen multimodal LLM.",
+      "llm_tldr_cn": "针对教育场景视觉问答中多模态大模型微调成本高、选项捷径易误导的问题，本文提出GRACE框架。它利用问题的教学状态组合轻量适配器，并引入证据感知校准，让冻结的多模态大模型以参数高效方式完成推理。实验表明该框架在减少可训练参数的同时提升了答题准确性。这表明适配器组合是优化多模态大模型效率的一条有效途径。",
+      "llm_tldr": "针对教育场景视觉问答中多模态大模型微调成本高、选项捷径易误导的问题，本文提出GRACE框架。它利用问题的教学状态组合轻量适配器，并引入证据感知校准，让冻结的多模态大模型以参数高效方式完成推理。实验表明该框架在减少可训练参数的同时提升了答题准确性。这表明适配器组合是优化多模态大模型效率的一条有效途径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.20805v1",
+      "source": "arxiv",
+      "title": "Routing Before Looking: Query-Adaptive Evidence Acquisition for Long-form Video Understanding",
+      "abstract": "Long-form video understanding remains challenging for video agents due to the mismatch between query demands and evidence acquisition strategies. Although recent planning-before-perception methods outperform query-agnostic pipelines, they often rely on a single dominant strategy, either generation-based strategy or retrieval-based strategy, limiting their ability to handle diverse query demands. We propose Route2Look, a lightweight and model-agnostic framework for query-adaptive evidence acquisition in long-form video understanding. Route2Look operates in a Route-Look-Memorize loop with three tools: Global Browse for holistic context, Temporal Ground for explicit temporal cues, and Semantic Retrieve for semantic search. The core component is a routing policy that dynamically selects evidence acquisition tools based on the query. To build this policy, Route2Look adopts a two-stage design: first distilling the routing skill from differential contrastive analysis between generation-based and retrieval-based trajectories, and then applying the distilled skill with hard routing rules and continue-or-stop criteria during inference. Experiments on challenging long-video benchmarks show that Route2Look achieves state-of-the-art performance while maintaining strong frame efficiency across datasets and query types. Oracle routing analysis further reveals the potential of query-adaptive evidence acquisition for future long-form video understanding.",
+      "authors": [
+        "Tianyue Wang",
+        "Xuying Wu",
+        "Yuxiang Ma",
+        "Ruiming Liang",
+        "Jiaxuan Kang",
+        "Yanchao Hao",
+        "Zheng Wei",
+        "Leigang Qu",
+        "Haiyun Guo",
+        "Jinqiao Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-21T07:23:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.20805v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Query-adaptive evidence acquisition reduces processed video evidence for efficient long-form video understanding in multimodal agents",
+      "llm_evidence_cn": "通过查询自适应证据获取降低多模态长视频理解的计算开销",
+      "llm_evidence": "通过查询自适应证据获取降低多模态长视频理解的计算开销",
+      "canonical_evidence": "通过查询自适应证据获取降低多模态长视频理解的计算开销",
+      "llm_tldr_en": "Route2Look is a lightweight, model-agnostic framework for query-adaptive evidence acquisition in long-form video understanding, combining global, temporal, and semantic retrieval tools to improve accuracy and efficiency over query-agnostic and single-strategy pipelines.",
+      "llm_tldr_cn": "长视频理解中查询需求与证据获取策略常不匹配，现有方法多依赖单一生成式或检索式策略，难以兼顾多种需求。本文提出Route2Look，以路由-查看-记忆循环组合全局浏览、时间定位和语义检索三类工具，实现查询自适应的证据获取。该框架轻量且与模型无关，在长视频理解任务上相比查询无关管线与单一策略方法提升了准确率和效率，为多模态智能体的高效推理提供了可行方案。",
+      "llm_tldr": "长视频理解中查询需求与证据获取策略常不匹配，现有方法多依赖单一生成式或检索式策略，难以兼顾多种需求。本文提出Route2Look，以路由-查看-记忆循环组合全局浏览、时间定位和语义检索三类工具，实现查询自适应的证据获取。该框架轻量且与模型无关，在长视频理解任务上相比查询无关管线与单一策略方法提升了准确率和效率，为多模态智能体的高效推理提供了可行方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.20890v1",
+      "source": "arxiv",
+      "title": "A Collaborative Multi-Modality Interaction for VLA-based End-to-End Autonomous Driving",
+      "abstract": "Vision-Language-Action (VLA) models have emerged as a powerful paradigm for end-to-end autonomous driving by jointly integrating perception, reasoning, and decision making within a unified multimodal framework. However, most existing VLA models formulate end-to-end autonomous driving as a visual question answering task, leading to unreliable and less interpretable decision reasoning. In addition, they fail to establish effective multi-modal interaction across heterogeneous sensors, thereby limiting robust scene perception and reliable driving reasoning in long-tail driving scenarios. To this end, we propose a robust VLA-based end-to-end autonomous driving system that combines multi-modality interaction with multi-trajectory planning and optimization, enabling more reliable, interpretable, and safer driving decisions. Our method comprises three core components: (1) Affinity-Guided Optimal Transport for main-auxiliary modality two-way interaction; (2) Distribution-Consistent Modality Transfer for heterogeneous modality distribution transfer and cross-modal interaction; (3) Multi-modal Multi-Trajectory Planning along with Perception-Oriented Trajectory Refinement for better driving decisions to long-tail driving scenarios. Experimental results in open-loop and closed-loop datasets demonstrate improvements in safety long-horizon driving reasoning and road scene perception over existing driving systems, highlighting the ability of our mutli-modality interaction and multi-trajectory planning and optimization for scalable VLA-based systems.",
+      "authors": [
+        "Jingtao Sun",
+        "Xiaohai He",
+        "Yike Zhang",
+        "Dong Huang",
+        "Yaonan Wang",
+        "Ajmal Mian",
+        "Mike Zheng Shou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-21T09:06:16+00:00",
+      "link": "https://arxiv.org/pdf/2608.20890v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "VLA-based end-to-end autonomous driving with collaborative multi-modality interaction",
+      "llm_evidence_cn": "VLA端到端自动驾驶中的协同多模态交互方法",
+      "llm_evidence": "VLA端到端自动驾驶中的协同多模态交互方法",
+      "canonical_evidence": "VLA端到端自动驾驶中的协同多模态交互方法",
+      "llm_tldr_en": "Addresses unreliable VLA autonomous driving by proposing a collaborative multi-modality interaction system with multi-trajectory planning; improves scene perception and interpretable decision reasoning in long-tail scenarios.",
+      "llm_tldr_cn": "针对现有VLA自动驾驶模型将任务简化为视觉问答、决策不透明且传感器交互不足的问题，本文提出一种协同多模态交互的VLA端到端自动驾驶系统。系统将多传感器信息与多轨迹规划有机结合，增强异构模态间的交互，从而提升复杂长尾场景下的场景感知与驾驶推理能力。实验证明该方法有效提升了决策的可靠性与可解释性，为VLA模型在自动驾驶中的应用提供了更稳健的技术路径。",
+      "llm_tldr": "针对现有VLA自动驾驶模型将任务简化为视觉问答、决策不透明且传感器交互不足的问题，本文提出一种协同多模态交互的VLA端到端自动驾驶系统。系统将多传感器信息与多轨迹规划有机结合，增强异构模态间的交互，从而提升复杂长尾场景下的场景感知与驾驶推理能力。实验证明该方法有效提升了决策的可靠性与可解释性，为VLA模型在自动驾驶中的应用提供了更稳健的技术路径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language action models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.21487v1",
+      "source": "arxiv",
+      "title": "TASSO: TAsk-Specific Subspace Optimization for Continual Learning of Vision-Language Models",
+      "abstract": "Vision-Language Models (VLMs) exhibit strong zero-shot capabilities, making them an attractive solution for continual learning across diverse tasks. However, during continual adaptation, both catastrophic forgetting and zero-shot degradation occur, severely degrading performance. In this paper, we introduce TASSO, a new paradigm that efficiently preserves the latent space geometry while ensuring network plasticity. We achieve this with two complementary techniques: subspace learning and geometry-aware knowledge distillation. Specifically, we first learn a sequence of task-specific low-rank projectors, which we use to project the latent representations before optimizing cross-entropy. Secondly, we employ a geodesic-distance-based loss that distills knowledge from the previous-task model while effectively preserving the latent space geometry. These design choices not only avoid unnecessary parameter updates along the full embedding dimensions but also improve learning by focusing on task-specific manifolds. Moreover, the geometry-aware distillation provides strong regularization and significantly reduces both catastrophic forgetting and zero-shot degradation throughout the continual learning sequence. Experimental results with the CLIP vision language model in the multi-domain task incremental and class incremental learning benchmarks demonstrate clear improvements over state-of-the-art methods in mitigating forgetting and preserving zero-shot capabilities.",
+      "authors": [
+        "Chang Sun",
+        "Francesco Barbato",
+        "Matteo Caligiuri",
+        "Pietro Zanuttigh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-21T12:18:14+00:00",
+      "link": "https://arxiv.org/pdf/2608.21487v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "efficient subspace-based continual learning and distillation for vision-language models",
+      "llm_evidence_cn": "面向视觉语言模型持续学习的高效子空间与蒸馏优化",
+      "llm_evidence": "面向视觉语言模型持续学习的高效子空间与蒸馏优化",
+      "canonical_evidence": "面向视觉语言模型持续学习的高效子空间与蒸馏优化",
+      "llm_tldr_en": "TASSO counters catastrophic forgetting and zero-shot degradation in continual learning of VLMs via task-specific low-rank projectors plus geodesic-distance knowledge distillation, yielding efficient preservation of latent geometry and network plasticity.",
+      "llm_tldr_cn": "视觉语言模型在持续学习不同任务时会出现灾难性遗忘和零样本能力退化，导致性能和泛化能力严重下降。针对该问题，本文提出TASSO范式，先学习任务特定的低秩投影器对潜在表示进行投影，再采用基于测地距离的几何感知知识蒸馏保持潜在空间几何，从而在保障网络可塑性的同时减少遗忘。大量持续学习实验表明，该方法能高效适配新任务并有效保持零样本性能，为多模态大模型的轻量持续优化提供了新思路。",
+      "llm_tldr": "视觉语言模型在持续学习不同任务时会出现灾难性遗忘和零样本能力退化，导致性能和泛化能力严重下降。针对该问题，本文提出TASSO范式，先学习任务特定的低秩投影器对潜在表示进行投影，再采用基于测地距离的几何感知知识蒸馏保持潜在空间几何，从而在保障网络可塑性的同时减少遗忘。大量持续学习实验表明，该方法能高效适配新任务并有效保持零样本性能，为多模态大模型的轻量持续优化提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.24763v1",
+      "source": "arxiv",
+      "title": "MoTE: Mixture of Task Experts for Multi-Task Video Understanding",
+      "abstract": "Procedural video-language models must solve heterogeneous tasks from the same visual evidence, including action recognition, forecasting, and procedure prediction. Dense transformer decoders share the same feed-forward networks across tasks, which can entangle task behavior and make controlled capability expansion difficult. Sparse Mixture-of-Experts (MoE) decoders provide conditional computation, but token-level learned routing is not naturally aligned with task-level procedural objectives. We propose MoTE (Mixture of Task Experts), a decoder architecture that converts large language model feed-forward networks into task-specific experts while keeping the multimodal backbone shared. Each example follows one sample-level task route, so active task-expert computation remains independent of the number of stored task experts. We instantiate this design as VideoLLM-MoTE and evaluate it on five COIN benchmarks using explicit task routes. The five-expert model activates ~2B LLM parameters per sample and achieves higher average top-1 accuracy than recent VideoLLM baselines. Under the same expert topology, it improves over dense all-expert activation and learned sparse-routing controls. These results show that task-structured routing provides an interpretable and compute-efficient decoder alternative for multi-task video-language learning.",
+      "authors": [
+        "Muhammad Asad Ali",
+        "Umar Khan",
+        "Nadia Robertini",
+        "Didier Stricker"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-25T16:00:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.24763v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Mixture-of-Experts decoder architecture for efficient multi-task video-language understanding",
+      "llm_evidence_cn": "面向多任务视频-语言理解的高效专家混合解码器架构",
+      "llm_evidence": "面向多任务视频-语言理解的高效专家混合解码器架构",
+      "canonical_evidence": "面向多任务视频-语言理解的高效专家混合解码器架构",
+      "llm_tldr_en": "Proposes MoTE, a Mixture-of-Task-Experts decoder that transforms LLM feed-forward networks into task-specific experts while sharing the multimodal backbone, aligning routing with task-level procedural objectives in multi-task video understanding.",
+      "llm_tldr_cn": "针对稠密Transformer解码器在多任务视频理解中共享前馈网络导致任务行为纠缠、扩展困难的问题，本文提出MoTE架构。它将大语言模型的前馈网络转换为任务专属专家，同时共享多模态主干，并让每个样本走单条任务级路由，相比token级路由更契合过程性任务目标。实验表明该方法可解耦任务行为并实现可控的能力扩展，是一种高效的多任务多模态解码方案。",
+      "llm_tldr": "针对稠密Transformer解码器在多任务视频理解中共享前馈网络导致任务行为纠缠、扩展困难的问题，本文提出MoTE架构。它将大语言模型的前馈网络转换为任务专属专家，同时共享多模态主干，并让每个样本走单条任务级路由，相比token级路由更契合过程性任务目标。实验表明该方法可解耦任务行为并实现可控的能力扩展，是一种高效的多任务多模态解码方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.21878v1",
+      "source": "arxiv",
+      "title": "ViSMoE: Visual-Aware Sparse Mixture-of-Experts for Embodied Referring Expression Grounding",
+      "abstract": "Embodied Referring Expression Grounding is the task of enabling an agent to navigate in real environments and to localize a remote object based on natural language instructions. In this scenario, the agent needs to select one view for navigation at each step and identify a specific object among all candidate objects at the destination. However, most of the previous approaches fail to distinguish between views and objects, instead processing them using the vanilla vision encoder, which results in ambiguous representations of both views and objects. To address the above issues, we propose ViSMoE, which equips sparse Mixture-of-Experts with a visual-aware routing policy for the embodied agent. This framework processes different types of visual information specifically, resulting in discriminative visual representations for both views and objects. Experimental results on REVERIE and SOON datasets demonstrate that ViSMoE outperforms the previous state-of-the-art methods, showing the superiority of our proposed method.",
+      "authors": [
+        "Shuo Feng",
+        "Piji Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-22T09:43:49+00:00",
+      "link": "https://arxiv.org/pdf/2608.21878v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Visual-aware sparse Mixture-of-Experts for embodied agent; efficient routing by distinguishing views and objects",
+      "llm_evidence_cn": "面向具身智能体的视觉感知稀疏专家混合，通过分视图与物体路由提升表示效率",
+      "llm_evidence": "面向具身智能体的视觉感知稀疏专家混合，通过分视图与物体路由提升表示效率",
+      "canonical_evidence": "面向具身智能体的视觉感知稀疏专家混合，通过分视图与物体路由提升表示效率",
+      "llm_tldr_en": "ViSMoE introduces visual-aware sparse Mixture-of-Experts for embodied referring expression grounding, routing differently for view selection and object localization to achieve clearer representations.",
+      "llm_tldr_cn": "具身指代表达定位需要同时区分导航视角与目标物体，但现有方法用统一视觉编码器导致表示模糊。ViSMoE采用视觉感知的稀疏专家混合，为视图和物体分配不同路由策略。实验表明在导航与定位准确率上优于基线。其视觉感知路由机制可作为高效具身视觉-语言架构的参考。",
+      "llm_tldr": "具身指代表达定位需要同时区分导航视角与目标物体，但现有方法用统一视觉编码器导致表示模糊。ViSMoE采用视觉感知的稀疏专家混合，为视图和物体分配不同路由策略。实验表明在导航与定位准确率上优于基线。其视觉感知路由机制可作为高效具身视觉-语言架构的参考。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient architectures for vision language action models",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
