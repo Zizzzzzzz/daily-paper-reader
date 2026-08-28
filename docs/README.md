@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-26</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-28</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 12 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 20 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>6</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>12</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-26 21:20:43 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-28 02:56:00 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,7 +62,10 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读12篇，重点聚焦事件相机运动估计与KV缓存压缩两大高分工作。最值得关注的是基于有向距离场的事件运动估计算法（10/10），以及保持单调等势分配的Geodesia-KV缓存优化（9/10）。建议优先复现高分论文核心方法，并留意速读中教育VQA与VLA自动驾驶的潜在应用价值。</p>
+<p>今日共生成 20 篇推荐（精读 8 篇，速读 12 篇）</p>
+<p>精读：《Beyond Sparse Weights: When Is Attention Compressible?》（9.0/10）, 《Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More》（9.0/10）</p>
+<p>速读：《V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models》（8.0/10）, 《StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models》（8.0/10）, 《FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models》（8.0/10）</p>
+<p>这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -71,12 +74,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">6 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Event-Based Motion Estimation via Oriented Distance Fields">Event-Based Motion Estimation via Oriented Distance Fields</span></li><li><span class="dpr-home-dashboard-paper-title" title="Squeezing the Cache, Preserving the Truth: Monotonic Equipotential Allocation with Geodesia-KV">Squeezing the Cache, Preserving the Truth: Monotonic Equipotential Allocation with Geodesia-KV</span></li><li><span class="dpr-home-dashboard-paper-title" title="Minima-KV: Retention-Preserving KV Cache Compression with Mixed-Format Paged Attention">Minima-KV: Retention-Preserving KV Cache Compression with Mixed-Format Paged Attention</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Beyond Sparse Weights: When Is Attention Compressible?">Beyond Sparse Weights: When Is Attention Compressible?</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More">Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More</span></li><li><span class="dpr-home-dashboard-paper-title" title="Real-time Unsupervised Object Discovery from Asynchronous Event Streams">Real-time Unsupervised Object Discovery from Asynchronous Event Streams</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>3</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -84,12 +87,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">6 篇</strong>
+    <strong class="dpr-home-dashboard-count">12 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="GRACE: Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration for Educational Visual Question Answering">GRACE: Grounded Reasoning via Adapter Composition and Evidence-Aware Calibration for Educational Visual Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="A Collaborative Multi-Modality Interaction for VLA-based End-to-End Autonomous Driving">A Collaborative Multi-Modality Interaction for VLA-based End-to-End Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="MoTE: Mixture of Task Experts for Multi-Task Video Understanding">MoTE: Mixture of Task Experts for Multi-Task Video Understanding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models">V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models">StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models">FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>10</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
 </section>
 </div>
 
