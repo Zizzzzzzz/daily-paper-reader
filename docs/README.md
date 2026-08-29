@@ -4,6 +4,13 @@
     <a class="dpr-home-notice-tutorial" href="#/tutorial/README">使用教程 <span aria-hidden="true">›</span></a>
   </div>
   <div class="dpr-home-notice-entry">
+    <time class="dpr-home-notice-date" datetime="2026-08-28">08.28</time>
+    <div>
+      <strong class="dpr-home-notice-entry-title">区间日报可正常点开</strong>
+      <span class="dpr-home-notice-entry-summary">长时间窗日报会挂在结束日那天的日历格上，此前点击没有反应，现在可以正常展开查看。</span>
+    </div>
+  </div>
+  <div class="dpr-home-notice-entry">
     <time class="dpr-home-notice-date" datetime="2026-07-20">07.20</time>
     <div>
       <strong class="dpr-home-notice-entry-title">反馈功能上线</strong>
@@ -41,17 +48,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-28</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-29</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 20 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 7 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>12</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-28 02:56:00 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 02:54:21 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,10 +69,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日共生成 20 篇推荐（精读 8 篇，速读 12 篇）</p>
-<p>精读：《Beyond Sparse Weights: When Is Attention Compressible?》（9.0/10）, 《Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More》（9.0/10）</p>
-<p>速读：《V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models》（8.0/10）, 《StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models》（8.0/10）, 《FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models》（8.0/10）</p>
-<p>这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。</p>
+<p>今日精读7篇论文，重点聚焦多表格文档问答与VLA推理加速；其中《A Table Is Worth 64 Tokens》提出像素级压缩方法（9.0分），《FlashVLA》实现流式异步动作解码（9.0分），均值得细读；若想快速上手，建议优先复现这两个高分方向，速读的6分工作可作背景了解。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -74,12 +78,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">8 篇</strong>
+    <strong class="dpr-home-dashboard-count">4 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Beyond Sparse Weights: When Is Attention Compressible?">Beyond Sparse Weights: When Is Attention Compressible?</span></li><li><span class="dpr-home-dashboard-paper-title" title="Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More">Not All Attention Heads Contribute to Critical Visual Token Selection: Head-Aware Pruning Matters More</span></li><li><span class="dpr-home-dashboard-paper-title" title="Real-time Unsupervised Object Discovery from Asynchronous Event Streams">Real-time Unsupervised Object Discovery from Asynchronous Event Streams</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering">A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference">FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">ev-cam <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -87,12 +91,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">12 篇</strong>
+    <strong class="dpr-home-dashboard-count">3 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models">V-Link: Recovering Lost Visual Representations in Action DiT for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models">StreamPI: Streaming Multimodal Temporal Modeling for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models">FOCUS &amp; RePAIR: Mitigating Text Degeneration via Token-Level Guidance for Pruned Large Language Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation">Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation</span></li><li><span class="dpr-home-dashboard-paper-title" title="DPA-I2P: Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration in Autonomous Driving">DPA-I2P: Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration in Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="G2D: Generative-to-Discriminative Collaborative Inference for Zero-Shot Image Classification">G2D: Generative-to-Discriminative Collaborative Inference for Zero-Shot Image Classification</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>10</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
 </section>
 </div>
 
