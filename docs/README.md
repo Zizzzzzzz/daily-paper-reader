@@ -51,14 +51,14 @@
       <span class="dpr-home-dashboard-kicker">2026-08-29</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 7 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 02:54:21 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 21:51:56 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -69,7 +69,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日精读7篇论文，重点聚焦多表格文档问答与VLA推理加速；其中《A Table Is Worth 64 Tokens》提出像素级压缩方法（9.0分），《FlashVLA》实现流式异步动作解码（9.0分），均值得细读；若想快速上手，建议优先复现这两个高分方向，速读的6分工作可作背景了解。</p>
+<p>今日聚焦VLA流式推理加速与多表文档问答像素级压缩两大核心方向。</p>
+<p>最值得看《FlashVLA》的异步流式动作解码，以及“一张表仅需64 Token”的表格问答压缩方案。</p>
+<p>建议优先阅读这两篇论文，并关注其实际推理效率与长文档场景下的压缩效果。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -81,7 +83,7 @@
     <strong class="dpr-home-dashboard-count">4 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering">A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference">FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference">FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering">A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span></div>
 </section>
@@ -91,12 +93,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation">Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation</span></li><li><span class="dpr-home-dashboard-paper-title" title="DPA-I2P: Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration in Autonomous Driving">DPA-I2P: Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration in Autonomous Driving</span></li><li><span class="dpr-home-dashboard-paper-title" title="G2D: Generative-to-Discriminative Collaborative Inference for Zero-Shot Image Classification">G2D: Generative-to-Discriminative Collaborative Inference for Zero-Shot Image Classification</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation">Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Token-Oriented Semantic Communication with Pretrained Vision Transformers">Token-Oriented Semantic Communication with Pretrained Vision Transformers</span></li><li><span class="dpr-home-dashboard-paper-title" title="Successive Capacity Growth: Task-Complexity-Driven Width and Depth Expansion for Vision Transformer Encoders in JEPA World Models">Successive Capacity Growth: Task-Complexity-Driven Width and Depth Expansion for Vision Transformer Encoders in JEPA World Models</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
 </section>
 </div>
 

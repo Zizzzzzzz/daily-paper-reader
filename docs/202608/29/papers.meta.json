@@ -1,24 +1,9 @@
 {
   "label": "2026-08-29",
   "date": "2026-08-29",
-  "generated_at": "2026-08-29T02:54:24",
-  "count": 7,
+  "generated_at": "2026-08-29T21:51:59",
+  "count": 10,
   "papers": [
-    {
-      "paper_id": "202608/29/2608.26949v1-a-table-is-worth-64-tokens-pixel-level-compression-for-multi-table-document-question-answering",
-      "section": "deep",
-      "title_en": "A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering",
-      "authors": "Iñigo Alonso, Mirella Lapata",
-      "date": "2026-08-27",
-      "pdf": "https://arxiv.org/pdf/2608.26949v1",
-      "score": "9.0",
-      "evidence": "面向文档问答的像素级视觉token压缩",
-      "tldr": "真实文档问答常需处理包含文本与多张表格的长文档，光学上下文压缩以图像表示表格可减少token，但下采样会损害可读性，导致模型用更长、效果更差的推理来补偿，反而抵消节省。然而高度压缩的表格仍足以判断其与问题的相关性。据此提出免训练的两阶段方法：先在压缩视图中定位所需表格，再以原生分辨率对其进行推理。在长文档上节省41%的token并提升7个准确率点，比单步压缩配置少用15%的token且无精度损失。",
-      "tags": "query:evlm",
-      "abstract_en": "Answering questions over real-world documents requires processing long inputs that interleave text with tables. Optical context compression, which represents context as images, promises to reduce token cost, but its effect on table understanding remains unclear. We study pixel-level table compression for question answering over documents with multiple tables, evaluating five VLMs across two benchmarks and five visual-token budgets. Representing tables as images at native resolution matches text in both performance and efficiency, but downscaling them makes models compensate the loss in readability with longer, less effective reasoning traces that cancel the expected savings. Highly downscaled tables, however, preserve enough signal to identify whether they are relevant to a question. We exploit this asymmetry with a training-free, two-step method: the model first identifies the tables needed to answer a question from a pixel-compressed context, and then reasons over those at native resolution. On long documents, our method saves 41% of total tokens and gains 7 accuracy points over single-step QA with native resolution tables. It also uses 15% fewer tokens than the most efficient single-step compressed configuration, with no accuracy loss.",
-      "source": "arxiv",
-      "selection_source": "fresh_fetch"
-    },
     {
       "paper_id": "202608/29/2608.27384v1-flashvla-streaming-action-decoding-for-fast-and-asynchronous-vla-inference",
       "section": "deep",
@@ -35,6 +20,21 @@
       "selection_source": "fresh_fetch"
     },
     {
+      "paper_id": "202608/29/2608.26949v1-a-table-is-worth-64-tokens-pixel-level-compression-for-multi-table-document-question-answering",
+      "section": "deep",
+      "title_en": "A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering",
+      "authors": "Iñigo Alonso, Mirella Lapata",
+      "date": "2026-08-27",
+      "pdf": "https://arxiv.org/pdf/2608.26949v1",
+      "score": "9.0",
+      "evidence": "面向文档问答的像素级视觉token压缩",
+      "tldr": "真实文档问答常需处理包含文本与多张表格的长文档，光学上下文压缩以图像表示表格可减少token，但下采样会损害可读性，导致模型用更长、效果更差的推理来补偿，反而抵消节省。然而高度压缩的表格仍足以判断其与问题的相关性。据此提出免训练的两阶段方法：先在压缩视图中定位所需表格，再以原生分辨率对其进行推理。在长文档上节省41%的token并提升7个准确率点，比单步压缩配置少用15%的token且无精度损失。",
+      "tags": "query:evlm",
+      "abstract_en": "Answering questions over real-world documents requires processing long inputs that interleave text with tables. Optical context compression, which represents context as images, promises to reduce token cost, but its effect on table understanding remains unclear. We study pixel-level table compression for question answering over documents with multiple tables, evaluating five VLMs across two benchmarks and five visual-token budgets. Representing tables as images at native resolution matches text in both performance and efficiency, but downscaling them makes models compensate the loss in readability with longer, less effective reasoning traces that cancel the expected savings. Highly downscaled tables, however, preserve enough signal to identify whether they are relevant to a question. We exploit this asymmetry with a training-free, two-step method: the model first identifies the tables needed to answer a question from a pixel-compressed context, and then reasons over those at native resolution. On long documents, our method saves 41% of total tokens and gains 7 accuracy points over single-step QA with native resolution tables. It also uses 15% fewer tokens than the most efficient single-step compressed configuration, with no accuracy loss.\n\n---",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
       "paper_id": "202608/29/2608.22419v1-robust-bimanual-vision-language-action-models-via-embarrassingly-simple-modality-masking",
       "section": "deep",
       "title_en": "Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking",
@@ -45,7 +45,7 @@
       "evidence": "面向机器人操作的视觉-语言-动作模型",
       "tldr": "查询式视觉-语言-动作模型在双臂操作中虽有低延迟优势，但常因多视角与语言融合不稳定而出现动作不连续和失败。本文提出仅训练时使用的模态掩码机制M3，随机遮蔽部分模态通道，强制策略忽略干扰线索并依赖可靠证据。在RoboTwin 2.0的十个双臂任务与三个真实长时任务中，M3较Adapter基线平均成功率分别提升21.7%（Clean）和11.4%（Clean2Rand），真实世界全任务成功率提升超30%。该方法无需架构改动或大规模预训练，是提升双臂操作鲁棒性的实用轻量方案。",
       "tags": "query:evlm",
-      "abstract_en": "Query-based Vision-Language-Action (VLA) models offer low-latency inference that is attractive for bimanual robotic manipulation, but we observe that they can still exhibit discontinuous actions and execution failures in complex dual-arm tasks. We hypothesize that unstable multi-view and language fusion is one contributing factor in these failures, often coinciding with attention spreading to distracting regions. To improve robustness, we introduce the Modality Masking Mechanism (M3), an embarrassingly simple, training-only strategy that requires no architectural changes or large-scale robot pretraining. M3 stochastically masks subsets of modality channels during training, exposing the policy to controlled partial observations and encouraging it to rely less on distracting cues and more on evidence that remains reliable. We evaluate M3 on ten bimanual tasks from RoboTwin 2.0 and on three long-horizon real-world tasks. Compared with the Adapter baseline, M3 improves average success by 21.7% in the Clean setting and 11.4% in Clean2Rand, where policies are trained on clean demonstrations and evaluated on randomized scenes, while also improving averaged real-world full-task success by over 30%. These results suggest that structured training-time masking is a practical way to improve the robustness of query-based VLA policies for bimanual manipulation.",
+      "abstract_en": "Query-based Vision-Language-Action (VLA) models offer low-latency inference that is attractive for bimanual robotic manipulation, but we observe that they can still exhibit discontinuous actions and execution failures in complex dual-arm tasks. We hypothesize that unstable multi-view and language fusion is one contributing factor in these failures, often coinciding with attention spreading to distracting regions. To improve robustness, we introduce the Modality Masking Mechanism (M3), an embarrassingly simple, training-only strategy that requires no architectural changes or large-scale robot pretraining. M3 stochastically masks subsets of modality channels during training, exposing the policy to controlled partial observations and encouraging it to rely less on distracting cues and more on evidence that remains reliable. We evaluate M3 on ten bimanual tasks from RoboTwin 2.0 and on three long-horizon real-world tasks. Compared with the Adapter baseline, M3 improves average success by 21.7% in the Clean setting and 11.4% in Clean2Rand, where policies are trained on clean demonstrations and evaluated on randomized scenes, while also improving averaged real-world full-task success by over 30%. These results suggest that structured training-time masking is a practical way to improve the robustness of query-based VLA policies for bimanual manipulation.\n\n---",
       "source": "arxiv",
       "selection_source": "fresh_fetch"
     },
@@ -60,7 +60,7 @@
       "evidence": "面向机器人操作的紧凑执行历史VLA模型",
       "tldr": "VLA模型单纯加入历史帧难以捕捉物理状态变化，导致长程多阶段操作易失败。TemporalFlow-VLA利用机器人状态和几何构建机器人-表面时间流作为训练监督，学习紧凑执行历史，并监督执行对齐的时序查询。在LIBERO上平均成功率97.63%，长程96.60%，在12个RoboTwin任务上取得85.5%/84.2%的干净/随机成功率，尤其擅长长程多阶段任务。该方法无需部署时运动估计，仅靠异步特征缓存保持单帧级延迟，提供了紧凑物理接地的历史利用接口。",
       "tags": "query:evlm",
-      "abstract_en": "Vision-language-action (VLA) models leverage pretrained vision-language representations for robot control, yet simply adding historical frames does not reliably capture recent physical change. This is especially problematic in multi-stage manipulation, where visually similar states may require different actions depending on prior execution. To address this challenge, we present TemporalFlow-VLA, which learns compact execution history through physically grounded temporal supervision. Using recorded robot states, robot geometry, and calibrated cameras, we construct robot-surface temporal flow as a training-only target and supervise two execution-aligned temporal queries that provide structured history to the action expert. The geometric supervision path is not evaluated at deployment. TemporalFlow-VLA achieves 97.63 +/- 0.26% average success on LIBERO, including 96.60 +/- 0.87% on LIBERO Long, and 85.5%/84.2% Clean/Randomized success across 12 RoboTwin tasks. It shows its clearest advantage over prior methods on longer-horizon, multi-stage manipulation. Controlled history interventions show that action prediction depends on both historical content and temporal order. With asynchronous feature caching, temporal conditioning maintains single-frame-level server-side sampling latency without additional historical-encoding overhead. Overall, TemporalFlow-VLA provides a compact, physically grounded interface for exploiting ordered execution history without explicit motion estimation or geometric processing at deployment.",
+      "abstract_en": "Vision-language-action (VLA) models leverage pretrained vision-language representations for robot control, yet simply adding historical frames does not reliably capture recent physical change. This is especially problematic in multi-stage manipulation, where visually similar states may require different actions depending on prior execution. To address this challenge, we present TemporalFlow-VLA, which learns compact execution history through physically grounded temporal supervision. Using recorded robot states, robot geometry, and calibrated cameras, we construct robot-surface temporal flow as a training-only target and supervise two execution-aligned temporal queries that provide structured history to the action expert. The geometric supervision path is not evaluated at deployment. TemporalFlow-VLA achieves 97.63 +/- 0.26% average success on LIBERO, including 96.60 +/- 0.87% on LIBERO Long, and 85.5%/84.2% Clean/Randomized success across 12 RoboTwin tasks. It shows its clearest advantage over prior methods on longer-horizon, multi-stage manipulation. Controlled history interventions show that action prediction depends on both historical content and temporal order. With asynchronous feature caching, temporal conditioning maintains single-frame-level server-side sampling latency without additional historical-encoding overhead. Overall, TemporalFlow-VLA provides a compact, physically grounded interface for exploiting ordered execution history without explicit motion estimation or geometric processing at deployment.\n\n---",
       "source": "arxiv",
       "selection_source": "fresh_fetch"
     },
@@ -76,6 +76,51 @@
       "tldr": "非对称传感器退化（整个模态或局部损坏）会严重破坏端到端多模态驾驶的融合稳定性，其难点不仅是增加不确定性头，更在于获得密集可靠性监督并校准。VG-SAF采用物理故障增强器生成连续掩码，结合跨分支蒸馏让模态专家预测像素级可靠性尺度，并通过混合注意力门控在规划前剔除不可靠特征。在CARLA Longest6基准上，相机、LiDAR及两者联合退化下，驾驶分数、路线完成度和违规分数均稳定超过基线。该方法利用可解释空间门和不确定性头，实现了对物理故障严重度的校准和闭环鲁棒性增强。",
       "tags": "query:mm-trf",
       "abstract_en": "End-to-end multimodal driving has progressed rapidly by fusing camera and LiDAR streams. Existing pipelines remain fragile under asymmetric sensor degradation, where either an entire modality or only a localized region is corrupted while other regions remain useful. The key difficulty is not simply to add an uncertainty head, but to obtain dense reliability supervision, calibrate this reliability against physical fault severity, and use it before unreliable features bias the planner. We propose Variance-Guided Spatial Attention Fusion (VG-SAF), in which dense heteroscedastic reliability estimates act as interpretable spatial gates. The framework couples three components. First, a physically grounded augmentor simulates representative camera and LiDAR failures and emits a continuous spatial mask, providing dense supervision without additional annotation. Second, modality-specific experts predict per-pixel reliability scales through cross-branch dense distillation in log space, enforcing a monotone severity-to-scale response. Third, calibrated reliability maps drive a hybrid attention mechanism that suppresses unreliable cells with a local spatial gate and arbitrates between modalities through a cross-modal trust softmax. A Laplace uncertainty head emits a systemic waypoint uncertainty scale that signals severe or combined sensor degradation, including severities outside the training ranges. On the CARLA Longest6 benchmark, VG-SAF consistently improves closed-loop robustness over the baselines across camera-only, LiDAR-only, and joint degradation regimes, as measured by driving score, route completion, and infraction score.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/29/2608.25410v1-token-oriented-semantic-communication-with-pretrained-vision-transformers",
+      "section": "quick",
+      "title_en": "Token-Oriented Semantic Communication with Pretrained Vision Transformers",
+      "authors": "Jiwoong Im, Minwoo Kim, Jaeho Lee, Yo-Seb Jeon, Yongjune Kim",
+      "date": "2026-08-26",
+      "pdf": "https://arxiv.org/pdf/2608.25410v1",
+      "score": "6.0",
+      "evidence": "按任务相关性选择令牌并传输压缩潜表示，与令牌剪枝思想高度相关。",
+      "tldr": "直接传输token嵌入通信开销大，且不同模型token空间互不兼容。为此提出token导向语义通信框架：利用ViT补丁token与图像压缩潜变量的一对一空间对齐，按token级任务相关性选择性传输压缩潜变量，并结合层选择性注意力归因与可学习token替代，无需端到端训练即可适配冻结服务器模型。在ImageNet上取得优于现有语义通信方案、手工编解码器和任务无关LIC模型的率-精度权衡，为资源受限边缘协同推理提供了高效新途径。",
+      "tags": "query:evlm",
+      "abstract_en": "Token communications realize the semantic communication principle at the granularity of transformer tokens, providing a promising direction for client--server collaborative inference in resource-constrained edge systems. However, directly transmitting token embeddings presents two practical challenges: substantial communication cost and limited interoperability across model-specific token embedding spaces. To address these challenges, we propose a \\emph{token-oriented} semantic communication framework. In this framework, token-level task relevance determines which compressed image latents are transmitted, enabling token-granular transmission without directly transmitting token embeddings. The framework is modular, coordinating three pretrained components---a lightweight client-side vision transformer (ViT), a learned image compression (LIC) model, and a large server-side ViT---without end-to-end training. The key enabler is the one-to-one spatial alignment between ViT patch tokens and the LIC latent vectors, which allows token-level task relevance to directly determine which latent vectors are transmitted. Building on this alignment, token-aligned LIC selectively transmits task-relevant latents, layer-selective attention rollout estimates token relevance from a selected range of attention layers in a single forward pass, and surrogate token substitution adapts the frozen server model by optimizing a single learnable token. Experiments on ImageNet show that the proposed framework achieves a more favorable rate--accuracy trade-off than recent semantic communication schemes, hand-crafted codecs, and task-agnostic LIC models.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/29/2608.27367v1-successive-capacity-growth-task-complexity-driven-width-and-depth-expansion-for-vision-transformer-encoders-in-jepa-world-models",
+      "section": "quick",
+      "title_en": "Successive Capacity Growth: Task-Complexity-Driven Width and Depth Expansion for Vision Transformer Encoders in JEPA World Models",
+      "authors": "Frederik Berenz",
+      "date": "2026-08-27",
+      "pdf": "https://arxiv.org/pdf/2608.27367v1",
+      "score": "6.0",
+      "evidence": "按任务复杂度减少冗余并扩展ViT编码器容量，与高效视觉语言模型编码器架构相关。",
+      "tldr": "针对JEPA世界模型固定编码器在简单任务上冗余、复杂任务上不足的问题，提出SCG方法：从极小编码器出发，通过函数保持扩展按需增加宽度（注意力头）或深度（Transformer块），由任务无关的测试-验证机制决定是否保留扩展。采用SIGReg保证语义维度独立。在60维动态任务中深度扩展使损失降低20.3%，参数效率提升56倍；在2D导航中宽度扩展提升23%，无虚假扩展且函数保持精确。表明编码器可随任务需求渐进增长。",
+      "tags": "query:evlm",
+      "abstract_en": "Joint-Embedding Predictive Architectures (JEPAs) for world modeling typically employ fixed-size Vision Transformer encoders that are over-provisioned for simple tasks and under-provisioned for complex ones, with significant redundancy across attention heads. We propose Successive Capacity Growth (SCG), a method that starts from a minimal encoder (1 head, 2 layers, 283K parameters) and grows incrementally in width (adding attention heads for low-level semantic capacity) or depth (adding transformer blocks for higher-order semantic abstraction), driven by a task-agnostic test-and-verify mechanism that exploits function-preserving expansion to safely trial architectural changes and roll back if they do not improve prediction loss. The Sketched Isotropic Gaussian Regularizer (SIGReg) ensures that all learned semantic dimensions remain statistically independent and aligned with the predictive objective, preventing collapse even as the architecture grows. On a 60-dimensional multi-object dynamics task, SCG naturally triggers depth expansion, improving prediction loss by 20.3% over the fixed small baseline with 56 times greater parameter efficiency than scaling to the fixed large model; on a 2D navigation task, a single width expansion yields even an 23% improvement over the fixed large model. Across all three tested environments of increasing complexity, the adaptive encoder matches or exceeds the fixed small baseline, with zero false-positive expansions and bit-exact function preservation (ratio = 1.0, absolute difference = 0.0). The take-away is that JEPA world model encoders need not be pre-allocated at maximum capacity - they can grow successively as the task demands, achieving significant compute and data efficiency while maintaining representation quality.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/29/2608.27417v1-retrieval-heads-meet-vision-uncovering-how-vlms-locate-and-extract-visual-information",
+      "section": "quick",
+      "title_en": "Retrieval Heads Meet Vision: Uncovering How VLMs Locate and Extract Visual Information",
+      "authors": "Chanho Park, Daehyeon Choi, Jihyun Lee, Minhyuk Sung",
+      "date": "2026-08-27",
+      "pdf": "https://arxiv.org/pdf/2608.27417v1",
+      "score": "6.0",
+      "evidence": "识别VLM中的因果注意力头，为高效架构提供头剪枝依据",
+      "tldr": "视觉语言模型能定位文本所指图像区域，但其内部机制未知。受文本检索头启发，本文提出视觉检索头（VRHs），即一小部分注意力头因果负责将文本描述与图像区域对齐。通过统一设计空间评分的头识别方法，掩蔽仅20个VRHs即可使接地精度下降最多80个百分点，而随机头几乎无影响。VRHs展现出跨任务泛化、功能特异性和架构共享性，揭示了VLM中视觉信息检索的因果稀疏机制。",
+      "tags": "query:evlm",
+      "abstract_en": "Vision-language models (VLMs) can locate an image region referred to by a text prompt and route the corresponding visual evidence to the output, yet the internal mechanism behind this behavior is not understood. Inspired by retrieval heads in large language models, we ask whether VLMs contain an analogous mechanism for visual retrieval. We answer affirmatively by introducing Visual Retrieval Heads (VRHs), a small subset of attention heads (about 1.7-2.6%) that are causally responsible for grounding text descriptions to image regions. To find them, we recast existing head-scoring methods under a unified design space over query tokens, key aggregation, and cross-sample aggregation. We then show that scoring attention from output prediction tokens with a sum over the ground-truth referent region most reliably identifies causal heads. Across eleven VLMs and five referring-expression benchmarks, masking only the top 20 VRHs reduces grounding accuracy by up to 80 percentage points, while masking the same number of random heads has little effect. Beyond replicating the causal-sparse-universal triad established for text retrieval heads, VRHs exhibit several properties not previously reported: they generalize across visual reference tasks, remaining causal on attribute, spatial, counting, and visual-math benchmarks despite being discovered through bounding-box prediction; they are functionally specific, preserving output format while corrupting localization; and they are architecturally shared, transferring causally across VLMs that share an LLM backbone but differ in vision encoder, projector, and instruction tuning.",
       "source": "arxiv",
       "selection_source": "fresh_fetch"
     },
