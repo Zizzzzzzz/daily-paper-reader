@@ -48,17 +48,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-29</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-30</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 10 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 21:51:56 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-30 22:24:14 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -69,9 +69,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日聚焦VLA流式推理加速与多表文档问答像素级压缩两大核心方向。</p>
-<p>最值得看《FlashVLA》的异步流式动作解码，以及“一张表仅需64 Token”的表格问答压缩方案。</p>
-<p>建议优先阅读这两篇论文，并关注其实际推理效率与长文档场景下的压缩效果。</p>
+<p>今日聚焦长视频理解与机器人操作模型，精读2篇高分论文并速读4篇相关研究。最值得关注LongVU-TTT对长视频视觉重采样的因果测试时训练，以及通过简单模态掩蔽增强双臂VLA模型鲁棒性的方法。建议下一步深入探索长视频时序建模技巧，并尝试将模态掩蔽策略应用于多模态模型的泛化提升。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -83,9 +81,9 @@
     <strong class="dpr-home-dashboard-count">4 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference">FlashVLA: Streaming Action Decoding for Fast and Asynchronous VLA Inference</span></li><li><span class="dpr-home-dashboard-paper-title" title="A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering">A Table Is Worth 64 Tokens: Pixel-level Compression for Multi-Table Document Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LongVU-TTT: Causal Test-Time Training for Visual Resampling in Long Video Understanding">LongVU-TTT: Causal Test-Time Training for Visual Resampling in Long Video Understanding</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li><li><span class="dpr-home-dashboard-paper-title" title="TAU-Agent: An Agentic Retrieval-Augmented Framework for Traffic Anomaly Understanding">TAU-Agent: An Agentic Retrieval-Augmented Framework for Traffic Anomaly Understanding</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -96,9 +94,9 @@
     <strong class="dpr-home-dashboard-count">6 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation">Variance-Guided Spatial Attention Fusion for Robust End-to-End Driving under Asymmetric Sensor Degradation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Token-Oriented Semantic Communication with Pretrained Vision Transformers">Token-Oriented Semantic Communication with Pretrained Vision Transformers</span></li><li><span class="dpr-home-dashboard-paper-title" title="Successive Capacity Growth: Task-Complexity-Driven Width and Depth Expansion for Vision Transformer Encoders in JEPA World Models">Successive Capacity Growth: Task-Complexity-Driven Width and Depth Expansion for Vision Transformer Encoders in JEPA World Models</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="TrAct: Bridging Robot Control and Visual Prediction with Visual Tracks">TrAct: Bridging Robot Control and Visual Prediction with Visual Tracks</span></li><li><span class="dpr-home-dashboard-paper-title" title="VideoHarness-RSI: Recursive Harness Self-Improvement for Long-Video Understanding with Frozen Vision-Language Models">VideoHarness-RSI: Recursive Harness Self-Improvement for Long-Video Understanding with Frozen Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Efficient Training with Foresight: Multi-Token Auxiliary Supervision for Autoregressive Image Generation">Efficient Training with Foresight: Multi-Token Auxiliary Supervision for Autoregressive Image Generation</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>4</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 
