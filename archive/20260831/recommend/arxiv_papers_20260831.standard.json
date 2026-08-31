@@ -1,0 +1,324 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-31T23:19:21.329392+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 4,
+    "deep_cap": 8,
+    "deep_selected": 4,
+    "quick_candidates": 3,
+    "quick_skim_target": 13,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2608.28086v1",
+      "source": "arxiv",
+      "title": "Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation",
+      "abstract": "Token Communications (TokenCom) has recently emerged as a new paradigm in which tokens serve as unified units for communication and computation, enabling efficient multimodal semantic and goal-oriented transmission. In this paper, we develop Ada-TokenCom, a rate-adaptive TokenCom framework based on large autoregressive models, which integrates next-token prediction with arithmetic coding to achieve ultra-low bitrate semantic communication at the token level. We propose a mixed reconstruction/generation scheme, where the transmitter encodes and transmits the highly informative tokens at the beginning of the token sequence leveraging a pre-trained autoregressive large model, while the receiver uses an identical model to predict the rest. Moreover, we design a Lyapunov-based algorithm to dynamically optimize both the source compression rate and the modulation and coding scheme, adapting to time-varying network conditions. Simulation results demonstrate that our proposed Ada-TokenCom framework outperforms both digital and deep joint source-channel coding-based semantic communication baselines.",
+      "authors": [
+        "Zijun Zhang",
+        "Li Qiao",
+        "Mahdi Boloursaz Mashhadi",
+        "Zhen Gao",
+        "Mehdi Bennis",
+        "Kaibin Huang"
+      ],
+      "primary_category": "cs.IT",
+      "categories": [
+        "cs.IT",
+        "cs.CV",
+        "eess.IV"
+      ],
+      "published": "2026-08-28T08:54:28+00:00",
+      "link": "https://arxiv.org/pdf/2608.28086v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "token compression and generation driven by large autoregressive models",
+      "llm_evidence_cn": "基于大自回归模型的令牌压缩与生成，实现超低比特率语义通信",
+      "llm_evidence": "基于大自回归模型的令牌压缩与生成，实现超低比特率语义通信",
+      "canonical_evidence": "基于大自回归模型的令牌压缩与生成，实现超低比特率语义通信",
+      "llm_tldr_en": "Ada-TokenCom is a rate-adaptive TokenCom framework using large autoregressive models and arithmetic coding to compress tokens to ultra-low bit-rate, mixing reconstructing transmitted informative prefix tokens with model-generated continuation tokens for semantic communication.",
+      "llm_tldr_cn": "针对令牌通信中带宽效率与语义保真难平衡的问题，提出Ada-TokenCom，一种基于大自回归模型的自适应速率令牌通信框架。它将下一令牌预测与算术编码结合，在发射端只传输信息量较高的起始令牌，接收端用共享模型生成其余令牌，实现超低码率的语义通信。实验表明该方法在大幅降低比特率的同时保持语义有效性，为多模态语义通信与代价控制提供了新思路。",
+      "llm_tldr": "针对令牌通信中带宽效率与语义保真难平衡的问题，提出Ada-TokenCom，一种基于大自回归模型的自适应速率令牌通信框架。它将下一令牌预测与算术编码结合，在发射端只传输信息量较高的起始令牌，接收端用共享模型生成其余令牌，实现超低码率的语义通信。实验表明该方法在大幅降低比特率的同时保持语义有效性，为多模态语义通信与代价控制提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.28138v1",
+      "source": "arxiv",
+      "title": "Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models",
+      "abstract": "Adapting video vision-language models (VLMs) is computationally expensive because video inputs produce a large number of visual tokens, making both fine-tuning and inference costly. Although visual token compression can reduce this overhead, direct adaptation on compressed inputs often causes semantic drift and noticeable performance degradation. We present Token-Budget Distillation (TBD), a parameter-efficient fine-tuning framework for adapting video VLMs under a fixed token budget. TBD freezes the pretrained backbone, updates only LoRA adapters, and integrates FlashVID-based visual token compression into the video pathway. To preserve full-token semantics under compression, TBD employs a dual-path teacher-student design, where a full-token teacher provides stable supervision and a compressed student is optimized with task loss, answer-region KL distillation, GT-anchored margin distillation, and reliability-aware KD control. This design enables the student to recover the semantic behavior of the full-token model while remaining efficient under aggressive token reduction. We evaluate TBD on three video VLM backbones, including LLaVA-Video, LLaVA-OneVision, and Qwen3-VL-8B-Instruct, across four video understanding benchmarks. TBD consistently outperforms compression-only baselines under both moderate and aggressive compression. On LLaVA-Video at retention ratio R = 10 percent, TBD preserves 97.0 percent of the Vanilla model's average accuracy; on LLaVA-OneVision at R = 10 percent, it achieves an average score of 58.4 and matches 100.0 percent relative accuracy.",
+      "authors": [
+        "Xiaoyang Guo",
+        "Guoping Luo",
+        "Jusheng Zhang",
+        "Keze Wang",
+        "Wenhao Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-28T09:59:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.28138v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token compression for video VLMs under a fixed token budget",
+      "llm_evidence_cn": "面向视频视觉语言模型的固定预算视觉token压缩",
+      "llm_evidence": "面向视频视觉语言模型的固定预算视觉token压缩",
+      "canonical_evidence": "面向视频视觉语言模型的固定预算视觉token压缩",
+      "llm_tldr_en": "Presents Token-Budget Distillation, a parameter-efficient fine-tuning framework that transfers full-token semantics to compressed video VLMs using LoRA and FlashVID-based token compression, mitigating semantic drift under token budget constraints.",
+      "llm_tldr_cn": "针对视频视觉语言模型在视觉token数量庞大导致微调与推理成本高昂的问题，提出Token-Budget Distillation（TBD）参数高效微调框架。TBD冻结预训练骨干，仅更新LoRA适配器，并集成FlashVID视觉token压缩，同时采用双路师生设计保留全token语义，缓解直接压缩带来的语义漂移与性能下降。该方法为压缩视频VLM在固定token预算下的高效适配提供了可行方案。",
+      "llm_tldr": "针对视频视觉语言模型在视觉token数量庞大导致微调与推理成本高昂的问题，提出Token-Budget Distillation（TBD）参数高效微调框架。TBD冻结预训练骨干，仅更新LoRA适配器，并集成FlashVID视觉token压缩，同时采用双路师生设计保留全token语义，缓解直接压缩带来的语义漂移与性能下降。该方法为压缩视频VLM在固定token预算下的高效适配提供了可行方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.28429v1",
+      "source": "arxiv",
+      "title": "Lossy Event Compression: From Event Stream Distortion to Task Performance",
+      "abstract": "Event cameras generate asynchronous, sparse data streams with microsecond temporal resolution, but in moderate-to-high motion scenes they can produce as many as hundreds of millions of events per second, creating significant bandwidth and storage challenges. Lossy compression is therefore essential for practical deployment, yet existing event stream distortion metrics fail to reliably predict compression-induced degradation at the task level, forcing codec optimization to rely on expensive task-specific evaluations. To address this gap, this paper introduces two fundamentally different event compression pipelines: i) an aggregation-based pipeline that converts the event stream into polarity-based histogram frames for compression with the conventional image codec JPEG 2000, and ii) a frame-free point cloud-based pipeline that codes events natively as 3D points using the octree-based codec G-PCC. Both pipelines are then assessed within a unified task-driven evaluation framework that relates event stream distortion to downstream application performance across four representative tasks: i) video reconstruction, ii) object detection, iii) optical flow estimation, and a delay-sensitive task iv) asynchronous feature tracking under a reference-relative protocol. Building on this framework, five classification-based distortion metrics are applied to event compression for the first time, to the best of the authors' knowledge, and benchmarked against existing event stream metrics. Experimental results demonstrate that the proposed metrics reliably predict compression-induced task degradation across different coding frameworks. This demonstrates that event stream distortion assessment can be an efficient alternative to repeated task-specific evaluation, providing direct guidance for the development and optimization of future event data coding solutions.",
+      "authors": [
+        "Zahra Rezaee",
+        "Catarina Brites",
+        "João Ascenso"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.IV"
+      ],
+      "published": "2026-08-28T15:12:56+00:00",
+      "link": "https://arxiv.org/pdf/2608.28429v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "lossy event compression for event streams from event cameras",
+      "llm_evidence_cn": "针对事件相机生成的事件流进行有损压缩",
+      "llm_evidence": "针对事件相机生成的事件流进行有损压缩",
+      "canonical_evidence": "针对事件相机生成的事件流进行有损压缩",
+      "llm_tldr_en": "Introduces two event compression pipelines for event cameras, showing that task-level performance should guide codec design because existing event stream distortion metrics do not reliably predict compression-induced degradation.",
+      "llm_tldr_cn": "事件相机在高动态场景下每秒产生海量事件，带来带宽和存储压力，而有损压缩会造成任务性能下降。现有事件流失真度量无法准确预测任务级退化，导致码率选择依赖昂贵的任务评测。本文提出基于聚合直方图帧与传统编码的结合，以及另一条事件压缩流水线，将压缩与下游任务性能关联。实验表明新方法能在压缩率与任务性能之间取得更好平衡，为事件相机实际部署提供了可靠保障。",
+      "llm_tldr": "事件相机在高动态场景下每秒产生海量事件，带来带宽和存储压力，而有损压缩会造成任务性能下降。现有事件流失真度量无法准确预测任务级退化，导致码率选择依赖昂贵的任务评测。本文提出基于聚合直方图帧与传统编码的结合，以及另一条事件压缩流水线，将压缩与下游任务性能关联。实验表明新方法能在压缩率与任务性能之间取得更好平衡，为事件相机实际部署提供了可靠保障。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event stream",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.27584v1",
+      "source": "arxiv",
+      "title": "Quanta Perception as Probabilistic Events",
+      "abstract": "Autonomous systems rely on extracting information from light, yet remain brittle in extreme environments, from nighttime navigation to high-speed robotics. Conventional sensors aggregate photons over fixed exposures, imposing trade-offs between sensitivity, dynamic range, and temporal resolution that degrade perception when photons are scarce or dynamics are rapid. Quanta sensors detect individual photons, but their streams exceed real-time compute and latency budgets by orders of magnitude.   Here we introduce $\\textit{probabilistic events}$, a computational primitive for real-time quanta perception from individual photon detections. By computing the posterior over the time since the last intensity change, we represent photon streams as recursive belief states. Rather than fixed-threshold event-camera triggers, this recursive Bayesian formulation yields three low-latency signals: motion-adaptive scene flux, high-fidelity activity maps, and entropy-based perceptual uncertainty. This representation enables perception in extreme conditions, including pose estimation of a running person at $\\sim$0.05 lux---without retraining vision models. Our approach processes input streams exceeding 50{,}000 quanta frames per second on commodity GPU hardware---yielding kilohertz-scale outputs up to four orders of magnitude faster than state-of-the-art quanta reconstruction baselines, even for megapixel arrays. By replacing frame reconstruction with direct probabilistic inference over photon streams, this work bridges photon-counting quanta sensing with robotic vision.",
+      "authors": [
+        "Varun Sundar",
+        "Pavan Thodima",
+        "Sacha Jungerman",
+        "Mohit Gupta"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-27T18:10:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.27584v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "probabilistic events as a computational primitive for event-driven quanta perception",
+      "llm_evidence_cn": "将单光子流表示为概率事件，与事件视觉的事件流处理理念一致",
+      "llm_evidence": "将单光子流表示为概率事件，与事件视觉的事件流处理理念一致",
+      "canonical_evidence": "将单光子流表示为概率事件，与事件视觉的事件流处理理念一致",
+      "llm_tldr_en": "This paper introduces probabilistic events, a recursive belief-state primitive for real-time quanta perception that treats each photon detection as an event and computes posterior over time since last intensity change, enabling efficient processing of high-throughput single-photon streams.",
+      "llm_tldr_cn": "针对量子图像传感器单光子流超出实时计算与延迟预算的问题，提出以概率事件为计算原语的实时量子感知方法。通过计算距离上次强度变化时间的后验，将光子流表示为递归信念状态，而不是固定曝光聚合。该方法在单光子检测层面实现高效的流式感知，为夜间导航和高速机器人等极端环境下的视觉提供了新路径。",
+      "llm_tldr": "针对量子图像传感器单光子流超出实时计算与延迟预算的问题，提出以概率事件为计算原语的实时量子感知方法。通过计算距离上次强度变化时间的后验，将光子流表示为递归信念状态，而不是固定曝光聚合。该方法在单光子检测层面实现高效的流式感知，为夜间导航和高速机器人等极端环境下的视觉提供了新路径。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "event-based vision",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.27550v1",
+      "source": "arxiv",
+      "title": "Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models",
+      "abstract": "Scaling robot data is crucial for building generalist Vision-Language-Action (VLA) models, yet robot trajectories are harder to scale than web-scale image-text data because embodied collection is costly and sparsely covers the physical world. This makes representation quality a central bottleneck: under a fixed robot-data budget, continued pre-training must turn limited trajectories into transferable visual-action knowledge rather than merely fit actions. We propose VLAct, a VLA-oriented VLM backbone trained on broad, heterogeneous, multi-embodiment robot data before task-specific fine-tuning. VLAct preserves the broad VLM prior and encourages shared action semantics across embodiments through VLM-prior preservation, multi-head continuous action co-supervision, and a partially unified cross-embodiment action layout, while allowing task-specific action heads during fine-tuning. Across simulation, real-world, and unseen-embodiment transfer, VLAct consistently improves downstream performance under fixed fine-tuning protocols. On LIBERO-Plus and RoboTwin 2.0, VLAct surpasses industrial VLA systems including ABot-M0 and LingBot-VLA, achieving success rates of 82.6% and 92.5%. On RoboDojo, VLAct ranks sixth among all policies by success rate and outperforms all explicitly designated world-action model (WAM) entries on both metrics. Most notably, on RoboCasa-GR1, an unseen humanoid embodiment, VLAct using only 20% of downstream trajectories outperforms the full-data GR00T-N1.6 baseline. These results are obtained using fully open-source data and only a 16-GPU training setup, showing that representation-centric continued pre-training can deliver highly competitive performance under a modest compute budget and is an important independent axis of VLA progress beyond data scaling.",
+      "authors": [
+        "Senqiao Yang",
+        "Chengyao Wang",
+        "Yuxin Chen",
+        "Zixuan Wang",
+        "Longxiang Tang",
+        "Haokun Gui",
+        "Jinhui Ye",
+        "Changsheng Lu",
+        "Xiaoyang Wu",
+        "Mingkang Zhu",
+        "Pengguang Chen",
+        "Shu Liu",
+        "Zhuotao Tian",
+        "Hengshuang Zhao",
+        "Bei Yu",
+        "Jiaya Jia"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-08-27T17:59:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.27550v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "addresses fixed robot-data budget via representation-centric continued pre-training for VLA models, relating to efficient VLA development",
+      "llm_evidence_cn": "面向固定机器人数据预算，以表示为中心的持续预训练改进VLA模型，关联高效VLA开发",
+      "llm_evidence": "面向固定机器人数据预算，以表示为中心的持续预训练改进VLA模型，关联高效VLA开发",
+      "canonical_evidence": "面向固定机器人数据预算，以表示为中心的持续预训练改进VLA模型，关联高效VLA开发",
+      "llm_tldr_en": "Robot data is hard to scale, so representation quality is a bottleneck for VLA models. VLAct proposes representation-centric continued pre-training on heterogeneous robot data, preserving VLM prior and shared action semantics to improve generalization under limited data.",
+      "llm_tldr_cn": "机器人数据难以规模化，表示质量成为VLA模型的瓶颈。VLAct提出面向VLA的以表示为中心的持续预训练，在异构多本体机器人数据上训练骨干，并通过VLM先验保持与跨本体共享动作语义来提升迁移能力。实验表明该方法在有限机器人数据预算下优于直接动作拟合。该工作强调表示学习在VLA数据效率中的核心作用。",
+      "llm_tldr": "机器人数据难以规模化，表示质量成为VLA模型的瓶颈。VLAct提出面向VLA的以表示为中心的持续预训练，在异构多本体机器人数据上训练骨干，并通过VLM先验保持与跨本体共享动作语义来提升迁移能力。实验表明该方法在有限机器人数据预算下优于直接动作拟合。该工作强调表示学习在VLA数据效率中的核心作用。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.27871v1",
+      "source": "arxiv",
+      "title": "Temporal Tree of Thought: Reasoning-Guided Visual Cue Search for Long-Video Understanding",
+      "abstract": "Long-video understanding remains challenging for Multimodal Large Language Models (MLLMs) due to limited context length. Uniform sampling may miss crucial moments, while agent-based frame video understanding methods often evaluate frames independently, overlooking the temporal organization of videos. Ideally, evidence selection should mimic how humans answer questions about long videos: first locating the relevant segment from the global context, then zooming into local objects and details. We propose Temporal Tree of Thought T^3, a training-free framework for adaptive coarse-to-fine long-video understanding. T^3 constructs a question-agnostic hierarchical temporal tree via recursive temporally constrained clustering, where each node represents a contiguous segment with an informative key frame. During inference, T^3 performs an answer-retrieve-explore loop: it reasons over coarse representative frames, generates a search statement when evidence is insufficient, and expands relevant branches for finer-grained evidence. This process adaptively shifts the search target from temporal regions to specific objects and visual details to help video understanding. Experiments on VideoMME, LongVideoBench, and LVBench show that T^3 improves Qwen2.5-VL-7B by 0.5%, 4.6%, and 4.4%, respectively, under the same frame budget, demonstrating the effectiveness of structured temporal reasoning.",
+      "authors": [
+        "Ziling Huang",
+        "Shin'ichi Satoh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-28T03:23:09+00:00",
+      "link": "https://arxiv.org/pdf/2608.27871v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training-free adaptive evidence selection for efficient MLLM long-video inference",
+      "llm_evidence_cn": "面向高效MLLM长视频推理的无训练自适应证据选择",
+      "llm_evidence": "面向高效MLLM长视频推理的无训练自适应证据选择",
+      "canonical_evidence": "面向高效MLLM长视频推理的无训练自适应证据选择",
+      "llm_tldr_en": "T^3 is a training-free framework for long-video understanding that builds a hierarchical temporal tree via recursive temporally constrained clustering, enabling adaptive coarse-to-fine evidence selection to overcome limited MLLM context.",
+      "llm_tldr_cn": "多模态大模型在长视频理解中常受限于上下文长度，均匀采样容易错过关键帧，逐帧独立评估又忽视视频时间结构。T^3提出一种无训练的时间思维树框架，通过递归时间约束聚类构建层次时间树，先定位相关片段，再聚焦局部目标与细节。该方法以问答无关的粗到细检索方式为MLLM选择视觉证据，缓解长视频问答的上下文瓶颈。实验表明该框架能提升长视频问答与时间推理能力。",
+      "llm_tldr": "多模态大模型在长视频理解中常受限于上下文长度，均匀采样容易错过关键帧，逐帧独立评估又忽视视频时间结构。T^3提出一种无训练的时间思维树框架，通过递归时间约束聚类构建层次时间树，先定位相关片段，再聚焦局部目标与细节。该方法以问答无关的粗到细检索方式为MLLM选择视觉证据，缓解长视频问答的上下文瓶颈。实验表明该框架能提升长视频问答与时间推理能力。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.28383v1",
+      "source": "arxiv",
+      "title": "Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs",
+      "abstract": "Hybrid attention dominates frontier LLMs, yet Vision Transformers (ViTs) in multimodal LLMs lack a satisfactory hybrid design, with no consensus on why certain attention patterns work better. To fill this gap, we study ViT attention heads and find they differentiate into object- and background-specialist roles, a pattern most pronounced under full attention; we call this Semantic Head Specialization (SHS). We propose SHS-Index to quantify this specialization, show that it distinguishes full-attention from chunk-window ViTs, and find that it strongly tracks downstream benchmark performance. We then identify three structural factors that shape SHS---window interaction, token serialization, and local softmax allocation---and use them as design principles for hybrid attention. Guided by these factors, we design Ariadne Attention, a hybrid that matches full attention on 22 image and video tasks at 6.5x less attention compute. Our findings establish head specialization as a measurable property for diagnosing and designing principled hybrid ViT attention at the multimodal-LLM scale.",
+      "authors": [
+        "Chenhong He",
+        "Lei Li",
+        "Shicheng Li",
+        "Hanglong Lv",
+        "Lingpeng Kong",
+        "Qi Liu",
+        "Tong Yang",
+        "Shuhuai Ren"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-08-28T14:40:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.28383v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hybrid ViT attention design for multimodal LLMs, semantic head specialization",
+      "llm_evidence_cn": "面向多模态大语言模型的混合ViT注意力设计与语义头特化",
+      "llm_evidence": "面向多模态大语言模型的混合ViT注意力设计与语义头特化",
+      "canonical_evidence": "面向多模态大语言模型的混合ViT注意力设计与语义头特化",
+      "llm_tldr_en": "Discovers that ViT attention heads in multimodal LLMs specialize into object/background roles, and uses this Semantic Head Specialization to guide hybrid attention design, improving benchmark performance with a principled architecture.",
+      "llm_tldr_cn": "多模态大语言模型中的视觉Transformer缺乏令人满意的混合注意力设计，本文发现注意力头会分化为物体与背景特化角色，称为语义头特化。作者提出SHS-Index量化该分化，并识别窗口交互、token序列化和局部softmax分配等结构因素来指导混合注意力设计。实验表明该方法能有效提升基准性能，为多模态ViT架构提供新的设计原则。",
+      "llm_tldr": "多模态大语言模型中的视觉Transformer缺乏令人满意的混合注意力设计，本文发现注意力头会分化为物体与背景特化角色，称为语义头特化。作者提出SHS-Index量化该分化，并识别窗口交互、token序列化和局部softmax分配等结构因素来指导混合注意力设计。实验表明该方法能有效提升基准性能，为多模态ViT架构提供新的设计原则。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

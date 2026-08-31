@@ -48,17 +48,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-30</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-31</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 10 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 7 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-30 22:24:14 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-31 23:25:30 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -69,7 +69,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日聚焦长视频理解与机器人操作模型，精读2篇高分论文并速读4篇相关研究。最值得关注LongVU-TTT对长视频视觉重采样的因果测试时训练，以及通过简单模态掩蔽增强双臂VLA模型鲁棒性的方法。建议下一步深入探索长视频时序建模技巧，并尝试将模态掩蔽策略应用于多模态模型的泛化提升。</p>
+<p>今日聚焦多模态与视频理解，精读两篇9分Token效率工作并速读三篇相关论文。</p>
+<p>最值得关注：Ada-TokenCom以大型模型驱动token压缩与生成，实现速率自适应通信；Token-Budget Distillation将完整token语义蒸馏至压缩视频视觉语言模型。</p>
+<p>下一步可对比两种token效率方案的适用场景，再结合VLA表示中心预训练拓展实际应用。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -81,9 +83,9 @@
     <strong class="dpr-home-dashboard-count">4 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="LongVU-TTT: Causal Test-Time Training for Visual Resampling in Long Video Understanding">LongVU-TTT: Causal Test-Time Training for Visual Resampling in Long Video Understanding</span></li><li><span class="dpr-home-dashboard-paper-title" title="Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking">Robust Bimanual Vision-Language-Action Models via Embarrassingly Simple Modality Masking</span></li><li><span class="dpr-home-dashboard-paper-title" title="TAU-Agent: An Agentic Retrieval-Augmented Framework for Traffic Anomaly Understanding">TAU-Agent: An Agentic Retrieval-Augmented Framework for Traffic Anomaly Understanding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation">Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models">Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Lossy Event Compression: From Event Stream Distortion to Task Performance">Lossy Event Compression: From Event Stream Distortion to Task Performance</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">ev-cam <strong>2</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -91,12 +93,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">6 篇</strong>
+    <strong class="dpr-home-dashboard-count">3 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="TrAct: Bridging Robot Control and Visual Prediction with Visual Tracks">TrAct: Bridging Robot Control and Visual Prediction with Visual Tracks</span></li><li><span class="dpr-home-dashboard-paper-title" title="VideoHarness-RSI: Recursive Harness Self-Improvement for Long-Video Understanding with Frozen Vision-Language Models">VideoHarness-RSI: Recursive Harness Self-Improvement for Long-Video Understanding with Frozen Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Efficient Training with Foresight: Multi-Token Auxiliary Supervision for Autoregressive Image Generation">Efficient Training with Foresight: Multi-Token Auxiliary Supervision for Autoregressive Image Generation</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models">Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs">Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="Temporal Tree of Thought: Reasoning-Guided Visual Cue Search for Long-Video Understanding">Temporal Tree of Thought: Reasoning-Guided Visual Cue Search for Long-Video Understanding</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>5</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
 </section>
 </div>
 

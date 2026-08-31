@@ -1,0 +1,807 @@
+Title: Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation
+
+URL Source: https://arxiv.org/pdf/2608.28086v1
+
+Published Time: Mon, 31 Aug 2026 00:53:26 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> 1
+
+# Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation 
+
+Zijun Zhang, Li Qiao, Member, IEEE , Mahdi Boloursaz Mashhadi, Senior Member, IEEE ,Zhen Gao, Senior Member, IEEE , Mehdi Bennis, Fellow, IEEE , and Kaibin Huang, Fellow, IEEE 
+
+Abstract —Token Communications (TokenCom) has recently emerged as a new paradigm in which tokens serve as unified units for communication and computation, enabling efficient multi-modal semantic and goal-oriented transmission. In this paper, we develop Ada-TokenCom, a rate-adaptive TokenCom framework based on large autoregressive models, which integrates next-token prediction with arithmetic coding to achieve ultra-low bitrate semantic communication at the token level. We propose a mixed reconstruction/generation scheme, where the transmitter encodes and transmits the highly informative tokens at the beginning of the token sequence leveraging a pre-trained autoregressive large model, while the receiver uses an identical model to predict the rest. Moreover, we design a Lyapunov-based algorithm to dynamically optimize both the source compression rate and the modulation and coding scheme, adapting to time-varying network conditions. Simulation results demonstrate that our proposed Ada-TokenCom framework outperforms both digital and deep joint source-channel coding-based semantic communication base-lines. 
+
+Index Terms —Token communications, Large AI models, au-toregressive generation, arithmetic coding, Lyapunov optimiza-tion, cross-layer design. 
+
+I. I NTRODUCTION 
+
+The rapid progress of generative foundation models (GFMs) and multimodal large language models (MLLMs) is opening up new design opportunities for semantic communications. Modern foundation models increasingly process heteroge-neous modalities through token sequences, where tokens may be discrete indices, latent visual codes, audio units, or con-tinuous token embeddings depending on the modality and model architecture. Such tokenized representations provide a structured interface between communication and computation, and have recently motivated the development of token com-munication (TokenCom) frameworks [1], [2]. In TokenCom, tokens serve as the basic units for semantic-level coding, trans-mission, inference, and generation, enabling communication systems to exploit the contextual and generative priors learned by pretrained GFMs and MLLMs. 
+
+A. From Semantic Communications to Token Communications 
+
+Semantic communication shifts wireless system design from bit-level recovery to semantic-level information exchange un-der bandwidth constraints and unreliable channels [3], [4]. 
+
+> Z. Zhang and Z. Gao are with the School of Information and Elec-tronics, Beijing Institute of Technology (Zhuhai), Zhuhai 519088, China (e-mail:{meshinazusa, gaozhen16}@bit.edu.cn); L. Qiao and K. Huang are with the Department of Electrical and Computer Engineering, The Uni-versity of Hong Kong, Pokfulam Road, Hong Kong SAR (e-mail: {qiaoli, huangkb}@hku.hk); Mahdi Boloursaz Mashhadi is with the University of Surrey, Guildford, U.K. (email: m.boloursazmashhadi@surrey.ac.uk). Mehdi Bennis is with the Centre for Wireless Communications, University of Oulu, 90014 Oulu, Finland (e-mail: mehdi.bennis@oulu.fi). Corresponding authors: L. Qiao and Z. Gao.
+
+Existing methods typically rely on end-to-end learned joint source-channel coding and perform well for specific tasks and modalities [5], [6]. However, their learned representations are often coupled with particular modalities, tasks, datasets, or channel conditions, limiting generalization and complicating integration with practical digital wireless systems. Recent advances in GFMs and MLLMs provide a differ-ent route based on tokenized representations. By converting heterogeneous source signals into structured token sequences, foundation models can process, predict, and generate mul-timodal content through a unified sequence-modeling inter-face [7], [8]. This observation has motivated the development of TokenCom, where tokens serve as the basic units for semantic-level coding, transmission, inference, and genera-tion [1], [2]. Among different token forms, discrete tokens are particularly attractive for digital semantic communication, since they can be naturally combined with entropy coding, channel coding, modulation, and link adaptation. The token-based representation also changes how semantic information can be compressed and recovered. Instead of transmitting all source samples or continuous latent features, a transmitter may send only selected tokens or a compressed token sequence, while the receiver reconstructs or generates the remaining semantic content using pretrained generative priors. This possibility is closely related to the predictive capability of modern foundation models. Autoregressive (AR) models estimate the conditional distribution of each token given its preceding context, and such conditional probabilities can be used for entropy coding. When the predicted token probabilities are accurate, predictable tokens require shorter codewords, whereas uncertain tokens require more explicit information to be transmitted [9], [10]. Therefore, AR token modeling provides a principled way to exploit context-induced predictability beyond conventional signal-level redundancy. Moreover, emerging architectures [11], [12] have redefined AR modeling by replacing traditional raster-scan sequences with hierarchical, scale-aware generation. By leveraging scale-agnostic priors, these emerging architectures can robustly preserve essential global features, including spatial topology, environmental context, and color distributions, even when only a minimal set of critical tokens is transmitted. 
+
+B. Related Works 1) Generative Semantic Communication: Generative se-mantic communication (GenSemCom) has recently attracted increasing attention by exploiting the generative AI priors for semantic reconstruction. Early learned semantic commu-arXiv:2608.28086v1 [cs.IT] 28 Aug 2026 2
+
+nication systems are mainly built upon deep joint source-channel coding (DeepJSCC), where source signals are mapped to continuous channel symbols and reconstructed from noisy channel observations [5], [13]. DeepJSCC-based schemes can jointly optimize source representation and channel protection, while digital variants further quantize semantic features into bits to improve compatibility with practical communication modules [14]. Nevertheless, these methods are usually trained for specific modalities, tasks, or channel distributions. Recent GenSemCom studies move beyond conventional DeepJSCC by incorporating diffusion models, GFMs, and MLLMs into the semantic reconstruction process. Diffusion-model-assisted methods have been developed to improve per-ceptual reconstruction quality and robustness under degraded channel conditions [15], [16], [17]. Foundation-model-based GenSemCom further exploits pretrained generative priors for low-rate image or video communication, where compact se-mantic descriptions, prompts, tokens, or partial representations are transmitted and the receiver uses generative models to recover the missing semantic content [18], [19], [20], [21], [22]. These studies demonstrate that generative priors can substantially reduce the amount of explicitly transmitted in-formation. Adaptive mechanisms have also been investigated in learned semantic communication systems, for example through variable-rate learned source-channel coding, latent masking, compression-ratio adaptation, or model-configuration selec-tion [23], [24]. These methods provide important insights into adaptive semantic transmission, but their rate adaptation is mainly tied to continuous learned representations or precon-figured semantic models. This motivates us to conceive a rate-adaptive token communications (Ada-TokenCom) framework, and it can perform rate adaptation at the discrete token-sequence level, where the truncation length directly determines how many tokens are explicitly compressed and transmitted and how many tokens are generated at the receiver. This enables token compression, receiver-side prediction, and MCS selection to be jointly optimized under long-term wireless resource constraints. 
+
+2) Recent Advances of TokenCom: Existing TokenCom studies can be broadly categorized according to their de-sign objectives: token-level reconstruction and protection, net-worked token transmission, and task-oriented edge inference. For source reconstruction, several works exploit token-level context to reduce transmission overhead or improve robustness against token loss. For example, loss-resilient image com-pression has been studied by recovering missing or corrupted latent tokens through masked visual token modeling [25]. An information bottleneck perspective has also been intro-duced to learn compact token representations that preserve task- or semantics-relevant information [26]. Other studies improve token transmission reliability or efficiency through communication-aware token organization and protection. For instance, semantic packet aggregation groups correlated to-kens to reduce packetization overhead and mitigate packet-loss impact [27], while unequal error protection has been designed according to the non-uniform semantic importance of tokens [28]. Joint semantic-channel coding and modulation further maps token representations to channel symbols for reliable wireless transmission [29]. For video and multimodal sources, textual intent and multimodal context have been used to guide multi-rate token transmission and adaptive source-channel protection [30], [31]. These studies demonstrate that token-level context and semantic importance are useful for improving reconstruction robustness and reducing communi-cation cost. TokenCom has also been extended to multi-user and net-worked wireless scenarios. One line of work studies tokenizer agreement among multiple users, where transmitters and re-ceivers need to select compatible tokenizers and codebooks under wireless resource constraints [32]. Another line exploits semantic context and inter-source semantic orthogonality to mitigate collisions among simultaneously transmitted token sequences [1], [33]. These works show that tokens can serve not only as source representations, but also as network-level units for packetization, coordination, protection, and multiple access. However, their focus is mainly on tokenizer agreement, token-domain collision mitigation, or transmission reliability, rather than on rate-adaptive token compression and prediction over time-varying wireless channels. Beyond reconstruction-oriented transmission, TokenCom has recently been studied as an interface for edge AI services. For example, vision-language token communication has been investigated to support multimodal and multitask inference at the receiver [34]. Task-relevant semantic token selection and wireless resource allocation have also been jointly considered for transformer-based edge inference under dynamic system conditions [35]. In addition, token merging has been used to reduce the number of transmitted tokens by combining re-dundant token representations while preserving edge inference performance [36]. This line of work highlights the potential of TokenCom for connecting wireless transmission with down-stream MLLM inference, rather than merely reconstructing source signals. Overall, existing studies have established key mechanisms for token recovery, selection, protection, packetization, tok-enizer agreement, multiple access, and task-oriented token transmission. Building on these foundations, our proposed Ada-TokenCom focuses on the adaptive control of digital to-ken transmission, where AR token compression, receiver-side prediction, and wireless link adaptation are jointly coordinated under time-varying channels and average symbol-overhead constraints. 
+
+C. Contributions 
+
+Existing TokenCom and generative semantic communica-tion studies have mainly focused on exploiting token-level con-text for recovering missing, corrupted, or untransmitted tokens, and thus reducing communication overhead and latency [1], [2], [30], [33]. However, the adaptation aspect remains much less explored. In particular, a principled digital TokenCom framework that jointly integrates AR token compression, receiver-side token prediction, modulation and coding schemes (MCSs) selection, and long-term symbol-overhead adaptation under time-varying wireless channels is still lacking. 3
+
+Motivated by this gap, we propose Ada-TokenCom, a rate-adaptive token communication framework for low-rate digital semantic communication. The key idea is to jointly exploit AR token compression and receiver-side token prediction. Specifically, each token sequence is partitioned into transmit-ted head tokens and locally generated tail tokens. The head tokens are compressed by arithmetic coding (AC) using AR-estimated conditional probabilities and transmitted through a digital wireless link. The tail tokens are then predicted at the receiver by the same AR model conditioned on the re-covered head tokens. This mixed compression-and-generation mechanism enables a controllable rate and quality trade-off by replacing part of explicit token transmission with receiver-side generative computation. The main contributions of this work are summarized as follows:  
+
+> •
+
+We propose a rate-adaptive digital TokenCom framework that integrates decoder-only Transformer-based AR prob-ability modeling with AC for bandwidth-efficient token-level compression, which provides a unified digital frame-work for efficient token compression and transmission.  
+
+> •
+
+We design a mixed reconstruction-and-generation mech-anism that partitions each token sequence into transmit-ted head tokens and locally generated tail tokens. This mechanism provides an adaptive rate-quality trade-off by exploiting receiver-side generative priors.  
+
+> •
+
+We develop a Lyapunov-based cross-layer optimization algorithm that jointly selects the token truncation length and MCS under time-varying wireless channels and long-term symbol-overhead constraints, thereby opportunisti-cally exploiting favorable channel conditions to improve semantic quality while satisfying the prescribed long-term CBR budget. 
+
+Notations: Bold lowercase, bold uppercase, and normal-face letters denote vectors, matrices, and scalars, respectively. 
+
+[N ] ≜ {1, 2, . . . , N }. For a vector v, vT, [v]i, and [v]i:j
+
+denote its transpose, i-th element, and subvector from the i-th to the j-th element, respectively. For a matrix A, [A]:,j and 
+
+[A]:,i :j denote its j-th column and the submatrix formed by its 
+
+i-th to j-th columns, respectively. E[·] denotes the expectation operator, and E[· | · ] denotes conditional expectation. II. T OKEN COM WITH AR AND AC S OURCE CODING 
+
+In this section, we present the main components of adaptive token-level source coding in the proposed Ada-TokenCom framework. 
+
+A. Token Representation and AR Modeling 
+
+Consider a typical token communication system, where high-dimensional signals such as images or video frames are first split (e.g., into patches) and then discretized by a pretrained tokenizer into sequences of tokens that convey semantic and structural information. Specifically, taking an image X ∈ RH×W ×C as an example, tokenization transforms 
+
+X into N token embeddings, producing a sequence of token indices, denoted as 
+
+s = [ s1, s 2, . . . , s N ]T = τ (X), (1) where τ (·) denotes the tokenization process. Each token index 
+
+sn ∈ [V ] points to a codeword in the token codebook D ∈
+
+RV ×d, with V being the vocabulary size and d the embedding dimension. For notational simplicity, we refer to each discrete token index simply as a “token” in the following. Directly modeling the joint distribution of the token se-quence s conditioned on sc is intractable due to its high dimensionality. Here, sc denotes conditioning tokens that pro-vide compact semantic side information, such as textual cap-tions, contextual priors, or class labels. Such side information enables multimodal TokenCom by conveying coarse source semantics. For example, the class label token can represent the semantic concept of a “Golden Retriever”. An AR framework makes this tractable by factorizing the joint distribution as 
+
+p(s | sc) = 
+
+> N
+
+∏
+
+> n=1
+
+p(sn | [s]1: n−1, sc). (2) Each one-step conditional p(sn | [s]1: n−1, sc) can be approx-imated by a pretrained AR language or multimodal model. Typically, a predefined token ordering, e.g., raster-scan order, is used during training and inference. We adopt the raster-scan order as the default token ordering, although the pro-posed framework is not limited to raster-scan order and can accommodate other predefined token orderings. According to the probabilistic model in (2), the self-information of a message s conditioned on sc is given by 
+
+I(s | sc) = 
+
+> N
+
+∑
+
+> n=1
+
+I(sn | [s]1: n−1, sc)= −
+
+> N
+
+∑
+
+> n=1
+
+log p(sn | [s]1: n−1, sc) ,
+
+(3) where I(sn | [s]1: n−1, sc) = − log p(sn | [s]1: n−1, sc) denotes the self-information of the n-th token, n ∈ [N ]. This quantity represents the minimum number of bits required to encode the token under the given probabilistic model. To obtain such a model and examine how I(sn | [s]1: n−1, sc) varies with the token position n, we employ pretrained AR image generation models. During the encoding process, images are first tokenized into discrete latent tokens, which are then processed by a pretrained Transformer in raster-scan order to produce AR probability distributions. These probabilities allow us to estimate the conditional self-information at each token position. The conditional self-information generally decreases along the generation order, indicating that earlier tokens contribute more information than later tokens. The resulting profile characterizes the self-information associated with each token position, and equivalently the number of bits required to encode the token conditioned on the preceding tokens. In addition to the realized self-information of the ground-truth token, the AR predictive distribution also provides a measure of model uncertainty before observing the token value. The corresponding conditional predictive entropy is defined as 
+
+Hn = −
+
+> V
+
+∑
+
+> v=1
+
+p(sn = v | [s]1: n−1, sc)
+
+× log 2 p(sn = v | [s]1: n−1, sc).
+
+(4) 4Cross-Layer      
+
+> Rate Controller  Channel Encoding & Modulation Arithmetic Code Decoder  Non-generative Reconstruction
+> Generative
+> Reconstruction
+> Input
+> Transmitter
+> Label/Prompt
+> "golden retriver "
+> Softmax
+> [17] [5]
+> ... [17] [5] [71]
+> Receiver
+> Label/Prompt
+> "golden retriver "
+> Channel
+> Tokenizer AR Prediction AR Prediction
+> Detokenizer
+> AR Large Model
+> [33]
+> Softnax Condition tokens Input tokens Arithmetic Code Encoder Channel Decoding & Demodulation
+> AR Large Model
+> AR Prediction ... [17] [5] [46] ...
+> [CLS] [CLS] [CLS]
+> Condition tokens Decoded tokens ... ...
+> [17] [5] [33] [71] ...
+> [CLS] [CLS] [CLS]
+> ... ...
+> [17] [5] [33] [71]
+> ... ... [33] [98]
+> SNR
+> ... [17] [33] [5]
+> Reconstruction using tokens
+
+Fig. 1: Block diagram of the proposed Ada-TokenCom framework. 
+
+Unlike self-information, Hn quantifies the uncertainty of the predictive distribution. Lower entropy indicates that tail tokens can be more reliably generated from the available context. This predictive uncertainty provides an interpretation for tail-token truncation. When the prefix tokens already provide sufficient semantic and structural context, the conditional distribution of later tokens can become more concentrated, leading to lower predictive entropy. In such cases, even if the tail tokens are not explicitly transmitted, the AR model may still complete them in a way that is consistent with the main semantics of the original image. These observations motivate the use of learned AR probabil-ities for source coding: if the probability distributions of future tokens can be predicted from previously decoded tokens and side information, then the expected coding rate can be reduced accordingly. 
+
+B. Arithmetic Coding with Large AR Model-Based Priors 
+
+AR modeling and AC are naturally compatible, since both operate sequentially on prefix-conditioned probability distribu-tions. In Ada-TokenCom, the AC encodes the token sequence by recursively refining a subinterval of [0 , 1) , using the AR model’s estimation of the factorized probability (2). From an information-theoretic perspective, a more accurate predictive distribution produced by the AR model yields a smaller expected code length. In particular, ignoring the negligible implementation overhead of practical coders, the resulting codelength for AC is close to the self-information described in (3). Let f (·) denote the pretrained AR model that outputs the predictive distribution over the token vocabulary. We define 
+
+[s]1:0 ≜ ∅ as the empty prefix. For n ∈ [n∗], the predictive distribution for the n-th token is given by 
+
+pn = f ([ s]1: n−1, sc), (5) where pn ∈ RV and [s]1:0 ≜ ∅ denotes the empty prefix. Accordingly, for each candidate token v ∈ [V ], we have 
+
+[pn]v = p(sn = v | [s]1: n−1, sc). (6) Collecting the predictive distributions over all positions yields 
+
+Π =
+
+[
+
+p1, p2, . . . , pn∗ ]
+
+∈ RV ×n∗
+
+. (7) According to [37], AC starts from the initial interval J0 =[0 , 1) . For encoding the n-th token in the sequence, the current interval is Jn−1 = [ ln−1, u n−1). Define the cumulative distribution associated with pn as 
+
+Fn(v) = 
+
+> v
+
+∑
+
+> j=1
+
+[pn]j , Fn(0) = 0 . (8) Then, for any candidate token value v ∈ [V ], the correspond-ing subinterval is given by 
+
+Jn(v) = 
+
+[
+
+ln−1 + ( un−1 − ln−1)Fn(v − 1) ,ln−1 + ( un−1 − ln−1)Fn(v)
+
+)
+
+.
+
+(9) Given the actual token sn, the encoder selects the correspond-ing subinterval 
+
+Jn = Jn(v|v = sn), n = 1 , 2, . . . , n ∗. (10) By recursively refining the interval over all n∗ tokens in the sequence, AC maps the sequence s to a unique final interval 
+
+Jn∗ . Any representative value z ∈ J n∗ is first selected as the code value associated with the final interval. The value 
+
+z is then converted into a binary fractional representation, yielding the compressed bitstream Bn∗ carrying the predictive conditional probability vectors of the first n∗ token positions. The AC encoding procedure can be written as 
+
+Bn∗ = ψ(sc, [s]1: n∗ , [Π]:,1: n∗ ) , (11) where ψ(·) denotes the AC encoder driven by the AR-model probability sequence. At the decoder, the same conditional dis-tributions are reproduced from sc and the previously decoded prefix using the pre-trained large AR model, so that the token sequence can be recovered in a lossless manner. 
+
+C. Mixed Reconstruction/Generation for Compression Rate Adaptation 
+
+Given the token sequence sn∗ produced by the tokenizer, AC can losslessly compress the transmitted tokens accord-ing to the conditional probabilities provided by the AR 5
+
+model. This observation further motivates a mixed reconstruc-tion/generation strategy for rate adaptation in Ada-TokenCom, i.e., instead of AC-encoding the entire token sequence, the transmitter encodes only the more informative head tokens, while the remaining tail tokens are not transmitted and are directly predicted by the AR model at the receiver. In this way, both the shared side information sc and the decoded token prefix serve as conditions to guide the prediction of the remaining tail tokens. 
+
+1) Reconstruction with AC-based Head Token Decoding: 
+
+The receiver employs an identical large AR model to repro-duce the same conditional probability distributions as those at the transmitter. Before decoding, the receiver initializes the interval J0 = [0 , 1) in the same manner as the transmitter. Conceptually, the received bitstream ˆBn∗ specifies the code value ˆz contained in the final coding interval. Decoding is then performed sequentially from the first token to the n∗-th transmitted token. For n = 1 , . . . , n ∗, the receiver reproduces the predictive distribution ˆpn according to (5). The predictive distribution partitions the current interval ˆJn−1 into V subintervals corre-sponding to candidate token indices v ∈ [V ]. The decoder then determines ˆsn as the unique token whose associated subinter-val contains the code value ˆz. Accordingly, the decoding rule is given by 
+
+ˆsn = v if and only if ˆz ∈ ˆJn(v), v ∈ [V ], n ∈ [n∗],
+
+(12) where ˆJn(v) is the subinterval induced by the predictive distribution at step n from the current interval ˆJn−1 according to (9). After ˆsn is determined, the interval is updated as 
+
+ˆJn = ˆJn(v|v = ˆ sn), and the procedure continues recursively until the first n∗ tokens have been recovered. For notational simplicity, we denote by ψ−1(·) the arithmetic-decoding oper-ator that recovers a token according to the decoded conditional probability vector. Then, the n-th decoded token can be written as 
+
+ˆsn = ψ−1(
+
+[ ˆΠ]:,1: n, ˆBn
+
+)
+
+, n ∈ [n∗]. (13) 
+
+2) Generation with Large AR Model-based Tail Token Pre-diction: After the first n∗ tokens have been recovered, the receiver uses the large AR model to autoregressively predict the remaining (N − n∗) tail tokens. Since the shared side information sc is available at both the transmitter and the receiver, and the decoded prefix [ˆ s]1: n∗ has already been recovered at the receiver, these two sources of context jointly guide the prediction of the missing tokens. We define g(·)
+
+as the token prediction function of the large AR model. The overall token reconstruction process can be expressed as 
+
+ˆsn =
+
+
+
+ψ−1
+
+(
+
+[ ˆΠ]:,1: n, ˆBn
+
+)
+
+, n ∈ [n∗],g(sc, [ˆ s]1: n−1), n∗ < n ≤ N. 
+
+(14) Therefore, the first n∗ head tokens are recovered exactly in the token domain via AC decoding, whereas the remaining tail tokens are completed by conditional AR prediction. The reconstructed signal ˆX is finally obtained as 
+
+ˆX = τ −1([ˆ s1, ˆs2, · · · , ˆsN ]T), (15) where τ −1(·) denotes the detokenization operator. This mech-anism enables straightforward compression-rate adaptation by adjusting the transmitted prefix token length: under tighter rate constraints, a smaller n∗ is transmitted and more tail tokens are generated at the receiver; under looser rate constraints, a larger transmitted prefix enables more faithful reconstruction. In this way, the proposed TokenCom framework combines exact AC-based recovery of the transmitted head tokens with large-AR-model-based completion of the untransmitted tail tokens, thereby achieving flexible rate adaptation while preserving semantic consistency. III. C ROSS -L AYER RATE ADAPTATION FOR WIRELESS 
+
+TOKEN COM 
+
+In wireless TokenCom, both the packet length and the selected channel protection level directly affect semantic re-liability under limited communication resources. In the pro-posed Ada-TokenCom framework, the retained prefix length 
+
+n∗ determines the source rate, while the selected MCS de-termines the channel protection level. This coupling natu-rally motivates a cross-layer rate adaptation mechanism that jointly controls source truncation and wireless transmission. This design choice cleanly separates source compression from channel protection, thereby maintaining compatibility with the separation-based design of the protocol stack in the existing wireless networks. Specifically, the transmitter encodes only the first n∗ tokens, where n∗ ∈ [N ], into a bitstream via AC, while the receiver re-constructs the remaining tail tokens using the large AR model conditioned on the decoded prefix and the shared side informa-tion sc. For a single packet, adjusting n∗ directly changes the packet length, which in turn affects the packet error rate (PER), increases the risk of packet retransmissions, and impacts the achievable semantic fidelity under limited channel resources. To exploit this coupling over time-varying wireless channels, we jointly optimize the retained prefix length and the channel transmission strategy through a Lyapunov-based cross-layer adapter [38]. 
+
+A. Wireless Communication Model 
+
+We consider a point-to-point wireless communication sys-tem and model the wireless link as a quasi-static block-fading Rayleigh channel. The transmitter applies channel encoding and M -ary quadrature amplitude modulation ( M -QAM) to the compressed bitstream b, producing a normalized baseband symbol vector for transmission over the wireless channel. The channel coefficient follows a circularly symmetric complex Gaussian distribution with zero mean and unit variance, and remains constant within one transmission block, while the additive noise is modeled as circularly symmetric complex Gaussian noise. Assuming perfect channel state information at the receiver, zero-forcing equalization is adopted before soft demodulation and channel decoding. The receiver then performs cyclic redundancy check (CRC) verification to de-termine whether the packet is successfully received. 6
+
+B. PER Approximation for Online Link Adaptation 
+
+In each time slot, the transmitter jointly selects the retained prefix length n∗ and a MCS m ∈ M according to the cross-layer optimization decision. Let ℓ(n∗) denote the number of source bits generated after AC encoding of the first n∗ tokens. After applying channel coding and appending protocol over-head such as CRC bits, the total packet length is denoted by L.Since the packet error rate depends on both the packet length and the selected MCS, we characterize the error behavior for each MCS m by a pair of fitting coefficients, which are obtained offline as described below. Although the wireless link considered in our system model follows a quasi-static Rayleigh fading channel, directly eval-uating the average PER for every candidate transmission configuration is computationally inconvenient for online adap-tation. To enable efficient online transmission adaptation, we therefore adopt the waterfall-threshold approximation in [39]. Specifically, for a given MCS m and packet length L, the packet error behavior over an additive white Gaussian noise (AWGN) channel is summarized by a waterfall threshold 
+
+γm
+
+> waterfall
+
+(L). This threshold is then used to approximate the average PER over the quasi-static Rayleigh fading channel as 
+
+PER m(L, ¯γ) ≈ 1 − exp 
+
+(
+
+− γm
+
+> waterfall
+
+(L)¯γ
+
+)
+
+, (16) where ¯γ denotes the average received SNR [39]. Following [40], the waterfall threshold for a fixed MCS m
+
+can be further approximated as a linear function of the packet length in the logarithmic domain, i.e., 
+
+γm
+
+> waterfall
+
+(L) ≈ αm ln L + βm, (17) where αm and βm are coefficients obtained by curve fitting offline. Substituting (17) into (16) yields 
+
+PER m(L, ¯γ) ≈ 1 − exp 
+
+(
+
+− αm ln L + βm
+
+¯γ
+
+)
+
+. (18) 
+
+C. Lyapunov-Based Joint Prefix-Length and MCS Adaptation 
+
+In the proposed Ada-TokenCom framework, the retained prefix length n∗ has a dual effect: it determines the packet length and hence the transmission reliability, while also adapt-ing how many tail tokens are predicted by conditional AR prediction at the receiver. Therefore, the choice of n∗ directly affects the trade-off between communication efficiency and semantic reconstruction fidelity. It is worth noting that reducing the n∗ value mainly affects the communication resource consumption, without affecting the receiver-side inference complexity. This is because the receiver still traverses the full token sequence: the transmitted head tokens are reconstructed sequentially via AC-assisted decoding, while the remaining tail tokens are generated by AR predictions with the same large model. Hence, we focus on the dominant communication–semantics trade-off and jointly adapt the retained prefix length n∗ and the MCSs. Since the wireless channel varies over time, the desirable prefix length–MCS pair may also vary from slot to slot. In favorable channel conditions, transmitting a longer prefix can improve semantic fidelity with acceptable transmission cost; while in poor channel states, a shorter prefix together with stronger channel protection may be preferable. Therefore, instead of imposing a rigid per-slot resource constraint, we constrain only the long-term average channel-symbol con-sumption. This allows the adapter to exploit favorable channel states opportunistically while respecting the overall average communication resource budget. Under this stochastic long-term formulation, Lyapunov optimization provides an effective online adaptive method without requiring knowledge of future channel realizations. Assume that one image is sent per time slot. In t-th time slot, the transmitter selects a retained prefix length n∗ 
+
+> t
+
+and an MCS mt. Define the decision variable as dt ∈ D , where D ≜
+
+{(n∗ 
+
+> t
+
+, m t) | n∗ 
+
+> t
+
+∈ N , m t ∈ M} is the set of all feasible prefix-length–MCS pairs, N denotes the candidate prefix-length set, and M denotes the candidate MCS set. For a given decision 
+
+dt, let Lt and C(dt) denote the packet length and the number of channel symbols for one transmission attempt, respectively. According to (18), the PER is approximated as 
+
+Pt(dt, ¯γt) ≜ PER mt (Lt, ¯γt), (19) where ¯γt is the average received SNR in t-th slot. To ac-count for transmission failures, type-I automatic repeat request (ARQ) is employed, where a packet is retransmitted in full whenever decoding fails [41]. Under the standard geometric approximation, the expected number of transmission attempts required for successful delivery is 1/(1 − Pt(dt, ¯γt)) . Hence, the expected channel-symbol consumption can be considered as 
+
+¯Ct(dt, ¯γt) = C(dt)1 − Pt(dt, ¯γt) . (20) Let At(n∗ 
+
+> t
+
+) denote the semantic quality achieved in t-th slot, e.g., peak signal-to-noise ratio (PSNR) for pixel-level fidelity, learned perceptual image patch similarity (LPIPS) [42] for perceptual similarity, contrastive language–image pre-training (CLIP) similarity [43] for semantic alignment, etc. Here, a CLIP-based semantic similarity score is adopted. The long-term objective is to maximize the time-average semantic quality subject to an average channel-symbol budget 
+
+max  
+
+> {dt∈D}
+
+lim  
+
+> T→∞
+
+1
+
+T
+
+> T
+
+∑
+
+> t=1
+
+E[At(n∗ 
+
+> t
+
+)] 
+
+s.t. lim  
+
+> T→∞
+
+1
+
+T
+
+> T
+
+∑
+
+> t=1
+
+E[ ¯Ct(dt, ¯γt)] ≤ Cth ,
+
+(21) where Cth is the allowable average number of channel symbols per slot. Following the classical Lyapunov optimization frame-work in [38], we introduce a virtual queue {Zt} with initial value Z0 = 0 to enforce the long-term channel-symbol budget constraint by tracking the accumulated budget violation. The queue evolves according to 
+
+Zt+1 = max {Zt + ¯Ct(dt, ¯γt) − Cth , 0} , t = 0 , 1, 2, . . . , 
+
+(22) where the queue accumulates the excess expected channel-symbol consumption relative to the prescribed budget Cth .Intuitively, aggressive transmission decisions increase the queue backlog and consequently impose a larger penalty 7
+
+Algorithm 1 The Proposed Online Joint Prefix-Length and MCS Adaptation for Ada-TokenCom                                          
+
+> Require: Candidate prefix-length set N, candidate MCS set M,adaptation parameter η, average symbol budget Cth , average received SNR ¯γt
+> 1: Initialize Z0= 0 .
+> 2: for t= 1 ,2, . . . do
+> 3: for each dt∈ D do
+> 4: Determine the corresponding packet length Ltand one-shot channel-symbol consumption C(dt).
+> 5: Compute Pt(dt,¯γt)according to (18).
+> 6: Compute ¯Ct(dt,¯γt)according to (20).
+> 7: Evaluate the minimization objective in (25).
+> 8: end for
+> 9: Obtain d∗
+> taccording to (25).
+> 10: Update Zt+1 according to (22).
+> 11: end for
+
+on future resource-intensive actions. According to [38], we define the Lyapunov function and the one-slot conditional drift as L(Zt) ≜ 12 Z2 
+
+> t
+
+and ∆( Zt) ≜ E[L(Zt+1 ) − L (Zt) | Zt],respectively. The drift can be upper-bounded as 
+
+∆( Zt) = E
+
+[ 12
+
+(Z2 
+
+> t+1
+
+− Z2
+
+> t
+
+) ∣∣∣ Zt
+
+]
+
+≤ E
+
+[ 12
+
+(Zt + ¯Ct(dt, ¯γt) − Cth 
+
+)2 − 12 Z2
+
+> t
+
+∣∣∣ Zt
+
+]
+
+≤ κ + Zt E[ ¯Ct(dt, ¯γt) − Cth | Zt
+
+] ,
+
+(23) where κ is a constant independent of the adaptation decision. To jointly maximize semantic quality while stabilizing the virtual queue, the drift-plus-penalty principle and upper-bound the following objective: 
+
+∆( Zt) − ηE[At(n∗ 
+
+> t
+
+) | Zt]
+
+≤ κ + ZtE[ ¯Ct(dt, ¯γt) − Cth | Zt
+
+] − ηE[At(n∗ 
+
+> t
+
+) | Zt] ,
+
+(24) where η > 0 is an adaptation parameter balancing semantic quality and long-term channel-symbol consumption. Since κ
+
+and −ZtCth are independent of the adaptation decision dt,minimizing the right-hand side of (24) is equivalent to solving 
+
+d∗ 
+
+> t
+
+= arg min 
+
+> dt∈D
+
+{
+
+ZtE[ ¯Ct(dt, ¯γt) | Zt
+
+] − ηE[At(n∗ 
+
+> t
+
+) | Zt]
+
+}
+
+= arg min 
+
+> dt∈D
+
+{Zt ¯Ct(dt, ¯γt) − ηA t(n∗ 
+
+> t
+
+)} .
+
+(25) Therefore, in each slot, the transmitter searches over the feasible set of prefix length–MCS pairs and selects the config-uration that minimizes (25). In this way, the adapter explicitly balances communication efficiency and semantic fidelity under time-varying wireless conditions. The overall procedure is summarized in Algorithm 1. 
+
+D. Complexity Analysis of Online Adaptation 
+
+For each candidate dt ∈ D , the evaluation of (18), (20), and (25) requires only constant-time operations, while the mapping from prefix length n to the corresponding bit length bn can be implemented via lookup. Therefore, the per-slot complexity of the proposed online adapter is O(|D| ) = O(|N ||M| ). The virtual queue update in (22) has complexity O(1) .IV. S IMULATION RESULTS 
+
+A. Experimental Setup 
+
+To evaluate the decoding performance of the proposed Ada-TokenCom framework, we adopt the tokenizer and generator architecture provided by LlamaGen [44], a GPT-style large image generation model, where both the image tokenizer and the AR transformer are pre-trained following [44]. In the main experiments, we consider the class-conditioned image generation setting, i.e., class-to-image (c2i). Specifically, a vector quantized generative adversarial networks (VQGAN)-based tokenizer trained on ImageNet-1K is combined with the corresponding LlamaGen-L AR model. For each image, the tokenizer produces a 16 × 16 discrete latent representation grid, each latent token corresponds to a spatial region of the original image. The tokenizer then flattens the grid, and maps it into a sequence of 256 visual tokens using a codebook with size V = 16384 . The image resolution is 256 × 256 unless otherwise specified. More generally, the semantic condition is not limited to a class label and may also take other forms of high-level semantic guidance, such as text descriptions. In this paper, the class-conditioned setting is used for the main quantitative evaluation, whereas other conditional forms are presented later only for illustrative discussion. Performance is evaluated on the ImageNet-V2 data set [45], which shares the same label space as ImageNet-1K but is not used for training, thereby assessing out-of-sample generalization. All experiments are conducted on a NVIDIA 5090 GPU. 
+
+B. Self-Information and Entropy Analysis of AR Image Tokens 
+
+We begin by empirically examining the key observation in-troduced above: the conditional uncertainty of an image token can be reduced when its head tokens and side information are available. Following (3), we compute self-information in bits at each position of the token sequence s, i.e., I(sn |
+
+[s]1: n−1, sc). Specifically, we evaluate two AR models from LlamaGen with different parameter scales, namely LlamaGen-B and LlamaGen-L. For comparison, we also include Taming Transformer [46], which follows an identical AR modeling paradigm, and shares an identical codebook size V = 16384 
+
+with LlamaGen-B and LlamaGen-L. This comparison allows us to examine whether the observed self-information behavior is consistent across different pretrained models. We randomly sample 1,000 images from the ImageNet-V2 dataset as inputs and report the averaged results. Fig. 2 shows the average conditional self-information across token positions with conditional class labels and with null labels (i.e., cond 
+
+and uncond ), where null label means that no class label is used for conditional side information. Fig. 3 visualizes the average self-information for token positions within the VQGAN grid, where the 2D latent grid is flattened row-by-row into a 1D token sequence, and the i-th row maps to token positions 
+
+16( i − 1) + 1 through 16 i, where i ∈ [16] . Self-information is higher for early tokens and decreases as more previous tokens are observed, confirming that preceding tokens provide useful context for subsequent prediction. Table I reports the average self-information per token for different pretrained 80 50 100 150 200 250 
+
+> Token Index
+> 78910 11 12 13 14
+> Average Self-Information (bits)
+> LlamaGen-B,cond LlamaGen-L,cond Taming Transformers,cond
+
+(a) 0 50 100 150 200 250  
+
+> Token Index
+> 78910 11 12 13 14
+> Average Self-Information (bits)
+> LlamaGen-B,uncond LlamaGen-L,uncond Taming Transformers,uncond
+
+(b) 
+
+Fig. 2: Self-information as a function of token position (a) with class label as conditional information ( cond ) and (b) with null label (uncond ), averaged over 1000 images from ImageNet-V2 datatset, for pretrained AR models with different parameter scales. LlamaGen-L, cond                         
+
+> 12345678910 11 12 13 14 15 16
+> Latent Grid
+> 12345678910 11 12 13 14 15 16
+> Latent Grid LlamaGen-L, uncond
+> 12345678910 11 12 13 14 15 16
+> Latent Grid
+> 12345678910 11 12 13 14 15 16
+> Latent Grid
+> 10 10.5 11 11.5 12 12.5 13 13.5
+> Average Self-Information (bits)
+
+Fig. 3: Visualization of self-information on a 16 × 16 VQGAN latent grid using LlamaGen-L. Fluctuations predominantly occur at positions associated with discontinuities, which are induced by flattening the 2D latent grid and mapping the grid into 1D token sequence. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 
+
+> Latent Grid
+> 12345678910 11 12 13 14 15 16
+> Latent Grid LlamaGen-L, cond
+> 9.4 9.6 9.8 10.0 10.2 10.4 10.6 10.8
+
+(a) Original  
+
+> 128/256 tokens
+> Decoded
+> 112/256 tokens
+> 96/256 tokens
+> 0246810 12
+> H bits
+> 0246810 12
+> H bits
+> 0246810 12
+> H bits
+
+(b) 
+
+Fig. 4: Visualization for (a) heatmap of conditional entropy on a 
+
+16 × 16 VQGAN latent grid, and (b) samples of their decoded image with specified lengths of head tokens. 
+
+models. Larger or stronger models achieve lower average self-information, e.g., 11.42 bits/token for LlamaGen-B, 11.22 bits/token for LlamaGen-L, and 8.09 bits/token for Taming Transformers when class label is available, demonstrating improved probability estimation. For reference, directly rep-resenting token indices in binary form requires log 2 V = 14 
+
+bits per token, corresponding to the maximum conditional self-information of a uniform distribution over the codebook. Fig. 4(a) shows the conditional predictive entropy averaged 
+
+TABLE I: Average conditional self-information per token under different AR models. 
+
+Model Params 1 Inference Cost 2
+
+Avg. Bits (cond) Avg. Bits (uncond) 
+
+LlamaGen-B 72 M + 111 M 52.56 G 11.42 11.54 LlamaGen-L 72 M + 343 M 173.57 G 11.22 11.33 Taming Transf. 76 M + 1411 M 364.00 G 8.09 8.37  
+
+> 1
+
+Parameters are reported as tokenizer parameters + AR model parameters.  
+
+> 2
+
+Inference cost is evaluated for 256 tokens and measured in floating-point operations (FLOPs). One fused multiply-add is counted as 2 FLOPs. 
+
+over 1000 ImageNet-V2 images. The entropy is not uniformly distributed across the latent grid. Since the main objects in ImageNet-V2 images are typically located near the image center, the model exhibits a clear low-entropy region in the middle of the latent grid when conditioned on both the class label and the preceding raster-scan tokens. This indicates that, after sufficient prefix information has been observed, subse-quent tokens can be predicted more reliably from the available contextual information. Fig. 4(b) further visualizes decoded examples under different truncation positions. Although the truncation positions vary across images, the decoded images still preserve the main semantic content. This supports that when the class condition and prefix tokens already provide sufficient semantic and structural information, the remaining tail tokens can be plausibly reconstructed by the AR model. 
+
+C. Semantic Compression Performance 
+
+In this subsection, the proposed framework is com-pared with several representative learned image compression baselines, including bmshj2018-Hyperior [47], Cheng2020-Attention [48] implemented using the CompressAI repos-itory [49], HiFiC [50], Better Portable Graphics (BPG), and GenSC scheme powered by diffusion models proposed in [18], namely Diff. GenSC , with prompt “ A photo of [label_name] ”. For token-based reference schemes, we use both the LlamaGen-L and Taming Transformers as the backbone models of proposed Ada-TokenCom . We further compare the performance under cond and uncond settings, and compare our framework with TokenCom [2] in which each to-ken is directly represented using log 2 V = 14 bits without AR completion. For Ada-TokenCom, different compression rates are realized by truncating the transmitted token sequence to different lengths, and the resulting rate is measured in bits per pixel (bpp). Reconstruction quality is evaluated on a randomly selected subset of 1000 validation images from ImageNet-V2, covering diverse classes. We adopt complementary metrics: PSNR, LPIPS, CLIP similarity, and Fréchet inception distance (FID) [51] for distributional realism. Since FID is computed on the selected subset rather than on the full benchmark, its absolute values are not directly comparable to those reported in [44]. As shown in Fig. 5, Ada-TokenCom-cond spans only 
+
+0.0062 –0.0468 bpp, which is over 90% lower than conven-tional learning-based codecs such as Cheng2020-Attention (≈ 0.145 –0.711 bpp), and also much lower than HiFiC (0.688 –1.003 bpp). Despite this substantial rate reduction, Ada-TokenCom-cond maintains high CLIP similarity scores 910 -2 10 -1 10 0              
+
+> bpp
+> 0.75 0.8 0.85 0.9 0.95 1
+> CLIP ( ")
+> 10 -2 10 -1 10 0
+> bpp
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+> LPIPS ( #)
+> 10 -2 10 -1 10 0
+> bpp
+> 050 100 150 200 250
+> FID ( #)
+> 10 -2 10 -1 10 0
+> bpp
+> 10 15 20 25 30 35 40 45
+> PSNR (dB) ( ")
+> Proposed(LlamaGen), cond Proposed(LlamaGen), uncond Proposed(Taming Transformer), cond Proposed(Taming Transformer), uncond HiFiC BPG bmshj2018 Hyperprior Cheng2020 Attention Diff. GenSC TokenCom
+
+Fig. 5. Performance comparison between the proposed Ada-TokenCom framework and benchmark image compression methods on the ImageNet-V2 dataset. Original 256x256 pixels                  
+
+> =256 448 Bytes, 0.054 bpp
+> Non-Generative
+> 193 Bytes, 0.024 bpp 101 Bytes, 0.012 bpp
+> =1024 1792 Bytes, 0.054 bpp
+> Original 512x512 pixels 1115 Bytes, 0.034 bpp 646 Bytes, 0.019 bpp 335 Bytes, 0.010 bpp
+> 284 Bytes, 0.035 bpp
+> Generative
+> "goldfish ""Agolden retriever with awhite tulip sitting in afenced yard "
+> (label: 10 bits) (prompt: 252 bits)
+
+Fig. 6: Visualization of image reconstruction at different token truncating levels for t2i and c2i scenarios. 
+
+of 0.923 –0.973 . It also achieves favorable FID in the low-rate region, indicating strong semantic alignment and distribution-level realism. Compared with vanilla TokenCom, which uses a fixed rate of log 2 V / 256 = 0 .0547 bpp, Ada-TokenCom further reduces the bitrate through AR-based arithmetic coding and supports flexible rate adaptation via token truncation and adaptive token allocation. Conventional codecs still achieve higher PSNR, as expected, since they are optimized for pixel-level fidelity, whereas the discrete tokenizer and generative reconstruction in Ada-TokenCom do not preserve exact pixel values. Nevertheless, Ada-TokenCom achieves a competitive LPIPS range of 0.140 –0.595 at much lower rates, suggesting that it trades pixel-level accuracy for semantic consistency and perceptual plausibility in the ultra-low-rate regime. To further illustrate the reconstruction behavior, Fig. 6presents representative visual examples under different trun-cation lengths for both the c2i and text-to-image (t2i) settings. In both cases, the reconstructed images exhibit progressively improved visual quality and semantic consistency as n∗ in-creases. For the c2i example, the semantic condition is the class label “goldfish”, whose transmission overhead is negligi-ble ( log 2 1000 ≈ 10 bits using fixed-length label encoding over ImageNet classes). For the t2i example, we use the 32 ×32 -grid VQGAN tokenizer released with LlamaGen and pre-trained on the LAION-COCO dataset, together with the corresponding text-conditional AR model. The test image is taken from ImageNet, and the text condition is given by the automatically generated caption “A golden retriever with a white tulip sitting in a fenced yard”. The prompt is compressed using character-frequency-based arithmetic coding, resulting in an overhead of 252 bits (31.5 Bytes), which is negligible compared with the transmitted image-token payload (e.g., 1115 Bytes in Fig. 4). Accordingly, the experiments focus on the transmission cost of image tokens only. Although the tokenizer resolution, pre-training dataset, and conditioning modality differ from those in the c2i setting, similar observations hold: reducing n∗
+
+lowers both the resulting bpp and the number of transmitted bytes, while the reconstructed image still preserves the main semantics specified by the condition. 
+
+D. Wireless Transmission Performance 
+
+To evaluate the proposed framework under wireless trans-mission, the Lyapunov-based joint prefix-length and MCS adaptation formulated in (21) is simulated with semantic quality values obtained from actual end-to-end reconstruc-tions. In each time slot, the full pipeline: source truncation, AC encoding, channel coding and modulation, fading-channel transmission, AC decoding, and AR-based token completion, is executed. The CLIP similarity between the reconstructed and original images is used as the semantic quality A.10                                                              
+
+> TABLE II: Candidate Sets of Channel Coding and Modulations Schemes QPSK 16QAM Code Rate Polynominal αmβmαmβm
+> Uncoded 1−1.742 -2.188 8.662 -13.306 Conv Code 1/2[5 ,7] 80.320 0.011 1.103 -0.277 Conv Code 2/3[51 ,31 ,13] 80.157 0.225 0.506 0.623 Conv Code 1/5[35, 33, 27, 37, 23] 80.086 0.070 0.268 0.075 Turbo Code 1/3[1 ,5/7,5/7] 80.031 0.560 0.087 1.630 TABLE III: Semantic quality A(CLIP) Under Different Prefix Lengths n∗
+> n∗256 224 192 160 128 96 64 32
+> A0.937 0.931 0.922 0.913 0.898 0.880 0.861 0.843
+
+The c2i model with image resolution 256 × 256 and class-label conditioning is adopted, and inference is performed on the ImageNet-V2 dataset. The candidate prefix lengths are n∗ ∈ {32 , 64 , . . . , 256 }, aligned with the boundaries of the flattened latent grid of the VQGAN tokenizer. The corresponding semantic quality values, measured as average CLIP similarity over the evaluation set, range from A = 0 .843 
+
+at n∗ = 32 to A = 0 .937 at n∗ = 256 , as listed in Table III. Five candidate channel coding and modulation schemes are predefined, i.e., |M| = 10 , covering uncoded transmission, rate-1/2, 2/3, and 1/5 convolutional codes, and a rate-1/3
+
+turbo code, each paired with both QPSK and 16QAM. The corresponding PER model parameters am and bm in (18) are summarized in Table II. Simulations are conducted using NVIDIA Sionna [52], an open-source link-level simulation toolbox built on TensorFlow. The channel is assumed to remain constant within each time slot, and the channel coefficient ht
+
+is assumed to be known at the receiver. 
+
+1) End-to-End Comparison with Baseline Schemes: The proposed framework is compared with SwinJSCC, a state-of-the-art DeepJSCC framework based on the Swin Transformer that supports joint SNR and rate adaptation [13]. For a fair comparison, SwinJSCC is trained and validated on ImageNet-1K with 1.2M and 50K images, respectively, while inference for all methods is performed on the ImageNet-V2 dataset containing 10K images. The average channel bandwidth ratio is defined as CBR = Navg /(3 × H × W ), where Navg is the average number of transmitted channel symbols over all time slots. Simulation is conducted over T = 10 3 time slots. The overhead caused by retransmissions and transmission failures is included when computing the average CBR, while the reconstruction quality metrics are evaluated over successfully reconstructed images. For the proposed framework, the operating CBR is adapted through the average channel-symbol budget Cth in the op-timization problem (21), which is swept over discrete val-ues ranging from 250 to 5000. A larger Cth permits more channel symbols per slot and thus a higher CBR, while a smaller Cth forces the optimizer to select shorter prefix lengths and more bandwidth-efficient MCS configurations. The trade-off parameter is set to η = 10 6 which represents the empirically optimal point found via exhaustive grid search over {10 0, 10 1, . . . , 10 8}. Recall from (25) that η governs the balance between semantic quality maximization and long-term resource expenditure: a small η favors queue stability and con-servative transmission, whereas a large η aggressively pursues higher semantic quality at the cost of increased channel usage. As illustrated in Fig. 7, we compare Ada-TokenCom with SwinJSCC under different channel conditions and bandwidth constraints. In Fig. 7(a), Ada-TokenCom achieves substan-tially higher CLIP similarity than SwinJSCC in the low-CBR regime, demonstrating stronger semantic preservation under limited wireless resources. Around CBR ≈ 10 −2, Ada-TokenCom improves CLIP similarity by about 21% –28% 
+
+across different SNRs, and the gain can reach approximately 
+
+47% at lower CBR. In Fig. 7(b), Ada-TokenCom also yields lower LPIPS as the available bandwidth increases, indicating improved perceptual reconstruction quality. At comparable CBRs, it reduces LPIPS by up to about 60% . Fig. 7(c) shows that SwinJSCC obtains higher PSNR, reflecting its advantage in pixel-level fidelity. Fig. 7(d) shows that Ada-TokenCom achieves markedly lower FID in the low-to-medium CBR range, with reductions of up to about 77% at high SNR. These results indicate that Ada-TokenCom prioritizes semantic and perceptual fidelity under stringent bandwidth constraints, while SwinJSCC is more favorable when pixel-wise distortion, as measured by PSNR, is the primary objective. Fig. 8 presents representative visual comparisons between Ada-TokenCom and SwinJSCC at SNR = 12 dB. At com-parable CBR, the proposed framework produces reconstruc-tions that are semantically coherent with the original con-tent, whereas SwinJSCC exhibits visible artifacts under low-bandwidth conditions. By leveraging pre-trained large models as implicit semantic codecs, the proposed framework decou-ples model training from channel adaptation, enabling reusable semantic communication across application domains without per-dataset end-to-end retraining. 
+
+2) Validation of the Lyapunov-Based Adaptation Policy: 
+
+We further investigate how the proposed Lyapunov-based pol-icy adapts online and clarify the role of the trade-off parameter 
+
+η. Although Lyapunov drift-plus-penalty is a classical online optimization tool, its role here is to provide a lightweight semantic-rate adapter that jointly adapts the prefix length and MCS under a long-term symbol budget, without requiring non-causal knowledge of future SNRs. We sweep η under four dynamic SNR scenarios, each sim-ulated independently over T = 10 4 time slots. The proposed policy is compared with the following reference schemes:  
+
+> •
+
+Per-slot oracle: a causal but myopic baseline that max-imizes the instantaneous semantic quality under the current-slot symbol budget. It does not use future SNR information, does not maintain a virtual queue, and cannot borrow transmission budget across time.  
+
+> •
+
+Long-term oracle: an offline benchmark with non-causal knowledge of the entire SNR sequence. It optimizes the cumulative semantic quality under the same long-term average budget and therefore serves as an upper bound with strict budget constraint.  
+
+> •
+
+Fixed: two non-adaptive baselines that always use a fixed number of retained tokens, with n = 32 and n = 256 ,respectively, regardless of channel condition or queue 11 10 -3 10 -2 
+
+CBR 
+
+0.6 0.65 0.7 0.75 0.8 0.85 0.9 0.95 1
+
+> CLIP ( ")
+
+(a) 
+
+10 -3 10 -2 
+
+CBR 
+
+0.1 0.2 0.3 0.4 0.5 0.6 0.7 
+
+> LPIPS ( #)
+
+(b) 
+
+10 -3 10 -2 
+
+CBR 
+
+10 15 20 25 30 
+
+> PSNR (dB) ( ")
+
+(c) 
+
+10 -3 10 -2 
+
+CBR 
+
+40 60 80 100 120 140 160 180 200 
+
+> FID ( #)
+
+(d) 
+
+> SNR = 4 dB SNR = 8 dB SNR = 12 dB Ada-TokenCom SwinJSCC
+
+Fig. 7: Performance comparison of reconstruction among the proposed LlamaGen-based Ada-TokenCom framework, SwinJSCC with rate and SNR adaptation on the ImageNet-V2 dataset. 0.0032/0.9238 0.0081/0.9682 0.0105/0.9802 0.0153/0.9763 0.0026/0.8738 0.0052/0.8949 0.0104/0.9203 0.0208/0.9571 Original 
+
+> A²RC SwinJSCC
+
+0.0047/0.9349 0.0086/0.9478 0.0118/0.9584 0.0145/0.9703 0.0026/0.8579 0.0052/0.8981 0.0104/0.9256 0.0208/0.9567 Original 
+
+> Ada-Tokencom SwinJSCC
+
+0.0042/0.9480 0.0081/0.9444 0.0105/0.9080 0.0136/0.9588 0.0026/0.8543 0.0052/0.8735 0.0104/0.9369 0.0208/0.9600 Original SwinJSCC  Ada-Tokencom 
+
+Fig. 8: Visualization of image reconstruction at different channel bandwidth ratios for the Ada-TokenCom framework and SwinJSCC with rate and SNR adaptation at SNR = 12 dB. The value shown on each image denotes CBR / CLIP score. 10 0 10 2 10 4 10 6 10 8        
+
+> 2
+> 0.8 11.2 1.4 1.6 1.8 2
+> Terminal Budget utilization
+> SNR ~ N(12,10) SNR ~ N(12,5) SNR ~ U(5,12) SNR =12 dB
+
+(a) 10 0 10 2 10 4 10 6 10 8         
+
+> 2
+> 0.7 0.8 0.9 11.1 1.2 1.3 1.4
+> Terminal Budget utilization
+> SNR ~ N(12,10) SNR ~ N(12,5) SNR ~ U(5,12) SNR =12 dB
+
+(b) 
+
+Fig. 9: Effect of the Lyapunov weight η on terminal budget utilization at (a) Cth = 500 and (b) Cth = 1500 under four SNR regimes. 
+
+state. Fig. 9 shows the terminal budget utilization under differ-ent values of η. A larger η gives more weight to seman-tic quality in the drift-plus-penalty objective and therefore makes the adapter more aggressive in selecting high-quality and high-symbol-consumption actions. Consequently, small 0 2500 5000 7500 10000 Time step 02468Cumulative CLIP (  ) 
+
+> 1e3
+
+Cth =500, =1e+06       
+
+> 9900 10000 8650 8700 8750
+> Fixed (256 tokens) Proposed Long-term oracle Per-slot oracle Fixed (32 tokens)
+> 02500 5000 7500 10000 Time step 02468Cumulative 1-LPIPS (  )
+> 1e3
+
+Cth =500, =1e+06               
+
+> 9500 10000 5000 5250 5500
+> 02500 5000 7500 10000 Time slot 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> Historical average link utilization 02500 5000 7500 10000 Time slot 10 2
+> 10 1
+> 10 0
+> 10 1
+> Historical average link utilization
+
+Fig. 10: Per-slot cumulative CLIP and (1 −LPIPS) (upper row) with their historical average link utilization (lower row) under SNR ∼
+
+N (12 , 10) when Cth = 500 .
+
+η values lead to under-utilization of the available budget, whereas excessively large values may cause visible budget violations. Across the considered SNR regimes and budget levels, η ≈ 10 6 provides a representative aggressive yet near-feasible operating point, and is therefore used in the following end-to-end comparisons. Fig. 10 further illustrates the temporal behavior of the proposed policy under a representative SNR process with 
+
+γt ∼ N (12 , 10) . η is selected as the largest value that satisfies the terminal long-term budget constraint. The proposed policy achieves a final-slot throughput close to that of the long-term oracle, while requiring no non-causal information. Under limited budgets, the proposed policy attains higher cumulative CLIP and cumulative perceptual reward, where the latter is measured by (1 − LPIPS) so that larger values correspond to better perceptual quality. Note that no negative (1 − LPIPS) 
+
+values were found during testing. The link utilization of the proposed policy may temporarily exceed one in the early slots, 12 
+
+TABLE IV: Comparison of model size, inference cost, and computation latency 1.
+
+Method Parameters / M (Encoder + Decoder) Inference Cost / GFlops (Encoder + Decoder) Encoder Latency Decoder Latency 
+
+SwinJSCC 18.34 + 14.73 35.01 + 34.11 10 ms 6 ms HiFiC 24.69 + 168.28 15.28 + 116.47 83 ms 188 ms BPG – – 307–824 ms 29–43 ms Ada-TokenCom (LlamaGen-L) 2 372.21 + 385.36 311.41 + 422.47 19 ms 1012 ms   
+
+> 1Latencies are measured using an NVIDIA 5090 GPU and an Intel Xeon Platinum 8260 CPU. BPG computations are primarily CPU-based.
+> 2For Ada-TokenCom, the encoder consists of a 29.30 M-parameter tokenizer and a 342.91 M-parameter AR model, while the decoder consists of a 42.45 M-parameter tokenizer and a 342.91 M-parameter AR model. The corresponding inference costs are 138.54 G + 172.87 G and 169.66 G + 252.81 G FLOPs, respectively.
+
+but it gradually converges to the constraint boundary as the virtual queue accumulates penalty. In contrast, the fixed policy with n = 32 is feasible but overly conservative, while the fixed policy with n = 256 achieves high quality at the cost of persistent budget violation. These two fixed baselines represent the lower and upper performance bounds achievable by layer-separation-based schemes without online prefix-length and MCS adaptation. 
+
+E. Computational Complexity and Latency Analysis 
+
+As shown in (14), the proposed framework reduces the number of transmitted bits through truncation, but it does not reduce the total number of receiver-side AR inference steps. For a token sequence of length N with retained prefix length 
+
+n∗, the shared AR model is invoked during the first n∗ steps to recover the arithmetic-coded prefix and during the remaining 
+
+(N − n∗) steps to generate the missing tail tokens. Hence, the decoder still performs N sequential model evaluations in total, regardless of the truncation length. In this sense, the proposed method has the same order of decoding complexity as full token transmission with arithmetic coding, while enabling semantic completion of the discarded tail tokens. At the transmitter, all retained prefix tokens are available. Their conditional probabilities can therefore be computed in a single prefill process, rather than through n∗ token-by-token AR iterations. This removes the sequential prediction loop for the retained prefix and substantially reduces the encoding latency. In our implementation, the LlamaGen forward pass is additionally accelerated with PyTorch torch.compile ,which fuses and optimizes the model execution graph during inference. This compilation is used as a runtime optimization and does not change the probability distributions or the trans-mitted bitstream. Table IV summarizes the model size, inference cost, and measured latency of the proposed method and the baseline models. Autoencoder-based baselines such as SwinJSCC and HiFiC are computationally lighter, whereas the proposed AR framework incurs a higher decoding latency due to full-horizon sequential inference. Nevertheless, this additional computa-tion is exchanged for substantially improved compression efficiency and semantic reconstruction quality in the low-rate regime. For Ada-TokenCom, we report the total latency as Ttokenizer + TAR + TAC , where Ttokenizer comes from tokenization or detokenization process, TAR comes from AR probability estimation, and TAC includes both softmax-based probability computation and AC coding. The encoder latency is Ttokenizer = 7 .1 ms, TAR = 3 .6 ms, and TAC = 8 .3
+
+ms, where TAC consists of 4.1 ms for softmax computation, and 4.2 ms for AC coding. The full-tokens prefill enables efficient encoder-side computation. At the decoder, the mea-sured latency is Ttokenizer = 8 .4 ms, TAR = 908 .1 ms, and 
+
+TAC = 95 .3 ms, including 82.0 ms for softmax computation and 13.3 ms for AC coding. The higher AR latency stems from enforcing exact numerical consistency with arithmetic coding. Specifically, to ensure identical probability evaluations between encoder and decoder in simulation, the full-prefix AR distribution is recomputed at each decoding step instead of standard token-by-token inference. Consequently, decoding a 256-token sequence requires 256 repeated prefill evalua-tions, which dominates the overall latency. This design is intentionally conservative to guarantee strict encoder-decoder consistency. In principle, full-sequence prefill and incremental AR decoding are equivalent, leaving substantial room for optimization. V. C ONCLUSION AND FUTURE WORK 
+
+This paper proposed Ada-TokenCom , a rate-adaptive dig-ital TokenCom framework that jointly integrates autoregres-sive token compression, receiver-side token generation, and Lyapunov-based cross-layer adaptation. Extensive experiments demonstrated that the proposed framework achieved an ef-fective trade-off between semantic reconstruction quality and communication efficiency under bandwidth-constrained wire-less environments. Ada-TokenCom is particularly suitable for bandwidth-limited applications in which receiver-side computation can be traded for reduced communication overhead. A current limitation is the additional latency introduced by AR token prediction. Future work will therefore investigate faster gen-eration mechanisms, the joint communication and generation tradeoff, and coarse-to-fine token representations that pro-gressively refine reconstruction quality. The framework can also be extended to other modalities with structured token dependencies, such as video and multimodal data, which we leave as future work. REFERENCES [1] L. Qiao, M. B. Mashhadi, Z. Gao, and D. Gündüz, “Token-domain multi-ple access: Exploiting semantic orthogonality for collision mitigation,” in              
+
+> Proc. IEEE Conf. Comput. Commun. Workshops (INFOCOM WKSHPS) ,2025, pp. 1–6. [2] L. Qiao, M. B. Mashhadi, Z. Gao, R. Tafazolli, M. Bennis, and D. Niyato, “Token communications: A large model-driven framework for cross-modal context-aware semantic communications,” IEEE Wireless Commun. , vol. 32, no. 5, pp. 80–88, 2025. 13
+
+[3] D. Gündüz et al. , “Beyond transmitting bits: Context, semantics, and task-oriented communications,” IEEE J. Sel. Areas Commun. , vol. 41, no. 1, pp. 5–41, 2023. [4] W. Yang et al. , “Semantic communications for future internet: Funda-mentals, applications, and challenges,” IEEE Commun. Surveys Tuts. ,vol. 25, no. 1, pp. 213–250, 2023. [5] E. Bourtsoulatze et al. , “Deep joint source-channel coding for wireless image transmission,” IEEE Trans. Cogn. Commun. Netw. , vol. 5, no. 3, pp. 567–579, 2019. [6] S. Wang et al. , “Wireless deep video semantic transmission,” IEEE J. Sel. Areas Commun. , vol. 41, no. 1, pp. 214–229, 2023. [7] X. Wang et al. , “Multimodal learning with next-token prediction for large multimodal models,” Nature , Jan. 2026. [8] S. Yin, C. Fu, S. Zhao, K. Li, X. Sun, T. Xu, and E. Chen, “A survey on multimodal large language models,” Natl. Sci. Rev. , vol. 11, no. 12, p. nwae403, 2024. [9] G. Deletang et al. , “Language modeling is compression,” in Int. Conf. Learn. Represent. , 2024. [10] T. Ren et al. , “Separate source channel coding is still what you need: An LLM-based rethinking,” ZTE Commun. , vol. 23, no. 1, pp. 30–44, Mar. 2025. [11] K. Miwa et al. , “One-D-Piece: Image tokenizer meets quality-controllable compression,” in Tokenization Workshop , 2026. [12] K. Tian et al. , “Visual autoregressive modeling: Scalable image genera-tion via next-scale prediction,” in Adv. Neural Inf. Process. Syst. , 2024. [13] K. Yang et al. , “SwinJSCC: Taming swin transformer for deep joint source-channel coding,” IEEE Trans. Cogn. Commun. Netw. , vol. 11, no. 1, pp. 90–104, 2025. [14] J. Huang et al. , “D 2-JSCC: Digital deep joint source-channel coding for semantic communications,” IEEE J. Sel. Areas Commun. , vol. 43, no. 4, pp. 1246–1261, 2025. [15] S. Wang et al. , “DiffCom: Channel received signal is a natural condition to guide diffusion posterior sampling,” IEEE J. Sel. Areas Commun. ,vol. 43, no. 7, pp. 2651–2666, 2025. [16] M. Zhang et al. , “Semantics-guided diffusion for deep joint source-channel coding in wireless image transmission,” IEEE Trans. Wireless Commun. , vol. 25, pp. 1547–1564, 2026. [17] J. Huang, Q. Zeng, and K. Huang, “Visual fidelity index for generative semantic communications with critical information embedding,” arXiv preprint arXiv:2505.10405 , 2025. [18] L. Qiao et al. , “Latency-aware generative semantic communications with pre-trained diffusion models,” IEEE Wireless Commun. Lett. , vol. 13, no. 10, pp. 2652–2656, 2024. [19] C. Xu et al. , “Generative semantic communications with foundation models: Perception-error analysis and semantic-aware power allocation,” 
+
+IEEE J. Sel. Areas Commun. , vol. 43, no. 7, pp. 2493–2505, 2025. [20] X. Liu et al. , “Communicate less, synthesize the rest: Latency-aware intent-based generative semantic multicasting with diffusion models,” 
+
+IEEE Trans. Veh. Technol. , pp. 1–16, 2026. [21] H. Yin et al. , “Generative video semantic communication via multimodal semantic fusion with large model,” IEEE Trans. Veh. Technol. , vol. 75, no. 1, pp. 1701–1706, 2026. [22] M. Ren, L. Qiao et al. , “Generative semantic communication via textual prompts: Latency performance tradeoffs,” IEEE Trans. Veh. Technol. ,vol. 74, no. 9, pp. 14 843–14 848, 2025. [23] J. Dai et al. , “Nonlinear transform source-channel coding for semantic communications,” IEEE J. Sel. Areas Commun. , vol. 40, no. 8, pp. 2300– 2316, 2022. [24] X. Chen et al. , “The communication and computation trade-off in wireless semantic communications,” IEEE Wireless Commun. Lett. ,vol. 14, no. 7, pp. 2259–2263, 2025. [25] S. Wang, J. Dai, X. Qin, K. Yang, K. Niu, and P. Zhang, “ResiComp: Loss-resilient image compression via dual-functional masked visual token modeling,” IEEE Trans. Circuits Syst. Video Technol. , vol. 35, no. 7, pp. 7181–7195, 2025. [26] H. Wei, W. Ni, W. Wang, W. Xu, D. Niyato, and P. Zhang, “Token communication in the era of large models: An information bottleneck-based approach,” IEEE Wireless Commun. Lett. , vol. 15, pp. 186–190, 2026. [27] S. Lee, J. Park, J. Choi, and H. Park, “Low-complexity semantic packet aggregation for token communication via lookahead search,” arXiv preprint arXiv:2506.19451, 2025. [28] K. Zhang, Z. Jin, Y. Zhang, Z. Cheng, M. Zeng, L. Qiao, and Z. Fei, “TokenCom-UEP: Semantic importance-matched unequal error protec-tion for resilient image transmission,” IEEE Wireless Commun. Lett. ,vol. 15, pp. 2809–2813, 2026. [29] J. Ying, Z. Qin, Y. Feng, L. Wang, and X. Tao, “Joint semantic-channel coding and modulation for token communications,” IEEE Trans. Wireless Commun. , vol. 25, pp. 8179–8193, 2026. [30] J. Men et al. , “Video TokenCom: Textual intent-guided multi-rate video token communications with UEP-based adaptive source-channel coding,” arXiv preprint arXiv:2603.02470, 2026. [31] J. Zhang, W. Ni, P. Wang, and D. Wang, “Task-oriented multimodal token transmission in resource-constrained multiuser networks,” IEEE Wireless Commun. Lett. , vol. 15, pp. 570–574, 2026. [32] F. Zeinali, M. B. Mashhadi, D. Niyato, and R. Tafazolli, “Wireless TokenCom: RL-based tokenizer agreement for multi-user wireless token communications,” arXiv preprint arXiv:2602.12338, 2026. [33] L. Qiao, M. B. Mashhadi, Z. Gao, R. Schober, and D. Gündüz, “ToDMA: Large model-driven token-domain multiple access for semantic commu-nications,” arXiv preprint arXiv:2505.10946v2 , 2025. [34] F. Jiang, S. Tu, L. Dong, X. Li, K. Wang, C. Pan, Z. Han, and J. Wang, “TokenCom: Vision-language model for multimodal and multitask token communications,” arXiv preprint arXiv:2603.00482, 2026. [35] A. Devoto et al. , “Adaptive semantic token communication for transformer-based edge inference,” IEEE Trans. Mach. Learn. Commun. Netw. , vol. 4, pp. 422–437, 2026. [36] O. Erak, O. Alhussein, H. Abou-Zeid, M. Bennis, and S. Muhaidat, “Adaptive token merging for efficient transformer semantic communica-tion at the edge,” IEEE Open J. Commun. Soc. , vol. 7, pp. 4112–4128, 2026. [37] I. H. Witten et al. , “Arithmetic coding for data compression,” Commun. ACM , vol. 30, no. 6, pp. 520–540, 1987. [38] M. J. Neely, Stochastic Network Optimization with Application to Communication and Queueing Systems . Morgan & Claypool Publishers, 2010. [39] I. Chatzigeorgiou et al. , “On the frame error rate of transmission schemes on quasi-static fading channels,” in Annu. Conf. Inf. Sci. Syst. (CISS) ,2008, pp. 577–581. [40] J. Wu et al. , “Energy efficiency and spectral efficiency tradeoff in Type-I ARQ systems,” IEEE J. Sel. Areas Commun. , vol. 32, no. 2, pp. 356– 366, 2014. [41] S. Lin et al. , “Automatic-repeat-request error-control schemes,” IEEE Commun. Mag. , vol. 22, no. 12, pp. 5–17, 1984. [42] R. Zhang et al. , “The unreasonable effectiveness of deep features as a perceptual metric,” in IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2018, pp. 586–595. [43] A. Radford et al. , “Learning transferable visual models from natural language supervision,” in Int. Conf. Mach. Learn. , vol. 139, 2021, pp. 8748–8763. [44] P. Sun et al. , “Autoregressive model beats diffusion: Llama for scalable image generation,” arXiv preprint arXiv:2406.06525 , 2024. [45] B. Recht et al. , “Do ImageNet classifiers generalize to ImageNet?” in 
+
+Int. Conf. Mach. Learn. , 2019, pp. 5389–5400. [46] P. Esser et al. , “Taming transformers for high-resolution image syn-thesis,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. , Jun. 2021, pp. 12 873–12 883. [47] J. Ballé et al. , “Variational image compression with a scale hyperprior,” 
+
+arXiv preprint arXiv:1802.01436 , 2018. [48] Z. Cheng, H. Sun, M. Takeuchi, and J. Katto, “Learned image com-pression with discretized gaussian mixture likelihoods and attention modules,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. ,June 2020. [49] J. Bégaint et al. , “CompressAI: A pytorch library and evalua-tion platform for end-to-end compression research,” arXiv preprint arXiv:2011.03029 , 2020. [50] F. Mentzer et al. , “High-fidelity generative image compression,” Adv. Neural Inf. Process. Syst. , vol. 33, 2020. [51] M. Heusel et al. , “GANs trained by a two time-scale update rule converge to a local nash equilibrium,” in Adv. Neural Inf. Process. Syst. ,vol. 30, 2017. [52] J. Hoydis et al. , “Sionna,” 2022, https://nvlabs.github.io/sionna/.
