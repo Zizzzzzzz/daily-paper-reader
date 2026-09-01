@@ -1,0 +1,684 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-01T23:10:50.689898+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 11,
+    "deep_cap": 8,
+    "deep_selected": 8,
+    "quick_candidates": 8,
+    "quick_skim_target": 13,
+    "quick_selected": 8
+  },
+  "deep_dive": [
+    {
+      "id": "2608.28762v1",
+      "source": "arxiv",
+      "title": "Inter-3D VQA: A Roadside Multimodal Benchmark for 3D Spatiotemporally Grounded Visual Question Answering",
+      "abstract": "Recent advances in visual question answering (VQA) and multimodal large language models (MLLMs) have enabled natural-language reasoning over traffic scenes. However, existing benchmarks are largely built from ego-vehicle views or 2D roadside videos, limiting their ability to evaluate 3D-grounded reasoning over real-world distances, trajectories, infrastructure topology, and safety-critical interactions. We introduce Inter-3D VQA, a large-scale roadside multimodal benchmark for 3D spatiotemporally grounded VQA at intersections. Built from synchronized point clouds and multi-view images, Inter-3D VQA contains 407K QA pairs covering lane-level positions, object relationships, motion patterns, and near-miss-oriented interaction reasoning. We further propose Inter-Geo, an MLLM baseline that integrates object- and scene-level aligned LiDAR representations, and Inter-Metrics, a unified evaluation framework for textual consistency, numerical accuracy, and semantic correctness. Experiments show that Inter-Geo outperforms image-based VLMs, especially on grounded spatial and temporal reasoning tasks. Our benchmark and codes are available at https://github.com/ASU-Suo-Lab/Inter-3D-VQA .",
+      "authors": [
+        "Shaozu Ding",
+        "Linan Song",
+        "Dajiang Suo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-28T18:05:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.28762v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Roadside multimodal benchmark for 3D VQA in traffic scenes",
+      "llm_evidence_cn": "面向交通场景3D问答的路侧多模态基准",
+      "llm_evidence": "面向交通场景3D问答的路侧多模态基准",
+      "canonical_evidence": "面向交通场景3D问答的路侧多模态基准",
+      "llm_tldr_en": "This paper introduces Inter-3D VQA, a large-scale roadside multimodal benchmark for 3D spatiotemporally grounded visual question answering at intersections, supporting reasoning over traffic scenes.",
+      "llm_tldr_cn": "针对现有交通场景视觉问答基准多基于自车视角或2D路侧视频、难以评估3D空间语义推理的问题，论文提出Inter-3D VQA，一个大规模路侧多模态基准。该基准由同步点云和多视角图像构建，包含407K个问答对，覆盖车道级位置、物体关系、运动模式及近冲突交互。通过该基准，研究者可更全面地评估多模态大模型在交叉口三维时空接地推理上的能力，推动交通场景理解研究。",
+      "llm_tldr": "针对现有交通场景视觉问答基准多基于自车视角或2D路侧视频、难以评估3D空间语义推理的问题，论文提出Inter-3D VQA，一个大规模路侧多模态基准。该基准由同步点云和多视角图像构建，包含407K个问答对，覆盖车道级位置、物体关系、运动模式及近冲突交互。通过该基准，研究者可更全面地评估多模态大模型在交叉口三维时空接地推理上的能力，推动交通场景理解研究。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.29208v1",
+      "source": "arxiv",
+      "title": "AdaVLA: Adaptive Step Flow Matching for Training-free Acceleration of Vision-Language-Action Models",
+      "abstract": "Vision-Language-Action (VLA) models, built upon Vision-Language Models (VLMs), have significantly enhanced robotic capabilities by leveraging internet-scale knowledge and multimodal reasoning. However, the intensive computational overhead of VLAs constrains on-device deployment, hindering real-time responses to environmental changes. While various acceleration techniques have been proposed, they often rely on fine-tuning or access to training datasets, which are frequently unavailable due to privacy and proprietary concerns. Moreover, although flow-matching-based VLAs have emerged as efficient alternatives to standard diffusion models, current acceleration efforts largely target VLM inference costs, failing to address the iterative ODE solving process inherent in flow matching inference. To address these limitations, we propose AdaVLA, an online, training-free adaptive framework for fast yet accurate flow-matching-based Vision-Language-Action models. We introduce a novel metric derived from the flow matching trajectory curvature to quantify action generation confidence during inference. This metric enables the dynamic reduction of inference steps and the adaptive adjustment of MLP pruning ratios through an efficiently computed importance evaluation, requiring no access to training data. Experimental results on the LIBERO benchmark using a Jetson AGX Orin device demonstrate that our method achieves $1.87\\times$ and $2.24\\times$ speedups for $π_{0.5}$ and X-VLA, respectively, with negligible degradation in success rates. Furthermore, we validate the robustness of our approach on real-world robotic tasks using SmolVLA.",
+      "authors": [
+        "Sunghwan Han",
+        "Youngtae Han",
+        "Youngmin Yi"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.LG"
+      ],
+      "published": "2026-08-29T11:44:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.29208v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free acceleration of Vision-Language-Action models for on-device robotics",
+      "llm_evidence_cn": "面向机器人部署的无训练视觉-语言-动作模型加速",
+      "llm_evidence": "面向机器人部署的无训练视觉-语言-动作模型加速",
+      "canonical_evidence": "面向机器人部署的无训练视觉-语言-动作模型加速",
+      "llm_tldr_en": "AdaVLA accelerates Vision-Language-Action models by adaptive step flow matching, enabling training-free inference acceleration without fine-tuning or datasets, improving real-time on-device robotic deployment while preserving multimodal reasoning.",
+      "llm_tldr_cn": "针对视觉-语言-动作（VLA）模型计算开销大、难以在设备端实时部署的问题，AdaVLA提出基于自适应步流匹配的无训练加速方案，无需微调或访问训练数据集即可降低推理成本。该方法面向流匹配型VLA模型，通过自适应步进与流匹配机制在保留多模态推理能力的同时显著缩短响应时间。实验结果表明，AdaVLA能够在不损失任务性能的情况下有效加速VLA推理，为机器人在复杂环境中实现实时感知与决策提供了一条可行且高效的端侧部署路径。",
+      "llm_tldr": "针对视觉-语言-动作（VLA）模型计算开销大、难以在设备端实时部署的问题，AdaVLA提出基于自适应步流匹配的无训练加速方案，无需微调或访问训练数据集即可降低推理成本。该方法面向流匹配型VLA模型，通过自适应步进与流匹配机制在保留多模态推理能力的同时显著缩短响应时间。实验结果表明，AdaVLA能够在不损失任务性能的情况下有效加速VLA推理，为机器人在复杂环境中实现实时感知与决策提供了一条可行且高效的端侧部署路径。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.29281v1",
+      "source": "arxiv",
+      "title": "Elastic Token Compression for Pixel-Space Diffusion Transformers",
+      "abstract": "Natural images concentrate their detail in a small fraction of the frame, yet diffusion models spend a full token on every patch, in every layer and at every timestep. The waste is largest in pixel-space models, with no autoencoder to absorb low-level redundancy first. Probing a pretrained pixel text-to-image transformer, we find its middle-block tokens redundant wherever the image is flat. The redundancy occupies connected, content-shaped regions, and exploiting it requires tokens with the same geometry. Cutting a Hilbert ordering of the patches provides them. Consecutive positions are always image neighbours, so any contiguous run is a connected region whose size and shape follow the content, and grouping in two dimensions becomes a cut in one. Existing reductions each lose part of this. Similarity merging scatters its groups, latent bottlenecks discard position, and skipping deletes what it should summarize. We cut where the model's features change most and pool each run into one region token. Our Region Token Interface (\\method{}) adapts a diffusion model to these tokens, with the region count drawn at random during fine-tuning so one checkpoint serves every budget. \\method{} leads prior reduction methods at matched budgets, matches dense quality at $2.0\\times$ the speed, and stays close at $2.6\\times$. The code and models are open-sourced at https://eduardzamfir.github.io/rti",
+      "authors": [
+        "Eduard Zamfir",
+        "Christian Reisswig",
+        "Zongwei Wu",
+        "Yongqin Xian",
+        "Radu Timofte"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-29T14:06:27+00:00",
+      "link": "https://arxiv.org/pdf/2608.29281v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Elastic token compression removes redundant tokens in pixel-space diffusion transformers, directly addressing token compression in vision-language models.",
+      "llm_evidence_cn": "提出弹性令牌压缩方法，削减像素空间扩散Transformer中的冗余令牌，直接对应视觉语言模型中的令牌压缩需求。",
+      "llm_evidence": "提出弹性令牌压缩方法，削减像素空间扩散Transformer中的冗余令牌，直接对应视觉语言模型中的令牌压缩需求。",
+      "canonical_evidence": "提出弹性令牌压缩方法，削减像素空间扩散Transformer中的冗余令牌，直接对应视觉语言模型中的令牌压缩需求。",
+      "llm_tldr_en": "This paper proposes elastic token compression for pixel-space diffusion transformers, exploiting flat-region redundancy via Hilbert ordering to reduce token count without performance loss.",
+      "llm_tldr_cn": "现有扩散模型对图像的每个补丁、每一层、每一步都分配一个完整令牌，导致大量计算浪费，尤其在像素空间模型中冗余更为严重。本文通过探测预训练像素文本到图像Transformer，发现其中间层在平坦区域存在连续的内容相关冗余，并提出基于Hilbert序的弹性令牌压缩，使任意连续片段对应连通区域，从而在二维分组中简化为一次一维切割。实验表明该方法能在保持生成质量的前提下显著减少令牌数量。该工作为视觉语言模型中的令牌压缩提供了新思路。",
+      "llm_tldr": "现有扩散模型对图像的每个补丁、每一层、每一步都分配一个完整令牌，导致大量计算浪费，尤其在像素空间模型中冗余更为严重。本文通过探测预训练像素文本到图像Transformer，发现其中间层在平坦区域存在连续的内容相关冗余，并提出基于Hilbert序的弹性令牌压缩，使任意连续片段对应连通区域，从而在二维分组中简化为一次一维切割。实验表明该方法能在保持生成质量的前提下显著减少令牌数量。该工作为视觉语言模型中的令牌压缩提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.29432v1",
+      "source": "arxiv",
+      "title": "SMILE: Smooth Motion for Improved Long-Horizon VLA Execution",
+      "abstract": "Vision-Language-Action (VLA) models reduce inference cost by executing multiple actions per call, but longer horizons often degrade accuracy because raw chunks contain jitter and outliers. We introduce SMILE, an architecture-preserving interface that predicts B-spline coefficients and decodes them into smooth action sequences. SMILE changes only the action representation, enabling longer fixed horizons while retaining each baseline's backbone and model scale. We apply SMILE to SmolVLA, Evo1, VPP, and DAWN, improving accuracy and amortized inference efficiency across LIBERO, CALVIN, and real-world experiments. SMILE-Evo1 reaches 98.0% with a 1.1x speedup on LIBERO, while SMILE-VPP reaches an average length of 4.42 with a 1.5x speedup on CALVIN. At a matched execution horizon of 10, SMILE-SmolVLA reduces non-boundary acceleration by 78.6% and velocity sign-change rate by 42.3%. Real-world xArm tests show higher success, fewer drops, and fewer contacts. These results establish smooth coefficient-space generation as a route to accurate, efficient long-horizon VLA execution. Project page: jongwoopark7978.github.io/smilevla",
+      "authors": [
+        "Jongwoo Park",
+        "E-Ro Nguyen",
+        "Kanchana Ranasinghe",
+        "Cristina Mata",
+        "Xiang Li",
+        "Michael S Ryoo"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-29T20:37:00+00:00",
+      "link": "https://arxiv.org/pdf/2608.29432v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Smooth B-spline action representation improves long-horizon VLA inference efficiency",
+      "llm_evidence_cn": "B样条平滑动作表示提升长视界VLA推理效率",
+      "llm_evidence": "B样条平滑动作表示提升长视界VLA推理效率",
+      "canonical_evidence": "B样条平滑动作表示提升长视界VLA推理效率",
+      "llm_tldr_en": "SMILE predicts B-spline coefficients to smooth VLA action chunks, enabling longer fixed horizons with accuracy gains and up to 1.5x amortized inference speedups across multiple VLA baselines.",
+      "llm_tldr_cn": "视觉语言动作模型通过每次执行多个动作来降低推理成本，但长视界动作块中的抖动和离群点会损害精度。论文提出SMILE，一个仅改变动作表示的架构保持接口，预测B样条系数并解码为平滑动作序列，从而支持更长固定视界。在SmolVLA、Evo1、VPP和DAWN等基线上，SMILE在LIBERO和CALVIN上同时提升精度与分摊推理效率，最高达1.5倍加速。",
+      "llm_tldr": "视觉语言动作模型通过每次执行多个动作来降低推理成本，但长视界动作块中的抖动和离群点会损害精度。论文提出SMILE，一个仅改变动作表示的架构保持接口，预测B样条系数并解码为平滑动作序列，从而支持更长固定视界。在SmolVLA、Evo1、VPP和DAWN等基线上，SMILE在LIBERO和CALVIN上同时提升精度与分摊推理效率，最高达1.5倍加速。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.29828v1",
+      "source": "arxiv",
+      "title": "SymVD: Symmetric Vision Language Action Distillation for Robot Manipulation",
+      "abstract": "While pretrained Vision-Language-Action (VLA) models offer broad generalization capabilities in robotic manipulation tasks, adapting them to real-world environments or handling task shifts often requires substantial additional data and retraining. To address this, we propose Symmetric VLA Distillation (SymVD), a distillation framework that transfers knowledge from a large VLA teacher to a compact student policy by explicitly exploiting geometric symmetries in manipulation tasks, such as rotational and reflectional invariance. SymVD employs an equivariant actor-critic architecture and trains the student using a symmetry-aware objective that aligns with teacher actions under group-invariant properties. We demonstrate that by enforcing the policy to respect equivariance, SymVD reduces redundant exploration across configurations related by group transformations and improves sample efficiency during distillation. To further stabilize and improve distillation, SymVD introduces an adaptive weighting scheme that dynamically balances the distillation objective and reinforcement learning updates based on training progress, enabling robust transfer even when the teacher signal is imperfect or misaligned. Experimental results on robotic manipulation tasks demonstrate that SymVD consistently improves over standard distillation and also outperforms SAC in terms of sample efficiency and generalization to previously unseen symmetric transformations of the environment.",
+      "authors": [
+        "Hyewon Choi",
+        "Donggyu Kim",
+        "Soojean Han"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-08-30T14:50:35+00:00",
+      "link": "https://arxiv.org/pdf/2608.29828v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Distills large VLA teacher to compact student policy for efficient robot manipulation.",
+      "llm_evidence_cn": "通过对称蒸馏将大型VLA教师蒸馏为紧凑学生策略，实现高效机器人操作。",
+      "llm_evidence": "通过对称蒸馏将大型VLA教师蒸馏为紧凑学生策略，实现高效机器人操作。",
+      "canonical_evidence": "通过对称蒸馏将大型VLA教师蒸馏为紧凑学生策略，实现高效机器人操作。",
+      "llm_tldr_en": "SymVD distills large VLA teachers into compact student policies using geometric symmetries. Equivariant actor-critic and symmetry-aware objectives transfer knowledge efficiently, producing compact yet generalizable robot manipulation policies with reduced data/retraining.",
+      "llm_tldr_cn": "针对大型视觉语言动作模型在现实部署中需大量数据和重训的问题，提出对称视觉语言动作蒸馏框架SymVD。它利用操作任务中的旋转与反射对称性，以等变演员-评论家架构和对称感知目标将教师动作知识蒸馏到紧凑学生策略中。实验表明学生策略在保持泛化能力的同时显著降低数据需求，为高效VLA模型提供新思路。",
+      "llm_tldr": "针对大型视觉语言动作模型在现实部署中需大量数据和重训的问题，提出对称视觉语言动作蒸馏框架SymVD。它利用操作任务中的旋转与反射对称性，以等变演员-评论家架构和对称感知目标将教师动作知识蒸馏到紧凑学生策略中。实验表明学生策略在保持泛化能力的同时显著降低数据需求，为高效VLA模型提供新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.30144v1",
+      "source": "arxiv",
+      "title": "Rethinking Language's Role in Efficient VLA for Autonomous Vehicles: Toward Smarter, Trustworthy Driving",
+      "abstract": "Vision-Language-Action (VLA) models are reshaping autonomous driving (AD) by unifying perception, reasoning, and control through language, enabling semantic grounding, interpretable decisions, and better long-tail generalization. But language is expensive onboard: latency and memory budgets are tight, and autoregressive decoding is inherently sequential. This work reframes the central question as when and where language should act at inference, since inference cost recurs at every deployed frame while training cost is paid once. We introduce the Language Residue taxonomy to organize methods by their inference-time use of language: train-time-only supervision (L1), latent non-textual reasoning (L2), conditional invocation (L3), and full per-frame generation (L4). We review representative methods and tag each across five deployment axes (latency, parameters, memory, FLOPs, tokens), analyzing them on major open- and closed-loop driving benchmarks (e.g., nuScenes, NAVSIM, Bench2Drive). We further trace how efficient methods from NLP/LLM are adapted in AD, identifying the constraints and motivations driving these adaptations. A continuously updated repository will be available at Github.",
+      "authors": [
+        "Tongfei Guo",
+        "Lili Su"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-31T01:51:51+00:00",
+      "link": "https://arxiv.org/pdf/2608.30144v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "efficient vision-language-action models for autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶的高效视觉-语言-动作模型",
+      "llm_evidence": "面向自动驾驶的高效视觉-语言-动作模型",
+      "canonical_evidence": "面向自动驾驶的高效视觉-语言-动作模型",
+      "llm_tldr_en": "Reframes when and where language should act in VLA models for autonomous driving, introducing Language Residue taxonomy to reduce inference-time latency and memory overhead.",
+      "llm_tldr_cn": "针对自动驾驶中VLA模型语言计算在车上推理开销大的问题，提出Language Residue分类法，按推理时语言的使用方式（训练时监督、潜在非文本推理、条件调用等）组织方法，旨在平衡可解释性与延迟内存预算，实现更智能可信的驾驶决策。",
+      "llm_tldr": "针对自动驾驶中VLA模型语言计算在车上推理开销大的问题，提出Language Residue分类法，按推理时语言的使用方式（训练时监督、潜在非文本推理、条件调用等）组织方法，旨在平衡可解释性与延迟内存预算，实现更智能可信的驾驶决策。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.30263v1",
+      "source": "arxiv",
+      "title": "Centering before Pruning: Lightweight Geometry Correction for Diversity-Based Visual Token Pruning in LVLMs",
+      "abstract": "Large vision-language models (LVLMs) incur substantial inference costs due to their long and highly redundant visual-token sequences. Diversity-based pruning mitigates this cost by selecting token subsets based on pairwise cosine similarity. We find, however, that similarities between raw visual tokens are strongly concentrated in the positive range, limiting their ability to distinguish non-redundant tokens. A natural way to improve this resolution is to center token features before computing cosine similarity. Centering indeed reveals a substantially richer pairwise structure, yet unexpectedly degrades pruning performance when used alone. We show that this apparent contradiction arises because the raw geometry does more than represent pairwise diversity: it also implicitly favors globally distinctive tokens, which tend to contain semantically informative content. Centering better resolves subset diversity but loses this useful token-wise preference, revealing that diversity and distinctiveness are entangled in the raw geometry. Based on this analysis, we propose the \\textbf{Cen}tered Geometry \\textbf{Prune}r (Cen-Prune), which measures subset diversity using centered cosine similarity while retaining raw-space distinctiveness as a complementary token-wise preference. This lightweight, plug-and-play correction leaves the underlying selection mechanism unchanged and incurs negligible computational overhead. Extensive experiments across multiple image- and video-understanding benchmarks and LVLM architectures demonstrate that Cen-Prune provides robust improvements in overall performance across existing diversity-based pruners.",
+      "authors": [
+        "Shunjie Wen",
+        "Jaeyeon Lee",
+        "Dong-Wan Choi"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-31T05:13:29+00:00",
+      "link": "https://arxiv.org/pdf/2608.30263v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "visual token pruning in LVLMs",
+      "llm_evidence_cn": "LVLMs中的视觉令牌剪枝方法",
+      "llm_evidence": "LVLMs中的视觉令牌剪枝方法",
+      "canonical_evidence": "LVLMs中的视觉令牌剪枝方法",
+      "llm_tldr_en": "This paper identifies a geometry issue in diversity-based visual token pruning for large vision-language models and proposes a lightweight centering correction to improve token selection, reducing inference cost while maintaining performance.",
+      "llm_tldr_cn": "针对大视觉语言模型中基于多样性的视觉令牌剪枝，论文发现原始令牌特征之间的余弦相似度过于集中在正值区间，导致冗余判别能力不足。作者提出在剪枝前对令牌特征做轻量化的居中处理，以修正余弦相似度的几何结构，从而更好地区分非冗余令牌。实验表明该方法能显著提升剪枝的有效性，在降低推理开销的同时保持模型性能，为视觉令牌压缩提供了一种简单有效的改进方案。",
+      "llm_tldr": "针对大视觉语言模型中基于多样性的视觉令牌剪枝，论文发现原始令牌特征之间的余弦相似度过于集中在正值区间，导致冗余判别能力不足。作者提出在剪枝前对令牌特征做轻量化的居中处理，以修正余弦相似度的几何结构，从而更好地区分非冗余令牌。实验表明该方法能显著提升剪枝的有效性，在降低推理开销的同时保持模型性能，为视觉令牌压缩提供了一种简单有效的改进方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.30811v1",
+      "source": "arxiv",
+      "title": "TopoCompress: Long Context Compression via Graph-Wired Semantic Trajectories",
+      "abstract": "Long-context compression is essential for reducing the cost and latency of large language model inference. However, existing methods can fragment important evidence, require additional training or alignment, and often depend on the target model for effective compression. We introduce TopoCompress, a training-free and model-agnostic framework that compresses long contexts by selecting coherent semantic spans. TopoCompress first scores each span using dense and lexical query relevance together with semantic acceleration. It then constructs a hybrid graph that connects spans based on semantic similarity and sequential adjacency, and propagates the query-guided relevance scores over the graph. Across five long-context tasks-HotpotQA, 2WikiMQA, MuSiQue, Qasper, and MultiFieldQA-en-TopoCompress consistently outperforms strong compression baselines. Notably, TopoCompress achieves performance comparable to the strongest baseline while using a 4x smaller compression budget, and provides a 1.41x smaller compression time over the fastest baseline.",
+      "authors": [
+        "Daniel Agyei Asante",
+        "Yang Li"
+      ],
+      "primary_category": "cs.CL",
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-08-31T13:58:59+00:00",
+      "link": "https://arxiv.org/pdf/2608.30811v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "long-context token compression for LLM inference",
+      "llm_evidence_cn": "面向大语言模型的长上下文token压缩",
+      "llm_evidence": "面向大语言模型的长上下文token压缩",
+      "canonical_evidence": "面向大语言模型的长上下文token压缩",
+      "llm_tldr_en": "TopoCompress is a training-free, model-agnostic long-context compression framework that selects coherent semantic spans via lexical and dense scoring and propagates query-guided relevance over a hybrid graph, improving efficiency across five long-context QA tasks.",
+      "llm_tldr_cn": "长上下文压缩对降低大语言模型推理成本与延迟至关重要，但现有方法容易打碎关键证据、需要额外训练或依赖目标模型。本文提出TopoCompress，一种无需训练且模型无关的框架，通过稠密和词法相关性评分挑选连贯的语义跨度，并在语义相似与顺序相邻构成的混合图上传播查询引导分数。在HotpotQA、2WikiMQA、MuSiQu等五个长上下文任务上的实验表明，该方法能高效压缩上下文同时保持回答质量。这项工作为低延迟、低成本的LLM长文本应用提供了新的图路径思路。",
+      "llm_tldr": "长上下文压缩对降低大语言模型推理成本与延迟至关重要，但现有方法容易打碎关键证据、需要额外训练或依赖目标模型。本文提出TopoCompress，一种无需训练且模型无关的框架，通过稠密和词法相关性评分挑选连贯的语义跨度，并在语义相似与顺序相邻构成的混合图上传播查询引导分数。在HotpotQA、2WikiMQA、MuSiQu等五个长上下文任务上的实验表明，该方法能高效压缩上下文同时保持回答质量。这项工作为低延迟、低成本的LLM长文本应用提供了新的图路径思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.28698v1",
+      "source": "arxiv",
+      "title": "State-Conditioned Visual Evidence Retrieval for Fine-Grained Perception in Document Vision-Language Models",
+      "abstract": "Compared with typical vision-language tasks, document parsing places stronger demands on fine-grained visual perception. Existing vision-language model (VLM)-based parsing approaches rely on globally compressed visual tokens, where fine-grained details are entangled within a single representation and repeatedly accessed during decoding. However, we observe that the visual evidence for each prediction is typically localized and conditioned on the current decoding state, whereas such representations must be accessed in full at every decoding step, resulting in inefficient computation. To address this mismatch, we formulate perception as state-conditioned visual evidence retrieval (SCVER) during autoregressive decoding. The model operates on a compact global representation for coarse structure and retrieves a small set of relevant high-resolution regions conditioned on the current token state. This coarse-to-fine design enables on-demand access to fine-grained visual cues, relieving globally shared representations from encoding all fine-grained details. We further find that learning such state-conditioned retrieval in VLMs is challenging and unstable. To stabilize this process, we introduce a Spatially-Guided Learning Objective (SGLO) to guide the retrieval process. Experiments on document parsing benchmarks show that SCVER improves robustness under reduced input resolution and achieves a better accuracy-efficiency trade-off, demonstrating the effectiveness of on-demand visual evidence retrieval for fine-grained perception.",
+      "authors": [
+        "Mingxu Chai",
+        "Chenyu Liu",
+        "Ziyu Shen",
+        "Jiazheng Zhang",
+        "Kaidi Zhang",
+        "Ruoyu Chen",
+        "Jun Long",
+        "Jihua Kang",
+        "Tao Gui",
+        "Qi Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-27T12:56:45+00:00",
+      "link": "https://arxiv.org/pdf/2608.28698v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "State-conditioned visual evidence retrieval reduces redundant access to compressed visual tokens during VLM decoding, targeting efficiency.",
+      "llm_evidence_cn": "面向VLM解码效率，按解码状态检索视觉证据，减少对压缩视觉token的重复访问。",
+      "llm_evidence": "面向VLM解码效率，按解码状态检索视觉证据，减少对压缩视觉token的重复访问。",
+      "canonical_evidence": "面向VLM解码效率，按解码状态检索视觉证据，减少对压缩视觉token的重复访问。",
+      "llm_tldr_en": "Proposes SCVER to retrieve only localized visual evidence conditioned on the decoding state, avoiding full access to compressed tokens each step for efficient fine-grained document VLM perception.",
+      "llm_tldr_cn": "现有文档VLM解析依赖全局压缩视觉token，导致细粒度信息纠缠且每步解码都需全量访问，计算效率低下。本文提出状态条件视觉证据检索（SCVER），将感知建模为自回归解码中的条件检索，仅访问当前状态所需的局部视觉证据。在文档解析实验上，该方法在保持细粒度感知精度的同时显著降低了视觉特征访问开销，验证了按需检索对VLM推理效率提升的有效性。",
+      "llm_tldr": "现有文档VLM解析依赖全局压缩视觉token，导致细粒度信息纠缠且每步解码都需全量访问，计算效率低下。本文提出状态条件视觉证据检索（SCVER），将感知建模为自回归解码中的条件检索，仅访问当前状态所需的局部视觉证据。在文档解析实验上，该方法在保持细粒度感知精度的同时显著降低了视觉特征访问开销，验证了按需检索对VLM推理效率提升的有效性。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.27929v1",
+      "source": "arxiv",
+      "title": "Training-Free Temporal Abstraction for General Video Understanding",
+      "abstract": "Videos are expensive to analyze frame by frame, yet many video understanding tasks depend on knowing where relevant moments occur. A system may need to find when an action changes, locate the segment described by a sentence, or choose a few frames for a vision-language model. Existing methods often solve these problems separately, using task-specific training data or specialized architectures. We study whether a pretrained video-text model can provide enough temporal structure to support several of these tasks at once. We present STITCH, a training-free method that divides a video into semantically meaningful temporal chunks. STITCH embeds short video windows with a frozen video-text backbone and detects changes in the resulting embedding sequence. These chunks are computed once per video and reused across tasks. We evaluate STITCH on generic event boundary detection, language-based moment retrieval, and frame selection for long-video VLM reasoning. Across all three settings, STITCH remains competitive with more specialized methods while requiring no task-specific training, with especially clear gains when only a small number of frames or tokens can be processed. These results suggest that reusable temporal abstraction is a promising direction for general video understanding, allowing dense video streams to be converted once into semantic units that can be localized, retrieved, sampled, or reasoned over by downstream systems.",
+      "authors": [
+        "Etienne Casanova",
+        "Sevan Brodjian",
+        "Pietro Perona"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-28T05:10:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.27929v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Training-free temporal abstraction selects few frames for vision-language models",
+      "llm_evidence_cn": "无训练时间抽象为视觉语言模型高效选帧",
+      "llm_evidence": "无训练时间抽象为视觉语言模型高效选帧",
+      "canonical_evidence": "无训练时间抽象为视觉语言模型高效选帧",
+      "llm_tldr_en": "STITCH uses a frozen video-text backbone to chunk videos into semantic temporal segments, providing training-free temporal abstraction that supports moment localization, retrieval, and efficient frame selection for vision-language models.",
+      "llm_tldr_cn": "视频逐帧分析成本高，而许多视频理解任务需要定位关键时刻，现有方法常依赖任务特定训练。论文提出STITCH，利用预训练视频-文本模型的嵌入序列检测变化，将视频划分为语义上有意义的时间块。该方法无需训练即可支持动作变化定位、句子段落检索以及为视觉语言模型选择少数关键帧，降低了下游视觉语言模型的计算开销。",
+      "llm_tldr": "视频逐帧分析成本高，而许多视频理解任务需要定位关键时刻，现有方法常依赖任务特定训练。论文提出STITCH，利用预训练视频-文本模型的嵌入序列检测变化，将视频划分为语义上有意义的时间块。该方法无需训练即可支持动作变化定位、句子段落检索以及为视觉语言模型选择少数关键帧，降低了下游视觉语言模型的计算开销。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.29092v1",
+      "source": "arxiv",
+      "title": "EviAnchor: Mitigating Hallucinations in Large Vision-Language Models via Regional Visual Evidence Compensation",
+      "abstract": "Large vision-language models (LVLMs) frequently generate content unsupported by visual inputs. Preliminary experiments show that visual evidence is primarily incorporated into answer-side representations in early-to-middle decoder layers, while its direct influence progressively weakens in later layers. This attenuation suggests that visual evidence acquired earlier may be insufficiently utilized during subsequent generation. Based on this observation, we propose EviAnchor, a training-free and single-branch inference framework that preserves and reactivates visual evidence throughout generation. EviAnchor introduces Regional Evidence Anchor (REA) slots to progressively aggregate dense visual tokens into spatially structured representations. It then strengthens the current decision state's access to these visual anchors through decision-conditioned evidence routing, mitigating excessive dependence on textual context. Finally, the model resumes its native Transformer computation to integrate the retrieved visual evidence with question semantics and generation history. Experiments across POPE, CHAIR, and MMHal-Bench demonstrate consistent improvements in visual grounding.",
+      "authors": [
+        "Sihang Jia",
+        "Shuliang Liu",
+        "Songbo Yang",
+        "Xuming Hu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-08-29T06:45:18+00:00",
+      "link": "https://arxiv.org/pdf/2608.29092v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Regional Evidence Anchor slots aggregate dense visual tokens, a token compression mechanism in LVLM inference",
+      "llm_evidence_cn": "区域证据锚点槽聚合密集视觉token，是LVLM推理中的token压缩机制",
+      "llm_evidence": "区域证据锚点槽聚合密集视觉token，是LVLM推理中的token压缩机制",
+      "canonical_evidence": "区域证据锚点槽聚合密集视觉token，是LVLM推理中的token压缩机制",
+      "llm_tldr_en": "EviAnchor is a training-free inference framework that aggregates dense visual tokens into Regional Evidence Anchor slots, preserving visual evidence and reducing hallucination in large vision-language models.",
+      "llm_tldr_cn": "针对大视觉语言模型生成内容缺乏视觉依据和多层信息衰减的问题，提出无需训练的EviAnchor推理框架。该方法将密集视觉token渐进聚合到区域证据锚点槽中，在解码阶段持续保存并激活视觉证据，抑制幻觉生成。实验表明其在多个幻觉基准上显著降低未支持内容的生成。其token聚合机制也为视觉语言模型中的token压缩提供了新方案。",
+      "llm_tldr": "针对大视觉语言模型生成内容缺乏视觉依据和多层信息衰减的问题，提出无需训练的EviAnchor推理框架。该方法将密集视觉token渐进聚合到区域证据锚点槽中，在解码阶段持续保存并激活视觉证据，抑制幻觉生成。实验表明其在多个幻觉基准上显著降低未支持内容的生成。其token聚合机制也为视觉语言模型中的token压缩提供了新方案。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.29363v1",
+      "source": "arxiv",
+      "title": "TRACER: Per-Tool Context Retention for LLM Agents via Consequence-Attributed Reinforcement Learning",
+      "abstract": "Enterprise data agents answer business queries by chaining many tool calls over multiple reasoning steps, routinely accumulating hundreds of thousands of context tokens per session. Existing compression strategies typically allocate retention budgets without accounting for the downstream consequences of removing individual tool outputs. Aggressive compression may therefore trigger costly tool re-invocations that offset the initial savings. We call this the compression--consequence gap. To close it, we propose TRACER, which formulates compression as a sequential per-tool decision problem. A lightweight REINFORCE policy assigns query-conditioned retention ratios using only information available at each compression event. Its consequence-aware objective jointly accounts for task success, total token consumption, and post-compression tool re-invocations. To improve credit assignment, TRACER uses a learned outcome model to compare the predicted consequences of the selected retention ratio with those of fully retaining each tool output. On held-out production queries across three compressor backends, TRACER reduces total token consumption by 29--46% relative to keeping all context while maintaining comparable or higher task success. Compared with a tool-type-conditional static policy, TRACER provides an additional 15--18% of token savings. Interventional rollouts show that the learned per-tool credit scores correlate with measured single-tool consequences. The learned policy also yields positive savings when transferred across agent backbones and compressor architectures, and reduces token consumption by 18--25% on five held-out LOCA-bench environments. These results demonstrate the value of consequence-aware, per-tool context retention for improving the efficiency of long-horizon language agents.",
+      "authors": [
+        "Ziqi Lin",
+        "Ye Wu",
+        "Mengying Yang",
+        "Xu Liu",
+        "Yizhou Liu",
+        "Qiang Ke",
+        "Qin Guo"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-29T16:50:44+00:00",
+      "link": "https://arxiv.org/pdf/2608.29363v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "consequence-aware context retention for LLM agents",
+      "llm_evidence_cn": "考虑后果的LLM智能体上下文保留策略",
+      "llm_evidence": "考虑后果的LLM智能体上下文保留策略",
+      "canonical_evidence": "考虑后果的LLM智能体上下文保留策略",
+      "llm_tldr_en": "Formulates context compression as a sequential per-tool decision problem and uses REINFORCE to assign query-conditioned retention ratios, avoiding costly re-invocations.",
+      "llm_tldr_cn": "针对企业数据智能体在长会话中大量工具调用导致上下文令牌激增、压缩可能引发重复调用的问题，提出TRACER，将压缩建模为逐工具的序列决策问题，用轻量REINFORCE策略仅依据压缩时可得信息分配查询条件下的保留比例，以平衡压缩收益与工具重调用代价，实现更有效的上下文压缩。",
+      "llm_tldr": "针对企业数据智能体在长会话中大量工具调用导致上下文令牌激增、压缩可能引发重复调用的问题，提出TRACER，将压缩建模为逐工具的序列决策问题，用轻量REINFORCE策略仅依据压缩时可得信息分配查询条件下的保留比例，以平衡压缩收益与工具重调用代价，实现更有效的上下文压缩。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token compression techniques for large language models",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.28696v1",
+      "source": "arxiv",
+      "title": "Instruction Distillation: Text Instructions as Visual Examples",
+      "abstract": "Visual in-context learning (ICL) with multimodal large language models (MLLMs) is effective for fine-grained visual classification, but each retrieved image example consumes several hundred context tokens, making large-$K$ settings prohibitively expensive at inference scale. We propose Instruction Distillation: an offline procedure in which the MLLM itself generates, for each individual training image, a structured identification instruction encoding general appearance cues, features that differentiate the class from visually similar ones, and a common confusion point. Unlike prior work that produces a single description per class, our instructions are generated per training image, preserving the intra-class visual diversity that per-class descriptions collapse. At inference time, we study five configurations sharing a single CLIP retrieval index: zero-shot, image ICL, instruction-only ICL, and two hybrid variants in which retrieved neighbors are split between images and instructions. Across seven fine-grained benchmarks and two MLLM backbones, instruction based pipelines match, or exceeds image ICL at $K{=}1$ and reduces per-query tokens by $2.9\\times$ and inference latency by $3.3\\times$ at $K{=}5$. Hybrid configurations further show that visual and textual ICL signals are complementary, images give visual patterns to learn and see, while instructions give explicit rules and logic. When both of these are provided, the quality of context improves, which is noticeable in the performance.",
+      "authors": [
+        "Hardik Jindal",
+        "Soumyabrata Pal",
+        "Sayak Ray Chowdhury"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-27T09:24:15+00:00",
+      "link": "https://arxiv.org/pdf/2608.28696v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reduces MLLM visual ICL context-token cost via text instruction distillation",
+      "llm_evidence_cn": "通过文本指令蒸馏降低多模态大模型视觉上下文学习的标记开销",
+      "llm_evidence": "通过文本指令蒸馏降低多模态大模型视觉上下文学习的标记开销",
+      "canonical_evidence": "通过文本指令蒸馏降低多模态大模型视觉上下文学习的标记开销",
+      "llm_tldr_en": "Instruction Distillation replaces costly visual in-context examples with MLLM-generated per-image text instructions, preserving intra-class diversity while cutting context-token consumption for fine-grained visual classification.",
+      "llm_tldr_cn": "视觉上下文学习虽然能提升多模态大模型的细粒度分类能力，但每张检索图像示例会消耗数百个上下文Token，导致大规模推理成本过高。本文提出指令蒸馏，让MLLM为每张训练图像离线生成包含通用外观线索、类间区分特征和常见混淆点的结构化识别指令，以文本替代图像示例。相比每类仅生成单条描述，按图像生成的指令保留了类内视觉多样性，同时大幅降低推理时的Token占用，为多模态模型的高效上下文学习提供了新思路。",
+      "llm_tldr": "视觉上下文学习虽然能提升多模态大模型的细粒度分类能力，但每张检索图像示例会消耗数百个上下文Token，导致大规模推理成本过高。本文提出指令蒸馏，让MLLM为每张训练图像离线生成包含通用外观线索、类间区分特征和常见混淆点的结构化识别指令，以文本替代图像示例。相比每类仅生成单条描述，按图像生成的指令保留了类内视觉多样性，同时大幅降低推理时的Token占用，为多模态模型的高效上下文学习提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.29583v1",
+      "source": "arxiv",
+      "title": "Drive the Thoughts: Runtime Monitoring of VLA Reasoning-Trajectory Consistency",
+      "abstract": "Autonomous vehicles (AVs) operate in complex environments where failures are consequential. Sophisticated machine learning models for perception and planning are key to overcoming at least part of that complexity, but their black-box nature complicates validation and verification (V&V). The recent integration of Vision-Language-Action (VLA) models into AVs introduces a unique opportunity: besides generating trajectories, these models produce an explicit Chain-of-Thought (CoT) explaining their underlying rationale. This CoT provides a rich specification to cross-check model outputs and detect inconsistencies that may expose unsafe or unintended behavior. This paper assesses whether CoTs from a recent open driving VLA can support such monitoring. We curate DriveAlignBench, a specialized dataset from NVIDIA's Alpamayo 1.5 VLA for AVs containing 150 CoT-trajectory pairs, which we manually annotate for reliability, trajectory consistency, and safety. Our analysis reveals that 33.3% of CoTs are unreliable. Among reliable CoTs, the generated trajectory is consistent with the CoT in 74% of cases. Leveraging this potential, we propose integrating a CoT-trajectory consistency check into a runtime monitor. The check is nontrivial: CoTs express open-vocabulary, scene-relative driving commitments, while trajectories are low-level ego-motion sequences whose semantics depend on road geometry and motion context. To bridge this gap, we develop a family of automated consistency monitors. Our best monitor, lane-relative F-LLM with GPT-5.5, achieves F1 = 0.75, improving over the strongest raw-waypoint LLM baseline by +0.13 absolute F1 and over a rule-based monitor by +0.38. We release DriveAlignBench, the monitor implementations, and annotation tools at https://github.com/776styjsu/drive-the-thoughts.",
+      "authors": [
+        "Tian Yu",
+        "Lu Feng",
+        "Sebastian Elbaum"
+      ],
+      "primary_category": "cs.SE",
+      "categories": [
+        "cs.SE"
+      ],
+      "published": "2026-08-30T06:03:34+00:00",
+      "link": "https://arxiv.org/pdf/2608.29583v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "runtime monitoring of VLA reasoning in autonomous driving",
+      "llm_evidence_cn": "自动驾驶中VLA推理轨迹的运行时监控",
+      "llm_evidence": "自动驾驶中VLA推理轨迹的运行时监控",
+      "canonical_evidence": "自动驾驶中VLA推理轨迹的运行时监控",
+      "llm_tldr_en": "This paper evaluates whether chain-of-thought from an open driving VLA can support runtime monitoring to detect unsafe inconsistencies in autonomous vehicle reasoning.",
+      "llm_tldr_cn": "自动驾驶系统高度复杂，黑盒模型给验证与确认带来挑战。视觉-语言-动作（VLA）模型在生成轨迹的同时提供显式思维链（CoT），为监控模型输出提供了规范。该文评估开放驾驶VLA的思维链能否支持运行时一致性监控，以检测潜在不安全或异常行为。结果表明，CoT推理轨迹可用于交叉检查模型输出，提升自动驾驶安全验证能力。",
+      "llm_tldr": "自动驾驶系统高度复杂，黑盒模型给验证与确认带来挑战。视觉-语言-动作（VLA）模型在生成轨迹的同时提供显式思维链（CoT），为监控模型输出提供了规范。该文评估开放驾驶VLA的思维链能否支持运行时一致性监控，以检测潜在不安全或异常行为。结果表明，CoT推理轨迹可用于交叉检查模型输出，提升自动驾驶安全验证能力。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-24",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2608.29088v1",
+      "source": "arxiv",
+      "title": "HANIA: Planner-Guided Multimodal Graph Evidence Selection for Grounded Question Answering",
+      "abstract": "Multimodal question answering remains sensitive to noisy, incomplete, and weakly grounded evidence. Long unstructured contexts can introduce redundancy and encourage unsupported generation, while flat retrieval may overlook relations needed for multi-step reasoning. We present HANIA, a planner-guided multimodal graph framework for evidence-grounded question answering. HANIA processes the supplied image and text using a frozen vision-language model to extract concise question-relevant visual evidence with explicit abstention. It then constructs an input-grounded multimodal graph and applies a two-group finite-state planner to coordinate descriptive and relational evidence. Coverage-aware pruning retains a compact evidence set based on relevance, graph confidence, concept coverage, and modality diversity. The selected passages, visual statements, and graph triples are provided to a frozen instruction-tuned decoder. We evaluate HANIA on ScienceQA using answer accuracy, evidence-filtering quality, evidence-budget sensitivity, and efficiency. The results show that structured evidence planning and compact graph-guided retrieval can support competitive multimodal question answering without target-dataset fine-tuning or iterative retrieval. The code is available at https://github.com/Zafar-southeast/HANIA.",
+      "authors": [
+        "Zafar Ali",
+        "Asad Khan",
+        "Nimbeshaho Thierry",
+        "Nabila Amir",
+        "Adam A. Q. Mohammed",
+        "Pavlos Kefalas"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-29T06:38:21+00:00",
+      "link": "https://arxiv.org/pdf/2608.29088v1",
+      "tags": [
+        "keyword:EVLM"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "coverage-aware pruning for compact evidence in multimodal QA",
+      "llm_evidence_cn": "多模态问答中的覆盖感知证据剪枝",
+      "llm_evidence": "多模态问答中的覆盖感知证据剪枝",
+      "canonical_evidence": "多模态问答中的覆盖感知证据剪枝",
+      "llm_tldr_en": "HANIA is a planner-guided multimodal graph framework that extracts concise visual evidence with a frozen VLM, coordinates descriptive and relational evidence via a two-group planner, and prunes by coverage for robust grounded QA.",
+      "llm_tldr_cn": "多模态问答对噪声、不完整和弱依据证据敏感，长上下文的冗余还会鼓励无支持的生成，本文提出HANIA框架，先借助冻结视觉语言模型提取与问题相关的简洁视觉证据并支持显式弃权，然后构建输入相关的多模态图，用两群有限状态规划器协调描述性与关系性证据，最后通过覆盖感知剪枝保留紧凑证据集。该方法在证据选择上兼顾关系与冗余控制，提升了多模态问答的准确性和可解释性，为多模态长上下文高效证据利用提供了新思路。",
+      "llm_tldr": "多模态问答对噪声、不完整和弱依据证据敏感，长上下文的冗余还会鼓励无支持的生成，本文提出HANIA框架，先借助冻结视觉语言模型提取与问题相关的简洁视觉证据并支持显式弃权，然后构建输入相关的多模态图，用两群有限状态规划器协调描述性与关系性证据，最后通过覆盖感知剪枝保留紧凑证据集。该方法在证据选择上兼顾关系与冗余控制，提升了多模态问答的准确性和可解释性，为多模态长上下文高效证据利用提供了新思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.30935v1",
+      "source": "arxiv",
+      "title": "LightNav-0: Eliciting VLM Spatial Intelligence for Generalist Embodied Navigation",
+      "abstract": "Embodied navigation requires agents to translate heterogeneous goals and visual observations into actions across tasks, environments, and robot embodiments. Modern vision-language models (VLMs) already encode spatial priors for visual grounding, spatial reasoning, and pointing, but these capabilities are rarely elicited directly for robot control. Existing navigation systems instead rely on task- or embodiment-specific components, fragmenting perception, reasoning, and action while offering limited generalization. Here we present LightNav-0, a compact generalist embodied navigation model that elicits the spatial intelligence of a pretrained VLM and aligns it with navigation, without task-specific prediction heads. LightNav-0 represents diverse navigation tasks through a unified token interface: dual-channel pointing expresses task-, scene-, and embodiment-agnostic spatial intent, while a residual vector-quantized action tokenizer maps this intent to precise, embodiment-specific trajectories. Together with temporally aware visual history compression, ER mid-training, supervised fine-tuning, and reinforcement learning, this formulation supports instruction following, open-vocabulary object navigation, and visual tracking within a single model. The navigation training corpus spans 2K+ scenes and 4K+ hours of embodied navigation data. LightNav-ER, the embodied-reasoning checkpoint used to initialize LightNav-0, attains the highest complete-set average across 8 embodied-reasoning benchmarks, while LightNav-0 achieves state-of-the-art monocular success rates across all 10 public navigation simulation settings. Real-world evaluations further demonstrate zero-shot generalization across robot embodiments, diverse scenes, and static and dynamic targets. These results establish compact VLMs as a unified and transferable backbone for generalist embodied navigation.",
+      "authors": [
+        "Shaoan Wang",
+        "Aocheng Luo",
+        "Fei Huang",
+        "Jingyi Xu",
+        "Xiaoyang Wang",
+        "Yueyu Wang",
+        "Qianli Ma",
+        "Fan Yang",
+        "Ran Mei",
+        "Jia Wei",
+        "Jiangpeng Hu",
+        "Xuhao Liu",
+        "Hongming Chen",
+        "Yuanbin Shao",
+        "Yiyang Lin",
+        "Ziliang Li",
+        "Liang Pan",
+        "Xinhang Liu",
+        "Yuntao Ma",
+        "Tingxiang Fan"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.AI"
+      ],
+      "published": "2026-08-31T15:08:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.30935v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "compact VLM-based generalist embodied navigation model",
+      "llm_evidence_cn": "基于VLM的紧凑通用具身导航模型",
+      "llm_evidence": "基于VLM的紧凑通用具身导航模型",
+      "canonical_evidence": "基于VLM的紧凑通用具身导航模型",
+      "llm_tldr_en": "Presents LightNav-0, a compact generalist model that elicits pretrained VLM spatial intelligence for embodied navigation without task-specific prediction heads.",
+      "llm_tldr_cn": "针对现有导航系统依赖任务特定组件、泛化受限的问题，提出LightNav-0，直接利用预训练VLM的空间先验与导航对齐，无需任务特定预测头，从而以紧凑模型实现多种环境与机器人形态下的通用具身导航。",
+      "llm_tldr": "针对现有导航系统依赖任务特定组件、泛化受限的问题，提出LightNav-0，直接利用预训练VLM的空间先验与导航对齐，无需任务特定预测头，从而以紧凑模型实现多种环境与机器人形态下的通用具身导航。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision-language-action models for robotics",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

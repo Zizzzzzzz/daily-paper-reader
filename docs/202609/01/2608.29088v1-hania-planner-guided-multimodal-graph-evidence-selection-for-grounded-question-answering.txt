@@ -1,0 +1,233 @@
+Title: HANIA: Planner-Guided Multimodal Graph Evidence Selection for Grounded Question Answering
+
+URL Source: https://arxiv.org/pdf/2608.29088v1
+
+Published Time: Tue, 01 Sep 2026 00:31:14 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# HANIA: Planner-Guided Multimodal Graph Evidence Selection for Grounded Question Answering 
+
+Zafar Ali 1, Asad Khan 1, Nimbeshaho Thierry 2, Nabila Amir 1, Adam A. Q. Mohammed 4, and Pavlos Kefalas 31School of Computer Science and Engineering, Southeast University, Nanjing, China 
+
+> 2
+
+Portland Institute Nanjing, NJUPT, Nanjing, China 
+
+> 3
+
+Dashub & School of Informatics, Aristotle University of Thessaloniki, Greece 
+
+> 4
+
+School of Information Science and Engineering, Shandong University, Qingdao, China 
+
+Abstract. Multimodal question answering remains sensitive to noisy, incomplete, and weakly grounded evidence. Long unstructured contexts can introduce redundancy and encourage unsupported generation, while flat retrieval may overlook relations needed for multi-step reasoning. We present HANIA , a planner-guided multimodal graph framework for evidence-grounded question answering. HANIA processes the supplied image and text us-ing a frozen vision–language model to extract concise question-relevant visual evidence with explicit abstention. It then constructs an input-grounded multimodal graph and applies a two-group finite-state planner to coordinate descriptive and relational evidence. Coverage-aware pruning retains a compact evidence set based on relevance, graph confidence, concept coverage, and modality diversity. The selected passages, visual statements, and graph triples are provided to a frozen instruction-tuned decoder. We evaluate HANIA on ScienceQA 
+
+using answer accuracy, evidence-filtering quality, evidence-budget sensitivity, and efficiency. The results show that structured evidence planning and compact graph-guided retrieval can support competitive multimodal question answering without target-dataset fine-tuning or iterative retrieval. The code is available at https://github.com/Zafar-southeast/HANIA .
+
+Keywords: Graph-enhanced LLMs; Multimodal KG-RAG; Planner-guided evidence con-trol; Input-grounded graph retrieval; Multimodal question answering 
+
+# 1 Introduction 
+
+Multimodal question answering requires grounded reasoning over heterogeneous evidence, includ-ing text, images or diagrams, and relational knowledge. Knowledge-graph question answering (KG-QA) Jiang et al. [2023] and retrieval-augmented generation (RAG) Chen et al. [2022] offer complementary strengths: graphs expose relations useful for multi-step reasoning, while retrieval helps identify relevant evidence. However, multimodal KG-assisted QA remains challenging un-der limited computational budgets because visual and textual information must be grounded, connected, and organized before generation. Extracted triples may be weakly aligned with visual content because of missing or misgrounded relations Zheng et al. [2023], while vision–language models can still produce unsupported answers even when relevant evidence is available Leng et al. [2024]. Graph-aware RAG methods address part of this problem by organizing evidence through explicit relational structure. KG 2RAG performs graph-guided expansion and chunk organiza-tion Zhu et al. [2025], while KERAG combines subgraph retrieval with filtering and summariza-tion Sun et al. [2025]. Other approaches introduce explicit reasoning control, including PMR for progressive KGQA Ren et al. [2026], SKRAG with finite-state reasoning skeletons Xu et al. 1arXiv:2608.29088v1 [cs.AI] 29 Aug 2026 [2025], and GLOW with GNN–LLM integration for open-world KGQA Abdallah et al. [2026]. Nevertheless, many existing methods remain text-centric, assume a pre-existing symbolic graph, or rely on complex training and retrieval pipelines. They provide limited support for constructing compact, question-aware graph evidence directly from supplied multimodal inputs. HANIA addresses this gap through input-grounded graph construction and planner-guided evidence control. Given a question and its supplied image and text, Qwen3-VL-Instruct Bai et al. [2025] extracts concise question-relevant visual evidence with explicit abstention. Con-trolled rules and GLiREL Boylan et al. [2025] then extract question-aware relations from the visual and textual evidence. The resulting input-grounded graph preserves links between each retained statement or triple and its original source. A two-group finite-state planner coordinates descriptive and relational evidence require-ments. Coverage-aware pruning then retains a compact evidence set based on question relevance, graph confidence, concept coverage, and modality diversity. The selected passages, visual state-ments, and graph triples are serialized for a frozen Qwen3-8B-Instruct decoder Yang et al. [2025]. HANIA therefore controls the evidence supplied to the decoder without target-dataset fine-tuning, decoder modification, external knowledge retrieval, or iterative retrieval. The main contributions are: • We introduce HANIA , a planner-guided multimodal graph framework that constructs question-aware evidence directly from supplied images and text. • We build an input-grounded multimodal graph with explicit provenance, preserving the connection between extracted relations and their supporting evidence. • We propose a two-group finite-state planner with coverage-aware pruning and evaluate its effectiveness on ScienceQA using answer accuracy, evidence-filtering quality, evidence-budget sensitivity, and efficiency. Next, Section 2 reviews related work. Section 3 presents HANIA. Section 4 describes the experiments and results. Section 5 concludes the paper. 
+
+# 2 Related Work 
+
+Research on question answering has developed along four closely related directions: KG-based reasoning, multimodal QA, retrieval-augmented generation, and structured LLM reasoning. We briefly review these areas and position HANIA as a lightweight, planner-guided framework for constructing and selecting compact multimodal graph evidence. KG-QA methods use structured triples to support interpretable reasoning Liu et al. [2023b]. Earlier systems relied on embedding-based retrieval and semantic parsing but often struggled with unseen entities, missing relations, and scalability. Recent LLM-based approaches incorpo-rate graph-aware prompting and traversal Taffa et al. [2024], including PMR Ren et al. [2026], SKRAG Xu et al. [2025], and GLOW Abdallah et al. [2026]. These methods improve multi-hop reasoning through structured intermediate steps, but they are largely text-centric and com-monly assume an existing symbolic graph. In contrast, HANIA constructs an instance-level multimodal graph directly from the supplied visual and textual evidence. Multimodal QA requires coordinated reasoning over images, text, and relational informa-tion. Multimodal knowledge graph methods investigate how heterogeneous signals can support grounded reasoning Zheng et al. [2023]. MR-MKG applies graph neural message passing over multimodal nodes Lee et al. [2024], while VaLiK studies automated vision-to-MMKG construc-tion with alignment-noise mitigation Liu et al. [2025]. VisDoM highlights the value of struc-tured retrieval for visually rich inputs such as tables and diagrams Suri et al. [2025], whereas VDocRAG preserves visual layout through image-based retrieval and modeling Tanaka et al. 2Figure 1: Architecture of HANIA. Input-grounded multimodal evidence is organized through finite-state planning and coverage-aware pruning before prediction by a frozen decoder. [2025]. However, many systems still depend on coarse evidence aggregation or long multimodal contexts. HANIA instead converts the supplied context into compact question-aware graph evidence and organizes it through constrained planning. RAG improves factual consistency by grounding LLM outputs in retrieved evidence. Multimodal and graph-enhanced variants incorporate multimodal alignment Chen et al. [2025, 2022] and graph-based retrieval or organi-zation, including KG 2RAG Zhu et al. [2025], KERAG Sun et al. [2025], and Pythia-RAG Ali et al. [2025]. Instruction tuning and Chain-of-Thought can improve reasoning control Liu et al. [2023a], while graph-aware prompting supports interpretability Mondal et al. [2024]. HANIA 
+
+differs by combining input-grounded multimodal graph construction, descriptive–relational plan-ning, and coverage-aware pruning to produce a compact provenance-preserving evidence package for a frozen decoder, without external knowledge retrieval, decoder modification, or iterative re-trieval. 
+
+# 3 Methodology: HANIA 
+
+Figure 1 presents HANIA , a planner-guided multimodal graph framework for evidence-grounded question answering. HANIA extracts question-relevant visual and textual evidence, constructs an input-grounded graph with explicit provenance, and uses a two-group finite-state planner to coordinate descriptive and relational requirements. Coverage-aware pruning then selects a compact set of passages, visual statements, and graph triples for a frozen Qwen3-8B-Instruct decoder. All pretrained components are frozen, with no external knowledge retrieval. 
+
+3.1 Input-Grounded Evidence and Graph Construction 
+
+Let Q denote the question, O the answer options, and X = ( I, T ) the supplied image and textual context, where either modality may be absent. For an available image, a frozen Qwen3-VL-Instruct model extracts a concise, question-relevant statement: 
+
+DIQ = fVL (I, Q, O) . (1) The model reports only visibly supported information and returns an abstention statement when the requested evidence cannot be determined. The original text T is retained without 3generative rewriting. HANIA then constructs a question-aware graph mG Q = ( VQ, E Q, π Q),
+
+where VQ contains entities, properties, and numerical values from DIQ and T , EQ contains the retained relations, and πQ links each graph element to its supporting visual statement or text span. A question-aware relation vocabulary RQ is selected based on the required evidence type, including attributes, counts, comparisons, and spatial relations. Deterministic templates convert regular visual statements into triples, while GLiREL Boylan et al. [2025] extracts relations from textual evidence: 
+
+(ˆ rjk , c jk ) = frel (ej , e k, s ; RQ) , (2) where s is the supporting evidence unit and cjk is the relation confidence. A relation is retained only if its entities are valid, ˆrjk ∈ R Q, cjk ≥ τr, and it is relevant to Q. Deterministic relations receive unit confidence. No external commonsense triples are added; unsupported requirements remain unresolved for the planning stage. 
+
+3.2 FSM-Constrained Two-Group Planning 
+
+Given Q and the input-grounded graph GQ, HANIA builds a bounded evidence plan before pruning. The required evidence is organized into two groups: 
+
+P = {Descriptive , Relational }. (3) The descriptive group covers attributes, colors, materials, counts, and shapes, while the relational group covers spatial, comparative, and object-level relations. The plan is an ordered sequence S = ( s1, . . . , s L), where sh = ( ah, g h, c h) and L ≤ H. Here, 
+
+ah is the planner action, gh ∈ P is the active evidence group, and ch contains relevant entity, relation, or property cues. The action space is: 
+
+Aplan = {InspectEvidence , InspectGraph , Combine , Stop }. (4) At each step, a frozen instruction-tuned planner proposes the next state under finite-state constraints: 
+
+sh = Plan FSM (Q, G Q, s <h ) , (ah−1, a h) ∈ T FSM , (5) where TFSM defines valid transitions. The controller rejects invalid transitions, avoids repeated inspection of the same group, and stops after at most H steps. Simple questions may use one evidence group, while more complex questions may combine both. The planner identifies evidence requirements but does not generate the final answer. 
+
+3.3 Planner-Guided Retrieval and Coverage-Aware Pruning 
+
+The candidate pool EQ contains textual spans, visual statements, and graph triples, each linked to its source through πQ. Each candidate e ∈ E Q is scored as: 
+
+R(e) = α1Sq(e, Q ) + α2Sgraph (e) + α3Splan (e, S),
+
+> 3
+
+X
+
+> i=1
+
+αi = 1 , (6) where Sq measures question relevance, Sgraph captures relation confidence or direct support, and 
+
+Splan measures alignment with the active planner groups. All scores are normalized to [0 , 1] .A fixed top-K ranking may retain redundant evidence while missing required concepts. HA-NIA therefore applies greedy coverage-aware pruning. Given the selected set A, the marginal value of a candidate is: 
+
+∆( e | A ) = R(e) + β1∆cov (e | A ) + β2∆div (e | A ) − β3Redundancy( e, A), (7) 4where ∆cov rewards newly covered question concepts and planner groups, while ∆div rewards complementary modalities or evidence types. Starting from A0 = ∅, HANIA selects: 
+
+e∗ 
+
+> t
+
+= arg max 
+
+> e∈E Q\A t−1
+
+∆( e | A t−1), At = At−1 ∪ { e∗ 
+
+> t
+
+}. (8) Selection stops when the budget Nmax is reached or the best remaining score falls below τ . The final package is Esub (Q) = AT , where T is the stopping step. If a required planner group remains unsupported, HANIA inserts an insufficient-evidence marker instead of retaining weak evidence. 
+
+3.4 Structured Evidence Prompting and Answer Generation 
+
+HANIA serializes the retained evidence Esub (Q) while preserving the provenance links defined by πQ. Evidence is grouped according to the descriptive and relational requirements identified by the planner: 
+
+F(g) = Serialize ( {(e, π Q(e)) | e ∈ E sub (Q), group( e) = g}) , g ∈ { desc , rel }. (9) Each item contains its original text or visual statement, any associated graph triple, and its supporting modality. If reliable support is missing, an insufficient-evidence marker is inserted. For answer options O = {o(j)}nj=1 , the structured decoder prompt is: 
+
+PHANIA =
+
+h
+
+Q; O; F(desc) ; F(rel) i
+
+. (10) A frozen Qwen3-8B-Instruct decoder Yang et al. [2025] selects an answer using only the supplied evidence. Let {y(j) 
+
+> i
+
+}Lj 
+
+> i=1
+
+denote the tokens of option o(j). Each option is scored using length-normalized log-likelihood: 
+
+S
+
+
+
+o(j)
+
+= 1
+
+LjLj
+
+X
+
+> i=1
+
+log pθ
+
+
+
+y(j) 
+
+> i
+
+| y(j) 
+
+> <i
+
+, P HANIA 
+
+
+
+, ˆy = arg max  
+
+> j
+
+S
+
+
+
+o(j)
+
+. (11) This constrained formulation avoids unrestricted generation and ensures that the prediction matches one of the provided options. 
+
+3.5 Frozen-Backbone Configuration 
+
+HANIA keeps the vision–language, relation-extraction, planner, and answer models frozen; none is fine-tuned on ScienceQA . Its contribution therefore lies in question-aware evidence con-struction, provenance-preserving graph representation, finite-state planning, and coverage-aware pruning. The relation-confidence threshold, planner horizon, evidence budget, prompts, and scoring weights are selected on the validation split and fixed before testing. Gold answers are used only for validation and evaluation and remain unavailable during graph construction, plan-ning, pruning, and prediction. 
+
+# 4 Experimental Evaluation 
+
+We evaluate HANIA on ScienceQA using answer accuracy, evidence-filtering quality, evidence-budget sensitivity, and end-to-end latency. All hyperparameters are selected on the validation split and fixed before test evaluation. 5Table 1: Controlled comparison and component-level ablation results on ScienceQA . All values are percentages.                                                          
+
+> Model/Variant Accuracy ↑Precision ↑Recall ↑F1 ↑
+> Baseline comparison
+> Qwen3-VL Direct Yang et al. [2025] 85.40 –––FOCUS + LLaVA-1.5-13B Jiang et al. [2025] 74.40 57.20 51.80 54.37 EfficientLLaVA Liang et al. [2025] 83.05 61.90 57.40 59.56 Cantor (Gemini) Gao et al. [2024] 84.96 63.10 58.80 60.87 SciTune-ScienceQA (CTOM, 7B) Horawalavithana et al. [2024] 86.11 64.30 59.70 61.91 SelF-Reasoner (UnifiedQA-Large) Wu et al. [2024] 87.24 66.20 60.50 63.22 Flat-RAG 86.90 65.30 59.80 62.43
+> Component ablation w/o Graph 86.70 66.50 61.00 63.65
+> w/o Coverage-Aware Pruning 86.40 65.20 62.00 63.58
+> w/o Insufficient-Evidence Markers 86.30 66.00 61.80 63.84
+> HANIA 87.80 68.57 62.31 65.29
+
+4.1 Dataset and Evaluation Protocol 
+
+ScienceQA Lu et al. [2022] is a multimodal multiple-choice benchmark whose instances may contain an image, textual context, both, or neither. We use the official test split and only the supplied context, without external knowledge retrieval. Answer accuracy is the primary metric, while evidence precision, recall, and F1 are computed against reference relevance annotations. We also vary the evidence budget k and report end-to-end latency. All models are evaluated on identical test instances under matched metrics, hardware, and inference settings, with baseline backbones kept frozen. Results are averaged over five runs, with 95% confidence intervals es-timated by 10,000 paired bootstrap samples. McNemar’s test with Holm correction is used for the pre-specified comparisons with Qwen3-VL Direct, Flat-RAG, and SelF-Reasoner. 
+
+4.2 Overall Results and Component Ablation 
+
+Table 1 reports the controlled comparison and component-level ablations on ScienceQA . All methods use the same evaluation protocol, and evidence-filtering metrics are computed against the same relevance annotations. 
+
+Comparative analysis. HANIA achieves the highest accuracy of 87 .80% , exceeding Qwen3-VL Direct by 2.40 points ( 95% CI: [1 .95 , 2.85] , Holm-adjusted p < 0.003 ). Compared with Flat-RAG, the closest matched baseline, HANIA improves accuracy by 0.90 points ( 95% CI: 
+
+[0 .52 , 1.28] , p = 0 .008 ) and F1 by 2.86 points ( 95% CI: [2 .10 , 3.50] ). It also exceeds SelF-Reasoner by 0.56 accuracy points ( 95% CI: [0 .18 , 0.94] , p = 0 .021 ). 
+
+Ablation analysis. Removing each component reduces performance. Replacing coverage-aware pruning with fixed top-k ranking causes the largest precision drop, indicating that marginal-gain selection limits redundant evidence. Removing insufficient-evidence markers pro-duces the largest accuracy reduction, while removing the graph lowers both accuracy and ev-idence F1. Together with the Flat-RAG comparison, these results show that HANIA benefits from provenance-linked graph construction, constrained planning, coverage-aware pruning, and explicit handling of unsupported evidence. 
+
+4.3 Filtering Quality and Evidence-Budget Selection 
+
+We vary the retained-evidence budget k while keeping all other settings fixed. Precision and recall are computed against the reference relevance labels for candidate evidence items, and 6Table 2: Effect of the retained-evidence budget k on ScienceQA . All metrics except latency are percentages.                                          
+
+> Budget Accuracy ↑Precision ↑Recall ↑F1 ↑Latency (s/q) ↓
+> k= 1 82.60 75.40 43.80 55.40 1.72
+> k= 3 86.10 71.20 57.40 63.56 2.18
+> k=587.80 68.57 62.31 65.29 2.64
+> k= 7 86.70 64.10 67.20 65.61 3.09
+> k= 9 85.30 59.80 70.40 64.68 3.51
+
+F1 is their harmonic mean. Latency denotes the mean end-to-end processing time per ques-tion, including visual evidence extraction, graph construction, planning, pruning, and answer prediction. Increasing k improves recall but gradually reduces precision. Accuracy peaks at 87 .80% with 
+
+k = 5 , while k = 7 produces the highest filtering F1 but slightly lower answer accuracy. At 
+
+k = 9 , the additional recall is accompanied by lower precision and accuracy, suggesting that redundant or weakly relevant evidence can distract the decoder. Mean latency also increases from 1.72 to 3.51 seconds per question. The value k = 5 was selected using the validation split before test evaluation because it provided the best validation accuracy with a moderate evidence and latency budget. The test-set analysis is therefore reported as a sensitivity study rather than a basis for parameter selection. 
+
+4.4 Controlled Analysis 
+
+Qwen3-VL Direct compares the complete HANIA pipeline with direct multimodal prompting under matched test instances and inference conditions. Flat-RAG provides the closest matched comparison because it uses the same candidate evidence pool and frozen answer decoder but removes two-group planning and coverage-aware pruning. The additional component-level vari-ants isolate the effects of graph construction, coverage-aware pruning, and insufficient-evidence handling. As reported in Section 4.2, removing any of these components reduces answer accu-racy or evidence-filtering quality. The evidence-budget analysis further examines the trade-off among accuracy, filtering quality, and latency. Together, these results indicate that HANIA’s gains arise from the combined contribution of provenance-linked graph evidence, constrained planning, coverage-aware selection, and explicit handling of unsupported evidence. 
+
+4.5 Parameter Selection 
+
+All parameters were selected on the ScienceQA validation split and fixed before test evaluation. The retained-evidence budget was set to k = Nmax = 5 , the relation-confidence threshold to 
+
+τr = 0 .50 , the evidence stopping threshold to τ = 0 .20 , and the planner horizon to H = 4 . The relevance-scoring weights in Equation (7) were set to α = (0 .50 , 0.25 , 0.25) for question relevance, graph support, and planner alignment, respectively. The pruning weights in Equation (8) were set to β = (0 .30 , 0.20 , 0.25) for concept coverage, evidence diversity, and redundancy. Planner decoding used temperature 0, and all prompt templates, thresholds, pretrained components, and evidence-processing rules remained unchanged across test experiments. The test split was not used for prompt design, hyperparameter tuning, or model selection. 
+
+4.6 Implementation Details 
+
+HANIA is implemented in PyTorch using Hugging Face Transformers. All pretrained compo-nents remain frozen. Each ScienceQA instance is processed using only its supplied question, answer options, image, and textual context. The frozen Qwen3-VL-Instruct model extracts a concise question-relevant visual statement, while the original textual context is retained without 7generative rewriting. Rule-based span extraction identifies entity candidates, and determin-istic templates together with GLiREL construct provenance-linked relations. Low-confidence, malformed, and question-irrelevant relations are removed. The descriptive–relational planner and coverage-aware pruning are applied once before pre-diction by the frozen Qwen3-8B-Instruct decoder. Planner decoding uses temperature 0 and is restricted to valid finite-state actions. The answer decoder assigns length-normalized scores only to the provided answer options. Experiments are conducted on a single NVIDIA A100 40 GB GPU. HANIA uses no external knowledge retrieval, iterative retrieval, decoder modifica-tion, or target-dataset fine-tuning. 
+
+# 5 Conclusion and Future Work 
+
+We presented HANIA , a planner-guided multimodal graph framework for evidence-grounded question answering. HANIA constructs question-aware graph evidence from the supplied visual and textual context, coordinates descriptive and relational requirements through a finite-state planner, and applies coverage-aware pruning before prediction with a frozen decoder. On Sci-enceQA , HANIA achieved 87 .80% accuracy, 68 .57% evidence precision, 62 .31% recall, and 
+
+65 .29% F1. The evidence-budget analysis identified k = 5 as the best setting for answer ac-curacy with moderate latency. Controlled comparisons and component-level ablations showed that provenance-linked graph construction, constrained planning, coverage-aware pruning, and explicit handling of unsupported evidence jointly improve answer accuracy and evidence quality over direct multimodal prompting and flat relevance ranking, without target-dataset fine-tuning or decoder modification. The study is limited to one benchmark and does not yet include detailed graph-quality, faithfulness, or question-type analyses. Future work will evaluate HANIA on ad-ditional multimodal benchmarks, improve visual relation extraction and planner constraints, and conduct deeper faithfulness, error, and graph-quality analyses. 
+
+# References 
+
+Hussein Abdallah, Ibrahim Abdelaziz, Panos Kalnis, and Essam Mansour. Leveraging LLM-GNN integration for open-world question answering over knowledge graphs. In Vera Demberg, Kentaro Inui, and Lluís Marquez, editors, Proceedings of the 19th Conference of the European Chapter of the Association for Computational Linguistics (Volume 1: Long Papers) , Rabat, Morocco, March 2026. Association for Computational Linguistics. Zafar Ali, Yi Huang, Asad Khan, Guilin Qi, Yuxin Zhang, Junlan Feng, Chao Deng, and Pavlos Kefalas. Pythia-rag: Retrieval-augmented generation over a unified multimodal knowledge graph for enhanced qa. Knowledge-Based Systems , page 115200, 2025. Shuai Bai, Yuxuan Cai, Ruizhe Chen, Keqin Chen, Xionghui Chen, Zesen Cheng, Lianghao Deng, Wei Ding, Chang Gao, Chunjiang Ge, et al. Qwen3-vl technical report. arXiv preprint arXiv:2511.21631 , 2025. Jack Boylan, Chris Hokamp, and Demian Gholipour Ghalandari. GLiREL - generalist model for zero-shot relation extraction. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers) , pages 8230–8245, Albuquerque, New Mexico, 2025. Association for Computational Linguistics. Boqi Chen, Anuj Khare, Gaurav Kumar, Arjun Akula, and Pradyumna Narayana. Seeing beyond: Enhancing visual question answering with multi-modal retrieval. In Proceedings of the 31st International Conference on Computational Linguistics (COLING) , pages 410–421, Abu Dhabi, UAE, 2025. Association for Computational Linguistics. 8Wenhu Chen, Hexiang Hu, Xi Chen, Pat Verga, and William Cohen. MuRAG: Multimodal retrieval-augmented generator for open question answering over images and text. In Proceed-ings of the 2022 Conference on Empirical Methods in Natural Language Processing (EMNLP) ,pages 5558–5570, Abu Dhabi, UAE, December 2022. Timin Gao, Peixian Chen, Mengdan Zhang, Chaoyou Fu, Yunhang Shen, Yan Zhang, Shengchuan Zhang, Xiawu Zheng, Xing Sun, Liujuan Cao, and Rongrong Ji. Cantor: In-spiring multimodal chain-of-thought of mllm. In Proceedings of the 32nd ACM International Conference on Multimedia , pages 9096–9105, 2024. Sameera Horawalavithana, Sai Munikoti, Ian Stewart, Henry Kvinge, and Karl Pazdernik. SCI-TUNE: Aligning large language models with human-curated scientific multimodal instructions. In Proceedings of the 1st Workshop on NLP for Science (NLP4Science) , pages 58–72, Miami, FL, USA, November 2024. Association for Computational Linguistics. Jinhao Jiang, Kun Zhou, Xin Zhao, and Ji-Rong Wen. UniKGQA: Unified retrieval and reasoning for solving multi-hop question answering over knowledge graph. In Proceedings of the 11th International Conference on Learning Representations (ICLR) , Kigali, Rwanda, 2023. Songtao Jiang, Chenyi Zhou, Yan Zhang, Yeying Jin, and Zuozhu Liu. Fast or slow? integrating fast intuition and deliberate thinking for enhancing visual question answering. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers) , pages 525–534, Vienna, Austria, July 2025. Association for Computational Linguistics. Junlin Lee, Yequan Wang, Jing Li, and Min Zhang. Multimodal reasoning with multimodal knowledge graph. In Proceedings of the 62nd Annual Meeting of the Association for Compu-tational Linguistics (ACL) , pages 10767–10782, Bangkok, Thailand, 2024. Sicong Leng, Hang Zhang, Guanzheng Chen, Xin Li, Shijian Lu, Chunyan Miao, and Lidong Bing. Mitigating object hallucinations in large vision-language models through visual con-trastive decoding. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 13872–13882, 2024. Yinan Liang, Ziwei Wang, Xiuwei Xu, Jie Zhou, and Jiwen Lu. EfficientLLaVA: Generalizable auto-pruning for large vision-language models. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 9445–9454, June 2025. Hanmeng Liu, Zhiyang Teng, Leyang Cui, Chaoli Zhang, Qiji Zhou, and Yue Zhang. Logicot: Logical chain-of-thought instruction tuning. In Findings of the Association for Computational Linguistics: EMNLP 2023 , pages 2908–2921, 2023a. Junming Liu, Siyuan Meng, Yanting Gao, Song Mao, Pinlong Cai, Guohang Yan, Yirong Chen, Zilin Bian, Botian Shi, and Ding Wang. Aligning vision to language: Text-free multimodal knowledge graph construction for enhanced llms reasoning. arXiv preprint arXiv:2503.12972 ,2025. Lihui Liu, Yuzhong Chen, Mahashweta Das, Hao Yang, and Hanghang Tong. Knowledge graph question answering with ambiguous query. In Proceedings of the 2023 ACM Web Conference (WWW) , pages 2477–2486, Austin, TX, 2023b. Pan Lu, Swaroop Mishra, Tony Xia, Liang Qiu, Kai-Wei Chang, Song-Chun Zhu, Oyvind Tafjord, Peter Clark, and Ashwin Kalyan. Learn to explain: multimodal reasoning via thought chains for science question answering. In Proceedings of the 36th International Conference in Neural Information Processing Systems (NeurIPS) , New Orleans, LA, 2022. 9Debjyoti Mondal, Suraj Modi, Subhadarshi Panda, Rituraj Singh, and Godawari Sudhakar Rao. KAM-CoT: Knowledge augmented multimodal chain-of-thoughts reasoning. In Proceed-ings of the 38th AAAI Conference on Artificial Intelligence (AAAI) and 36th Conference on Innovative Applications of Artificial Intelligence (IAAI) and 14th Symposium on Educational Advances in Artificial Intelligence (EAAI) , pages 18798–18806, Vancouver, Canada, 2024. Yuan Ren, Zhijie Nie, Richong Zhang, and Xudong Liu. Progressive multi-hop reasoning for question answering over knowledge graphs. Information Systems , 140:102721, 2026. Yushi Sun, Kai Sun, Yifan Ethan Xu, Xiao Yang, Xin Luna Dong, Nan Tang, and Lei Chen. KERAG: Knowledge-enhanced retrieval-augmented generation for advanced question answer-ing. In Christos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng, editors, Findings of the Association for Computational Linguistics: EMNLP 2025 , pages 6194– 6216, Suzhou, China, November 2025. Association for Computational Linguistics. ISBN 979-8-89176-335-7. Manan Suri, Puneet Mathur, Franck Dernoncourt, Kanika Goswami, Ryan A. Rossi, and Di-nesh Manocha. VisDoM: Multi-document QA with visually rich elements using multimodal retrieval-augmented generation. In Proceedings of the Conference of the Nations of the Ameri-cas Chapter of the Association for Computational Linguistics: Human Language Technologies ,pages 6088–6109, Albuquerque, NM, 2025. Tilahun Abedissa Taffa, Debayan Banerjee, Yaregal Assabie, and Ricardo Usbeck. Hybrid-SQuAD: Hybrid scholarly question answering dataset. arXiv preprint arXiv:2412.02788 , 2024. Ryota Tanaka, Taichi Iki, Taku Hasegawa, Kyosuke Nishida, Kuniko Saito, and Jun Suzuki. Vdocrag: Retrieval-augmented generation over visually-rich documents. In Proceedings of the Computer Vision and Pattern Recognition Conference (CVPR) , pages 24827–24837, June 2025. Yexin Wu, Zhuosheng Zhang, and Hai Zhao. Mitigating misleading chain-of-thought reasoning with selective filtering. In Proceedings of the 2024 Joint International Conference on Com-putational Linguistics, Language Resources and Evaluation (LREC-COLING 2024) , pages 11325–11340, Torino, Italia, May 2024. ELRA and ICCL. Xiaotong Xu, Yizhao Wang, Yunfei Liu, and Shengyang Li. SKRAG: A retrieval-augmented generation framework guided by reasoning skeletons over knowledge graphs. In Christos Christodoulopoulos, Tanmoy Chakraborty, Carolyn Rose, and Violet Peng, editors, Findings of the Association for Computational Linguistics: EMNLP 2025 , pages 13983–13994, Suzhou, China, November 2025. Association for Computational Linguistics. ISBN 979-8-89176-335-7. An Yang, Anfeng Li, Baosong Yang, Beichen Zhang, Binyuan Hui, Bo Zheng, Bowen Yu, Chang Gao, Chengen Huang, Chenxu Lv, et al. Qwen3 technical report. arXiv preprint arXiv:2505.09388 , 2025. Shangfei Zheng, Weiqing Wang, Jianfeng Qu, Hongzhi Yin, Wei Chen, and Lei Zhao. MMMKGR: Multi-hop multi-modal knowledge graph reasoning. In Proceedings of the 39th IEEE International Conference on Data Engineering (ICDE) , pages 96–109, Anaheim, CA, 2023. Xiangrong Zhu, Yuexiang Xie, Yi Liu, Yaliang Li, and Wei Hu. Knowledge graph-guided retrieval augmented generation. In Luis Chiruzzo, Alan Ritter, and Lu Wang, editors, Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computa-tional Linguistics: Human Language Technologies (Volume 1: Long Papers) . Association for Computational Linguistics, April 2025. 10

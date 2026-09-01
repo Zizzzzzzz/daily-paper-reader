@@ -48,17 +48,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-31</span>
+      <span class="dpr-home-dashboard-kicker">2026-09-01</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 7 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 16 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>4</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>3</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>8</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>8</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-31 23:25:30 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-09-01 23:19:47 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -69,9 +69,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日聚焦多模态与视频理解，精读两篇9分Token效率工作并速读三篇相关论文。</p>
-<p>最值得关注：Ada-TokenCom以大型模型驱动token压缩与生成，实现速率自适应通信；Token-Budget Distillation将完整token语义蒸馏至压缩视频视觉语言模型。</p>
-<p>下一步可对比两种token效率方案的适用场景，再结合VLA表示中心预训练拓展实际应用。</p>
+<p>今日推荐16篇论文，其中精读2篇高分为《Inter-3D VQA》与《AdaVLA》。最值得关注3D时空视觉问答基准，以及无需训练加速VLA模型的新方法。建议优先精读这两篇，速读部分可关注文档感知检索与VLA轨迹监控。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -80,12 +78,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">4 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation">Ada-TokenCom: Rate-Adaptive Token Communications via Large-Model-Driven Token Compression and Generation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models">Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Lossy Event Compression: From Event Stream Distortion to Task Performance">Lossy Event Compression: From Event Stream Distortion to Task Performance</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Inter-3D VQA: A Roadside Multimodal Benchmark for 3D Spatiotemporally Grounded Visual Question Answering">Inter-3D VQA: A Roadside Multimodal Benchmark for 3D Spatiotemporally Grounded Visual Question Answering</span></li><li><span class="dpr-home-dashboard-paper-title" title="AdaVLA: Adaptive Step Flow Matching for Training-free Acceleration of Vision-Language-Action Models">AdaVLA: Adaptive Step Flow Matching for Training-free Acceleration of Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Elastic Token Compression for Pixel-Space Diffusion Transformers">Elastic Token Compression for Pixel-Space Diffusion Transformers</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">ev-cam <strong>2</strong></span><span class="dpr-home-dashboard-tag">evlm <strong>2</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -93,12 +91,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">3 篇</strong>
+    <strong class="dpr-home-dashboard-count">8 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models">Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs">Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="Temporal Tree of Thought: Reasoning-Guided Visual Cue Search for Long-Video Understanding">Temporal Tree of Thought: Reasoning-Guided Visual Cue Search for Long-Video Understanding</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="State-Conditioned Visual Evidence Retrieval for Fine-Grained Perception in Document Vision-Language Models">State-Conditioned Visual Evidence Retrieval for Fine-Grained Perception in Document Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="TRACER: Per-Tool Context Retention for LLM Agents via Consequence-Attributed Reinforcement Learning">TRACER: Per-Tool Context Retention for LLM Agents via Consequence-Attributed Reinforcement Learning</span></li><li><span class="dpr-home-dashboard-paper-title" title="Drive the Thoughts: Runtime Monitoring of VLA Reasoning-Trajectory Consistency">Drive the Thoughts: Runtime Monitoring of VLA Reasoning-Trajectory Consistency</span></li></ul>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span></div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>7</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
 </section>
 </div>
 
