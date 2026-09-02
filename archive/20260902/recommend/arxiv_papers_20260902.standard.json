@@ -1,0 +1,337 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-02T23:21:30.800681+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 5,
+    "deep_cap": 8,
+    "deep_selected": 5,
+    "quick_candidates": 2,
+    "quick_skim_target": 13,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2609.01200v1",
+      "source": "arxiv",
+      "title": "Compressing AI Traffic: Standardized Neural Network Coding of Visual-Token Representations in Split Vision-Language Inference",
+      "abstract": "When the visual encoder and the language decoder of a vision-language model (VLM) run on different compute nodes, the intermediate visual-token embeddings become a communicated payload rather than an internal activation. We call such machine-consumed intermediate tensors AI traffic and ask how far they can be compressed with a standardized, training-free codec. We insert ISO/IEC 15938-17 Neural Network Coding (NNC) round trips on the complete visual interface of a Qwen3-VL-8B-Instruct video question answering pipeline, comprising the main visual-token representation and the DeepStack feature streams, while leaving weights, prompts, and generation untouched, and sweep the quantization parameter (QP) over a wide rate range. Closed-ended Video-MME accuracy remains close to the uncompressed reference up to a 98% reduction of the transmitted BF16 tensor and only then collapses; open-ended MLVU generation shows the same plateau-and-collapse profile under an LLM judge. This robustness is not due to near-lossless reconstruction: the decoded tensor is heavily discretized, carries substantial row-wise relative L2 error, and has a visibly steeper singular-value decay than its source. Downstream reasoning therefore depends on coarse structure and relative geometry rather than exact floating-point values, which argues for rate-task rather than rate-distortion optimization of AI traffic codecs.",
+      "authors": [
+        "Reza Heidari",
+        "Hamed R. Tavakoli",
+        "Juho Kannala"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "eess.IV"
+      ],
+      "published": "2026-09-01T13:07:32+00:00",
+      "link": "https://arxiv.org/pdf/2609.01200v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "specializes in compressing visual-token representations in split VLM inference",
+      "llm_evidence_cn": "专注于分裂式视觉语言推理中视觉令牌表征的压缩",
+      "llm_evidence": "专注于分裂式视觉语言推理中视觉令牌表征的压缩",
+      "canonical_evidence": "专注于分裂式视觉语言推理中视觉令牌表征的压缩",
+      "llm_tldr_en": "Paper investigates compressing intermediate visual-token embeddings ('AI traffic') between VLM encoder and decoder using standardized NNC codec, achieving training-free compression for Qwen3-VL video QA pipeline.",
+      "llm_tldr_cn": "针对分裂式视觉语言推理中视觉编码器与语言解码器之间传输的视觉令牌表征成为通信负载的问题，论文提出将ISO/IEC 15938-17神经网络编码标准插入Qwen3-VL-8B-Instruct的视频问答流程的完整视觉接口，在不改动权重、提示词和生成过程的前提下，对视觉令牌和DeepStack特征流进行训练自由的量化压缩。通过扫描量化参数，系统评估了不同压缩配置对下游任务的影响。该工作为视觉令牌压缩提供了标准化、即插即用的高效方案，有助于降低多模态大模型分布式推理的通信代价。",
+      "llm_tldr": "针对分裂式视觉语言推理中视觉编码器与语言解码器之间传输的视觉令牌表征成为通信负载的问题，论文提出将ISO/IEC 15938-17神经网络编码标准插入Qwen3-VL-8B-Instruct的视频问答流程的完整视觉接口，在不改动权重、提示词和生成过程的前提下，对视觉令牌和DeepStack特征流进行训练自由的量化压缩。通过扫描量化参数，系统评估了不同压缩配置对下游任务的影响。该工作为视觉令牌压缩提供了标准化、即插即用的高效方案，有助于降低多模态大模型分布式推理的通信代价。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "latest research on token compression in vision language models",
+      "matched_requirement_id": "req-16",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.01224v1",
+      "source": "arxiv",
+      "title": "S$^2$Prune: Spatially Structured Visual Token Pruning for Multimodal Large Language Models",
+      "abstract": "Visual token pruning reduces the inference overhead of multimodal large language models (MLLMs) by retaining only a subset of visual tokens. Existing methods usually select tokens based on importance or redundancy. However, we observe that these criteria produce stable spatial biases across inputs and do not always outperform simple Uniform Grid sampling, highlighting the value of broad spatial coverage. Motivated by this, we propose S$^2$Prune, a training-free pruning method that preserves spatial coverage while adapting token density to local image structure. We first divide the image into regions and assign at least one token to each region to preserve coverage. The remaining token budget is then distributed according to Laplacian variation, giving more tokens to regions with richer structure. We then use Early Representation Change (ERC), computed from the first decoder block, to select representative tokens within each region. We evaluate S$^2$Prune across diverse settings and two MLLM architectures. On Qwen2.5-VL-7B-Instruct, it achieves the highest average accuracy among the evaluated training-free pruning methods. With only 32 of the original 576 visual tokens, it still retains 79.3% of the full-model performance. Code is available at https://github.com/yuanyuanjia71-spec/S2Prune.",
+      "authors": [
+        "Yuanyuan Jia",
+        "Shunpu Tang",
+        "Qianqian Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-09-01T13:26:57+00:00",
+      "link": "https://arxiv.org/pdf/2609.01224v1",
+      "tags": [
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "spatially structured visual token pruning for MLLMs",
+      "llm_evidence_cn": "在多模态大模型中按空间覆盖进行视觉token剪枝",
+      "llm_evidence": "在多模态大模型中按空间覆盖进行视觉token剪枝",
+      "canonical_evidence": "在多模态大模型中按空间覆盖进行视觉token剪枝",
+      "llm_tldr_en": "S2Prune is a training-free visual token pruning method for MLLMs that divides the image into regions, guarantees each region keeps at least one token, then allocates the remaining budget by local structure, improving efficiency while preserving spatial coverage.",
+      "llm_tldr_cn": "现有视觉token剪枝方法通常按重要性或冗余度选择token，却存在输入共有的空间偏差，并不总优于均匀网格采样。本文提出训练免费的S2Prune方法，先将图像划分为区域并确保每个区域至少保留一个token以维持空间覆盖，再根据局部图像结构按拉普拉斯分布分配剩余预算。在相同token预算下，该方法能在不牺牲多模态性能的情况下有效降低推理开销，验证了空间结构先验在token剪枝中的作用。",
+      "llm_tldr": "现有视觉token剪枝方法通常按重要性或冗余度选择token，却存在输入共有的空间偏差，并不总优于均匀网格采样。本文提出训练免费的S2Prune方法，先将图像划分为区域并确保每个区域至少保留一个token以维持空间覆盖，再根据局部图像结构按拉普拉斯分布分配剩余预算。在相同token预算下，该方法能在不牺牲多模态性能的情况下有效降低推理开销，验证了空间结构先验在token剪枝中的作用。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.29749v1",
+      "source": "arxiv",
+      "title": "DriftingVLA: Native One-Step Vision-Language-Action Generation via Per-Dimension Temporal Drifting",
+      "abstract": "Conventional flow-based vision-language-action (VLA) models support expressive continuous action generation but rely on multi-step refinement to produce each action chunk, increasing latency in online robot control. To address this issue, we introduce DriftingVLA, a native one-step VLA that generates a complete action chunk with a single action-expert forward pass. Rather than learning a flow field that requires iterative integration at inference, DriftingVLA uses a distribution-drifting objective to learn a direct noise-to-action-chunk mapping for one-step deployment. Since robot action dimensions carry distinct control semantics and distributional characteristics, we further introduce Per-Dimension Temporal Drifting (PDTD). PDTD treats the complete temporal trajectory of each action dimension as a separate drifting unit, enabling finer-grained modeling and shaping of dimension-specific action distributions. This per-dimension decomposition applies only to the training objective; the shared VLA model still generates the complete action chunk jointly, thereby preserving cross-dimensional dependencies. DriftingVLA achieves 98.32% success on LIBERO, 81.09% on RoboTwin 2.0, and 77.67% across six real-world single- and dual-arm tasks, outperforming the evaluated multi-step flow policy and one-step VLA baselines. Native one-step deployment also delivers a 3.36-fold speedup in action-chunk generation, eliminating iterative refinement without sacrificing control performance.",
+      "authors": [
+        "Yuxuan Gao",
+        "Shiqi Zhang",
+        "Yedong Shen",
+        "Yifan Duan",
+        "Wenhao Yu",
+        "Xin Zhang",
+        "Siyuan Cao",
+        "Jiajun Deng",
+        "Yanyong Zhang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-08-30T12:21:44+00:00",
+      "link": "https://arxiv.org/pdf/2608.29749v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Native one-step action chunk generation reduces latency for online robot control",
+      "llm_evidence_cn": "原生一步生成完整动作块以减少在线机器人控制延迟",
+      "llm_evidence": "原生一步生成完整动作块以减少在线机器人控制延迟",
+      "canonical_evidence": "原生一步生成完整动作块以减少在线机器人控制延迟",
+      "llm_tldr_en": "DriftingVLA replaces multi-step flow refinement in VLA models with a one-step distribution-drifting objective, and introduces per-dimension temporal drifting to generate an action chunk in a single forward pass.",
+      "llm_tldr_cn": "基于流匹配的VLA模型虽能生成连续动作，但推理时需多步迭代，延迟较高，难以用于在线控制。本文提出DriftingVLA，通过分布漂移目标学习从噪声到动作块的直接映射，仅用一次动作专家前向即可生成完整动作块。针对不同动作维度具备不同控制语义，进一步引入逐维度时间漂移PDTD。该方法有望提升VLA模型实时推理速度并保持动作生成质量。",
+      "llm_tldr": "基于流匹配的VLA模型虽能生成连续动作，但推理时需多步迭代，延迟较高，难以用于在线控制。本文提出DriftingVLA，通过分布漂移目标学习从噪声到动作块的直接映射，仅用一次动作专家前向即可生成完整动作块。针对不同动作维度具备不同控制语义，进一步引入逐维度时间漂移PDTD。该方法有望提升VLA模型实时推理速度并保持动作生成质量。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "optimization techniques for real time VLA model inference",
+      "matched_requirement_id": "req-18",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.00111v1",
+      "source": "arxiv",
+      "title": "Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomous Driving",
+      "abstract": "We present Qwen-Drive-1.0, an initial step towards a vision-language foundation model for autonomous driving. Qwen-Drive-1.0 retains the architecture of the pretrained vision-language model (VLM) and integrates 3D perception, visual question answering, and motion planning within a unified framework. An external bird's-eye-view (BEV) perception head jointly performs 3D object detection, semantic occupancy prediction, and BEV map segmentation. It serves as a probe of the 3D information accessible from the shared representations and provides an explicit, inspectable interface to 3D scene structure. A Planning Expert conditions on shared VLM representations to generate future ego trajectories. A staged training recipe combines driving supervision with general-purpose vision-language data to acquire driving-specific competence while helping preserve broad visual understanding and instruction-following capabilities. Experiments demonstrate strong 3D perception and driving scene understanding while largely preserving general vision-language capability. Comprehensive evaluations across open-loop, pseudo-closed-loop, and closed-loop settings further show highly competitive motion-planning performance.",
+      "authors": [
+        "Xin Zhou",
+        "Zongchuang Zhao",
+        "Zhibo Yang",
+        "Mingsheng Li",
+        "Humen Zhong",
+        "Shuai Bai",
+        "Du Chu",
+        "Ruizhe Chen",
+        "Zhaohai Li",
+        "Jun Tang",
+        "Qiuyue Wang",
+        "Mingkun Yang",
+        "Jiazhao Zhang",
+        "Dayiheng Liu",
+        "Dingkang Liang",
+        "Xiang Bai"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-31T17:59:54+00:00",
+      "link": "https://arxiv.org/pdf/2609.00111v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Vision-language foundation model for autonomous driving integrating 3D perception, VQA, and motion planning in a unified framework",
+      "llm_evidence_cn": "面向自动驾驶的视觉语言基础模型，统一三维感知、视觉问答与运动规划，可用于交通场景理解",
+      "llm_evidence": "面向自动驾驶的视觉语言基础模型，统一三维感知、视觉问答与运动规划，可用于交通场景理解",
+      "canonical_evidence": "面向自动驾驶的视觉语言基础模型，统一三维感知、视觉问答与运动规划，可用于交通场景理解",
+      "llm_tldr_en": "Qwen-Drive-1.0 unifies 3D perception, visual question answering, and motion planning inside a vision-language model, adding an external BEV perception head and a Planning Expert for structured autonomous-driving scene understanding.",
+      "llm_tldr_cn": "自动驾驶场景理解需要视觉语言模型同时完成三维感知、视觉问答与运动规划，但目前缺少统一框架。Qwen-Drive-1.0在预训练VLM基础上整合外部鸟瞰图感知头，联合执行三维目标检测、语义占用预测和BEV地图分割，并由规划专家基于共享表征生成自车轨迹。其分阶段训练能够显式探查共享表征的三维信息质量，为多模态交通场景理解与规划提供统一可控的模型方案。",
+      "llm_tldr": "自动驾驶场景理解需要视觉语言模型同时完成三维感知、视觉问答与运动规划，但目前缺少统一框架。Qwen-Drive-1.0在预训练VLM基础上整合外部鸟瞰图感知头，联合执行三维目标检测、语义占用预测和BEV地图分割，并由规划专家基于共享表征生成自车轨迹。其分阶段训练能够显式探查共享表征的三维信息质量，为多模态交通场景理解与规划提供统一可控的模型方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Traffic Scene Understanding Based on Multimodal Large Language Models",
+      "matched_requirement_id": "req-19",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.01004v1",
+      "source": "arxiv",
+      "title": "SinkPruner: Sink-Free Visual Token Pruning for Multimodal Large Language Models",
+      "abstract": "Despite their strong multimodal understanding ability, multimodal large language models (MLLMs) incur substantial computational overhead when processing long visual token sequences. To reduce inference costs, recent studies have explored visual token pruning through vision-centric or text-guided strategies. However, these methods often overlook high-norm outlier tokens, i.e., tokens with abnormally large feature norms, leading to suboptimal pruning decisions. In this work, we show that such high-norm outlier tokens are highly redundant in both feature and spatial dimensions, yet are often mistakenly preserved as informative cues by existing methods.   Motivated by this observation, we propose SinkPruner, a training-free visual token pruning framework for efficient MLLM inference. SinkPruner follows a coarse-to-fine design with two key modules: a visual sanitizer that filters high-norm redundancies and alleviates attention sink and attention dispersion, and a text-guided pruner that further retains tokens semantically aligned with the text query.   Extensive experiments on twelve image-language and four video-language benchmarks demonstrate the effectiveness, efficiency, and generalizability of our framework. Notably, SinkPruner preserves 96.5% (91.8%) of the original performance of LLaVA-1.5 (Qwen2.5-VL) under an 89% token reduction. Experiments further indicate that our visual sanitizer exhibits promising transferability in enhancing the performance of existing pruning methods. Our code is available at https://github.com/LaVi-Lab/SinkPruner.",
+      "authors": [
+        "Shiyu Li",
+        "Zi-Yuan Hu",
+        "Shijia Huang",
+        "Yanyang Li",
+        "Yiwu Zhong",
+        "Liwei Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.CL",
+        "cs.LG"
+      ],
+      "published": "2026-09-01T09:52:10+00:00",
+      "link": "https://arxiv.org/pdf/2609.01004v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "training-free visual token pruning for multimodal large language models targeting redundant high-norm tokens",
+      "llm_evidence_cn": "面向多模态大语言模型的免训练视觉token剪枝，专门处理高范数冗余token",
+      "llm_evidence": "面向多模态大语言模型的免训练视觉token剪枝，专门处理高范数冗余token",
+      "canonical_evidence": "面向多模态大语言模型的免训练视觉token剪枝，专门处理高范数冗余token",
+      "llm_tldr_en": "SinkPruner is a training-free visual token pruning method that identifies and removes redundant high-norm outlier tokens in MLLMs, reducing inference cost while preserving multimodal understanding.",
+      "llm_tldr_cn": "多模态大语言模型在推理长视觉token序列时计算开销高，现有剪枝方法没有关注高范数离群token，容易将其误判为重要信息。SinkPruner论证这些高范数token在特征和空间上高度冗余，提出免训练的剪枝框架，显式移除这类异常token。实验结果显示SinkPruner能够在显著压缩视觉token数量的同时保持甚至提升多模态理解性能。该方法为MLLM推理开销优化提供了一种轻量且有效的补充思路。",
+      "llm_tldr": "多模态大语言模型在推理长视觉token序列时计算开销高，现有剪枝方法没有关注高范数离群token，容易将其误判为重要信息。SinkPruner论证这些高范数token在特征和空间上高度冗余，提出免训练的剪枝框架，显式移除这类异常token。实验结果显示SinkPruner能够在显著压缩视觉token数量的同时保持甚至提升多模态理解性能。该方法为MLLM推理开销优化提供了一种轻量且有效的补充思路。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.30657v1",
+      "source": "arxiv",
+      "title": "InfraOcc: An Infrastructure Occupancy Benchmark with Static-to-Dynamic Reasoning",
+      "abstract": "Fixed-viewpoint infrastructure sensors repeatedly observe the same traffic space, making roadside 3D occupancy structurally different from ego-vehicle perception: a near-persistent static scaffold is overlaid with sparse, short-lived dynamic events. Existing occupancy benchmarks and methods, however, are built around moving ego vehicles and neither measure nor exploit this structure, instead treating occupancy as flat one-shot voxel classification. We address this gap from both data and model perspectives. We build InfraOcc, to our knowledge, the first real-world infrastructure-side semantic occupancy benchmark, with dense voxel annotations for 290 multi-modal sequences in a fixed roadside frame, a static-dynamic decoupled annotation pipeline, unified camera-only, LiDAR-only, and multi-modal evaluation, and diagnostics for static and dynamic occupancy. InfraOcc shows that static infrastructure fills 97.3% of occupied voxels and persists across frames, whereas dynamic participants have a median occupied-frame ratio of only 1.8% per location, revealing a structural static-dynamic asymmetry beyond semantic long-tailedness. We further propose ProSD-Occ, which reformulates occupancy as progressive static-to-dynamic evidence reasoning: it explains persistent layout, exposes residual dynamic evidence under static-confidence guidance, and recomposes static, dynamic, and free-space evidence into a unified field. ProSD-Occ ranks first in overall, dynamic, static, and geometric occupancy on every track, e.g., a 23.5% relative camera-only dynamic-mIoU gain over the strongest baseline and 65.87 multi-modal overall mIoU, establishing fixed-viewpoint roadside occupancy as a distinct problem with its own reasoning paradigm. The benchmark and code will be publicly available at https://github.com/yanglei18/InfraOcc",
+      "authors": [
+        "Lei Yang",
+        "Xiaokai Bai",
+        "Boqi Li",
+        "Chunmian Lin",
+        "Li Wang",
+        "Ziying Song",
+        "Jiahuan Zhang",
+        "Enhui Ma",
+        "Haibao Yu",
+        "Jiaqi Ma",
+        "Kaicheng Yu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-31T11:56:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.30657v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Roadside infrastructure 3D occupancy benchmark for comprehensive traffic scene perception",
+      "llm_evidence_cn": "面向综合交通场景感知的路侧基础设施三维占用基准",
+      "llm_evidence": "面向综合交通场景感知的路侧基础设施三维占用基准",
+      "canonical_evidence": "面向综合交通场景感知的路侧基础设施三维占用基准",
+      "llm_tldr_en": "Presents InfraOcc, a first real-world infrastructure-side semantic occupancy benchmark with dense voxel annotations for 290 multi-modal roadside sequences and static-dynamic decoupled annotation, enabling models to reason about persistent static scaffolds and sparse dynamic vehicles.",
+      "llm_tldr_cn": "固定视点基础设施传感器反复观察同一交通空间，路侧三维占用呈现出近似不变的静态骨架加稀疏瞬态动态事件的特点，而现有占用基准和方法仅面向移动自车感知。本文构建首个真实世界的基础设施侧语义占用基准InfraOcc，提供290段多模态序列的稠密体素标注与静态-动态解耦标注流程，并设计对应推理方法。该工作填补路侧占用的评测空白，为复杂交通环境下的综合感知提供数据与方法基础。",
+      "llm_tldr": "固定视点基础设施传感器反复观察同一交通空间，路侧三维占用呈现出近似不变的静态骨架加稀疏瞬态动态事件的特点，而现有占用基准和方法仅面向移动自车感知。本文构建首个真实世界的基础设施侧语义占用基准InfraOcc，提供290段多模态序列的稠密体素标注与静态-动态解耦标注流程，并设计对应推理方法。该工作填补路侧占用的评测空白，为复杂交通环境下的综合感知提供数据与方法基础。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2609.00830v1",
+      "source": "arxiv",
+      "title": "Visual Attention Faithfulness in Vision-Language Models is Heterogeneous",
+      "abstract": "Whether attention weights faithfully reflect model reasoning has been actively debated in NLP, yet this question remains largely unexplored for the visual modality in Vision-Language Models (VLMs). We address this gap through causal perturbation analysis on current VLMs, evaluating both the comprehensiveness and sufficiency gap of attention-ranked visual tokens. Our analysis reveals that visual attention faithfulness is heterogeneous, manifesting in three distinct processing modes: Faithful-Sufficient, where top-$k$ attention tokens are both necessary and sufficient for prediction; Faithful-Distributed, where they are necessary but broader visual context remains required; and Non-Focal, where no localized attention region is individually necessary while visual information remains an essential trigger for prediction. Furthermore, human-annotated ground-truth regions satisfy comprehensiveness in only $\\sim 60$% of cases compared with model attention rankings, revealing systematic divergence between model visual reliance and human intuition. We demonstrate these patterns across both general VQA on VQAv2 and document tasks on VRDU and ChartQA, showing that visual attention faithfulness varies systematically with processing demands and model architectures rather than being uniformly faithful or unfaithful.",
+      "authors": [
+        "Xurui Song",
+        "Weishi Wang",
+        "Zhongqi Yue",
+        "Kuluhan Binici",
+        "Tao Bai",
+        "Hongxin Shao",
+        "Daniel Dahlmeier",
+        "Jun Luo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-09-01T07:32:01+00:00",
+      "link": "https://arxiv.org/pdf/2609.00830v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Causal perturbation analysis of visual attention in VLMs reveals when top-k tokens are necessary or sufficient, informing attention-based token pruning",
+      "llm_evidence_cn": "对VLM视觉注意力进行因果扰动分析，揭示前k个视觉token是否必要或充分，可为基于注意力的token剪枝提供依据",
+      "llm_evidence": "对VLM视觉注意力进行因果扰动分析，揭示前k个视觉token是否必要或充分，可为基于注意力的token剪枝提供依据",
+      "canonical_evidence": "对VLM视觉注意力进行因果扰动分析，揭示前k个视觉token是否必要或充分，可为基于注意力的token剪枝提供依据",
+      "llm_tldr_en": "This work causally perturbs VLM visual attention to test whether top-k tokens are necessary and sufficient. It finds heterogeneous faithfulness in three modes, with implications for attention-based token pruning.",
+      "llm_tldr_cn": "视觉语言模型是否用注意力权重表示推理依据，此前研究多集中在NLP而较少关注视觉模态。本文通过因果扰动分析评估注意力排序的视觉token在预测中的完整性与充分性差距，发现存在忠实充分、忠实分布和非焦点三种处理模式。这种异质性说明在某些模型中无法仅靠局部高注意力区域解释预测，也提示token剪枝或压缩必须考虑注意力分布的差异。",
+      "llm_tldr": "视觉语言模型是否用注意力权重表示推理依据，此前研究多集中在NLP而较少关注视觉模态。本文通过因果扰动分析评估注意力排序的视觉token在预测中的完整性与充分性差距，发现存在忠实充分、忠实分布和非焦点三种处理模式。这种异质性说明在某些模型中无法仅靠局部高注意力区域解释预测，也提示token剪枝或压缩必须考虑注意力分布的差异。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "token pruning",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
