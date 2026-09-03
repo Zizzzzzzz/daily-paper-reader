@@ -1,0 +1,265 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-03T21:27:04.566027+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 3,
+    "deep_divecandidates": 4,
+    "deep_cap": 8,
+    "deep_selected": 4,
+    "quick_candidates": 2,
+    "quick_skim_target": 13,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.28726v1",
+      "source": "arxiv",
+      "title": "Pro-Router: Token-Aware Progressive Model Routing with Adaptive Edge-Cloud Collaboration for Efficient Multimodal LLM Inference",
+      "abstract": "The remarkable performance of multimodal large language models (MLLMs) comes at the cost of substantial computational overhead, posing significant challenges to real-time deployment and cost effectiveness. Existing model routing approaches either decide from coarse request-level features alone or spend one or several extra language model passes to inspect the generated response, leaving the token-level uncertainty signals that emerge during generation unused. To address these limitations, we propose Pro-Router, a token-aware progressive model routing method with adaptive edge-cloud collaboration for efficient multimodal LLM inference. Pro-Router employs a two-stage progressive decision mechanism. First, a lightweight prompt pre-scorer module performs rapid pre-screening before token generation begins, guiding apparently simple requests to small models. Second, a token-aware verifier reads the sampling probability distribution of each token the small model generates, estimating the model's confidence in its own output to determine, per request, whether the answer ships or escalates to the cloud-based high-precision model. Furthermore, we design an adaptive edge-cloud serving pipeline that sizes every dispatch to each device's measured service rate, so both the edge and the cloud tiers stay fully utilized without manual parameter tuning and are not impacted by the network latency. Extensive experiments on multiple multimodal benchmark datasets and models demonstrate the effectiveness of Pro-Router. Compared to other methods, it achieves the highest routing accuracy and improves routing speed by more than 10x. Its serving pipeline also reaches more than 75% higher end-to-end throughput than the existing model routing pipeline. Our code is available at https://github.com/xinyuangui2/pro-router.",
+      "authors": [
+        "Xinyuan Gui",
+        "Shaowen Wang",
+        "Sheng Sun",
+        "Zijian Wang",
+        "Zishu Yu",
+        "Zheming Yang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-08-28T16:45:58+00:00",
+      "link": "https://arxiv.org/pdf/2608.28726v1",
+      "tags": [
+        "keyword:EVLM",
+        "query:EVLM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Proposes token-aware progressive model routing and edge-cloud collaboration to reduce high inference cost of multimodal LLMs.",
+      "llm_evidence_cn": "面向多模态大模型推理开销问题，利用token级不确定性进行渐进式路由与边云协同优化。",
+      "llm_evidence": "面向多模态大模型推理开销问题，利用token级不确定性进行渐进式路由与边云协同优化。",
+      "canonical_evidence": "面向多模态大模型推理开销问题，利用token级不确定性进行渐进式路由与边云协同优化。",
+      "llm_tldr_en": "Pro-Router introduces token-aware progressive model routing and adaptive edge-cloud collaboration, exploiting token-level uncertainty during generation to reduce multimodal LLM inference overhead and improve cost effectiveness.",
+      "llm_tldr_cn": "多模态大语言模型（MLLM）推理开销巨大，现有路由方法仅依据请求级特征或需额外扫描回答。Pro-Router提出两阶段渐进式决策，利用生成过程中涌现的token级不确定性信号，结合自适应边云协作进行灵活模型路由，力求在不明显损失质量的前提下降低推理成本、提升响应效率。",
+      "llm_tldr": "多模态大语言模型（MLLM）推理开销巨大，现有路由方法仅依据请求级特征或需额外扫描回答。Pro-Router提出两阶段渐进式决策，利用生成过程中涌现的token级不确定性信号，结合自适应边云协作进行灵活模型路由，力求在不明显损失质量的前提下降低推理成本、提升响应效率。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficiency optimization for multimodal large language models",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.00839v1",
+      "source": "arxiv",
+      "title": "Residual Kalman Dynamics for Event-Based UAV Forecasting",
+      "abstract": "We study short- and mid-horizon UAV bounding-box forecasting on the FRED event-camera dataset. We use a constant-velocity Kalman filter over a full center-size box state as a strong physical baseline, and train a residual model to predict acceleration-like corrections from recent box history, filtered state features, and local event representations. This simple residual formulation consistently improves over the Kalman baseline, with event-conditioned models giving the strongest results among the evaluated methods. We further show that part of the residual target is predictable from anchor position and velocity alone, indicating that canonical FRED results can reflect both visual evidence and dataset-specific motion priors. To analyze this effect, we introduce decorrelated subsets as a diagnostic stress test, showing that event-conditioned residual models retain useful predictive signal even when measured position- and velocity-based shortcuts are weakened.",
+      "authors": [
+        "Per Nyblom",
+        "Hannes Ovrén",
+        "David Gustafsson"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-09-01T07:38:56+00:00",
+      "link": "https://arxiv.org/pdf/2609.00839v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "query:EV-CAM"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "event-camera FRED dataset and local event representations improve UAV bounding-box forecasting",
+      "llm_evidence_cn": "使用FRED事件相机数据集与局部事件表征改进无人机包围框预测",
+      "llm_evidence": "使用FRED事件相机数据集与局部事件表征改进无人机包围框预测",
+      "canonical_evidence": "使用FRED事件相机数据集与局部事件表征改进无人机包围框预测",
+      "llm_tldr_en": "Augments a constant-velocity Kalman filter with residual acceleration corrections predicted from recent boxes, filter state and local event representations on the FRED event-camera dataset, improving UAV forecasting.",
+      "llm_tldr_cn": "针对事件相机数据集上无人机短中期包围框预测，作者以常速卡尔曼滤波作为物理基线，并训练残差模型从历史框、滤波状态和局部事件表征预测加速度修正量。事件条件残差模型的一致优于纯卡尔曼滤波，且部分残差可由锚点位置与速度单独预测，说明FRED结果混合了视觉证据与数据集特有运动先验。研究也提示事件视觉评测需要考虑数据先验，并为事件驱动目标预测提供了简洁改进路径。",
+      "llm_tldr": "针对事件相机数据集上无人机短中期包围框预测，作者以常速卡尔曼滤波作为物理基线，并训练残差模型从历史框、滤波状态和局部事件表征预测加速度修正量。事件条件残差模型的一致优于纯卡尔曼滤波，且部分残差可由锚点位置与速度单独预测，说明FRED结果混合了视觉证据与数据集特有运动先验。研究也提示事件视觉评测需要考虑数据先验，并为事件驱动目标预测提供了简洁改进路径。",
+      "llm_tags": [
+        "query:ev-cam"
+      ],
+      "matched_query_tag": "query:ev-cam",
+      "matched_query_text": "Object Detection and Tracking Using Event Cameras",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.01657v1",
+      "source": "arxiv",
+      "title": "NeoMME: A Single-Tower Multimodal-Native Multilingual Foundation Encoder for Efficient Fine-Tuning and Inference",
+      "abstract": "Multimodal models often build on architectures designed for generative vision-language modeling, typically combining separately pretrained vision encoders with causal language models. Visual document retrievers such as ColPali repurpose these models as encoders, carrying over the parameter and compute overhead of a VLM for a non-generative task.   We introduce NeoMME, a family of 260M and 800M-parameter Multimodal and Multilingual bidirectional Encoders that process multilingual text and raw image patches in a single bidirectional Transformer encoder. Both models are pretrained from scratch with a masked discrete-diffusion text objective, conditioned on visible image patches for multimodal examples. Both support a 16,384-token context, enough to encode up to two standard 4K UHD images.   To demonstrate its downstream capabilities, we fine-tune NeoMME with jointly trained dense and late-interaction heads. On the ViDoRe v3 benchmark, the resulting NeoMME-Retriever 260M outperforms all evaluated models strictly below 800M parameters with 0.523 nDCG@10, while NeoMME-Retriever 800M reaches 0.556. At a matched 2048x2048 image input size on an NVIDIA L40S, NeoMME-260M encodes pages with about 2x the throughput of ColModernVBERT. Hierarchical token pooling and asymmetric quantization compress late-interaction multimodal document embeddings by 255x while preserving over 95% of baseline nDCG@10. We contribute NeoMME to Hugging Face Transformers and release the pretrained backbone and retrieval-compatible checkpoints under Apache 2.0 at https://hf.co/collections/Hcompany/neomme.",
+      "authors": [
+        "Aurélien Lac",
+        "Tony Wu"
+      ],
+      "primary_category": "cs.IR",
+      "categories": [
+        "cs.IR",
+        "cs.AI",
+        "cs.CV"
+      ],
+      "published": "2026-08-31T13:08:15+00:00",
+      "link": "https://arxiv.org/pdf/2609.01657v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Efficient fine-tuning and inference via single-tower multimodal-native bidirectional encoders, reducing VLM parameter/compute overhead",
+      "llm_evidence_cn": "通过单塔多模态原生双向编码器降低VLM参数和算力开销，实现高效微调与推理",
+      "llm_evidence": "通过单塔多模态原生双向编码器降低VLM参数和算力开销，实现高效微调与推理",
+      "canonical_evidence": "通过单塔多模态原生双向编码器降低VLM参数和算力开销，实现高效微调与推理",
+      "llm_tldr_en": "NeoMME introduces single-tower bidirectional multimodal encoders (260M/800M) that process multilingual text and raw image patches without a causal VLM stack, enabling efficient fine-tuning and inference for multilingual document retrieval.",
+      "llm_tldr_cn": "论文针对视觉文档检索等场景套用生成式视觉语言模型带来的参数与算力冗余问题，提出NeoMME系列单塔双向多模态编码器。该模型从零预训练，用掩码离散扩散文本目标联合建模多语言文字与图像块，在260M和800M两种规模下实现多语言多模态理解。NeoMME以非生成式架构替代VLM编码器，显著降低微调与推理开销，同时保持跨模态语义对齐能力。",
+      "llm_tldr": "论文针对视觉文档检索等场景套用生成式视觉语言模型带来的参数与算力冗余问题，提出NeoMME系列单塔双向多模态编码器。该模型从零预训练，用掩码离散扩散文本目标联合建模多语言文字与图像块，在260M和800M两种规模下实现多语言多模态理解。NeoMME以非生成式架构替代VLM编码器，显著降低微调与推理开销，同时保持跨模态语义对齐能力。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.02350v1",
+      "source": "arxiv",
+      "title": "LookStep: Efficient Vision-Language Navigation with Linguistic Foresight and Event Driven Memory",
+      "abstract": "Vision-Language Navigation (VLN) requires an embodied agent to follow natural-language instructions in unseen environments. Recent progress has been largely driven by Multimodal Large Language Models (MLLMs). Existing methods follow a next-step action prediction paradigm, supervising only the expert action, which requires a high quantity of data for training. They also rely on cognitive maps, accumulated historical frames, or external 3D tools to maintain states, leading to high computational and memory overhead. To realize resource efficiency VLN, we propose LookStep, a unified end-to-end framework that combines Language Centric Future State Modeling and Event Driven Rolling Memory that uses language labels to generate coarse-grained navigation progress and future states for each candidate action, while autonomously deciding whether to write each observation into a bounded rolling memory with a semantic role. We validate LookStep empirically. On VLN-CE tasks, LookStep outperforms existing methods under the same training settings, achieving a 49.7\\% success rate on R2R-CE Val-Unseen with better memory efficiency and less data usage. Code and model is available at https://github.com/kunyang-YU/LookStep.",
+      "authors": [
+        "Kun-Yang Yu",
+        "Yingzhe Li",
+        "Hongyu Xu",
+        "Shi-Yu Tian",
+        "Zhi Zhou",
+        "Yang Chen",
+        "Ming Yang",
+        "Sheng Wang",
+        "Qing Yu",
+        "Lan-Zhe Guo",
+        "Yu-Feng Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-09-02T09:24:08+00:00",
+      "link": "https://arxiv.org/pdf/2609.02350v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "resource-efficient MLLM-based navigation framework reduces compute and memory overhead",
+      "llm_evidence_cn": "面向MLLM视觉语言导航的资源高效框架，降低计算和内存开销",
+      "llm_evidence": "面向MLLM视觉语言导航的资源高效框架，降低计算和内存开销",
+      "canonical_evidence": "面向MLLM视觉语言导航的资源高效框架，降低计算和内存开销",
+      "llm_tldr_en": "Presents LookStep, a resource-efficient MLLM navigation framework combining language-centric future-state modeling and event-driven rolling memory to reduce data, compute and memory overhead relative to next-step supervised VLN.",
+      "llm_tldr_cn": "视觉语言导航中的多模态大模型方法通常只监督专家动作，并依赖认知地图、历史帧累积或外部3D工具，造成数据需求大、计算和内存开销高。LookStep提出语言中心未来状态建模和事件驱动滚动记忆，利用语言标签生成粗粒度未来线索，以端到端方式按需更新记忆。该设计在保持指令导航理解能力的同时大幅压缩状态维护开销，为资源受限机器人上的高效VLN提供了一个统一框架。",
+      "llm_tldr": "视觉语言导航中的多模态大模型方法通常只监督专家动作，并依赖认知地图、历史帧累积或外部3D工具，造成数据需求大、计算和内存开销高。LookStep提出语言中心未来状态建模和事件驱动滚动记忆，利用语言标签生成粗粒度未来线索，以端到端方式按需更新记忆。该设计在保持指令导航理解能力的同时大幅压缩状态维护开销，为资源受限机器人上的高效VLN提供了一个统一框架。",
+      "llm_tags": [
+        "query:evlm"
+      ],
+      "matched_query_tag": "query:evlm",
+      "matched_query_text": "efficient vision language models architecture and inference",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.29759v1",
+      "source": "arxiv",
+      "title": "SynCrash: A Multi-Stage Pipeline for Zero-Shot Accident Detection and Localization in Traffic Surveillance Video",
+      "abstract": "We present SynCrash, a multi-stage pipeline for zero-shot accident detection, spatial localization, and collision-type classification in fixed-view CCTV surveillance video. Our approach addresses the ACCIDENT at CVPR 2026 Challenge, which requires predicting when an accident occurs, where in the frame the impact happens, and what type of collision it is, all without access to labeled real-world training data. The pipeline operates in three decoupled stages: (1) Temporal localization via a VideoMAEv2-giant backbone fine-tuned on CARLA-based synthetic clips with metadata-aware embeddings and dense sliding-window inference; (2) Spatial localization using YOLO for object detection combined with a physics-informed hybrid heuristic that leverages bounding-box overlap and trajectory-based reasoning to predict the impact point; and (3) Collision-type classification using a lightweight rule-based strategy derived from the number and configuration of detected vehicles. The key insight is that temporal understanding benefits from supervised fine-tuning on synthetic data, whereas spatial understanding is better served by pretrained object detectors and physics priors that transfer naturally across domains.",
+      "authors": [
+        "Arkya Jyoti Bagchi",
+        "Ritul Jangir",
+        "Varun Raskar"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-30T12:42:59+00:00",
+      "link": "https://arxiv.org/pdf/2608.29759v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Zero-shot accident detection and localization in traffic surveillance video",
+      "llm_evidence_cn": "交通监控视频中的零样本事故检测与定位",
+      "llm_evidence": "交通监控视频中的零样本事故检测与定位",
+      "canonical_evidence": "交通监控视频中的零样本事故检测与定位",
+      "llm_tldr_en": "Presents SynCrash, a three-stage pipeline for zero-shot accident detection, spatial localization, and collision-type classification in fixed-view CCTV, using synthetic CARLA data, YOLO detection, and physics-informed heuristics without real-world labels.",
+      "llm_tldr_cn": "面向交通监控视频中事故检测依赖标注真实数据的问题，提出SynCrash多阶段零样本流水线。方法将事故任务拆分为时间定位、空间定位和碰撞类型分类三个阶段，用CARLA合成片段微调VideoMAEv2骨干，并借助YOLO与物理信息假设完成定位。该方法在CVPR 2026挑战中无需真实标注即可同时预测事故时间、位置和碰撞类型，为交通视频场景理解提供零样本方案。",
+      "llm_tldr": "面向交通监控视频中事故检测依赖标注真实数据的问题，提出SynCrash多阶段零样本流水线。方法将事故任务拆分为时间定位、空间定位和碰撞类型分类三个阶段，用CARLA合成片段微调VideoMAEv2骨干，并借助YOLO与物理信息假设完成定位。该方法在CVPR 2026挑战中无需真实标注即可同时预测事故时间、位置和碰撞类型，为交通视频场景理解提供零样本方案。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-20",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2609.02341v1",
+      "source": "arxiv",
+      "title": "Towards Zero-Shot Transfer Across Embodiments For Driving VLAs",
+      "abstract": "Vision-Language-Action models (VLAs) have shown strong potential in autonomous driving by leveraging multimodal pretraining for instruction following, visual reasoning, and scene-level generalization. In robotic manipulation, scaling VLA fine-tuning across multiple robot setups--especially when unifying representations across embodiments--has been shown to improve in-dataset performance and cross-embodiment generalization; in autonomous driving, however, VLAs remain largely trained on individual datasets and are rarely evaluated for zero-shot transfer to unseen datasets and camera rigs; furthermore naively adding more datasets to the training data does not necessarily lead to better performance within seen embodiments. To address these problems, we study multi-dataset training for the driving task and BEV-Forcing, an auxiliary objective that transfers ground-plane object-layout information from a specialized Bird's-Eye-View model into the VLA backbone. By encouraging the model to represent object position through a shared BEV spatial interface, we show that an auxiliary task such as BEV-Forcing can improve both in-distribution and out-of-distribution performance when training on a small number of camera rigs. As the number of training embodiments increases, however, the benefits of the auxiliary task are reduced; we present this as evidence that new techniques in the literature may see their benefits diminish when simply scaling up training diversity, which motivates presenting results taking into account data scaling.",
+      "authors": [
+        "Caio Azevedo",
+        "Stefano Sabatini",
+        "Sascha Hornauer",
+        "Fabien Moutarde"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-09-02T09:17:54+00:00",
+      "link": "https://arxiv.org/pdf/2609.02341v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:EVLM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:EVLM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "driving VLA application in autonomous driving scene-level generalization across datasets and camera rigs",
+      "llm_evidence_cn": "自动驾驶场景下的VLA多数据集与跨相机应用，涉及多模态模型泛化",
+      "llm_evidence": "自动驾驶场景下的VLA多数据集与跨相机应用，涉及多模态模型泛化",
+      "canonical_evidence": "自动驾驶场景下的VLA多数据集与跨相机应用，涉及多模态模型泛化",
+      "llm_tldr_en": "Studies multi-dataset training and unified cross-embodiment representations for driving VLAs to improve zero-shot transfer to unseen datasets and camera rigs, complementing manipulation-based VLA scaling.",
+      "llm_tldr_cn": "机器人操作中的VLA可以通过跨本体微调获得更好的泛化，但自动驾驶VLA通常只在单数据集训练，很少测试对未知数据集和相机系统的零样本迁移，而且简单加入更多数据不必然改善已见本体性能。本文专门研究自动驾驶VLA的跨数据集与跨本体训练，评估多源数据对场景级泛化的影响。结果表明需要谨慎设计数据集组合与表征统一方式，才能提升跨相机线束的零样本迁移能力。",
+      "llm_tldr": "机器人操作中的VLA可以通过跨本体微调获得更好的泛化，但自动驾驶VLA通常只在单数据集训练，很少测试对未知数据集和相机系统的零样本迁移，而且简单加入更多数据不必然改善已见本体性能。本文专门研究自动驾驶VLA的跨数据集与跨本体训练，评估多源数据对场景级泛化的影响。结果表明需要谨慎设计数据集组合与表征统一方式，才能提升跨相机线束的零样本迁移能力。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-24",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
