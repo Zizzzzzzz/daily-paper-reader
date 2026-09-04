@@ -1,0 +1,429 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-04T21:50:49.964213+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 3,
+    "deep_cap": 7,
+    "deep_selected": 3,
+    "quick_candidates": 7,
+    "quick_skim_target": 12,
+    "quick_selected": 7
+  },
+  "deep_dive": [
+    {
+      "id": "2608.27206v1",
+      "source": "arxiv",
+      "title": "PACE: A Unified Condense-and-Extract Paradigm for Fast VLM Inference",
+      "abstract": "Vision-Language Models (VLMs) demonstrate exceptional visual reasoning capabilities, yet their inference costs escalate rapidly with the proliferation of visual tokens. Existing visual token pruning methods exhibit two fundamental limitations. First, most approaches operate exclusively post-vision encoder, leaving the substantial latency of the visual encoding phase unoptimized. Second, under strict token budgets, these methods often fail to jointly preserve holistic visual contexts and fine-grained details, leading to performance degradation. To address these bottlenecks, we propose PACE (Pixel-Adaptive Condense and Extract), a training-free inference framework that accelerates both the vision encoder and the Large Language Model (LLM) via a unified Condense-and-Extract paradigm. During the Condense stage, an Adaptive Pixel Compressor (APC) evaluates visual information density prior to encoding, adaptively downsampling redundant inputs, curtailing encoder computation while preserving global context and essential visual cues. In the Extract stage, a Dynamic Dual-Attention Extractor (DDAE) selectively retains visual tokens via a fusion of internal visual signals from the encoder and semantic signals from the LLM, safeguarding task-critical details. By integrating PACE into Qwen2.5-VL-7B, the model retains 93.8% of its original performance while utilizing only 10% of the visual tokens, yielding a 3.1x speedup in time to first token (TTFT). Our code is available at https://github.com/jjL357/PACE.",
+      "authors": [
+        "Junjie Liu",
+        "Shengyuan Ye",
+        "Xu Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-27T14:52:09+00:00",
+      "link": "https://arxiv.org/pdf/2608.27206v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Training-free visual token condense-and-extract framework for fast VLM inference, directly addressing token pruning and efficiency",
+      "llm_evidence_cn": "面向快速VLM推理的免训练视觉token压缩-抽取框架，直接对应token剪枝与效率优化",
+      "llm_evidence": "面向快速VLM推理的免训练视觉token压缩-抽取框架，直接对应token剪枝与效率优化",
+      "canonical_evidence": "面向快速VLM推理的免训练视觉token压缩-抽取框架，直接对应token剪枝与效率优化",
+      "llm_tldr_en": "Presents PACE, a training-free Visual Token Condense-and-Extract framework that speeds up both vision encoder and LLM, overcoming post-encoder token pruning limits by preserving holistic contexts and details under constrained budgets.",
+      "llm_tldr_cn": "视觉语言模型的推理成本随视觉token数量快速攀升。针对现有剪枝方法只作用于编码器之后且难以兼顾整体上下文与细节的问题，论文提出PACE，采用统一的像素自适应压缩与抽取（Condense-and-Extract）范式，无需训练即可同时加速视觉编码器和语言模型阶段。该方法可降低推理延迟并保持视觉问答等任务性能，为高效多模态模型推理提供轻量通用方案。",
+      "llm_tldr": "视觉语言模型的推理成本随视觉token数量快速攀升。针对现有剪枝方法只作用于编码器之后且难以兼顾整体上下文与细节的问题，论文提出PACE，采用统一的像素自适应压缩与抽取（Condense-and-Extract）范式，无需训练即可同时加速视觉编码器和语言模型阶段。该方法可降低推理延迟并保持视觉问答等任务性能，为高效多模态模型推理提供轻量通用方案。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.03675v1",
+      "source": "arxiv",
+      "title": "CoFiE: Coarse-to-Fine Evidence Selection for Efficient Streaming Video Understanding",
+      "abstract": "Streaming video understanding requires Vision Language Models (VLLMs) to process growing video streams and answer user questions under tight latency constraints. Existing methods improve efficiency through token pruning and memory-bank schemes, but mainly reduce visual tokens after visual encoding. Consequently, downstream token pruning alone cannot substantially reduce end-to-end latency because the expensive frame encoding cost has already been incurred. We propose CoFiE, a Coarse-to-Fine Evidence Selection framework that decouples evidence selection into a coarse, query-agnostic filtering stage before the vision encoder and a fine, query-specific refinement stage during LLM prefill. CoFiE introduces Novelty-Guided Frame Filtering to retain visually distinctive candidate frames and Query-Specific Evidence Refinement to select the frames most relevant to the user query. This design removes substantial redundancy before frame encoding while preserving query-specific refinement once semantic information becomes available. Experiments show that CoFiE establishes a new state-of-the-art accuracy-efficiency trade-off across multiple video understanding benchmarks, reaching 78.86% accuracy on StreamingBench and 68.72% on OvO-Bench, with improvements of up to 3.15% over prior methods. Even with up to 80% evidence-frame filtering, CoFiE outperforms strong open-source multimodal models while improving end-to-end inference latency by up to 2.54 times.",
+      "authors": [
+        "Jing Jiang",
+        "Yiran Ling",
+        "Ruonan Li",
+        "Dimitrios Stamoulis",
+        "Jie Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-09-03T11:14:21+00:00",
+      "link": "https://arxiv.org/pdf/2609.03675v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Reduces visual tokens and frame encoding latency via pre-encoder filtering and LLM prefill refinement; fits token pruning and efficient VLM requirements.",
+      "llm_evidence_cn": "在视觉编码前做帧过滤并结合LLM预填充阶段的token精化以降低延迟，契合token剪枝与高效视觉语言模型需求。",
+      "llm_evidence": "在视觉编码前做帧过滤并结合LLM预填充阶段的token精化以降低延迟，契合token剪枝与高效视觉语言模型需求。",
+      "canonical_evidence": "在视觉编码前做帧过滤并结合LLM预填充阶段的token精化以降低延迟，契合token剪枝与高效视觉语言模型需求。",
+      "llm_tldr_en": "Streaming VLLMs suffer full frame encoding cost before downstream token pruning. CoFiE uses coarse-to-fine evidence selection, filtering frames before the vision encoder and refining tokens during LLM prefill, cutting end-to-end latency while preserving accuracy.",
+      "llm_tldr_cn": "流式视频理解模型面临持续增长的视频流与低延迟要求，但已有token剪枝大多在视觉编码之后进行，完整编码代价仍不可避免。CoFiE提出粗到细证据选择框架，在视觉编码前用新颖性引导的帧过滤剔除冗余帧，并在LLM预填充阶段做与查询相关的细粒度token精化，显著降低端到端延迟。实验证明该方法在保持视频问答性能的同时提升推理效率，为高效视觉语言模型提供了可借鉴的证据压缩范式。",
+      "llm_tldr": "流式视频理解模型面临持续增长的视频流与低延迟要求，但已有token剪枝大多在视觉编码之后进行，完整编码代价仍不可避免。CoFiE提出粗到细证据选择框架，在视觉编码前用新颖性引导的帧过滤剔除冗余帧，并在LLM预填充阶段做与查询相关的细粒度token精化，显著降低端到端延迟。实验证明该方法在保持视频问答性能的同时提升推理效率，为高效视觉语言模型提供了可借鉴的证据压缩范式。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2609.04070v1",
+      "source": "arxiv",
+      "title": "Continuous Actions from Discrete Minds: Latent-Aligned Planning for End-to-End Autonomous Driving",
+      "abstract": "Bridging the gap between the discrete reasoning of Vision-Language Models and the continuous, physics-constrained nature of autonomous driving remains a significant challenge. In this work, we introduce LaPla, a unified Vision-Language-Action (VLA) framework featuring latent-aligned planning to seamlessly ground semantic understanding in precise motion execution. We first design an action tokenizer based on a residual vector-quantized variational autoencoder (VQ-VAE), capturing vehicle kinematics and encoding trajectory features into a structured latent space. Rather than discrete codebook lookups that inevitably introduce quantization errors, LaPla repurposes this representation as a physical prior to bridge the modality gap between high-dimensional semantics and the raw action space. Specifically, given multimodal inputs integrating multi-view images, historical actions, and textual instructions, LaPla incorporates concurrent action queries to causally attend to the multimodal context in a single forward pass, projecting hidden states directly into the pretrained VQ-VAE latent space. The frozen decoder then translates these continuous latents into actions, effectively eliminating quantization errors and ensuring physically plausible trajectories while bypassing time-consuming autoregressive generation. Extensive experiments on the nuScenes benchmark demonstrate that LaPla achieves competitive open-loop performance, reducing long-horizon L2 error by 15.52% compared to state-of-the-art VLA methods. Closed-loop evaluations on the NVIDIA AlpaSim simulator further confirm its superior capability in ensuring smooth driving progress, improving the success rate by 33.34 percentage points with significantly reduced inference latency.",
+      "authors": [
+        "Ruoyu Yao",
+        "Yusen Xie",
+        "Qingzhao Liu",
+        "Pei Liu",
+        "Zewei Yang",
+        "Yipeng Zhu",
+        "Xiaolong Wang",
+        "Jun Ma"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-09-03T16:42:11+00:00",
+      "link": "https://arxiv.org/pdf/2609.04070v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "VLA framework with latent-aligned planning for end-to-end autonomous driving; application of multimodal LLMs to traffic environments",
+      "llm_evidence_cn": "面向端到端自动驾驶的统一视觉语言行动VLA框架，将语义理解与连续运动执行对齐",
+      "llm_evidence": "面向端到端自动驾驶的统一视觉语言行动VLA框架，将语义理解与连续运动执行对齐",
+      "canonical_evidence": "面向端到端自动驾驶的统一视觉语言行动VLA框架，将语义理解与连续运动执行对齐",
+      "llm_tldr_en": "LaPla is a unified Vision-Language-Action (VLA) framework for end-to-end autonomous driving. It uses a VQ-VAE action tokenizer and latent-aligned planning to bridge semantic understanding and continuous motion control, evidencing multimodal large model use in traffic environments.",
+      "llm_tldr_cn": "论文针对视觉语言模型离散推理与自动驾驶连续控制之间的鸿沟，提出统一的视觉-语言-行动(VLA)框架LaPla。方法用残差VQ-VAE动作分词器把轨迹特征编码到结构化潜在空间，并以潜在对齐规划将语义理解映射到精确运动执行。该工作示范了多模态大模型在复杂交通环境下的感知-规划应用，为端到端自动驾驶新架构提供了思路。",
+      "llm_tldr": "论文针对视觉语言模型离散推理与自动驾驶连续控制之间的鸿沟，提出统一的视觉-语言-行动(VLA)框架LaPla。方法用残差VQ-VAE动作分词器把轨迹特征编码到结构化潜在空间，并以潜在对齐规划将语义理解映射到精确运动执行。该工作示范了多模态大模型在复杂交通环境下的感知-规划应用，为端到端自动驾驶新架构提供了思路。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Applications of multimodal LLMs in complex traffic environment perception",
+      "matched_requirement_id": "req-15",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.28383v1",
+      "source": "arxiv",
+      "title": "Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs",
+      "abstract": "Hybrid attention dominates frontier LLMs, yet Vision Transformers (ViTs) in multimodal LLMs lack a satisfactory hybrid design, with no consensus on why certain attention patterns work better. To fill this gap, we study ViT attention heads and find they differentiate into object- and background-specialist roles, a pattern most pronounced under full attention; we call this Semantic Head Specialization (SHS). We propose SHS-Index to quantify this specialization, show that it distinguishes full-attention from chunk-window ViTs, and find that it strongly tracks downstream benchmark performance. We then identify three structural factors that shape SHS---window interaction, token serialization, and local softmax allocation---and use them as design principles for hybrid attention. Guided by these factors, we design Ariadne Attention, a hybrid that matches full attention on 22 image and video tasks at 6.5x less attention compute. Our findings establish head specialization as a measurable property for diagnosing and designing principled hybrid ViT attention at the multimodal-LLM scale.",
+      "authors": [
+        "Chenhong He",
+        "Lei Li",
+        "Shicheng Li",
+        "Hanglong Lv",
+        "Lingpeng Kong",
+        "Qi Liu",
+        "Tong Yang",
+        "Shuhuai Ren"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.CL"
+      ],
+      "published": "2026-08-28T14:40:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.28383v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "SHS and hybrid ViT attention analysis for multimodal LLMs, informing efficient VLM architecture design",
+      "llm_evidence_cn": "针对多模态大模型ViT的语义头特化与混合注意力分析，关联高效VLM架构设计",
+      "llm_evidence": "针对多模态大模型ViT的语义头特化与混合注意力分析，关联高效VLM架构设计",
+      "canonical_evidence": "针对多模态大模型ViT的语义头特化与混合注意力分析，关联高效VLM架构设计",
+      "llm_tldr_en": "VLM ViT heads are found to specialize into object and background roles; the paper introduces SHS-Index that distinguishes full attention from chunk-window ViTs and strongly tracks downstream performance, then extracts design factors to guide hybrid ViT architecture.",
+      "llm_tldr_cn": "多模态大模型的视觉Transformer在混合注意力设计上缺乏共识。本文发现注意力头会分化为目标和背景两类专家角色，提出语义头特化SHS-Index并证明其与下游基准性能强相关。进一步归纳窗口交互、token序列化和局部softmax分配三个结构因素，为设计更优的混合ViT注意力提供可操作原则。该方法有助于在多模态大模型中实现高效的视觉编码与推理。",
+      "llm_tldr": "多模态大模型的视觉Transformer在混合注意力设计上缺乏共识。本文发现注意力头会分化为目标和背景两类专家角色，提出语义头特化SHS-Index并证明其与下游基准性能强相关。进一步归纳窗口交互、token序列化和局部softmax分配三个结构因素，为设计更优的混合ViT注意力提供可操作原则。该方法有助于在多模态大模型中实现高效的视觉编码与推理。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.26589v1",
+      "source": "arxiv",
+      "title": "DPA-I2P: Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration in Autonomous Driving",
+      "abstract": "Image-to-Point Cloud Registration aims to estimate the camera pose of a given image within a 3D scene point cloud, which is a fundamental task in autonomous driving and large-scale outdoor localization. Recent implicit correspondence learning methods have improved registration performance by learning cross-modal alignment in an end-to-end framework, leading to more accurate camera pose estimation. However, due to the inherent modality discrepancy between images and sparse LiDAR point clouds, reliable cross-modal correspondence learning remains challenging. To address this issue, we propose Depth-Guided Projective Alignment for Image-to-Point-Cloud Registration (DPA-I2P). Unlike naive depth or feature concatenation, Ray-Conditioned Metric Depth Encoding (RMDE) and Projection-Consistent Vision Lifting (PVL) exploit depth and visual cues in a structured, geometry-aware manner. In addition, Cross-Modal Query Pruning (CQP) suppresses unreliable queries during early refinement to improve matching stability. Experiments on KITTI and nuScenes demonstrate the effectiveness of the proposed method. On KITTI, DPA-I2P reduces RTE and RRE by 45.0% and 55.6% over the strongest implicit baseline, respectively. On nuScenes, DPA-I2P also improves registration accuracy over the evaluated baselines, suggesting better transferability to different driving scenes.",
+      "authors": [
+        "Wenxin Zhang",
+        "Hang Li",
+        "Zhiwei Xu",
+        "Qiankun Dong",
+        "Gang Wang",
+        "Tao Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-27T04:01:15+00:00",
+      "link": "https://arxiv.org/pdf/2608.26589v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "depth-guided image-to-point-cloud registration for autonomous driving",
+      "llm_evidence_cn": "面向自动驾驶的图像到点云跨模态配准技术",
+      "llm_evidence": "面向自动驾驶的图像到点云跨模态配准技术",
+      "canonical_evidence": "面向自动驾驶的图像到点云跨模态配准技术",
+      "llm_tldr_en": "Introduces DPA-I2P, depth-guided projective alignment for image-to-point-cloud registration, which mitigates image-LiDAR modality gap and improves pose estimation in autonomous driving.",
+      "llm_tldr_cn": "图像到点云配准是自动驾驶定位的基础任务，但图像与稀疏LiDAR之间的模态鸿沟使跨模态对应不可靠。该文提出深度引导的投影对齐方法DPA-I2P，利用当前图像深度生成投影并进行射线约束的特征对齐，避免简单深度或特征拼接的局限。配准实验表明该方法能得到更准确稳健的相机位姿。该成果能提升自动驾驶多传感器融合下的场景理解与定位精度。",
+      "llm_tldr": "图像到点云配准是自动驾驶定位的基础任务，但图像与稀疏LiDAR之间的模态鸿沟使跨模态对应不可靠。该文提出深度引导的投影对齐方法DPA-I2P，利用当前图像深度生成投影并进行射线约束的特征对齐，避免简单深度或特征拼接的局限。配准实验表明该方法能得到更准确稳健的相机位姿。该成果能提升自动驾驶多传感器融合下的场景理解与定位精度。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.28706v1",
+      "source": "arxiv",
+      "title": "Variable-Granularity Tokenization for High-Resolution Object Detection",
+      "abstract": "ViT detectors fix a uniform token grid before any learned stage. A native-resolution aerial detector must then choose between resolving few-pixel objects and staying inside compute and memory limits. We introduce VGTok, a training-free tokenizer that sets patch granularity per region from pixels, ahead of the encoder. VGTok scores each region by multi-scale morphological top-hat separability from its surround, then thresholds those scores at a per-image percentile, which fixes the token budget. A structure-tensor gate ($λ_{\\min}$) refines only where two-dimensional object structure supports it, leaving one-dimensional clutter coarse. The resulting token set is a strict partition of the image. In a Co-DETR detector with an EVA-02 ViT-L encoder, VGTok clears every published VisDrone-val AP and AP$_S$ at every budget from 40\\% to 100\\% of tokens. At 40\\% it records 44.22 AP with three fifths of the sequence discarded before the first transformer block; dense, it reaches 48.38 AP, $6.08$ above the strongest published entry. VGTok transfers to AI-TOD-v2 untouched, same scorer and same rank, and sets a new state of the art at 37.27 AP and 19.51 AP$_{vt}$. As a pure drop-in into a frozen checkpoint it reaches 36.29 AP at 78.5\\% of tokens, above every published entry, where our 376.3M-parameter detector clears a 3.0B multi-expert model. We show that a token budget fixed before the backbone, from local separability and structure geometry alone, holds accuracy on the tiny-object regimes that dominate aerial detection, at $3.1\\times$ less encoder compute and $1.9\\times$ less encoder memory. Code and models are available at \\href{https://github.com/khayrulbuet13/vgtok}{\\texttt{github.com/khayrulbuet13/vgtok}} and \\href{https://huggingface.co/khayrulbuet13/vgtok}{\\texttt{huggingface.co/khayrulbuet13/vgtok}}.",
+      "authors": [
+        "Khayrul Islam"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-27T18:39:32+00:00",
+      "link": "https://arxiv.org/pdf/2608.28706v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training-free variable-granularity tokenizer fixes token budget for high-resolution vision encoders",
+      "llm_evidence_cn": "免训练可变粒度分词器按图像区域设定patch大小并固定token预算",
+      "llm_evidence": "免训练可变粒度分词器按图像区域设定patch大小并固定token预算",
+      "canonical_evidence": "免训练可变粒度分词器按图像区域设定patch大小并固定token预算",
+      "llm_tldr_en": "VGTok is a training-free tokenizer that sets per-region patch granularity from pixel structure and fixes the token budget. In Co-DETR with EVA-02 ViT-L, it cuts compute for high-resolution aerial object detection while maintaining performance.",
+      "llm_tldr_cn": "针对ViT检测器处理高分辨率图像时计算与内存开销大的问题，论文提出免训练的可变粒度分词器VGTok。它根据区域的多尺度形态学显著度设置patch粒度，并用结构张量门控筛选二维结构区域，从全图层面固定token预算。在Co-DETR与EVA-02 ViT-L组合上的实验表明，VGTok能有效降低token数量，同时保持高分辨率目标检测精度。该方法为视觉特征编码的高效分词提供了即插即用的改进思路。",
+      "llm_tldr": "针对ViT检测器处理高分辨率图像时计算与内存开销大的问题，论文提出免训练的可变粒度分词器VGTok。它根据区域的多尺度形态学显著度设置patch粒度，并用结构张量门控筛选二维结构区域，从全图层面固定token预算。在Co-DETR与EVA-02 ViT-L组合上的实验表明，VGTok能有效降低token数量，同时保持高分辨率目标检测精度。该方法为视觉特征编码的高效分词提供了即插即用的改进思路。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.29194v1",
+      "source": "arxiv",
+      "title": "RLG-TPV: Radar- and LiDAR-Guided Tri-Perspective View Fusion for Camera-Radar 3D Object Detection",
+      "abstract": "Tri-Perspective View (TPV) representations describe 3D scene structure through top, side, and front feature planes, but existing TPV lifting is primarily camera-based, leaving the depth of sampled image evidence ambiguous along projected camera rays. We propose RLG-TPV, a multimodal TPV framework for camera-radar 3D object detection in which radar and training-time LiDAR provide complementary geometric guidance during representation construction. A ray-guided deformable-attention lift weights sampled image features using LiDAR-supervised camera depth probabilities and radar frustum occupancy, while radar additionally refines the depth distribution before lifting. Because conventional radar provides limited elevation information, LiDAR-derived class-occupancy targets supervise the side and front planes during training; the corresponding heads are removed at inference, so deployment requires only cameras and radar. For temporal aggregation, Doppler-guided temporal fusion aligns past features using a motion field anchored by measured radar radial velocity, with gating that limits warping in regions without supported motion. An RCS-aware radar scatter further allows radar evidence to spread over spatial neighborhoods conditioned on radar cross section. On the nuScenes validation set, RLG-TPV achieves 0.4981 mAP and 0.5959 NDS, reducing orientation and velocity error by 31.9\\% and 30.7\\% relative to the published CRN baseline. Ablation studies show that ray-level geometric guidance is a major contributor to the final performance.",
+      "authors": [
+        "Ahmet Mete Dokgoz",
+        "A. Enes Doruk",
+        "Hasan F. Ates"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-29T11:08:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.29194v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "camera-radar 3D object detection with LiDAR guidance for autonomous driving perception",
+      "llm_evidence_cn": "面向自动驾驶的相机-雷达三维目标检测，受LiDAR几何引导，构成多模态交通感知方法",
+      "llm_evidence": "面向自动驾驶的相机-雷达三维目标检测，受LiDAR几何引导，构成多模态交通感知方法",
+      "canonical_evidence": "面向自动驾驶的相机-雷达三维目标检测，受LiDAR几何引导，构成多模态交通感知方法",
+      "llm_tldr_en": "RLG-TPV improves Tri-Perspective View fusion by using radar and training-time LiDAR to guide lifting of camera features, resolving depth ambiguity along rays and enabling robust camera-radar 3D object detection for autonomous driving.",
+      "llm_tldr_cn": "现有基于三视角视图表示的三维检测大多是纯相机方案，沿相机射线的图像特征深度存在歧义。RLG-TPV引入雷达与训练时的激光雷达共同提供几何引导，用射线引导的可变形注意力将图像特征提升至三维，并结合雷达视锥占用改进深度分布估计，从而在相机-雷达融合下提高三维目标检测精度。该方法为自动驾驶场景中的多模态感知提供了新的几何约束融合思路。",
+      "llm_tldr": "现有基于三视角视图表示的三维检测大多是纯相机方案，沿相机射线的图像特征深度存在歧义。RLG-TPV引入雷达与训练时的激光雷达共同提供几何引导，用射线引导的可变形注意力将图像特征提升至三维，并结合雷达视锥占用改进深度分布估计，从而在相机-雷达融合下提高三维目标检测精度。该方法为自动驾驶场景中的多模态感知提供了新的几何约束融合思路。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.29929v1",
+      "source": "arxiv",
+      "title": "Evaluating 2D and 3D-Aware Vision Foundation Models for Vehicle Attribute Recognition",
+      "abstract": "Vehicle attribute recognition is an important task in intelligent transportation systems, particularly when Automatic License Plate Recognition (ALPR) is unavailable or unreliable. Although vision foundation models have shown strong transferability across domains, their effectiveness for fine-grained vehicle classification remains underexplored. Moreover, given the inherently three-dimensional structure of vehicles, it is unclear whether emerging 3D-aware foundation models offer advantages over standard 2D architectures. This paper presents an empirical benchmark of 14 state-of-the-art 2D and 3D-aware vision foundation models. Using the challenging real-world UFPR-VeSV dataset, we evaluate these models as frozen feature extractors via linear probing for vehicle type, make, and model recognition. We further stress-test the best-performing models under few-shot learning and Out-of-Distribution (OOD) domain shifts. Our results show that standard 2D self-supervised models, particularly DINOv3, substantially outperform 3D-aware models in fine-grained tasks, achieving over 93% Macro-Accuracy for make and model recognition. However, the 3D-aware Depth Anything v2 exhibits stronger invariance to viewing angles in vehicle type classification. These findings motivate hybrid approaches that combine 2D and 3D priors for robust vehicle recognition. Our code is publicly available at https://github.com/UFPR-IPASPPR/3D-Vision-Benchmark/.",
+      "authors": [
+        "Alexandre V. Delazeri",
+        "Gabriel E. Lima",
+        "Eduil Nascimento",
+        "Rayson Laroca",
+        "David Menotti"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-30T17:51:44+00:00",
+      "link": "https://arxiv.org/pdf/2608.29929v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "benchmark of 2D/3D vision foundation models for vehicle attribute recognition",
+      "llm_evidence_cn": "面向车辆属性识别的视觉基础模型评测，服务交通感知",
+      "llm_evidence": "面向车辆属性识别的视觉基础模型评测，服务交通感知",
+      "canonical_evidence": "面向车辆属性识别的视觉基础模型评测，服务交通感知",
+      "llm_tldr_en": "Benchmarks 14 vision foundation models for vehicle attribute recognition on real-world UFPR-VeSV, providing practical guidance for fine-grained traffic perception.",
+      "llm_tldr_cn": "车牌不可用情况下车辆属性识别对智能交通系统十分关键，但视觉基础模型在该任务上的表现尚未系统验证。论文在真实UFPR-VeSV数据集上评测了14种2D与3D感知视觉基础模型，以冻结特征提取方式实现细粒度车辆分类。结果显示不同架构各有适用场景，可为车辆感知模型选型提供依据。该工作拓展了基础模型在交通场景精细感知中的应用认知。",
+      "llm_tldr": "车牌不可用情况下车辆属性识别对智能交通系统十分关键，但视觉基础模型在该任务上的表现尚未系统验证。论文在真实UFPR-VeSV数据集上评测了14种2D与3D感知视觉基础模型，以冻结特征提取方式实现细粒度车辆分类。结果显示不同架构各有适用场景，可为车辆感知模型选型提供依据。该工作拓展了基础模型在交通场景精细感知中的应用认知。",
+      "llm_tags": [
+        "query:mm-trf"
+      ],
+      "matched_query_tag": "query:mm-trf",
+      "matched_query_text": "Comprehensive traffic scene understanding and perception",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2609.00830v1",
+      "source": "arxiv",
+      "title": "Visual Attention Faithfulness in Vision-Language Models is Heterogeneous",
+      "abstract": "Whether attention weights faithfully reflect model reasoning has been actively debated in NLP, yet this question remains largely unexplored for the visual modality in Vision-Language Models (VLMs). We address this gap through causal perturbation analysis on current VLMs, evaluating both the comprehensiveness and sufficiency gap of attention-ranked visual tokens. Our analysis reveals that visual attention faithfulness is heterogeneous, manifesting in three distinct processing modes: Faithful-Sufficient, where top-$k$ attention tokens are both necessary and sufficient for prediction; Faithful-Distributed, where they are necessary but broader visual context remains required; and Non-Focal, where no localized attention region is individually necessary while visual information remains an essential trigger for prediction. Furthermore, human-annotated ground-truth regions satisfy comprehensiveness in only $\\sim 60$% of cases compared with model attention rankings, revealing systematic divergence between model visual reliance and human intuition. We demonstrate these patterns across both general VQA on VQAv2 and document tasks on VRDU and ChartQA, showing that visual attention faithfulness varies systematically with processing demands and model architectures rather than being uniformly faithful or unfaithful.",
+      "authors": [
+        "Xurui Song",
+        "Weishi Wang",
+        "Zhongqi Yue",
+        "Kuluhan Binici",
+        "Tao Bai",
+        "Hongxin Shao",
+        "Daniel Dahlmeier",
+        "Jun Luo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-09-01T07:32:01+00:00",
+      "link": "https://arxiv.org/pdf/2609.00830v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "causal analysis of top-k visual token sufficiency directly relevant to token pruning in efficient VLMs",
+      "llm_evidence_cn": "对视觉token充分性的因果分析可指导高效VLM的token剪枝与压缩",
+      "llm_evidence": "对视觉token充分性的因果分析可指导高效VLM的token剪枝与压缩",
+      "canonical_evidence": "对视觉token充分性的因果分析可指导高效VLM的token剪枝与压缩",
+      "llm_tldr_en": "This paper causally perturbs VLMs to test whether attention-ranked top-k visual tokens are necessary and sufficient, finding heterogeneous faithfulness modes (faithful-sufficient, faithful-distributed, non-focal), which has implications for token pruning and efficient VLM inference.",
+      "llm_tldr_cn": "现有研究很少在视觉模态验证注意力权重是否忠实反映VLM推理。本文通过因果扰动分析评估注意力排序后的视觉token的充分性和充分性缺口，发现模型呈现忠实-充分、忠实-分散、非焦点三种模式。忠实-充分模式下保留高注意力token即足以预测，但这并不能在所有模型中成立。该结论为注意力解释性和VLM token压缩与剪枝策略设计提供了实证依据。",
+      "llm_tldr": "现有研究很少在视觉模态验证注意力权重是否忠实反映VLM推理。本文通过因果扰动分析评估注意力排序后的视觉token的充分性和充分性缺口，发现模型呈现忠实-充分、忠实-分散、非焦点三种模式。忠实-充分模式下保留高注意力token即足以预测，但这并不能在所有模型中成立。该结论为注意力解释性和VLM token压缩与剪枝策略设计提供了实证依据。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2609.03216v1",
+      "source": "arxiv",
+      "title": "ProgResViT: Progressive Resolution and Width for Adaptive Vision Transformers",
+      "abstract": "Vision Transformers (ViTs) typically process every image using a fixed input resolution and model width, even though many images can be classified with substantially less computation. We introduce ProgResViT, an input-adaptive ViT that performs inference progressively across multiple rounds. The first round processes a low-resolution image with a narrow subnetwork. Inference terminates when the prediction is sufficiently confident; otherwise, the model reuses the representations produced in the current round and proceeds with a higher-resolution input and a wider subnetwork to refine its prediction. As all rounds share a single backbone, we propose Progress-Conditioned Soft Gating (PSG), which conditions token fusion and layer outputs on the current round, block, and input resolution. On image classification, applying ProgResViT to DeiT yields better accuracy-compute trade-offs than adaptive-width, adaptive-depth, and dynamic-token baselines. With knowledge distillation, a DeiT-based ProgResViT achieves 84.9% top-1 accuracy, slightly exceeding the reported DeiT-III-S accuracy under a comparable evaluation setting. We show that the same design also provides favorable accuracy-compute trade-offs for self-supervised DINO representations and downstream semantic segmentation. Code is available at https://github.com/ds-kiel/ProgResViT.",
+      "authors": [
+        "Ali Hojjat",
+        "Janek Haberer",
+        "Olaf Landsiedel"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-09-02T23:10:56+00:00",
+      "link": "https://arxiv.org/pdf/2609.03216v1",
+      "tags": [
+        "keyword:EV-CAM",
+        "keyword:MM-TRF",
+        "query:EV-CAM",
+        "query:MM-TRF"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Input-adaptive progressive ViT with variable resolution and width, an enabling efficient design for VLM vision backbones",
+      "llm_evidence_cn": "输入自适应的渐进式ViT，通过可变的分辨率与宽度降低计算量，可作为VLM视觉编码的高效设计方案",
+      "llm_evidence": "输入自适应的渐进式ViT，通过可变的分辨率与宽度降低计算量，可作为VLM视觉编码的高效设计方案",
+      "canonical_evidence": "输入自适应的渐进式ViT，通过可变的分辨率与宽度降低计算量，可作为VLM视觉编码的高效设计方案",
+      "llm_tldr_en": "ProgResViT enables adaptive ViT inference by starting from low resolution/narrow width, progressively adding wider subnetworks and higher resolution when uncertain, reusing representations with Progress-Conditioned Soft Gating to reduce computation.",
+      "llm_tldr_cn": "视觉Transformer常以固定分辨率与宽度处理所有图像，计算利用率不高。本文提出ProgResViT，在不同轮次从低分辨率窄子网开始推断，低置信度时再切换到高分辨率宽子网并复用已有表示。借助进度条件软门控调节token融合与层输出，在单骨干内自适应控制计算量，为图像分类提供高效的自适应ViT推理范式。该方法可迁移到VLM的视觉编码端，减少冗余计算。",
+      "llm_tldr": "视觉Transformer常以固定分辨率与宽度处理所有图像，计算利用率不高。本文提出ProgResViT，在不同轮次从低分辨率窄子网开始推断，低置信度时再切换到高分辨率宽子网并复用已有表示。借助进度条件软门控调节token融合与层输出，在单骨干内自适应控制计算量，为图像分类提供高效的自适应ViT推理范式。该方法可迁移到VLM的视觉编码端，减少冗余计算。",
+      "llm_tags": [
+        "query:evlm:composite"
+      ],
+      "matched_query_tag": "query:evlm:composite",
+      "matched_query_text": "Papers central to token压缩、高效视觉语言模型及高效VLA模型最新论文检索, especially work that connects or combines: token compression techniques for large language models; token pruning; efficient vision language models architecture and inference; efficient vision-language-action models for robotics; efficiency optimization for multimodal large language models; efficient vision language action models; latest research on token compression in vision language models; efficient architectures for vision language action models; optimization techniques for real time VLA model inference.",
+      "matched_requirement_id": "req-composite-evlm",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

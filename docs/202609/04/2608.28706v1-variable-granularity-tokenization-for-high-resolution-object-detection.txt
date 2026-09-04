@@ -1,0 +1,619 @@
+Title: Variable-Granularity Tokenization for High-Resolution Object Detection
+
+URL Source: https://arxiv.org/pdf/2608.28706v1
+
+Published Time: Tue, 01 Sep 2026 00:08:30 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Variable-Granularity Tokenization for High-Resolution Object Detection 
+
+# Khayrul Islam Lawrence Livermore National Laboratory 7000 East Ave, Livermore, CA 94550 
+
+Islam11@llnl.gov 
+
+# Abstract 
+
+ViT detectors fix a uniform token grid before any learned stage. A native-resolution aerial detector must then choose between resolving few-pixel objects and staying inside com-pute and memory limits. We introduce VGTok, a training-free tokenizer that sets patch granularity per region from pixels, ahead of the encoder. VGTok scores each re-gion by multi-scale morphological top-hat separability from its surround, then thresholds those scores at a per-image percentile, which fixes the token budget. A structure-tensor gate ( λmin ) refines only where two-dimensional ob-ject structure supports it, leaving one-dimensional clutter coarse. The resulting token set is a strict partition of the image. In a Co-DETR detector with an EVA-02 ViT-L en-coder, VGTok clears every published VisDrone-val AP and AP S at every budget from 40% to 100% of tokens. At 40% it records 44.22 AP with three fifths of the sequence dis-carded before the first transformer block; dense, it reaches 48.38 AP, 6.08 above the strongest published entry. VGTok transfers to AI-TOD-v2 untouched, same scorer and same rank, and sets a new state of the art at 37.27 AP and 19.51 AP vt . As a pure drop-in into a frozen checkpoint it reaches 36.29 AP at 78.5% of tokens, above every published entry, where our 376.3M-parameter detector clears a 3.0B multi-expert model. We show that a token budget fixed before the backbone, from local separability and structure geometry alone, holds accuracy on the tiny-object regimes that dom-inate aerial detection, at 3.1× less encoder compute and 
+
+1.9× less encoder memory. Code and models are avail-able at github.com/khayrulbuet13/vgtok and 
+
+huggingface.co/khayrulbuet13/vgtok .  
+
+> This work was performed under the auspices of the U.S. Department of Energy by Lawrence Livermore National Laboratory under Contract DE-AC52-07NA27344. Release number: LLNL-CONF-2023636. (a) Input with ground truth: 317 instances, 280 below 32×32 px (b) VGTok allocation: 70% of tokens, 47.8 AP zero-shot (−0.6 vs dense) 358 nodes stopped by the gate
+> (c) Close-up of the boxed region
+> (d) Quadtree: contrast alone refines the paint 204 tokens
+> (e) λ min gate: the paint costs one token, not four 174 tokens 10 stopped
+
+Figure 1. VGTok on a VisDrone frame at 70% tokens. Contrast alone spends 204 tokens on painted crosswalk bars holding no ob-ject; the λmin gate emits the same crop in 174 . (a) Ground truth: 
+
+317 instances, 280 of them under 32 × 32 px. (b) The finest patch size stays on the vehicles while empty roadway, plaza and build-ing faces coarsen, at 47 .76 AP zero-shot with no weight changed, 
+
+5.46 AP above the strongest published val result; Tab. 4 prints this budget trained. (c) The boxed region, enlarged: paint on plain as-phalt. (d) Contrast refines that paint to the finest size. (e) The gate stops the descent, one coarse token in place of four fine ones. 
+
+# 1. Introduction 
+
+A ViT detector reads an image as a grid of patches of one size, and every later stage computes on that grid. Small objects on aerial imagery occupy a handful of pixels, and a grid fine enough to resolve them is too expensive over a full frame. SAHI [5] regains that resolution by tiling the frame into overlapping chips, but spends the budget uni-formly, giving empty background and dense clusters iden-tical per-pixel allocation. Compute must therefore be spent selectively, on evidence cheap enough to read before the backbone runs. Tokenization fixes the token count N before any learned stage, so every mechanism that allocates compute after it (token pruning and merging [11, 29, 52, 56, 58, 92], sparse and density-guided detection heads [41, 42, 60, 84, 102], 1arXiv:2608.28706v1 [cs.CV] 27 Aug 2026 crop-and-tile inference [43, 50, 53, 91, 100], saliency-guided warping [59, 79, 80, 103]) inherits a token budget it cannot enlarge, or leaves N untouched and carries every prediction back through an inverse map. Any tokenizer that varies the ViT’s patch size must de-cide from pixels alone whether a region deserves resolution, either by learning the decision [15, 39, 75, 93, 99] or by cut-ting a scalar measure of intra-patch structure (entropy, blur energy, a Laplacian response) at a constant [16, 54, 62, 97]. Either way the measure scores a region in isolation. De-tection asks a different question. An object is defined by separation from its surround, so the informative quantity is separability from the surround [33, 69]. The two diverge where the surround is textured and the target smooth. Ascalar average attenuates a target in proportion to its area, so the evidence weakens as the target shrinks. VGTok there-fore scores a region, ahead of patch projection, by its sepa-rability from the surround, a multi-scale morphological top-hat whose max over structuring-element sizes and polarities keeps the score independent of target area. Both approaches then refine the same way, replacing a selected region with four sub-patches and emitting all four [39, 62, 93], so refining costs four tokens even where the evidence is a single straight edge. Leaving the regular grid costs more still, giving up the pretrained patch embed-ding [1, 106], and a second uniform scale raises the token count [14]. VGTok instead separates the decision to refine from the evidence that would justify it. A region is refined only where λmin , the smaller eigenvalue of the structure ten-sor [70], reports two-dimensional structure, and otherwise stops at its own coarse size (Fig. 1). The token set stays a strict partition. A road marking costs 1 token where all-or-nothing refinement costs 4.We cut tokens with these two training-free statistics in a plain ViT-L detector at 2048 × 1152 [28, 51, 107]. Every budget from 40% to 100% of the tokens beats every pub-lished VisDrone-val AP and AP S : discarding 60% of the sequence leaves 44 .22 AP and 35 .56 AP S , and the same detector run dense reaches 48 .38 AP against the 42 .3 of the strongest published entrant [85], a margin of 6.08 AP. On AI-TOD-v2, carried across with no retuning and no weight changed, VGTok holds 36 .29 AP at 78 .5% of to-kens, and 36 .57 at its 70% operating point, against 35 .7
+
+for the strongest entrant published on that test split [101], a 3.0B multi-expert model to our 376 .3M. The shorter se-quence runs packed and variable-length [21–23], which is what turns removed tokens into removed work [3, 26]. Be-cause neither statistic is learned, the budget is not a property of the weights. A learned scorer settles the retained fraction during training [39, 93], and an absolute per-scale thresh-old settles it implicitly [16, 62, 97]; a per-image percentile makes it an argument the operator supplies at inference. One released checkpoint therefore serves the whole lad-der, so a deployment picks its own point on the accuracy– compute curve and moves it later without retraining. 
+
+# 2. Related Work 
+
+2.1. Mixed-scale patchification 
+
+Aerial tiny-object detection is resolution-limited, since a handful of pixels decides assignment, localisation and eval-uation alike [71, 81, 82, 86, 88, 89, 104]. Chips and pyramids buy that resolution back by running the detec-tor twice [5, 43, 50, 57, 73, 74, 91, 100], and warping buys it in one pass [59, 79, 80, 103]. Sparse and density-guided heads [13, 42, 60, 84, 102, 105] and token prun-ing [41, 52, 58] then work within a length settled before they ran. Patch size is a controllable model axis, and FlexiViT serves many sizes from one weight set [9, 24, 27], uniform across the frame and fixed at deploy time. Varying it by region means recursing on a quadtree, classical in image coding [40, 64, 77], where the recursion was never the hard part: exhaustive rate-distortion search was displaced by cheap partition predicates [8, 36]. A tokenizer inherits nei-ther that search nor its objective, only the demand that the predicate run from pixels before the encoder. (Quadtree at-tention recurses inside attention, not over granularity [78].) Setting granularity ahead of the backbone is established. A quadtree halted on summed edge magnitude is training-free, as is the gradient-thresholded quadtree QLIP drops into a frozen encoder [16, 97], and evaluators built from edge, entropy and frequency cues do the same [2, 15, 45, 87, 95]. Each halts on gradient strength, which a painted line supplies as readily as a vehicle; we test in-stead whether the gradients agree on a direction. An ex-act token count is Quadformer’s [62], per-input adaptivity is MSViT’s, learned inside the network [39], and a quantile is DART’s, differentiable inside a learned scorer [93]. Atop-down 16 /32 /64 ladder over ragged sequences packed block-diagonally is the standard execution path for this fam-ily [17, 39, 62, 93]. We fix that ladder across every tokenizer we compare, so that the scorer is the only term that varies, and re-open the choice of scorer under a matched budget on aerial data. Two further choices follow from the aerial setting, and neither is the recursion. An absolute per-scale constant fixes the retained fraction only implicitly, and the constants are themselves tuned [16, 62, 97]; a per-image percentile makes that fraction an operator input, holds competing scorers to identical budgets, and transfers a rank set on VisDrone to AI-TOD-v2 unchanged. And where adapting a detector to a new tokenizer ordinarily costs a finetune [2, 39, 93], VG-Tok’s scorer and gate add no parameter and its fusion is inert at initialisation, so the tokenizer drops into a released check-point unchanged, which is what the 80% row is. Refinement 2stays all or nothing at the node for every tokenizer above, so a region judged worth resolving costs four tokens whether the evidence inside it is a vehicle or a painted line; VGTok tests a busy node a second time, on λmin , and halts where the gradients agree on a direction. The second line, which keeps both scales over the same pixels [14, 34, 35, 83], we do not use, since our tokens stay a strict partition. 
+
+2.2. Scoring a region, and running what is left 
+
+Every scorer in this line measures structure inside a re-gion (Quadformer’s pixel blur and two auxiliary forward passes [62], patch entropy as compressibility in space-variant tokenizers [46, 54, 66]). On aerial frames compress-ibility and objectness decouple: gravel, foliage and crop texture carry high entropy and no objects, while the target is a vehicle on uniform asphalt (Fig. 1). Entropy measures intra-patch structure, not separability from the surround, which the centre-surround account of saliency makes cen-tral [4, 12, 33, 44, 47]. We take the operator that measures separability from classical morphology. The white and black top-hat is its contrast operator [67, 76], multi-scale in Bai and Zhou’s infrared form [6, 7], whose deep successors reweight fea-tures the backbone has already computed [18, 19, 90] while the cheap statistics that precede the encoder rank a uniform grid [55, 63]. The rank is standard too, since an order statis-tic is the robust threshold of choice [32, 61, 94], and we spend it as budget control, which makes the retained frac-tion an operator input. A shorter sequence is less work only if it executes as one, and packing variable lengths behind block-diagonal masks is settled practice [20–23, 49]; ours belongs to that line. Padding, masking and dispatch can erase a pruning bene-fit [3, 11, 26], so we report FLOPs, wall-clock and peak memory together, and Sec. 4.5 holds every scorer to one budget under one protocol [38]. 
+
+# 3. Method 
+
+We propose VGTok, a tokenizer that replaces the fixed patch grid of a ViT detector with one whose granularity is set per region, from pixels, before any learned stage runs. Both statistics driving VGTok are training-free. The scorer and the gate add no parameter and no auxiliary loss, and they run ahead of the patch projection to set the sequence the backbone receives. A region v receives a score s(v), a threshold τ separates the regions worth resolving, a rank 
+
+r decides where refinement stops, and the retained tokens number N . Every region is then assigned one of the 3 patch sizes (Fig. 2). 
+
+3.1. Where to look: separability from the surround 
+
+VGTok scores a region by its separability from the sur-round, using a multi-scale morphological top-hat [6, 7]. On BT.601 luma y the white top-hat subtracts from y its open-ing under a square element of width w, leaving what is nar-rower than w, while the black top-hat is the complementary closing. We take both polarities at w ∈ { 5, 9, 17 } and re-duce the six responses by a pixelwise maximum. We call this the top-hat score, and write T for the tokenizer that reads it. That maximum makes s independent of target area for any target narrower than the largest w. Objects of side 2
+
+and side 16 produce an identical response, a 64 -fold change in area at the same score. Above w = 17 the opening pre-serves the object and the response falls to zero. Regions are square patches of 16 , 32 or 64 pixels, and a patch inherits the strongest response it contains without averaging it away. All 3 grids are max-pooled from one pixel map on a single canvas padded to a multiple of 64 pixels, so the grids nest and each coarse patch spans exactly 4 patches of the next finer grid. Writing v for a node and vi for its 4 children, the shared canvas gives s(v) = max i s(vi) exactly. VGTok sets τ to the p-th percentile of the 16 -pixel grid, per image. The threshold adapts to the image while the re-tained fraction is set by the operator, so two scorers can be held to one budget. A matched budget isolates the scorer, since two tokenizers holding the same count spend it on dif-ferent pixels. A node is calm when s(v) ≤ τ and busy oth-erwise. By the identity, v is busy exactly when at least one of its 4 children is. The threshold admits two consumers, Single-pass ( S) and Top-hat, whose difference is algorith-mic. Single-pass computes a separate τ per scale, marks a patch coarse where s(v) < τ , then subtracts every coars-ened region from the finer masks. Each scale is decided once and the subtraction leaves the masks disjoint. Top-hat instead takes the single τ from the finest grid and walks the quadtree top down [40, 64]. A calm node is emitted as a leaf and a busy one is discarded in favour of its 4 children; the masks are disjoint by construction. 
+
+3.2. Where to stop: the λmin gate 
+
+Every quadtree tokenizer in this family spends 4 tokens re-fining a node even when one child holds everything worth resolving (Sec. 2). A busy node needs only one busy child, and 3 of its 4 are commonly calm. The score cannot say which case it is in, because the score is what raised the ques-tion. On an aerial frame road markings, roof ridges and field boundaries all deviate strongly from their surround. They are contrast and they are not objects. Raising τ removes them only together with the objects of equal contrast, which on these datasets is most of them. A second threshold on the same score cannot separate them. The gate therefore reads a second statistic, one blind to contrast and so independent of the axis contrast alone cannot decide. What the gate saves grows as the budget tightens. The 4 tokens a painted line costs are affordable where tokens are plentiful and costly where they are scarce. 31 coarse ← 1-D ridge 4 fine ← 2-D object SPLIT-tree 1,842 + gate 1,500 dense · 2,304 tokens ours · 1,500 tokens (65%)                                   
+
+> packed variable-length attention
+> score = gap to the surround local surround (opening, closing) luma along one row
+> max(WTH, BTH) over SE sizes 5, 9, 17
+> τlowest 40% of patches busy calm → 1 coarse busy → 4 fine
+> τ = one percentile of this image
+> ViT-L Co-DETR
+> detections the tokens stay disjoint Figure 2. VGTok in four stages: score, split, gate, pack. On this frame, at p= 40 and the shipped r= 0 .20 ,77 nodes are gated: the ungated descent emits 1842 tokens, VGTok 1500 at the same τ. Stage 1scores every pixel by a top-hat at structuring-element widths 5,9
+> and 17 ; stage 2sets τfrom one per-image percentile and splits the busy nodes; stage 3stops that descent where 1/(1 + λmin )ranks high, emitting the node at its own size and dropping its 4children; stage 4packs the retained tokens. No pixel is described twice.
+
+What separates the two is the number of directions along which the intensity varies. Let J be the structure tensor of the luma, the outer product of the gradient averaged over a window [10, 30], and let λmin be its smaller eigenvalue. Where the gradients inside the window agree on one direc-tion, as they do along an edge or a painted line, J has rank 
+
+1 and λmin ≈ 0. Where they differ, as they do at a corner or a compact blob, λmin is large. We take the statistic and its reading from the classical corner tests: λmin is the test for structure in two directions [70], and the same two eigenval-ues form the Harris response [37]. A vehicle is the second case and a lane marking is the first, at equal contrast. The gate reads a gradient anisotropy score, g(v) =1/(1 + λmin ), and a node takes the largest λmin it contains. A node is anisotropic, and scores high on g, only when it holds no two-dimensional structure anywhere inside it. One vehicle in a node of 64 pixels is enough to keep g low. We rank the busy nodes Top-hat would visit by g, per image, and the top r of them stop splitting, each emitted at its own coarse size with its 4 children dropped. Every other busy node splits as Top-hat would. The rank is the gate’s only setting. We hold it at r = 0 .20 on both datasets. It is an in-terior optimum bracketed on both sides, and the neighbour-hood around it is flat to within 0.05 AP, which is what lets one value carry from VisDrone to AI-TOD-v2 untouched. We write the gated tokenizer T + g where it stands beside its controls, and VGTok for the system as a whole. New here are the setting and the aggregation: block-level 
+
+λmin on aerial RGB, under a token budget, scored by detec-tion AP and not encoder speed, ahead of patch projection, where no ViT tokenizer has used the test; the branch it stops is a run of tokens the backbone would otherwise attend over. The ancestry is deliberate. Deciding how finely to subdi-vide a block from its structure tensor is established in image and video coding [8, 36], hierarchical edge representations have long held a straight edge in one large leaf [65, 72], and 3D-HEVC depth coding thresholds this same smaller eigenvalue, crediting the same source we do [70], splitting until only a single directional edge remains [31]. λmin ad-mits a second use, which we build and measure as a control, blended into the pixel score instead of spent as a stop rule on the descent. We write that score T ⊕ λ; it leaves the quadtree unchanged and only reorders which nodes it calls busy. The two uses are substitutes, not complements, so the statistic is spent once. A gated node replaces its children, so the emitted tokens tile the frame exactly once. The tokenizer’s overlap record is empty at every r, and no module is needed to reconcile two descriptions of the same pixels. Written back to the dense grid (Sec. 3.3), each coarse token fills the 16 -pixel cells it spans, none of them twice. A gated node at 32 pix-els stands in for the 4 base tokens below it, and one at 64 
+
+pixels for up to 16 . On the frame of Fig. 2, at p = 40 and 
+
+r = 0 .20 , 77 nodes are gated: Top-hat emits 1842 tokens and VGTok emits 1500 at the same τ , 18 .6% fewer. Under Single-pass the budget is exact and affine: coarsening the lowest-scoring p% of patches replaces four fine tokens with one, so the retained fraction is 1 − 0.0075 p to within 0.29 
+
+percentage points across 548 images, and to within 0.03 
+
+from 70% retention upward. The law belongs to Single-4pass alone, since a quadtree’s token count depends on where the busy nodes sit and the gate moves where they stop. We therefore set quadtree budgets by inverting a measured re-tention table: p = 81 .88 for Top-hat and p = 74 .82 for the gated tokenizer both reach 40% of the tokens over the same 
+
+548 images. Every comparison we report is calibrated this way. 
+
+3.3. Packed execution 
+
+Tokens at every size are embedded by one convolution ap-plied at the base patch size, so a 64 -pixel token lands in the same space of dimension D as a 16 -pixel one, which a pro-jection per scale would give up. A coarse token is that pro-jection of the resampled patch plus a zero-initialised fusion of the base-size patches it covers [98]. The fusion holds 
+
+11 .3M parameters and is exactly zero at initialisation, so our drop-in rows run the released weights unchanged and emit predictions identical to the fusion-free path; only the cells we finetune train it. Scattering the retained tokens back onto the dense grid leaves every block computing on the full grid. VGTok instead runs all blocks on the packed 
+
+(N, D ) sequence and scatters once, after the last block. The work removed leaves the backbone as well as the token count [22, 23]. Attention is confined to those groups by a single block-diagonal variable-length call [21], window blocks grouping by window and global blocks by image. It computes the same attention a masked scaled dot-product call would over the same partition, differing only in never materialising the padding, so the pairs a mask would discard are never computed at all. Our detector carries three pretraining stages, it is Co-DETR with an EVA-02 ViT-L encoder pretrained by masked image modelling, then given labelled detection pre-training on Objects365 before COCO [28, 68, 107]. VGTok inherits all three, which is why every tokenizer we compare is run inside this same detector, so the tokenizer is the only term that moves. 
+
+# 4. Experiments 
+
+We evaluate VGTok on two aerial benchmarks, one dense and one of very small objects. On VisDrone every budget from 40% to 100% of tokens clears every published val AP and every published val AP S : at 40% it scores 44 .22 AP and 35 .56 AP S , +1 .92 and +2 .66 over published bars of 
+
+42 .3 [85] and 32 .9 [53], the latter with multi-scale testing, with three fifths of the sequence discarded before the first transformer block. The same tokenizer and rank, carried to AI-TOD-v2 without retuning, set a new state of the art on all three metrics. 
+
+4.1. Setup 
+
+We report VisDrone2019-DET val (548 images, 10 
+
+classes) [25] and AI-TOD-v2 test (the official 14 ,018 -image split, 8 classes) [82, 88]: COCO AP at IoU 0.5:0.95 , sin-gle model, single scale, no test-time augmentation, Vis-Drone at maxDets 500 with ignore regions at IoF ≥ 0.5
+
+and native 2048 × 1152 input, AI-TOD-v2 at maxDets 1500 
+
+and 2048 , since COCO’s default of 100 understates AP on both. The detector is Co-DETR with an EVA-02 ViT-L en-coder [28, 107] pretrained by masked image modelling and then on Objects365 and COCO [68], inherited by every cell; trained cells are finetuned from the dense checkpoint for 8
+
+epochs at one image per iteration, so the tokenizer is the only variable. Budgets are matched by measurement. Each percentile is set by inverting that tokenizer’s retention table over all 
+
+548 val images, and the realised token count is re-measured on the same split: every tokenizer lands within 0.02 per-centage points of its target, and every comparison is against a control holding at least as many tokens; the supplementary carries the audit. Every trained VisDrone cell in this paper is the mean of three independent finetunes differing only in seed, 72 in all across the tokenizer grid. Differences are read against a seed floor of 0.16 AP and 0.22 AP S , twice the standard error of a difference between two three-seed means pooled over all 24 replicated cells, and we report the differences that clear it. Both quadtree tokenizers carry the same inherited coarse-patch fusion, so Tab. 4’s gate effect is a difference between two cells of identical parameter count; Single-pass carries one fusion stage fewer and is reported as a reference, never differenced against them. Every zero-shot row is one checkpoint, the released dense model with the tokenizer swapped in; the trained rows add a finetune at the target budget. Compute is forward-only at batch size 
+
+1 in fp16 on a single exclusively held H100 80GB, tabu-lated in the supplementary. We will release the tokenizer, the training recipe and the retention tables on GitHub, and the two state-of-the-art dense checkpoints on Hugging Face. 
+
+4.2. VisDrone2019-DET val 
+
+Table 1 compares VGTok with the published record on VisDrone2019-DET val, where most prior entries rely on crop-and-zoom pipelines [43, 100]. The ceiling here is paid for at native resolution, which VGTok renders practical. The zero-shot 80% entry is VGTok inserted into our dense checkpoint at inference, with no head added, no loss changed and no weight touched. It holds 48 .04 AP, 5.74 
+
+above the strongest published val result and within 0.34 of our own dense ceiling ( 48 .38 ), so a fifth of the sequence is free at deployment time. A fifth is also loose enough that the allocator is not the binding constraint, since a flat per-scale percentile lands inside the seed floor here ( 48 .12 
+
+interpolated against our measured 48 .04 ), which is why the allocator is measured where budgets bind (Sec. 4.5). We adopt 40% tokens as the operating point. It is the lowest budget that still exceeds every published AP and 520 40 60 80 100     
+
+> retained tokens (% of dense)
+> 15 20 25 30 35 40
+> AP S
+> (b)
+> YOLC+MS 32.9
+> +9.32 AP S
+> VGTok ( +g), finetuned Top-hat ( ), finetuned Top-hat ( ), zero-shot Single-pass ( ), zero-shot 20 40 60 80 100
+> retained tokens (% of dense)
+> 20 25 30 35 40 45 50
+> AP
+> (a)
+> EVORL 42.2 Dome-DETR-L 40.5
+> +7.90 AP
+> quadtree over Single-pass: same score, budget, weights
+
+Figure 3. Operating range on VisDrone2019-DET val. VGTok clears every published bar from 40% of tokens upward. AP (a) and AP S (b) against the measured retained-token fraction, 20% to 
+
+100% of the dense grid; each point is one budget from that tok-enizer’s measured retention table. Solid, finetuned for 8 epochs: VGTok ( T + g) over its ungated control Top-hat ( T ), whose gap is the gate and widens as the budget tightens. Dashed, zero-shot on the dense checkpoint: Top-hat is worth +7 .90 AP and +9 .32 
+
+AP S over Single-pass ( S) at 40% , from the splitter alone; trained, that same contrast is +0 .62 AP (Tab. 4). Dotted: EVORL at 42 .2
+
+AP [96], Dome-DETR-L at 40 .5 [41], YOLC with multi-scale testing at 32 .9 AP S [53]. Finetuned points are three-seed means, as in Tab. 4. 
+
+AP S , and the regime where the tokenizer’s selection sep-arates from its control by more than three times the seed floor. At this budget three-fifths of the dense grid is dis-carded, yet the model records 44 .22 AP and 35 .56 AP S ,
+
+1.92 AP and 2.66 AP S above the strongest published entries (Tab. 1). The two metrics fall nearly in step ( 3.92 and 3.97 
+
+below a dense model finetuned under the identical 8-epoch recipe, 48 .14 AP and 39 .53 AP S ), and that near-parity is the signature of content-aware pruning. A uniform cut of this depth would remove small-object tokens first and open a larger gap on AP S . VGTok instead releases the empty nodes and routes the remaining tokens to the finest scale (Fig. 1), so a 2.5× reduction leaves the object-bearing to-kens largely intact. At the looser 70% and 80% budgets the dense checkpoint already holds the accuracy. The identi-cal 80% tokenizer scores 48 .04 zero-shot and 47 .11 after the matched schedule (Tab. 4), and the 70% pair behaves the same way. The 40% column is where the allocation is earned (Sec. 4.5). 
+
+Table 1. Comparison with the published record on VisDrone2019-DET val. Every token budget from 40% to 100% exceeds every published val AP and every published val AP S , including entries that use multi-scale testing. We reach these numbers at native 
+
+2048 ×1152 in one forward pass from a single checkpoint, set-ting the token count at inference; no published entry above sets its own token budget, and most re-run the detector over crops, zooms, or scales. Zero-shot ∗: VGTok inserted into the released dense checkpoint at inference, nothing retrained, no head added, no loss changed.                                                                       
+
+> Method Backbone Input AP AP 50 AP S
+> DroneFINE-L [85] Swin-L (G-DINO) concurrent 42.3 65.8 —EVORL [96] CSPDarkNet multi-crop 42.2 66.0 —Focus-and-Detect [48] ResNeXt-101 2-stage crop 42.06 66.12 32.0 Dome-DETR-L [41] HGNetv2-B4 1200 ×800 40.5 64.5 —AdaZoom [100] ResNeXt-101 multi-crop 40.3 66.9 —UFPMP-Det + MS [43] ResNeXt-101 crop + MS 40.1 66.8 —YOLC + MS [53] HRNet crop + MS 39.6 63.7 32.9 Dome-DETR-L [41] HGNetv2-B4 800 239.0 61.1 —YOLC [53] HRNet crop 37.8 61.7 30.5 VGTok, 100% tokens ViT-L (EVA-02) 2048 ×1152
+> 48.38 74.28 39.63
+> VGTok, 80% tokens ∗48.04 73.90 39.35 VGTok, 70% tokens 47.04 73.16 38.46
+> VGTok, 40% tokens 44.22 69.78 35.56
+
+4.3. AI-TOD-v2 test 
+
+Table 2 shows that the same recipe transfers. The tokenizer and rank r = 0 .20 are carried from VisDrone to AI-TOD-v2 without retuning and evaluated on objects an order of mag-nitude smaller. At full retention VGTok reaches 37.27 AP and 19.51 AP vt , a new state of the art on all three, +1 .57 
+
+AP and +4 .38 AP 50 over ScaleBridge-Det [101] and +0 .51 
+
+AP vt over Dome-DETR-L [41]. The tokenizers hold that lead. The pure drop-in at 78.5% of tokens, the loosest bud-get the gate reaches at r = 0 .20 , exceeds every previously published AP ( 36 .29 against 35 .7) with no weight changed. At its 70% operating point a 376 .3M detector clears a 3.0Bmulti-expert model by 0.87 AP, an eighth of the parameters. Reaching objects this small takes resolution. We read these 
+
+800 2 frames at 2048 2, against 800 2 to 1024 2 for the pub-lished entries. Making that resolution affordable is what VGTok is for, and the supplementary shows the accuracy cost of a fixed token cut only falls as the input grows. The supplementary opens the same factorial band by band. Zero-shot, the gate is positive on every band that has the instances to measure it: on aggregate AP it is worth 
+
++0 .29 , +0 .07 and +0 .30 at 70% , 40% and 20% of tokens, and on the tiny band, which holds 275 ,050 of the split’s 
+
+376 ,121 instances, it is positive and flat, +0 .30 , +0 .37 ,
+
++0 .36 . Only AP vt changes sign, and that band is an un-weighted mean over eight classes of which four hold 105 of its 48 ,995 boxes, so half of it rests on a fifth of a percent of the annotations. Trained, the two budgets we can difference both sit below the 70 –100% range we report here and fall inside our seed floor at one finetune each, so the gate is read on this benchmark off the bands and classes that do resolve 6Table 2. Transfer to AI-TOD-v2 test, no retuning. At 100% of to-kens VGTok takes every column: 37 .27 AP against ScaleBridge-Det’s 35 .7, 76 .48 AP 50 against its 72 .1, and 19 .51 AP vt against Dome-DETR-L’s 19 .0. The tokenizer and rank r = 0 .20 are car-ried from VisDrone under the same four budgets; protocol as in Sec. 4.1, and AP vt is the very-tiny band ( < 82 px). Italics mark our operating point, 70% here against VisDrone’s 40% . Zero-shot ∗: nothing retrained. 78 .5% is the loosest budget the gate reaches at r = 0 .20 .                                                                      
+
+> Method Backbone Input AP AP 50 AP vt
+> ScaleBridge-Det (3.0B) [101] MoE 3.0B 1024 235.7 72.1 16.2 Dome-DETR-L [41] HGNetv2-B4 800 234.6 69.2 19.0 Dome-DETR-M [41] HGNetv2-B2 800 234.0 68.4 18.4 ScaleBridge-Det (2.0B) [101] MoE 2.0B 1024 233.6 71.8 14.2 Dome-DETR-S [41] HGNetv2-B0 800 233.3 67.5 17.8 D3R-DETR [84] HGNetv2-B0 800 231.3 65.1 16.6 DQ-DETR [42] ResNet-50 800 230.2 68.6 15.3 RFLA [89] DetectoRS 800 225.7 58.9 9.3 NWD-RKA [88] DetectoRS 800 224.7 57.2 9.7 VGTok, 100% tokens ViT-L (EVA-02) 2048 2
+> 37.27 76.48 19.51
+> VGTok, 78 .5% tokens ∗36.29 75.24 19.39
+> VGTok, 70% tokens 36.57 74.39 18.08 VGTok, 40% tokens 34.04 71.65 16.26
+
+it. Per class that is where the mechanism shows. The gate moves six of the eight classes up, and every class holding more than a thousand very-tiny boxes moves up. What the dataset does change is how far the budget can be pushed. The gate pays by declining to descend on one-dimensional structure, so its effect tracks the composition of the population the splitter still reaches. On VisDrone the clutter fraction among gate-visible nodes falls from 79 .1% 
+
+to 56 .1% between the 70% and 20% budgets and the gate effect grows with it, from +0 .18 AP zero-shot at 70% to 
+
++1 .00 at 40% and +0 .96 at 20% . On AI-TOD it stays above 
+
+91% and the effect stays flat, before training and after it. We attribute this to what the descent reaches rather than to the statistic, which separates clutter from objects better on AI-TOD than on VisDrone, as the node-level audit in the supplementary shows. The range we report is accordingly 
+
+70 to 100% here and 40 to 100% on VisDrone, fixed at the lower end by the trained rows of Tab. 2. A criterion that predicts where its own effect will be flat, and is flat there, is tested by more than its wins. 
+
+4.4. From tokens to FLOPs 
+
+VGTok turns a token reduction into a measured compute reduction. At 70% of the tokens the encoder costs 4093 
+
+GFLOPs against the dense 8282 ; at 40% it costs 2634 , a 
+
+3.1× reduction, and a lower bound. Latency falls from 
+
+92 .3 to 53 .0 ms and peak memory from 0.466 to 0.251 GB, and end to end the detector drops from 12955 .5 to 7307 .7
+
+GFLOPs and from 182 .8 to 136 .9 ms (Tab. 3). Encoder cost drops faster than the token count because the packed path evaluates attention only within its groups, where the dense grid pays for the whole frame. 
+
+Table 3. Forward-pass cost at four token budgets. Packing is what turns a token cut into a compute cut: the scatter control holds the same gate and the same retained tokens but returns them to the dense grid before the first block, and costs more than dense. Batch 1, fp16 with the variable-length kernel, one exclusively held H100 80GB, median over three repeats on all 548 val im-ages with the reported checkpoints loaded; every end-to-end bud-get is re-measured and lands within 0.0004 of its target. Encoder columns use the fused-score variant, whose 40% row sits at 46 .7% 
+
+retention, so the reported 3.1× is a lower bound. Encoder End-to-end Tokenizer Tokens GFLOPs ms GB GFLOPs ms Dense 100 .0% 8282 92.3 0.466 12955.5 182.8 VGTok 80 .0% 4498 69.8 0.408 9172.4 158.9 VGTok 70 .0% 4093 66.9 0.372 8767.2 154.9 
+
+VGTok 40 .0% 2634 53.0 0.251 7307.7 136.9 Control 70 .0% 8293 104.0 0.498 12967.0 193.3 
+
+The reduction is possible only because VGTok emits a strict partition. The retained tokens form a single variable-length sequence rather than a dense grid with holes. Ev-ery block therefore runs on the packed (N, D ) sequence and scatters once after the last [22, 23], with attention con-fined to its groups by one block-diagonal variable-length call [21]. Padding is neither stored nor computed. A scatter control isolates the contribution of that execu-tion path. It keeps the identical gate and the identical re-tained tokens, then returns them to the dense grid before the first block. The control spends 8293 GFLOPs against dense’s 8282 , with higher latency and higher memory. Dis-carding 30% of the tokens without packing is strictly worse than discarding none. Same tokenizer and same tokens pro-duce opposite outcomes: the compute saving requires the packed path. The encoder is the whole of what a tokenizer can reach, and VGTok takes 3.1× of it. The neck and Co-DETR head read a dense feature map whose shape is fixed by input res-olution and the decoder’s query set, not by N , so their cost is a constant of the detector under every tokenizer and every budget: encoder peak memory falls by 1.9×, and the 4.76 –
+
+4.83 GB that remains is the head’s, not the tokenizer’s to spend. The scorer and the gate add no parameters. The rise from 365 .0M to 376 .3M is entirely the inherited patch em-bedding. Head-side sparsity and token-side sparsity operate in different domains and compose directly. 
+
+4.5. Ablation study 
+
+We first ask how much freedom there really is in the choice of pixel score, holding the token allocator and budget fixed. Under a common 70% token budget with Single-pass, we evaluate eight training-free pixel scores. Their zero-shot ranking spans 1.91 AP and 2.11 AP S , so the signal a to-7Table 4. Gate ablation, VisDrone2019-DET val, five matched bud-gets. The λmin gate’s effect grows monotonically as the bud-get tightens, reaching +1 .28 AP and +1 .51 AP S at 20% ; at the                                                                                  
+
+> 40% operating point the three finetunes per cell do not overlap,
+> [44 .11 ,44 .30] against [43 .66 ,43 .77] . The monotone run begins at +0 .06 AP and −0.03 AP Sat 80% , where the budget does not bind. AP above, AP Sbelow, 8finetune epochs per row, every cell a three-seed mean (Sec. 4.1). The two Trows differ only in the gate at rank r= 0 .20 , and gate effect is their difference. unr.
+> marks budgets Single-pass cannot reach. Bold compares the two
+> Trows, which differ only in the gate, and marks only leads that clear the seed floor.
+> Tokenizer (AP) 80% 70% 60% 40% 20%
+> Single-pass ( S)47.56 47.30 46.64 43.11 unr.
+> Top-hat ( T)47.04 46.92 46.38 43.73 33.89 Top-hat ( T)+g47.11 47.04 46.65 44.22 35.17
+> gate effect +0 .06 +0 .12 +0 .27 +0 .49 +1 .28
+> Tokenizer (AP S)80% 70% 60% 40% 20%
+> Single-pass ( S)39.00 38.66 38.00 33.93 unr.
+> Top-hat ( T)38.41 38.25 37.78 34.99 24.15 Top-hat ( T)+g38.38 38.46 38.00 35.56 25.66
+> gate effect −0.03 +0 .21 +0 .22 +0 .56 +1 .51
+
+kenizer reads is worth that much on its own, before any al-locator decides anything; the supplementary prints the full ordering. The two statistics VGTok reads take the first two places of the eight, separated by 0.07 against a 0.16 floor, and the top-hat we ship sits 1.84 AP above patch entropy, the intra-patch detail measure this line of tokenizers uses (Sec. 2). We ship the top-hat because the same statistic is worth more spent at the gate than in the score, which is what the rest of this section measures. What no entry in that ranking escapes is the ceiling they all share. Every one is a contrast measure, and contrast on an aerial frame is as often a road marking or a field boundary as an object. One-dimensional structure is not noise a better threshold re-moves; it is exactly what a contrast score is defined to find, and at tight budgets it competes directly with objects for tokens. The λmin gate is designed to answer the question no con-trast measure can. It acts on the quadtree itself rather than on the score. We halt descent wherever the gradients in a node already agree on one direction, and we keep the token set a strict partition of the image (Fig. 2). In other words, the gate treats long, thin structures as regions that should not be further subdivided, preventing the allocator from spending tokens on repeated contrast along the same one-dimensional support. Tab. 4 measures the gate exactly where no contrast scorer can substitute for it. It intervenes when there is a bud-get trade-off to make, and its effect grows monotonically as that trade-off tightens. VGTok adds one statistic and spends it once, at the gate. Nothing of our own is trained or tuned. Blending λmin into the pixel score instead moves the 40% budget by well under the seed floor, and spending it both ways is worse than the gate alone at 40% and no better at any other budget. The separation at that budget is not seed noise: the three fine-tunes behind 44 .22 span [44 .11 , 44 .30] and the three behind the ungated control span [43 .66 , 43 .77] , two ranges that do not touch on AP, and the same holds on AP S .Depth and the gate are both budget-tightness machin-ery, and we isolate each to show this. A Single-pass per-centile (no recursion, no gate) is trained at every budget it can reach, and reading that row across is the clearest state-ment of the thesis we can make. Its operating range ends where ours begins to matter. Two levels floor retention at a quarter of the dense grid, so no threshold reaches a 20% 
+
+budget at any setting, and at a matched 40% zero-shot the recursive descent alone is worth +7 .90 AP over it. Across the range they share, the two track each other to within half a point down to 60% (46 .64 against 46 .65 ), then sepa-rate: at 40% Single-pass falls 1.12 AP behind ( 43 .11 against 
+
+44 .22 ). The crossing is a printed column, not an interpola-tion between off-grid runs. Where tokens are plentiful no allocator is needed and the reference reads a little ahead; the gated three-level descent is built for the range where al-location has to be earned, and it is the only tokenizer we test that reaches 20% at all. Reading the no-gate row across shows why the tight end of this range matters most: 80% to 60% costs 0.67 AP, 60% 
+
+to 40% costs 2.65 , and 40% to 20% costs 9.84 as the budget begins coarsening the objects themselves. The gate is worth its largest margin precisely there, +1 .28 AP and +1 .51 AP S
+
+at 20% .
+
+# 5. Conclusion 
+
+The headroom in adaptive tokenization sits in the criterion, not the mechanism. VGTok tests it with two training-free statistics read from pixels ahead of the encoder. A top-hat scores each region by separability from its surround, and a 
+
+λmin gate halts refinement where the gradients agree on a direction. At every budget from 40 to 100% of the dense grid it exceeds all published VisDrone-val AP and AP S ,reaching 48.38 AP at full retention, 6.08 above the strongest published entry. It transfers to AI-TOD-v2 untouched, to a state of the art on all three metrics, where 376.3M parame-ters clear a 3.0B multi-expert model. The criterion is what carries that. With the allocator, the ladder and the budget fixed, eight training-free statistics span 1.91 AP, and patch entropy, the measure this line of to-kenizers reads, sits 1.84 below ours. What a tokenizer looks for is worth more than how it descends, and more the less there is to spend. The gate is worth 1.28 AP where tokens are scarcest and 0.06 where they are plentiful, and the same reading predicts where it should be flat. On AI-TOD-v2, where the clutter never thins, flat is what it is. Because no 8part of the tokenizer is learned, one checkpoint serves the whole ladder and the budget stays an operator input after training. 9Variable-Granularity Tokenization for High-Resolution Object Detection 
+
+# Supplementary Material 
+
+In this supplementary material, we provide the analy-ses and protocol details deferred from Sec. 4. Section A isolates the gate statistic at the level of individual quadtree nodes: λmin ranks clutter above object-bearing structure at an AUROC of 0.712 to 0.750 , where four contrast-derived alternatives reach 0.52 to 0.65 . Section B then ablates eight training-free pixel scores at a matched budget. Section C separates the splitter from the gate, where the recursive de-scent alone is worth +7 .90 AP at a matched 40% budget. Sections D and E decompose the gain by object scale on VisDrone and by area band and class on AI-TOD-v2. The gate moves the small-object band further than the aggre-gate, +0 .56 AP S against +0 .49 AP at the 40% operating point. Sections F, G and J report sensitivity to the gate rank 
+
+r, the convergence of the dense reference, and sensitivity to input resolution. Sections H and I give the seed protocol be-hind the seed floor and the token-budget audit behind every matched comparison, and Sec. K bounds how much of what the gate declines to refine was describing an object. Two conventions govern the whole document, and we state them here because the sections that use them come first. Every difference we argue for clears the seed floor, 
+
+0.16 AP and 0.22 AP S , pooled over 24 trained VisDrone cells and 72 finetunes (Sec. H). We set every token budget by inverting that tokenizer’s own measured retention table and then re-measure the result, so we hold every tokenizer to the same token count as the control it is compared against (Sec. I). The four tokenizers are named as in Sec. 3. T is driven by the multi-scale top-hat score. Adding + g puts the 
+
+λmin gate on the descent at rank r = 0 .20 , ranking nodes by gradient anisotropy, and ⊕ λ blends λmin into the pixel score instead. Every cell below is our own measurement, so no table carries a quotation marker or an unrun cell. One symbol ap-pears: unreachable is a cell no threshold can reach, because at the shipped rank the gate alone caps retention below the stated budget. That is a structural property of the tokenizer, not a gap in the sweep. Bold marks the best value in a col-umn among comparable rows and carries no other meaning. We never use it to mark the shipped setting, and never to mark a difference, since a difference is not a value that can be best. A column whose top two values sit closer than the seed floor carries no bold at all, because a lead the noise floor cannot resolve is not a lead. 
+
+# A. Node-level discrimination of λmin 
+
+λmin tells one-dimensional structure (road markings, roof ridges, field boundaries) from the two-dimensional struc-
+
+Table A1. Gate statistic discrimination, with a budget sweep. AU-ROC for ranking clutter nodes, those no ground-truth box over-laps, above object-bearing ones: only 1/(1 + λmin ) clears chance meaningfully, at 0.712 or better in every column. Two levels and not three: the gate is a stop rule, so it acts at 64 and 32 px, and the 16 px leaf has no split to stop, so that column would be struc-turally empty, not unrun. Pools are 150 VisDrone val and 150 
+
+AI-TOD-v2 val images. Bold is the best of the five candidates in an upper-block column, fixed at 70% .                                                   
+
+> VisDrone AI-TOD-v2 32 px 64 px 32 px 64 px
+> Five candidates, at the 70% budget
+> 1/(1 + λmin )0.712 0.731 0.748 0.750
+> node vs. surround ×homogeneity 0.599 0.639 0.612 0.648 within-node homogeneity 0.602 0.624 0.606 0.634 node vs. surround 0.552 0.601 0.580 0.616 fine structuring element 0.531 0.524 0.523 0.537
+> 1/(1 + λmin )at tighter budgets
+> 40% 0.651 0.672 0.697 0.704 20% 0.597 0.614 0.664 0.663
+> clutter fraction, 70% 79.1% 75.1% 96.8% 95.7%
+> clutter fraction, 40% 69.3% 67.3% 94.9% 94.3%
+> clutter fraction, 20% 56.1% 55.0% 91.5% 91.1%
+
+ture of an object, and contrast alone cannot. That claim is falsifiable at the level of individual nodes, so we test it there. Table A1 puts the shipped statistic against four contrast-derived alternatives on both datasets, then follows it down the budget range. We fix the population by the ungated quadtree’s own de-scent: every node that is busy, reachable, and not padding, at the two levels where a gate can act ( 32 and 64 pixels). We label a node clutter if no ground-truth box overlaps it. We then ask how well each candidate statistic ranks clutter above object-bearing nodes and report the area under the ROC curve. Fixing the population under the ungated de-scent matters: a statistic that fired at 64 pixels would other-wise hide its own 32 -pixel children and change the denom-inator under itself. 
+
+Which images these are. Both pools are 150 images. On VisDrone we draw them from the 548 -image val split, the split every VisDrone AP in this paper is scored on, so the audit and the accuracy it explains sit on the same images. On AI-TOD-v2 we draw them from the 2,804 -image val 
+
+split. There the audit is an out-of-sample check: its im-ages are disjoint from the 14 ,018 -image test split the AP tables score, so it measures what the statistic separates on the benchmark rather than on the evaluation images them-selves. 10 Gradient anisotropy is the only candidate of the five that clears chance by a margin worth reporting. It reaches 
+
+0.712 –0.750 against 0.52 –0.65 for four contrast-derived al-ternatives, and that set includes the classic local-contrast test and the product of the two strongest of them. It also gains the most on AI-TOD-v2, where the objects are far smaller while the clutter (coastlines, runways, field edges) is not. Discrimination then falls as the budget tightens, from 
+
+0.731 to 0.614 on VisDrone. We attribute that to the popula-tion and not the statistic: at a tight budget the clutter fraction among gate-visible nodes falls from 75% to 55% , so there is progressively less clutter left to distinguish. 
+
+Scope of the audit. The audit isolates the mechanism and the AP tables price it. It establishes that λmin identifies the nodes we built the method to identify, on 150 VisDrone val and 150 AI-TOD-v2 val images, with no detector in the loop. Accuracy is a separate measurement, and we take it from AP under the stated protocol, on the full evalua-tion split, with the detector trained against the tokenizer it is scored with. Together they are what a mechanism claim needs: the audit shows the statistic does what we say, and Sec. 4 shows what that buys. 
+
+# B. Pixel-score ablation 
+
+The choice of pixel score is not free. Eight training-free candidates held to one budget span 2.10 AP 50 , 2.32 AP 75 
+
+and 2.11 AP S . Table A2 prints the ranking behind the spread the main paper quotes. We hold everything but the statistic: eight patch scores at a fixed 70% budget under Single-pass, zero-shot on the dense checkpoint. The score that ranks patches is our only variable, and no training en-ters. 
+
+Where λmin pays. Three measurements in this document constrain the design between them. In the ranking above, 
+
+λmin sits at the head of the eight candidate pixel scores, within the floor of the top-hat we ship. In Tab. A1 it separates clutter from object-bearing nodes at 0.712 –0.750 
+
+where every contrast score reaches at most 0.65 , so the in-formation it carries is not the information a contrast score carries. In Tab. A4 we blend it into the pixel score, and the blend ties the gated tokenizer at four budgets and loses 0.28 
+
+AP at the fifth. The statistic is informative, and the gate is where it pays. We spend it once, at the gate, where it decides whether to stop rather than where to look. 
+
+Why the bake-off runs under Single-pass. We run the bake-off under Single-pass because one of the eight candi-dates has no legal budget under a quadtree at all. Upsam-ple MSE scores a patch by how much detail is lost when                                              
+
+> Table A2. Eight patch scores on the metrics beyond AP. The rank-ing is the same on every metric we measured: against the AP or-der AP Stransposes nothing, AP 50 transposes one adjacent pair by 0.07 and AP 75 one by 0.05 , both inside the 0.16 AP seed floor. Fixed 70% budget, zero-shot on the dense checkpoint un-der Single-pass; VisDrone val, 548 images, maxDets 500 , with detector, budget and protocol identical across rows. Rows are in AP order and AP itself is not reprinted; the main paper quotes its spread in prose. Bold is the best value in a column. ∗Upsample MSE is a valid measurement at this budget but cannot be budget-matched under a quadtree, for the reason below.
+> Statistic AP 50 AP 75 AP S
+> λmin (structure tensor) 73.67 50.91 38.97
+> top-hat 73.50 50.69 38.85 max deviation, Lab 73.57 50.55 38.84 max deviation 73.03 50.12 38.43 upsample MSE ∗72.84 49.87 38.09 gradient energy 72.66 49.92 38.01 Laplacian 72.30 49.16 37.37 entropy 71.57 48.59 36.86
+> spread 2.10 2.32 2.11
+
+the region is rendered coarsely. Our implementation eval-uates it at a scale factor of 1 on the finest grid, where the downsample–upsample round trip is the identity, so the map is identically zero. Under Single-pass this is harmless. Each scale gets its own percentile, and a percentile of a constant array still selects exactly 1 − p/ 100 of the patches, so the budget is exact and the row above is a valid measurement. Under any quadtree it is fatal. A quadtree takes a single global threshold from the finest grid, and that threshold is zero at every percentile. The descent then stops depend-ing on the percentile, and the retained fraction flatlines at 
+
+0.2493 across the whole sweep. The scorer cannot be held to a stated budget under the splitter this paper uses, so it appears here and nowhere else. Its two coarser scales carry real signal, so no aggregate view of the scorer shows the de-fect. We found it by checking that retention must be mono-tone in the percentile that sets it, a test the budget-inversion protocol of Sec. I makes routine and an absolute-threshold tokenizer never runs. 
+
+# C. Zero-shot budget ladders 
+
+These ladders separate what the splitter buys from what the gate buys, at matched budgets and with no weight changed. The dashed curves of Fig. 3 are the two families: we swap each tokenizer into the dense checkpoint and change noth-ing else. Table A3 is the quadtree family. Single-pass is the other curve, and we give it in prose because its shape is one law and two endpoints. Twelve thresholds from p = 5 to 
+
+p = 80 , evaluated over the same 548 VisDrone val images at maxDets 500 , retain 0.965 down to 0.400 of the dense grid. A fifth of the tokens can be dropped for nothing. At 
+
+p = 10 it holds 0.928 retained and scores 48 .43 AP and 11 Table A3. Zero-shot gate effect at five matched budgets. The effect grows as the budget tightens, peaks at +1 .00 AP and +1 .15 AP S                                                    
+
+> at 40% , then flattens to +0 .96 and +0 .97 at 20% . The quadtree splitter on the released dense checkpoint. VisDrone val, 548 im-ages, maxDets 500 . We reach each budget by inverting that tok-enizer’s own measured retention table, so the two rows hold the same token count in every column.
+> Tokenizer 80% 70% 60% 40% 20%
+> AP
+> Top-hat ( T)47.97 47.58 46.37 39.45 20.22 Top-hat ( T)+g48.04 47.76 46.85 40.44 21.18
+> gate effect +0 .07 +0 .18 +0 .48 +1 .00 +0 .96
+> AP S
+> Top-hat ( T)39.29 38.92 37.91 31.30 13.84 Top-hat ( T)+g39.35 39.13 38.31 32.45 14.82
+> gate effect +0 .05 +0 .21 +0 .41 +1 .15 +0 .97
+
+39 .64 AP S , above the dense checkpoint it was cut from. It is still at 48 .30 with 0.851 retained. It holds 47 .58 AP and 
+
+38 .85 AP S at 0.700 retained, still above every published VisDrone-val entry, and reaches 31 .55 and 21 .99 at 0.400 ,where a single global percentile has no depth left to real-locate. The two families are different splitters on differ-ent percentile scales, so the controlled comparison between them is vertical, at a fixed retained fraction, never horizontal across a threshold. The controlled comparison between the two families is vertical, at a fixed retained fraction. At 40% the recursive descent is worth +7 .90 AP and +9 .32 AP S over the single-pass allocator: 39 .45 and 31 .30 against 31 .55 and 21 .99 ,under identical scores, identical budget, identical weights and identical protocol. This is the largest effect we measure anywhere in the paper, and it is what the descent buys before the gate does anything at all. Table A3 then isolates the gate on top of it. 
+
+An affine retention law, and why the quadtree needs a measured one. Under Single-pass the retained fraction is an exact affine function of the threshold, retained =1 − 0.0075 p. Measured over all 548 val images the law reproduces every one of those twelve rungs to within 0.29 
+
+percentage points, and to within 0.03 percentage points at every rung from p = 40 downward in budget. The reason is structural: the gate applies an independent percentile to each scale, and a percentile keeps exactly 1 − p/ 100 of the patches at each of them whatever the image contains. This law is Single-pass’s alone, and its failure under a quadtree is why we built the budget protocol. A quadtree’s token count depends on where the busy nodes sit and on how deep the descent runs before it stops, so no closed form maps a threshold onto a budget. We therefore set every quadtree budget in this paper by inverting a measured retention table (Sec. I), which is what lets us hold four tokenizers to 0.4001 
+
+of the dense grid at once. 
+
+# D. Scale-resolved results on VisDrone 
+
+The gate lifts the smallest objects most, and the size it favours is the mechanism’s clearest prediction, so we open the bands here. Table A6 gives all six COCO bands at the operating point. Table A4 carries the fused half of the 4 × 5
+
+grid on both metrics, from the same evaluations we report on AP alone in the main paper. The gate moves the small-object band further than the aggregate at both tight budgets. On AP S it is worth +0 .56 
+
+against +0 .49 AP at 40% , and +1 .51 against +1 .28 at 20% .This is the ordering the mechanism predicts. The gate de-clines to spend tokens on one-dimensional structure, and the descent re-spends them at the finest scale, where the small objects are. We take the ordering as evidence: a gate work-ing by some other route would have no reason to favour AP S over AP. At 80% the effect is −0.03 AP S , zero to the precision we measure, and that is what a stop rule is worth where tokens are not scarce. 
+
+# E. AI-TOD-v2 by area band and class 
+
+AI-TOD-v2 supports a decomposition VisDrone does not. Every AI-TOD-v2 evaluation in this paper writes all four of the benchmark’s area bands and, separately, the very-tiny band broken out over all eight classes, where VisDrone’s evaluations carry no per-class field. We use that here to test the gate against a prediction the mechanism makes about specific object geometries, a check the first dataset cannot run. The tokenizer and the rank r = 0 .20 are carried across unchanged. We open the bands in Tab. A7, carrying the factorial the main paper states in prose, and the classes in Tab. A8. Read down the 70% block. The gate is worth +0 .29 
+
+AP and moves every band the same way: +1 .24 very-tiny, 
+
++0 .30 tiny, +0 .57 small, +0 .44 medium. At 40% it is worth +0 .07 AP and the bands disagree, −0.46 very-tiny against +0 .37 tiny. At 20% it is worth +0 .30 AP, still 
+
++0 .36 on the tiny band and still negative on the very-tiny one. The band that keeps its sign is the tiny band, which holds 275 ,050 of the split’s 376 ,121 instances. The band that flips holds the fewest instances, and the fewest classes carrying them, which is what we open in Tab. A8. The gate moves six of the eight classes up, and every class holding more than a thousand very-tiny boxes moves up: +0 .02 , +0 .10 , +0 .19 and +0 .41 on vehicle, person, storage-tank and ship. None of those turns on a handful of detections. The aggregate is a different quantity. AP vt on this benchmark is an unweighted mean over eight classes, and four of them hold 105 of the 48 ,995 very-tiny boxes be-tween them. Half of the metric therefore rests on a fifth of a percent of the instances. Airplane alone contributes +1 .288 
+
+of the +1 .24 and the other seven classes net to −0.046 .We measured that column under a real control (same check-12 Table A4. Fused pixel score T ⊕ λ, gated and ungated. The gate is where λmin earns its cost: blending it into the pixel score as well ties the shipped tokenizer of Tab. 4 at four of five budgets and trails it by 0.28 AP and 0.38 AP S at the fifth, so one use of the statistic is the one we ship. VisDrone val, 548 images, maxDets 500 , each budget set by inverting its own retention table; every cell is a three-finetune mean with its sample σ, none outstanding. Bold marks the best value in a column within a metric block; a column whose top two values sit closer than the seed floor ( 0.16 AP, 0.22 AP S ; Tab. A10) carries none. 
+
+Tokenizer (AP) 80% 70% 60% 40% 20% 
+
+Top-hat ( T ) ⊕λ 47.12 ±0.04 46.95 ±0.08 46.36 ±0.13 43.85 ±0.18 34.84 ±0.12 
+
+Top-hat ( T ) ⊕λ + g 47.12 ±0.02 47.00 ±0.08 46.66 ±0.05 43.94 ±0.03 35.05 ±0.04 
+
+gate effect −0.01 +0 .04 +0 .30 +0 .09 +0 .20 
+
+Tokenizer (AP S ) 80% 70% 60% 40% 20% 
+
+Top-hat ( T ) ⊕λ 38.42 ±0.06 38.32 ±0.12 37.64 ±0.17 35.10 ±0.21 25.12 ±0.09 
+
+Top-hat ( T ) ⊕λ + g 38.42 ±0.05 38.27 ±0.11 38.05 ±0.16 35.18 ±0.08 25.48 ±0.02 
+
+gate effect +0 .00 −0.05 +0 .41 +0 .08 +0 .37 
+
+Table A5. Seed spread behind every cell of Tab. 4. The widest range over three finetunes is 0.341 AP and 0.466 AP S , on the ungated control at 80% , which we do not ship. VisDrone val, 548 images, maxDets 500 ; each σ is the sample deviation of three 8-epoch finetunes differing only in seed, and we match each budget by inverting that tokenizer’s own retention table. unr. marks a budget Single-pass cannot reach at any threshold, since two scales floor its retention at a quarter of the dense grid. 
+
+Tokenizer (AP) 80% 70% 60% 40% 20% 
+
+Single-pass ( S) 47.56 ±0.06 47.30 ±0.06 46.64 ±0.12 43.11 ±0.09 unr. 
+
+Top-hat ( T ) 47.04 ±0.17 46.92 ±0.16 46.38 ±0.12 43.73 ±0.06 33.89 ±0.07 
+
+Top-hat ( T ) + g 47.11 ±0.10 47.04 ±0.03 46.65 ±0.07 44.22 ±0.10 35.17 ±0.11 
+
+Tokenizer (AP S ) 80% 70% 60% 40% 20% 
+
+Single-pass ( S) 39.00 ±0.04 38.66 ±0.06 38.00 ±0.09 33.93 ±0.11 unr. 
+
+Top-hat ( T ) 38.41 ±0.26 38.25 ±0.18 37.78 ±0.18 34.99 ±0.15 24.15 ±0.07 
+
+Top-hat ( T ) + g 38.38 ±0.21 38.46 ±0.08 38.00 ±0.11 35.56 ±0.18 25.66 ±0.08 
+
+Table A6. All six COCO bands at the 40% operating point. In five of the six columns the gain clears each tokenizer’s own σ and runs 
+
+1.8× to 5.2× the propagated σ∆. VisDrone val, 548 images, maxDets 500 . Each mean is three independent 8-epoch finetunes at a budget matched to 0.4001 retained, with σ their sample standard deviation. The two rows differ only in the gate g. On the difference row 
+
+σ∆ = pσ21 + σ22 , the propagated spread of a single-run difference. AP L covers 1068 of 38 ,759 scored instances; we report the remaining five bands, where the gain clears σ.
+
+Tokenizer AP AP 50 AP 75 AP S AP M AP L
+
+Top-hat ( T ) 43.73 ±0.06 69.29 ±0.06 45.99 ±0.17 34.99 ±0.15 56.27 ±0.08 70.58 ±0.78 
+
+Top-hat ( T ) + g 44.22 ±0.10 69.78 ±0.07 46.51 ±0.23 35.56 ±0.18 56.53 ±0.08 71.19 ±0.78 
+
+gate effect +0 .49 ±0.12 +0 .49 ±0.09 +0 .52 ±0.29 +0 .56 ±0.23 +0 .26 ±0.11 +0 .61 ±1.10 
+
+13 Table A7. AI-TOD-v2 area bands, by budget. The gate lifts ev-ery band at the 70% operating point we report on this benchmark; below it the very-tiny band alone turns over, the one place the or-dering runs opposite to VisDrone, and every cell is printed in full. AI-TOD-v2 test, the 14 ,018 -image split, maxDets 1500 at 2048 ;AP vt is very-tiny (under 82 px), then tiny, small and medium, no large band here. Every row is zero-shot on one shared NWD dense checkpoint, budgets matched by inverting each tokenizer’s own re-tention table (Tab. A12). There is no 80% block: at r = 0 .20 the gate alone caps retention at 0.785 here.                                                                                                                           
+
+> Tokenizer Budget AP AP vt AP tAP sAP m
+> VGTok, 100% tokens 100% 37.27 19.51 37.47 43.57 56.04 Top-hat ( T)70% 35.37 17.22 35.66 40.89 52.35 Top-hat ( T)+g70% 35.66 18.46 35.96 41.46 52.79
+> Top-hat ( T)⊕λ70% 35.47 18.13 35.90 41.15 52.74 Top-hat ( T)⊕λ+g70% 35.65 18.52 36.00 41.27 52.71 Top-hat ( T)40% 30.09 14.61 30.14 34.59 45.22
+> Top-hat ( T)+g40% 30.16 14.16 30.51 34.48 44.69 Top-hat ( T)⊕λ40% 30.36 14.91 30.68 34.60 45.03 Top-hat ( T)⊕λ+g40% 30.19 14.35 30.54 34.53 44.81 Top-hat ( T)20% 20.40 9.62 20.10 23.33 33.69 Top-hat ( T)+g20% 20.70 9.32 20.46 23.88 33.69 Top-hat ( T)⊕λ20% 21.03 9.71 20.96 24.24 33.63 Top-hat ( T)⊕λ+g20% 20.54 8.83 20.24 23.91 32.89
+
+point, same budget, same protocol) on 17 boxes. We read the direction from the four populous classes. The gate’s one large per-class loss lands where the mechanism says it must. The gate declines to split one-dimensional structure, so an object that is one-dimensional should be the object it damages. Wind-mill, a hub with three long thin blades seen from nadir, falls 1.04 , from 5.59 to 
+
+4.55 . That is the largest per-class loss we record anywhere, on the one class in this benchmark whose geometry the gate is built to reject. We read it as evidence the gate acts through the mechanism we claim, not through some correlate of it. A statistic working by another route would have no reason to single out this class. Swimming-pool is the opposite ge-ometry (a compact rectangle of near-uniform texture) and falls 0.13 on 39 boxes, inside anything we would call reso-lution on this metric. The prediction is directional, and the class that carries it is wind-mill; bridge, the other one-dimensional class here, moves +0 .09 and is the hardest class on the split for ev-ery tokenizer, including VGTok at 100% tokens, 4.84 AP vt 
+
+there against 3.14 ungated. 
+
+# F. Sensitivity to the gate rank r
+
+VGTok adds exactly one hyperparameter, the gate rank r,and we ship it at r = 0 .20 on both datasets without retun-ing. Table A9 is our accuracy sweep behind that value: 0.20 
+
+is the argmax at every budget, and AP falls on both sides of it, so the shipped setting is an interior optimum. Table A12 separately shows what r does to the budget, which is a dif-ferent question. The peak is real and sits at r = 0 .20 at every budget, and it sits on a plateau; both halves of that are worth stat-ing. Moving out to r = 0 .05 costs 0.38 AP at the 40% 
+
+budget and 0.37 at 20% ; moving out to r = 0 .30 costs 0.31 
+
+and 0.22 , so a rank away from 0.20 in either direction is measurably worse. Inside the plateau the margin over the neighbouring rank r = 0 .10 is 0.02 , 0.05 and 0.04 AP. The table settles that the answer lies in that neighbourhood, and the flatness there is what makes the knob transferable: any 
+
+r in it costs at most 0.05 AP, so one setting carries across datasets. We then put that to the test by carrying r = 0 .20 
+
+onto AI-TOD-v2 unchanged. Table A12 explains the shape at the loose end. At the 
+
+70% budget the four ranks already spend most of their re-duction on different mechanisms. Rank r = 0 .05 reaches that budget at p 47 .12 and r = 0 .30 at p 8.66 , where the threshold has almost stopped contributing. The four rows are therefore increasingly unlike one another even though they hold the same token count, and the AP they reach is within 0.05 of a common value. At the tight end the thresh-old does most of the work in every row ( p 91 –p 94 at the 
+
+20% budget), and the rank becomes a genuine second vari-able on top of it. That is where the 0.37 AP spread appears. 
+
+# G. Convergence of the dense reference 
+
+We make every comparison against VGTok at 100% of to-kens, 48 .38 AP, so that ceiling has to be converged for the margins beneath it to mean anything. We check it twice, by running longer and by restarting the schedule, and it holds both times. The ladder saturates. The four points from epoch 22 to epoch 28 lie inside 0.03 AP of one another, and most of the curve is spent by epoch 12 . We read the annealing check as the sharper of the two, because a saturated cosine sched-ule is where one expects a fresh anneal to find another few tenths. It finds none, which is what makes the dense refer-ence a fair one. Restarting from the epoch-28 point with a fresh schedule dips to 47 .70 , peaks at 48 .30 and finishes at 
+
+48 .15 , all at or under the checkpoint we report. The refer-ence is a finished schedule, and the headroom we claim is not a training artifact. One figure moves: AP S at the link’s best point reaches 39 .66 against 39 .63 , and we print it. 
+
+# H. Seed replication and the seed floor 
+
+Every trained VisDrone number in this paper is a three-seed mean. That is the 24 trained cells of Tab. 4 and Tab. A4, 72 
+
+full 8-epoch finetunes, and it is what lets us separate the gate effect from seed noise instead of asserting it. We list the 12 
+
+finetunes at the operating point individually in Tab. A10, on AP and on AP S , with the sample standard deviation beside each mean. The runs differ only in data order and initiali-14 Table A8. Per-class AP on the very-tiny band. The +1 .24 AP vt the gate is worth at 70% is one class: airplane moves +10 .30 on 17 
+
+boxes. AI-TOD-v2 test, 14 ,018 images, maxDets 1500 ; both tokenizer rows are zero-shot on the same NWD dense checkpoint at a budget matched to 70% by inverting each tokenizer’s own retention table, so the gate is the only difference between them. Very-tiny boxes is that class’s instance count in the band, counted from the test annotations. AP vt is an unweighted mean over the eight classes, so each carries one eighth of it however few boxes it holds, and the share row is that eighth.                                                                     
+
+> vehicle person ship storage-tank bridge swimming-pool airplane wind-mill AP vt
+> very-tiny boxes 38,504 5,934 2,930 1,522 41 39 17 848,995 VGTok, 100% tokens 19.39 11.07 35.07 32.20 4.84 27.74 20.34 5.46 19.51 Top-hat ( T)19.50 10.46 31.64 31.93 3.14 26.50 9.01 5.59 17.22 Top-hat ( T)+g19.52 10.56 32.05 32.12 3.23 26.37 19.31 4.55 18.46
+> gate effect +0 .02 +0 .10 +0 .41 +0 .19 +0 .09 −0.13 +10 .30 −1.04 +1 .24
+> share of the mean +0 .002 +0 .013 +0 .051 +0 .024 +0 .011 −0.017 +1 .288 −0.130 +1 .242
+
+Table A9. Rank sweep at three matched budgets. The shipped 
+
+r = 0 .20 is the argmax of AP in all three columns and AP falls on both sides of it, so this is an interior optimum rather than an untested default. Twelve zero-shot evaluations of one released dense checkpoint, tokenizer swapped in and no weight changed: VisDrone val, 548 images, maxDets 500 , native 2048 × 1152 ,splitter and scorer fixed so that r is the only variable. We match budgets per rank by inverting each rank’s own retention table, so the percentiles Tab. A12 prints differ by row. Bold is the best value in a column among the four comparable rows. No training seed enters a zero-shot evaluation, so these differences are exact rather than draws against the seed floor. A fifth rung at r = 0 .40 falls further, to 40 .05 and 20 .80 . The rank was chosen on VisDrone val, then carried onto AI-TOD-v2 and never re-tuned.                  
+
+> AP, at a matched token budget Gate rank r70% 40% 20% 0.05 47.72 40.06 20.81 0.10 47.74 40.40 21.14 0.20 (shipped) 47.76 40.44 21.18
+> 0.30 47.71 40.14 20.96
+
+sation seed, and we score each under the VisDrone protocol at maxDets 500 .The spread is not constant across budgets or tokenizers. Over the 24 trained VisDrone cells behind this paper the range of three finetunes runs from 0.038 to 0.341 AP and from 0.046 to 0.466 AP S , and the widest on both metrics belongs to the ungated control at the loosest budget, a set-ting we do not ship. We therefore quote one floor every-where, pooled over the whole factorial: the alternative, tak-ing the widest observed range, is not a standard error, and its expected value climbs with the number of cells inspected, so replicating more of the grid would have raised our own bar. The 40% separation then holds on AP S as well as AP, the metric we aim at and the noisier of the two. 
+
+# I. Token-budget matching protocol 
+
+VGTok makes the retained fraction an operator input rather than an outcome, and this section is the audit that shows it 46.5 47.0 47.5 48.0 48.5 reported +0.32 AP after epoch 12 final four within 0.03 AP 5 10 15 20 25 
+
+Training epoch  
+
+> 37.0 37.5 38.0 38.5 39.0 39.5 AP AP S
+> AP (%)
+
+Figure A1. Dense epoch ladder, eleven checkpoints of one train-ing run. The ladder saturates: everything after epoch 12 is worth 
+
++0 .32 AP in total, and the last twelve epochs of that only +0 .10 .Every point is scored under the reported protocol: VisDrone val, 
+
+548 images, maxDets 500 , ignore regions at IoF ≥ 0.5, native 
+
+2048 × 1152 . The ringed point is the checkpoint we report and the maximum of both curves. 
+
+holds. Under a quadtree the token count depends on where the busy nodes sit, and no closed form maps a threshold onto a budget. We therefore set every threshold by inverting a measured retention table, then re-measure the result on the split we report. All four tokenizers land on 0.4001 of the dense grid. Table A11 is our re-measurement and Tab. A12 is the table our thresholds came out of. The audit is exact. All four tokenizers realise 0.4001 of the dense grid at the thresholds we deployed them at, so the gate’s margin at 40% is measured at matched tokens rather than inferred across a budget gap. Table A12 answers the question a reader asks on seeing two knobs. At the 40% budget we run the shipped setting at 
+
+p 74 .82 , where the ungated control needs p 81 .88 to buy the same tokens. At r = 0 .40 we reach that budget at p 60 .66 .At the loosest budget the two knobs collide. The shipped to-15 Table A10. Seed replicates at the 40% budget. The gated and ungated tokenizers do not overlap on either metric: worst gated 
+
+44 .11 against best ungated 43 .77 on AP, and 35 .35 against 35 .16 
+
+on the noisier AP S , so the reported gate effect is not seed noise. VisDrone2019-DET val, 548 images, maxDets 500 ; all twelve runs sit at one budget, 0.4001 retained (Tab. A11), and the two blocks score them on AP and AP S . Run 1 is the original cell and the rest independent repeats; σ is their sample standard deviation. We pool both seed floors over the factorial instead of reading them off one cell: within-cell σ over the 24 trained VisDrone cells is 
+
+0.0974 AP and 0.1342 AP S , so a difference of two three-seed means has standard error 0.0795 and 0.1095 ; twice that, 0.16 AP and 0.22 AP S , is the smallest difference we argue for.                                                                            
+
+> Tokenizer (AP) Run 1 Run 2 Run 3 Mean σ
+> Top-hat ( T)43.66 43.76 43.77 43.73 0.06 Top-hat ( T)+g44.11 44.26 44.30 44.22 0.10 Top-hat ( T)⊕λ43.65 43.90 43.99 43.85 0.18 Top-hat ( T)⊕λ+g43.96 43.95 43.91 43.94 0.03 Tokenizer (AP S)Run 1 Run 2 Run 3 Mean σ
+> Top-hat ( T)34.89 34.93 35.16 34.99 0.15 Top-hat ( T)+g35.35 35.65 35.68 35.56 0.18 Top-hat ( T)⊕λ34.88 35.13 35.29 35.10 0.21 Top-hat ( T)⊕λ+g35.24 35.09 35.21 35.18 0.08
+
+Table A11. Token-budget audit of the 40% column. All four to-kenizers land on 0.4001 of the dense grid, so the gate’s margin at this budget is measured at matched tokens. We measure the re-tained fraction over all 548 VisDrone val images at 2048 × 1152 
+
+against a dense grid of 9216 tokens, for each tokenizer at the exact threshold we deployed it at; Tokens is the per-image mean.                                
+
+> Tokenizer Threshold Tokens Retained Top-hat ( T)p81 .88 3687.9 0.4001 Top-hat ( T)+gp74 .82 3687.3 0.4001 Top-hat ( T)⊕λp81 .96 3687.6 0.4001 Top-hat ( T)⊕λ+gp74 .70 3688.1 0.4001
+
+kenizer reaches 80% only at p 5.62 , so the gate does nearly all of the reduction and the threshold almost none. That is the regime where the gate is worth +0 .06 AP, level with the ungated control against a 0.16 floor, and the reason is me-chanical: with tokens this plentiful, there is no tightening trade-off for a stop rule to exploit. 
+
+The AI-TOD-v2 budgets are verified on the split they are scored on. We invert each retention table on the 2804 -image AI-TOD-v2 val split, then check the percentiles it produces against the 14 ,018 -image test split that every AI-TOD-v2 AP here is scored on. Both tokenizers overshoot, and both overshoot by the same small amount. The ungated control realises 0.8015 , 0.7012 , 0.6011 , 0.4015 and 0.2010 
+
+against targets of 0.80 down to 0.20 ; the shipped gated tok-enizer realises 0.7011 , 0.6009 and 0.4006 against 0.70 , 0.60 
+
+and 0.40 . Every error is positive and none exceeds 0.15 per-centage points, so this is a common bias between two splits 
+
+Table A12. Inverted retention tables, five budgets by five gate ranks. Rank and threshold are not interchangeable: raising r shifts the whole table left until the loosest budgets fall off it, and by 
+
+r = 0 .30 the 80% budget is unreachable on both datasets. Each cell is the percentile that delivers the column’s budget at that rank, from a 32 -rung measured sweep over all 548 VisDrone val images and 2804 AI-TOD-v2 images. The italic row is the shipped set-ting, r = 0 .20 , used unchanged on both. Unreachable is structural rather than unrun: at that rank the gate alone caps retention below the budget, which is why Tab. A7 has no 80% block. We invert percentiles on the AI-TOD-v2 val split and verify them against the 
+
+14 ,018 -image test split both tokenizers are scored on, where each overshoots its target by at most 0.15 percentage points.                                                                   
+
+> Gate rank r80% 70% 60% 40% 20%
+> VisDrone val ,548 images none (= T)37.91 51.53 63.44 81.88 94.58 0.05 32.16 47.12 60.28 80.45 94.21 0.10 25.56 42.03 56.54 78.82 93.79
+> 0.20 (shipped) 5.62 29.06 47.01 74.82 92.76
+> 0.30 unreachable 8.66 33.43 69.16 91.38 0.40 unreachable unreachable 12.08 60.66 89.41
+> AI-TOD-v2 ,2804 images none (= T)46.79 59.79 69.98 84.90 95.17 0.10 32.11 50.98 64.13 82.52 94.51
+> 0.20 (shipped) unreachable 36.70 55.70 79.29 93.66
+> 0.30 unreachable unreachable 41.96 74.69 92.53
+
+and not scatter. A bias shared by both tokenizers cancels out of the difference between them. No AI-TOD-v2 com-parison in this paper rests on a budget match looser than a tenth of a percentage point. 
+
+# J. Sensitivity to input resolution 
+
+The cost of pruning falls as the input grows, which is the direction high-resolution detection is moving. We fix the protocol at the native 2048 × 1152 throughout the paper, and Tab. A13 shows what happens if it is not, for VGTok at 100% and at 70% of tokens, on the same checkpoint and the same split. Going from 2048 to 2560 is worth +1 .01 AP at 100% 
+
+of tokens and +1 .12 at 70% , and going down to 1536 costs 
+
+−2.86 and −3.33 . The two columns move together, and the pruned one gains more at each step up, which is why the gap closes. We print the off-protocol rows in full, including the 49 .39 AP at 2560 that sits above the number we claim. The protocol is fixed at 2048 throughout, and every number we report is measured there. 
+
+# K. What the λmin gate declines to refine 
+
+The gate fires on the top r of a ranking, and Sec. A mea-sures that ranking: at an AUROC of 0.712 –0.750 , the best of the five candidates by a wide margin, it orders a randomly drawn clutter/object pair correctly between 71% and 75% of the time. Ranking quality is not itself a cost, and this section prices the cost. Table A14 turns it into the quantity we care about: not how many nodes we mis-rank, but how much of 16 Table A13. VGTok at two budgets across four input resolutions. The cost of pruning falls as the input grows: the gap between full and 70% retention narrows monotonically from 1.28 AP at 1536 
+
+to 0.69 at 2560 , so the tokenizer gets cheaper in accuracy terms exactly where high-resolution detection is headed. Same check-point, same 548 -image VisDrone val split, maxDets 500 ; only the input resolution changes. The 70% column is Single-pass evalu-ated zero-shot, the tokenizer we measured at all four resolutions, rather than the shipped quadtree one; the reading is about how the two columns move together at a fixed retention and does not de-pend on which tokenizer fills the second pair. Gap is 100% minus 
+
+70% on AP, taken on unrounded values: at 1536 it is 1.28 where the printed cells differ by 1.27 .                             
+
+> VGTok, 100% VGTok, 70%
+> Evaluation resolution AP AP SAP AP Sgap , AP 1536 45.52 35.97 44.25 34.94 +1 .28
+> 2048 (the protocol) 48.38 39.63 47.58 38.85 +0 .80
+> 2304 48.86 40.39 48.14 39.85 +0 .72
+> 2560 49.39 41.04 48.70 40.45 +0 .69
+
+Table A14. Coarsened tokens, by distance to the nearest object. The rate follows the budget, not the statistic: at the 40% operating point 14 .6% of the tokens the gate declines to spend lie on an object, and on AI-TOD-v2 the figure is 1.4% or below at every budget we report. The last four columns bin every finest-grid token the gate declines to spend by distance from its node to the nearest ground-truth box; the region is still described, at the gate’s own coarse scale. Shipped statistic at rank r = 0 .20 , on 150 VisDrone 
+
+val and 150 AI-TOD-v2 val images. Fires on is the fraction of gate-visible nodes that fire; frees is the percentage points of the dense grid regained: at 20% , firing on 0.9% of nodes frees 2.8
+
+points. Rows are rounded independently and need not sum to 100 .                                              
+
+> coarsened tokens, by distance Budget fires on frees on an object 1 node 2–3 nodes farther
+> VisDrone val ,150 images 70% 4.4% 13.1 pp 6.3% 5.1% 12.3% 76.4% 40% 2.3% 6.9 pp 14.6% 6.0% 9.9% 69.5% 20% 0.9% 2.8 pp 29.0% 6.4% 7.6% 57.0%
+> AI-TOD-v2 val ,150 images 70% 4.1% 12.2 pp 0.4% 0.9% 3.3% 95.4% 40% 2.2% 6.6 pp 1.4% 1.3% 3.3% 94.1% 20% 0.9% 2.7 pp 3.0% 1.8% 3.0% 92.1%
+
+what the gate declines to spend was describing an object. A gated node is still emitted, at its own coarse scale, so a finest-grid token counted here is a region described coarsely rather than a region dropped. Two effects set that rate, and the numbers separate them. 
+
+The population changes, not the gate. On VisDrone we hold the statistic and the rank fixed. At 70% of the budget 
+
+6.3% of the tokens the gate declines to spend lie on an ob-ject, and 14 .6% at the 40% operating point; at 20% , a bud-get below the range we report, 29 .0% do. Nothing about the gate changed between those rows; the population did. At a tight budget the nodes the descent still reaches are increas-ingly object-bearing, and the clutter fraction falls from 79% 
+
+to 56% (Tab. A1). Firing on the top r of a population that is mostly objects necessarily hits objects, and the gate is still worth +1 .28 AP there. It need not be right every time to pay: the tokens it frees are re-spent where the descent needs them most, and the regions it coarsens are still described. 
+
+Compact two-dimensional clutter reads like an object. 
+
+λmin is large wherever the gradient directions inside a win-dow disagree. That is true of a vehicle. It is equally true of a roundabout, a tree crown, a rooftop vent cluster or a stack of pallets. λmin measures the property a compact object and compact clutter share, and separating those two is out-side what one second-moment eigenvalue can express; that is the ceiling holding the AUROC at 0.75 rather than higher. What it costs is a saving and not an object: the gate keeps descending into clutter it could have declined, so those to-kens are spent rather than freed, and the +0 .49 AP the gate is worth at the operating point is measured with that ceiling already in it. 
+
+# References 
+
+[1] Marius Aasan, Odd Kolbjørnsen, Anne Schistad Solberg, and Ad´ ın Ram´ ırez Rivera. A spitting image: Modular su-perpixel tokenization in vision transformers. In ECCV 2024 workshop , 2024. [2] Marius Aasan, Martine Hjelkrem-Tan, Nico Catalano, Changkyu Choi, and Ad´ ın Ram´ ırez Rivera. Differentiable hierarchical visual tokenization. In NeurIPS 2025 , 2025. [3] Abdellatif and Almasri. Dispatch-aware ragged attention for pruned vision transformers. arXiv preprint, v1 16 Apr 2026, v2 12 May 2026, 2026. [4] Radhakrishna Achanta, Sheila Hemami, Francisco Estrada, and Sabine Susstrunk. Frequency-tuned salient region de-tection. In IEEE CVPR 2009 , 2009. [5] Fatih Cagatay Akyon, Sinan Onur Altinuc, and Alptekin Temizel. Slicing aided hyper inference and fine-tuning for small object detection. In ICIP 2022 (IEEE International Conference on Image Processing) , 2022. [6] Xiangzhi Bai and Fugen Zhou. Analysis of new top-hat transformation and the application for infrared dim small target detection. Pattern Recognition (Elsevier), 2010 ,2010. [7] Xiangzhi Bai, Fugen Zhou, and Bindang Xue. Image en-hancement using multi scale image features extracted by top-hat transform. Optics & Laser Technology (Elsevier), March 2012 , 2012. [8] Siham Bakkouri, Abderrahmane Elyousfi, and Hamza Hamout. Fast CU size and mode decision algorithm for 3D-HEVC intercoding. Multimedia Tools and Applications , 79 (11–12):6987–7004, 2020. [9] Lucas Beyer, Pavel Izmailov, Alexander Kolesnikov, Mathilde Caron, Simon Kornblith, Xiaohua Zhai, Matthias Minderer, Michael Tschannen, Ibrahim Alabdulmohsin, 
+
+17 and Filip Pavetic. FlexiViT: One model for all patch sizes. In CVPR 2023 , 2023. [10] Josef Big¨ un and G¨ osta H. Granlund. Optimal orientation detection of linear symmetry. In ICCV , pages 433–438, 1987. [11] Daniel Bolya, Cheng-Yang Fu, Xiaoliang Dai, Peizhao Zhang, Christoph Feichtenhofer, and Judy Hoffman. To-ken merging: Your ViT but faster. In ICLR 2023 , 2023. [12] Neil D. B. Bruce and John K. Tsotsos. Saliency, attention, and visual search: An information theoretic approach. Jour-nal of Vision , 2009. [13] Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nico-las Usunier, Alexander Kirillov, and Sergey Zagoruyko. End-to-end object detection with transformers (DETR). In 
+
+ECCV 2020 , 2020. [14] Chun-Fu (Richard) Chen, Rameswar Panda, and Quanfu Fan. RegionViT: Regional-to-local attention for vision transformers. In ICLR 2022 , 2022. [15] Mengzhao Chen, Mingbao Lin, Ke Li, Yunhang Shen, Yongjian Wu, Fei Chao, and Rongrong Ji. CF-ViT: A gen-eral coarse-to-fine method for vision transformer. In AAAI 2023 , 2023. [16] Kyle R. Chickering, Bangzheng Li, and Muhao Chen. QLIP: A dynamic quadtree vision prior enhances MLLM performance without retraining. In ICLR , 2026. [17] Rohan Choudhury, JungEun Kim, Jinhyung Park, Eunho Yang, L´ aszl´ o A. Jeni, and Kris M. Kitani. Accelerating vi-sion transformers with adaptive patch sizes. In ICLR 2026 ,2026. [18] Yimian Dai, Yiquan Wu, Fei Zhou, and Kobus Barnard. Asymmetric contextual modulation for infrared small tar-get detection. In WACV , 2021. [19] Yimian Dai, Yiquan Wu, Fei Zhou, and Kobus Barnard. At-tentional local contrast networks for infrared small target detection. IEEE Transactions on Geoscience and Remote Sensing , 2021. [20] Dao, Fu, Ermon, Rudra, and Re. FlashAttention: Fast and memory-efficient exact attention with IO-Awareness. In 
+
+NeurIPS 2022 , 2022. [21] Tri Dao. FlashAttention-2: Faster attention with better par-allelism and work partitioning. In ICLR 2024 , 2024. [22] Mostafa Dehghani, Basil Mustafa, Josip Djolonga, Jonathan Heek, Matthias Minderer, Mathilde Caron, An-dreas Steiner, Joan Puigcerver, Robert Geirhos, Ibrahim Al-abdulmohsin, Avital Oliver, Piotr Padlewski, Alexey Grit-senko, Mario Luˇ ci´ c, and Neil Houlsby. Patch n’ pack: NaViT, a vision transformer for any aspect ratio and res-olution. In NeurIPS 2023 , 2023. [23] Juechu Dong, Boyuan Feng, Driss Guessous, Yanbo Liang, and Horace He. Flex attention: A programming model for generating optimized attention kernels. In MLSys , 2025. [24] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An im-age is worth 16x16 words: Transformers for image recog-nition at scale (ViT). In ICLR 2021 , 2021. [25] Dawei Du, Pengfei Zhu, Longyin Wen, Xiao Bian, Haibin Ling, and Qinghua Hu and. VisDrone-DET2019: The vi-sion meets drone object detection in image challenge re-sults. In ICCV 2019 Workshops (ICCVW) , 2019. [26] Eliopoulos, Jajal, Davis, Liu, Thiravathukal, and Lu. Pruning one more token is enough: Leveraging latency-workload non-linearities for vision transformers on the edge. WACV 2025, 2025. [27] Qihang Fan, Quanzeng You, Xiaotian Han, Yongfei Liu, Yunzhe Tao, Huaibo Huang, Ran He, and Hongxia Yang. ViTAR: Vision transformer with any resolution. In arXiv, March 2024 , 2024. [28] Yuxin Fang, Quan Sun, Xinggang Wang, Tiejun Huang, Xinlong Wang, and Yue Cao. EVA-02: A visual repre-sentation for neon genesis. Image and Vision Computing ,2024. [29] Mohsen Fayyaz, Soroush Abbasi Koohpayegani, Farnoush Rezaei Jafari, Sunando Sengupta, Hamid Reza Vaezi Joze, Eric Sommerlade, Hamed Pirsiavash, and Juergen Gall. Adaptive token sampling for efficient vision transformers. In ECCV 2022 , 2022. [30] Wolfgang F¨ orstner and Eberhard G¨ ulch. A fast operator for detection and precise location of distinct points, cor-ners and centres of circular features. In ISPRS Intercom-mission Workshop on Fast Processing of Photogrammetric Data , pages 281–305, 1987. [31] Chang-Hong Fu, Yui-Lam Chan, Hong-Bin Zhang, Sik-Ho Tsang, and Meng-Ting Xu. Efficient depth intra frame cod-ing in 3D-HEVC by corner points. IEEE TIP , 30:1608– 1622, 2021. [32] P. P. Gandhi and S. A. Kassam. Analysis of CFAR proces-sors in nonhomogeneous background. IEEE Transactions on Aerospace and Electronic Systems , 1988. [33] Dashan Gao, Vijay Mahadevan, and Nuno Vasconcelos. The discriminant center-surround hypothesis for bottom-up saliency. In NIPS 2007 (Advances in NIPS 20) , 2007. [34] David Hagerman, Roman Naeem, Erik Brorsson, Fredrik Kahl, and Lennart Svensson. ARTA: Adaptive mixed-resolution token allocation for efficient dense feature ex-traction. arXiv preprint, 2026. [35] David Hagerman, Roman Naeem, and Fredrik Kahl. BATS: Resource-efficient volumetric segmentation with boundary-aware mixed-resolution tokens. arXiv preprint, 2026. [36] Hamza Hamout and Abderrahmane Elyousfi. Fast depth map intra coding for 3D video compression-based tensor feature extraction and data analysis. IEEE TCSVT , 30(7): 1933–1945, 2020. [37] Chris Harris and Mike Stephens. A combined corner and edge detector. In Alvey Vision Conference , pages 147–151, 1988. [38] Joakim Bruslund Haurum, Sergio Escalera, Graham W. Taylor, and Thomas B. Moeslund. Which tokens to use? In-vestigating token reduction in vision transformers. In ICCV 2023 Workshops , 2023. [39] Jakob Drachmann Havtorn, Amelie Royer, Tijmen Blankevoort, and Babak Ehteshami Bejnordi. MSViT: Dy-namic mixed-scale tokenization for vision transformers. In 
+
+ICCV 2023 workshop , 2023. 
+
+18 [40] S. L. Horowitz and T. Pavlidis. Picture segmentation by a tree traversal algorithm. Journal of the ACM , 1976. [41] Zhangchi Hu. Dome-DETR: DETR with density-oriented feature-query manipulation for efficient tiny object detec-tion. In ACM Multimedia 2025 , 2025. [42] Yi-Xin Huang and Hou-I Liu. DQ-DETR: DETR with dy-namic query for tiny object detection. In ECCV 2024 main conference , 2024. [43] Zelong Huang, Zhigang Sun, Mingyue Liu, Jieru Zhang, and Junwei Han. UFPMP-Det: Toward accurate and effi-cient object detection on drone imagery. In AAAI Confer-ence on Artificial Intelligence , 2022. [44] Laurent Itti, Christof Koch (Caltech, Computation & Neu-ral Systems), and Ernst Niebur (Johns Hopkins). A model of saliency-based visual attention for rapid scene analysis. 
+
+IEEE TPAMI , 1998. [45] Mingqian Ji, Shanshan Zhang, and Jian Yang. Revisiting token compression for accelerating ViT-based sparse multi-view 3D object detectors. In arXiv 2026-04 , 2026. [46] Aditya Jonnalagadda, William Yang Wang, B. S. Manju-nath, and Miguel P. Eckstein. FoveaTer: Foveated trans-former for image classification. In ICLR 2023 main confer-ence , 2023. [47] Timor Kadir and Michael Brady. Saliency, scale and im-age description. International Journal of Computer Vision ,2001. [48] Onur Can Koyun, Reyhan Kevser Keser, ˙ Ibrahim Batuhan Akkaya, and Behc ¸et U˘ gur T¨ oreyin. Focus-and-detect: A small object detection framework for aerial images. Signal Processing: Image Communication , 2022. [49] Krell, Kosec, Perez, and Fitzgibbon. Efficient sequence packing without cross-contamination: Accelerating large language models without impacting performance. arXiv preprint (v1 Jun 2021, v2 Oct 2022), 2021. [50] Changlin Li, Taojiannan Yang, Sijie Zhu, Chen Chen, and Shanyue Guan. Density map guided object detection in aerial images (DMNet). In CVPRW 2020 , 2020. [51] Yanghao Li, Hanzi Mao, Ross Girshick, and Kaiming He. Exploring plain vision transformer backbones for object de-tection (ViTDet). In ECCV 2022 , 2022. [52] Youwei Liang, Chongjian Ge, Zhan Tong, Yibing Song, Jue Wang, and Pengtao Xie. Not all patches are what you need: Expediting vision transformers via token reorganizations. In ICLR 2022 , 2022. [53] Yu Liu et al. YOLC: You only look clusters for tiny object detection in aerial images. IEEE Transactions on Intelligent Transportation Systems , 2024. [54] Kyan Mahajan and Mohammad Saqlain. SpiralFovea: Input-adaptive foveated tokenization as a third lever of resource-adaptive inference. arXiv 2026-07 (v1 2026-07-01, v2), 2026. [55] Tanvir Mahmud, Burhaneddin Yaman, Chun-Hao Liu, and Diana Marculescu. PaPr: Training-free one-step patch pruning with lightweight ConvNets for faster inference. In 
+
+ECCV 2024 , 2024. [56] Lingchen Meng, Hengduo Li, Bor-Chun Chen, Shuyang Lan, Zuxuan Wu, Yu-Gang Jiang, and Ser-Nam Lim. AdaViT: Adaptive vision transformers for efficient image recognition. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022. [57] Mahyar Najibi, Bharat Singh, and Larry S. Davis. AutoFo-cus: Efficient multi-scale inference. In ICCV 2019 , 2019. [58] Yongming Rao, Wenliang Zhao, Benlin Liu, Jiwen Lu, Jie Zhou, and Cho-Jui Hsieh. DynamicViT: Efficient vision transformers with dynamic token sparsification. NeurIPS 2021 , 2021. [59] Adria Recasens, Petr Kellnhofer, Simon Stent, Wojciech Matusik, and Antonio Torralba. Learning to zoom: asaliency-based sampling layer for neural networks. In 
+
+ECCV , 2018. [60] Byungseok Roh, JaeWoong Shin, Wuhyun Shin, and Sae-hoon Kim. Sparse DETR: Efficient end-to-end object de-tection with learnable sparsity. In International Conference on Learning Representations , 2022. [61] Hermann Rohling. Radar CFAR thresholding in clutter and multiple target situations. IEEE Transactions on Aerospace and Electronic Systems , 1983. [62] Tomer Ronen, Omer Levy, and Avram Golbert. Vision transformers with mixed-resolution tokenization. In CVPR 2023 workshop , 2023. [63] Rubab and Arslan Abdul Ghaffar. Dyna-ViT: Parameter-free pre-encoder token pruning for efficient vision trans-formers. CVPR 2026 Findings track, 2026. [64] Hanan Samet. The quadtree and related hierarchical data structures. ACM Computing Surveys , 1984. [65] Hanan Samet and Robert E. Webber. Storing a collection of polygons using quadtrees. ACM Transactions on Graphics ,4(3):182–222, 1985. [66] Tanner Schmidt and Richard Newcombe. Segment this thing: Foveated tokenization for efficient point-prompted segmentation. In CVPR 2025 , 2025. [67] Jean Serra. Image analysis and mathematical morphology. Book, Academic Press, London/New York, 1982, xviii + 610 pp, 1982. [68] Shuai Shao, Zeming Li, Tianyuan Zhang, Chao Peng, Gang Yu, Xiangyu Zhang, Jing Li, and Jian Sun. Objects365: A large-scale, high-quality dataset for object detection. In 
+
+ICCV 2019 , 2019. [69] Shashi Shekhar, Chang-Tien Lu, and Pusheng Zhang. Aunified approach to detecting spatial outliers. In GeoInfor-matica (Kluwer) , 2003. [70] Jianbo Shi and Carlo Tomasi. Good features to track. In 
+
+CVPR , pages 593–600, 1994. [71] Shuohao Shi, Qiang Fang, Tong Zhao, and Xin Xu. Simi-larity distance-based label assignment for tiny object detec-tion. arXiv preprint, 2024. [72] Michael Shneier. Two hierarchical linear feature repre-sentations: Edge pyramids and edge quadtrees. Computer Graphics and Image Processing , 17(3):211–224, 1981. [73] Bharat Singh and Larry S. Davis. An analysis of scale in-variance in object detection – SNIP. In CVPR 2018 , 2018. [74] Bharat Singh, Mahyar Najibi, and Larry S. Davis. SNIPER: Efficient multi-scale training. In NeurIPS 2018 , 2018. 
+
+19 [75] Lin Song, Songyang Zhang, Songtao Liu, Zeming Li, Xum-ing He, Hongbin Sun, Jian Sun, and Nanning Zheng. Dy-namic grained encoder for vision transformers. In NeurIPS 2021 main conference , 2021. [76] Stanley R. Sternberg. Grayscale morphology. Computer Vision, Graphics, and Image Processing , 1986. [77] Gary J. Sullivan and Richard L. Baker. Efficient quadtree coding of images and video. IEEE Transactions on Image Processing , 1994. [78] Shitao Tang, Jiahui Zhang, Siyu Zhu, and Ping Tan. QuadTree attention for vision transformers. In ICLR 2022 – main conference , 2022. [79] Chittesh Thavamani, Mengtian Li, Nicolas Cebron, and Deva Ramanan. FOVEA: Foveated image magnification for autonomous navigation. In ICCV , 2021. [80] Chittesh Thavamani, Mengtian Li, Francesco Ferroni, and Deva Ramanan. Learning to zoom and unzoom. In CVPR ,2023. [81] Jinwang Wang, Chang Xu, Wen Yang, and Lei Yu. A nor-malized gaussian wasserstein distance for tiny object detec-tion. arXiv preprint, 26 Oct 2021 (v1), 2021. [82] Jinwang Wang, Wen Yang, Haowen Guo, Ruixiang Zhang, and Gui-Song Xia. Tiny object detection in aerial images. 
+
+2020 25th International Conference on Pattern Recognition (ICPR), held Jan 2021 , 2021. [83] Tao Wang et al. PnP-DETR: Towards efficient visual anal-ysis with transformers. In IEEE/CVF International Confer-ence on Computer Vision , 2021. [84] Zixiao Wen, Zhen Yang, Xianjie Bao, Lei Zhang, Xiantai Xiang, Wenshuai Li, and Yuhan Liu. D3R-DETR: DETR with dual-domain density refinement for tiny object detec-tion. arXiv preprint, 2026. [85] Ke Wu, Yanan Zhang, Yingjie Gao, Wenhao Li, Chenyu Zhou, XinZhu Ma, Jiaxin Chen, and Di Huang. Drone-FINE: Domain-aware parameter-efficient fine-tuning of vision-language detectors for drone images. In ECCV 2026 ,2026. [86] Gui-Song Xia, Xiang Bai, Jian Ding, Zhen Zhu, Serge Belongie, Jiebo Luo, Mihai Datcu, Marcello Pelillo, and Liangpei Zhang. DOTA: A large-scale dataset for object detection in aerial images. In CVPR 2018 , 2018. [87] Fei Xie, Weijia Zhang, Zhongdao Wang, and Chao Ma. QuadMamba: Learning quadtree-based selective scan for visual state space model. In NeurIPS 2024 – main confer-ence track, poster , 2024. [88] Chang Xu, Jinwang Wang, Wen Yang, Huai Yu, Lei Yu, and Gui-Song Xia. Detecting tiny objects in aerial images: A normalized wasserstein distance and a new benchmark. 
+
+ISPRS Journal of Photogrammetry and Remote Sensing ,2022. [89] Chang Xu, Jinwang Wang, Wen Yang, Huai Yu, Lei Yu, and Gui-Song Xia. RFLA: Gaussian receptive field based label assignment for tiny object detection. In ECCV 2022 (Euro-pean Conference on Computer Vision, Tel Aviv) , 2022. [90] Qian Xu, Chi Zhang, Qiming Zhang, Xi Li, Haojuan Yuan, and Mingjin Zhang. Na-IRSTD: Enhancing infrared small target detection via native-resolution feature selection and fusion. arXiv 2026-05-07, 2026. [91] Fan Yang, Heng Fan, Peng Chu, Erik Blasch, and Haibin Ling. Clustered object detection in aerial images (ClusDet). In ICCV 2019 , 2019. [92] Hongxu Yin, Arash Vahdat, Jose M. Alvarez, Arun Mallya, Jan Kautz, and Pavlo Molchanov. A-ViT: Adaptive tokens for efficient vision transformer. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022. [93] Shicheng Yin, Kaixuan Yin, Yang Liu, Weixing Chen, and Liang Lin. DART: Differentiable dynamic adaptive region tokenizer for vision foundation models. In arXiv 2025-06 (v1 2025-06-12 , 2025. [94] Irving S. Reed & Xiaoli Yu. Adaptive multiple-band CFAR detection of an optical pattern with unknown spectral distri-bution. IEEE Transactions on Acoustics, Speech, and Sig-nal Processing (TASSP) , 1990. [95] Qiyang Yu, Yu Fang, Tianrui Li, Xuemei Cao, Yan Chen, Jianghao Li, and Fan Min. Dynamic granularity matters: Rethinking vision transformers beyond fixed patch split-ting. In arXiv 2025-11-24 , 2025. [96] Zhang et al. Scale optimization using evolutionary rein-forcement learning for object detection on drone imagery. In AAAI Conference on Artificial Intelligence , 2024. [97] Enzhi Zhang, Isaac Lyngaas, Peng Chen, Xiao Wang, Jun Igarashi, Yuankai Huo, Masaharu Munetomo, and Mo-hamed Wahib. Adaptive patching for high-resolution image segmentation with transformers. In SC24 , 2024. [98] Lvmin Zhang, Anyi Rao, and Maneesh Agrawala. Adding conditional control to text-to-image diffusion models. In 
+
+ICCV , 2023. [99] Yu Zhang, Yepeng Liu, Duoqian Miao, Qi Zhang, Yiwei Shi, and Liang Hu. MG-ViT: A multi-granularity method for compact and efficient vision transformers. In NeurIPS 2023 main conference , 2023. [100] Yifan Zhang et al. AdaZoom: Adaptive zoom network for multi-scale object detection in large scenes, 2021. [101] Zhicheng Zhao, Yin Huang, Lingma Sun, Chenglong Li, and Jin Tang. Bridging the scale gap: Balanced tiny and general object detection in remote sensing imagery. arXiv preprint, 2025. [102] Dehua Zheng et al. Less is more: Focus attention for ef-ficient DETR. In IEEE/CVF International Conference on Computer Vision , 2023. [103] Shen Zheng, Anurag Ghosh, and Srinivasa G. Narasimhan. Instance-warp: Saliency guided image warping for unsu-pervised domain adaptation. In WACV , 2025. [104] Pengfei Zhu, Longyin Wen, Dawei Du, Xiao Bian, Heng Fan, Qinghua Hu, and Haibin Ling. Detection and tracking meet drones challenge. IEEE TPAMI 44(11):7380-7399, 2022 (early access 2021) , 2022. [105] Xizhou Zhu, Weijie Su, Lewei Lu, Bin Li, Xiaogang Wang, and Jifeng Dai. Deformable DETR: Deformable transform-ers for end-to-end object detection. In ICLR 2021 , 2021. [106] Chen Ziwen, Kaushik Patnaik, Shuangfei Zhai, Alvin Wan, Zhile Ren, Alexander G. Schwing, Alex Colburn, and Li Fuxin. AutoFocusFormer: Image segmentation off the grid. In CVPR 2023 – main conference , 2023. 
+
+20 [107] Zhuofan Zong, Guanglu Song, and Yu Liu. DETRs with collaborative hybrid assignments training (Co-DETR). In 
+
+ICCV 2023 , 2023. 
+
+21
