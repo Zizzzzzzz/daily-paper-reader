@@ -1,0 +1,2132 @@
+ProgResViT: Progressive Resolution and Width for Adaptive Vision Transformers
+Ali Hojjat1,2, Janek Haberer1, Olaf Landsiedel2,1,3
+1Kiel University, Germany
+2Hamburg University of Technology (TUHH), Germany
+3UNU-INWEH, Germany
+ali.hojjat@tuhh.de, janek.haberer@cs.uni-kiel.de, olaf.landsiedel@tuhh.de
+https://github.com/ds-kiel/ProgResViT
+Abstract
+Vision Transformers (ViTs) typically process every image us-
+ing a fixed input resolution and model width, even though
+many images can be classified with substantially less com-
+putation. We introduce ProgResViT, an input adaptive ViT
+that performs inference progressively across multiple rounds.
+The first round processes a low-resolution image with a nar-
+row subnetwork. Inference terminates when the prediction is
+sufficiently confident; otherwise, the model reuses the repre-
+sentations produced in the current round and proceeds with a
+higher-resolution input and a wider subnetwork to refine its
+prediction. As all rounds share a single backbone, we pro-
+pose Progress-Conditioned Soft Gating (PSG), which con-
+ditions token fusion and layer outputs on the current round,
+block, and input resolution. On image classification, applying
+ProgResViT to DeiT yields better accuracy–compute trade-
+offs than adaptive-width, adaptive-depth, and dynamic-token
+baselines. With knowledge distillation, a DeiT-based Pro-
+gResViT achieves 84.9% top-1 accuracy, slightly exceeding
+the reported DeiT-III-S accuracy under a comparable evalua-
+tion setting. We show that the same design also provides favor-
+able accuracy–compute trade-offs for self-supervised DINO
+representations and downstream semantic segmentation. Code
+is available in supplementary material.
+1
+Introduction
+Motivation.
+Vision Transformers (ViTs) process every im-
+age with the same input resolution, token grid, depth, and
+model width (Dosovitskiy et al. 2021). This fixed-cost design
+ignores two important sources of variation: images differ in
+difficulty, and correct predictions require different amounts
+of spatial detail. A clear, centered object can be recognized
+from a coarse view and a small model, whereas cluttered or
+fine-grained examples require both a denser token grid and
+greater representational capacity.
+Prior work.
+Adaptive ViTs address this mismatch by vary-
+ing individual computational axes. Early-exit methods adapt
+the executed depth (Bakhtiarnia, Zhang, and Iosifidis 2021;
+Xu et al. 2023); token-adaptive methods prune, merge, or se-
+lectively process spatial tokens (Rao et al. 2021; Meng et al.
+2022; Yin et al. 2022); and adaptive-width Transformers ex-
+pose subnetworks from a single parameter set (Devvrit et al.
+2024). ThinkingViT is the closest predecessor to our setting:
+it repeatedly executes progressively wider subnetworks and
+routes images according to prediction uncertainty (Hojjat
+et al. 2026). However, its rounds retain a fixed input resolu-
+tion, and it does not explicitly condition the repeatedly exe-
+cuted shared blocks on the current stage. In general, existing
+adaptive ViTs typically adjust only one computational axis at
+a time or rely on separately optimized operating points, leav-
+ing open how a single shared model can jointly adapt spatial
+resolution and model capacity while progressively refining
+representations.
+ProgResViT.
+We introduce ProgResViT, a confidence-
+routed ViT that progressively increases both image resolution
+and active model width. The model follows an ordered se-
+quence of resolution–width operating points. The first round
+processes a low-resolution image with a narrow subnetwork.
+Inference terminates when the prediction is sufficiently con-
+fident; otherwise, a cross-resolution token projector spatially
+aligns the patch tokens, expands their embedding dimension,
+and fuses them with fresh higher-resolution embeddings. The
+model then activates the full-width subnetwork, using more
+channels and attention heads and thereby allocating addi-
+tional computation to harder samples. Consequently, a single
+trained model provides a tunable accuracy–compute trade-
+off by varying only the inference threshold, without requiring
+separate models for different operating points. Figure 1 sum-
+marizes the pipeline.
+Iterative inference uses the same Transformer blocks un-
+der different operating conditions, including changes in input
+resolution and active model width. Naively reusing the same
+blocks across these settings forces each block to process rep-
+resentations with different spatial and channel characteristics
+without explicit knowledge of the current stage. Inspired by
+(Jacobs et al. 2026), we introduce Progress-Conditioned Soft
+Gating (PSG), a stage-conditioned modulation mechanism
+that uses round, block, and resolution metadata to modulate
+token fusion, attention and MLP residual updates, and block
+outputs. This conditioning enables the shared weights to spe-
+cialize across progressive stages while remaining part of a
+single backbone.
+Results Overview.
+On ImageNet-1K, ProgResViT with
+the 192 →240 resolution schedule reaches 82.21% top-1
+accuracy at 6.27 GMACs under full two-round inference and
+retains 82.18% at 4.47 average GMACs with confidence-
+based routing, reducing computation by 28.7%. This sched-
+arXiv:2609.03216v1  [cs.CV]  2 Sep 2026
+
+
++
+PSG
+PSG
+Round 1
+Low resolution
+Round 2, if needed
+High resolution
+Progress-Conditioned
+Soft Gating (PSG)
+ProgResViT block
+Progressive resolution and width inference
+Dog
+Norm
+MHA
+Norm
+MLP
+PSG
+PSG
+PSG
++
++
+Norm
+MHA
+Norm
+MLP
++
++
+Norm
+MHA
+Norm
+MLP
++
++
+ProgResViT block (×N)
+Layer 
+output
+Gated 
+output
+50%                                     100% 
+50%                                     100% 
+50%                                     100% 
+50%                                     100% 
+Token Proj.
+Embedding Proj.
+ProgResViT block (×N)
+Confident?
+Yes Dog
+No
+Linear
+(128, embed_dim)
+Linear
+(128, 128)
+Linear
+(metadata_dim, 128)
+Stage-and-resolution metadata
+(round number, block number, resolution, …)
+Layer Scale
+Figure 1: Overview of ProgResViT: Round 1 processes a low-resolution image using a narrow subnetwork with entropy-based
+routing. The second round uses a higher-resolution version of the input to generate new embeddings. The round 1 tokens are
+projected to match the dimensions of the new embeddings and then merged with them. The resulting combined embeddings are
+processed by the full subnetwork. As the same backbone is reused across rounds, its shared blocks must process representations
+with different token grids, spatial resolutions, and active widths, despite receiving no explicit indication of the current stage.
+To address this mismatch, ProgResViT introduces Progress-Conditioned Soft Gating (PSG), which uses round, block, and
+resolution metadata to condition token fusion and layer outputs on the current stage.
+ule outperforms the adaptive-width, adaptive-depth, and
+dynamic-token baselines. For maximum accuracy, the dis-
+tilled 160 →384 resolution schedule reaches 84.90% at
+16.15 GMACs and retains 84.87% at 11.12 average GMACs,
+reducing computation by 31.1%. We further show that Pro-
+gResViT maintains frontier accuracy–compute trade-offs for
+DINO representation learning, semantic segmentation, and
+distribution shifts represented by ImageNet variants. Figure 2
+summarizes the main results.
+Contributions.
+• We introduce a progressive resolution–width ViT that
+allocates both spatial detail and model capacity according
+to input complexity.
+• We introduce cross-resolution feature reuse, together with
+PSG for stage-conditioned modulation of repeatedly exe-
+cuted shared blocks.
+• We evaluate the resulting design through classification,
+distribution-shift tests, self-supervised DINO representa-
+tions, and semantic segmentation.
+2
+Related Work
+Adaptive-width Transformers.
+Matryoshka Representa-
+tion Learning learns useful representations at nested dimen-
+sionalities (Kusupati et al. 2022), while DynaBERT, Sort-
+edNet, MatFormer, HydraViT, and SlicingViT embed sub-
+networks with different capacities within a single parameter-
+sharing Transformer (Hou et al. 2020; Valipour et al. 2023;
+Devvrit et al. 2024; Haberer, Hojjat, and Landsiedel 2024;
+Zhang et al. 2024). These methods primarily support elastic
+deployment across selected operating points. ThinkingViT
+extends this idea to input-adaptive progressive inference
+by executing progressively wider subnetworks and apply-
+ing confidence-based early termination (Hojjat et al. 2026).
+ProgResViT extends this paradigm to progressive resolution
+and width inference. Additionally, it transfers features across
+rounds by projecting previous-round representations across
+both the token grid and the embedding dimension. Moreover,
+motivated by the depth-conditioned residual scaling of Rap-
+tor (Jacobs et al. 2026), ProgResViT introduces Progress-
+Conditioned Soft Gating (PSG) to explicitly condition token
+fusion and repeatedly executed shared blocks on the current
+round, block, and resolution.
+Resolution-flexible Transformers.
+FlexiViT and related
+multi-resolution methods support varying patch sizes, reso-
+lutions, or aspect ratios, but do not adapt resolution to pre-
+diction difficulty (Beyer et al. 2023; Fan et al. 2024; Tian
+et al. 2023; Dehghani et al. 2023). DVT and related adaptive
+multi-resolution methods allocate additional spatial compu-
+tation to uncertain inputs (Wang et al. 2021; Yang et al.
+2020; Guidez, Duffner, and Garcia 2026). CF-ViT refines
+informative patches while retaining the remaining regions at
+a coarse scale, and LF-ViT localizes a class-discriminative
+region from a low-resolution image before processing that
+region at a higher resolution (Chen et al. 2023; Hu et al.
+2024). MSViT instead selects a coarse or fine token scale for
+every image region and preserves full-image coverage (Hav-
+torn et al. 2023). Unlike these methods, ProgResViT jointly
+increases full-image resolution and active width within one
+shared backbone.
+
+
+2
+4
+6
+Avg. GMACs
+64
+66
+68
+70
+72
+ImageNet accuracy (%)
+ProgResViT (DINO)
+DINO ViT-S/16 (224)
+DINO ViT-S/16 (240)
+(a) DINO 20-NN.
+5
+10
+20
+50
+100
+150
+Avg. GMACs (log scale)
+38
+40
+42
+44
+mIoU (%)
+512
+576
+512
+576
+512
+576
+ProgResViT
+ThinkingViT
+DeiT-T/16
+DeiT-S/16
+DeiT-B/16
+(b) ADE20K segmentation.
+1
+2
+3
+4
+5
+6
+Avg. GMACs
+70
+72
+74
+76
+78
+80
+82
+ImageNet accuracy (%)
+HydraViT
+MatFormer
+ThinkingViT
+ProgResViT
+(c) Adaptive-width baselines.
+Model
+GMACs Top-1
+DeiT-III-S
+15.5
+84.80
+(3842)
+ProgResViT
+12.3
+84.90
+(1602 →3842)
+(d) ImageNet-1K accuracy.
+Figure 2: Summary of the main results. Across (a) DINOv1 representation learning, (b) ADE20K semantic segmentation, and
+(c) ImageNet-1K adaptive-width inference, ProgResViT consistently outperforms the corresponding baselines at comparable
+compute. (d) Although built on DeiT-S, distilled ProgResViT reaches 84.90% top-1 accuracy, slightly exceeding the reported
+DeiT-III-S accuracy under a comparable evaluation setting. For ProgResViT, the reported accuracy and GMACs use entropy-
+based routing with threshold τ = 0.15.
+Early exit and token-adaptive inference.
+LGViT and
+other early-exit networks adapt depth using intermediate clas-
+sifiers (Xu et al. 2023; Teerapittayanon, McDanel, and Kung
+2016; Huang et al. 2018; Bakhtiarnia, Zhang, and Iosifidis
+2021). Token-adaptive methods instead modify which spa-
+tial tokens are processed. DynamicViT progressively prunes
+tokens according to input-dependent importance scores, A-
+ViT adaptively halts computation for individual tokens, and
+AdaViT jointly selects patches, attention heads, and Trans-
+former blocks on a per-input basis (Rao et al. 2021; Yin et al.
+2022; Meng et al. 2022). Unlike these methods, ProgResViT
+preserves the complete token grid at each round while adapt-
+ing computation along two axes. It changes the token count
+by varying the input resolution and adjusts the computation
+per token by varying the Transformer width.
+3
+ProgResViT
+This section describes the ProgResViT pipeline. We first
+present the adaptive-width rounds, followed by cross-
+resolution token projection, PSG, joint training, and early
+stopping metrics.
+Adaptive-Width Progressive Rounds
+ProgResViT begins by resizing the input image to a lower
+resolution and processing it with a narrow subnetwork. Let
+{(rs, hs, ds)}S
+s=1 denote each round, where rs is the image
+resolution, hs is the number of active attention heads, and ds
+is the active embedding width. Round 1 uses (r1, h1, d1) and
+produces a complete prediction. Round 2 process a higher-
+resolution version of the same image using the wider operat-
+ing point (r2, h2, d2). Each round traverses all D blocks of
+the same ViT backbone.
+Subnetwork extraction.
+We slice the subnetworks follow-
+ing the slicing scheme of adaptive-width models (Haberer,
+Hojjat, and Landsiedel 2024). Specifically, to create each
+subnetwork, we select the first hs attention heads and their
+corresponding first ds channels. We use the same channel
+prefix throughout the shared Transformer, including the nor-
+malization parameters, attention projections, and MLP. At
+round s + 1, we resize the input image to rs+1, re-embed it,
+mix the resulting tokens with tokens from previous rounds,
+and process them using the wider prefix defined by hs+1
+and ds+1; see Figure 1. Because the patch grid changes with
+the resolution, we interpolate the spatial component of the
+shared positional embedding to the grid of each round before
+selecting the active channel prefix.
+Cross-Resolution Token Projection.
+Successive rounds
+reuse tokens from earlier rounds, but differ in token count
+and embedding width. To reconcile these mismatched rep-
+resentations, we introduce a token projector that resizes the
+patch-token grid and projects it to the next round’s width,
+while a separate projection adjusts the class token. We then
+fuse the aligned tokens with fresh, higher-resolution embed-
+dings for the next round. See Appendix A for more informa-
+tion.
+Progress-Conditioned Soft Gating (PSG)
+In ProgResViT, each Transformer block serves multiple sub-
+networks across successive inference rounds and therefore
+processes representations with different resolutions and ac-
+tive widths. Without stage conditioning, the same parameters
+must simultaneously optimize representations from different
+distributions caused by changes in token count, spatial resolu-
+tion, and active width. Motivated by iteration-aware modula-
+tion (Jacobs et al. 2026), we introduce Progress-Conditioned
+Soft Gating to condition each block on the progress of infer-
+ence. Let X denote the input to block b in round s. PSG ap-
+plies channel-wise multipliers to the attention update, MLP
+update, and final block output; see Figure 1. We summa-
+rize the resulting block computation as follows, with blue
+highlighting the terms introduced by PSG:
+X ←X + Gattn
+s,b ⊙LayerScale(Att(X)),
+X ←X + Gmlp
+s,b ⊙LayerScale(MLP(X)),
+Xout = Gout
+s,b ⊙X.
+(1)
+PSG constructs a five-value metadata vector from the
+round index, normalized progress across all block execu-
+
+
+0.0
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+Avg. GMACs per image
+60
+65
+70
+75
+80
+85
+ImageNet top-1 accuracy (%)
+160→240
+192→240
+128→192→240
+160→384
+(a) Resolution schedules.
+0
+50
+100
+150
+Feature channel
+Block 1
+Block 2
+Block 3
+Block 4
+Block 5
+Block 6
+Block 7
+Block 8
+Block 9
+Block 10
+Block 11
+Block 12
+0
+50
+100
+150
+200
+250
+300
+350
+Feature channel
+0
+1
+2
+3
+4
+5
+PSG multiplier
+(b) Progress-Conditioned Soft Gating (PSG) multipliers.
+Figure 3: (a) Ablation of different resolution schedules. Two-round variants use 3→6 heads, while the three-round variant uses
+2→4→6. The 192→240 schedule offers the best trade-off. (b) Heatmap of learned PSG multipliers across layers and rounds.
+Each block shows attention, MLP, and output gates. PSG learns distinct patterns across rounds, layers, and channels.
+tions, the current and previous resolutions, and their rela-
+tive change. A small shared encoder maps this metadata to
+a condition embedding. Separate gate heads then produce
+multiplier vectors for the attention, MLP, and block-output
+pathways. Each gate predicts a residual ∆G and outputs
+G = 1 + ∆G. Zero-initializing the final layer makes PSG an
+identity at initialization, after which it learns channel-wise
+amplification and suppression across inference stages.
+We apply the sameconditioning mechanismwhencombin-
+ing information across rounds; see Figure 1. For a later round,
+let Es denote the new tokens extracted from the higher-
+resolution image, and let bZs denote the aligned state from
+the preceding round. Separate PSG multipliers scale the two
+streams before fusion:
+X(0)
+s
+= Gimg
+s
+⊙Es + Gprev
+s
+⊙bZs.
+(2)
+For further details on the PSG architecture, see Appendix B.
+Training and Inference
+During training, ProgResViT jointly optimizes all rounds
+using the same classification-loss weight. Early exiting is
+disabled, so every round is trained on every sample. During
+inference, after each round, we compute the entropy of the
+top-10 class probabilities as the uncertainty score. Samples
+with entropy below a specified threshold exit, while the re-
+maining samples continue to the next round. Varying this
+threshold produces an accuracy–compute frontier without
+retraining. At matched continuation rates, the learned router
+improves accuracy by at most 0.21 percentage points over
+entropy-based routing; see Appendix C. Given this marginal
+gain, we favor entropy routing because it is simple and incurs
+no additional overhead.
+4
+Experiments
+Setup
+Image
+classification.
+We
+evaluate
+ProgResViT
+on
+ImageNet-1K (Russakovsky et al. 2015). Our implemen-
+tation uses the DeiT-S architecture (Touvron et al. 2021)
+Schedule
+Round 1
+Round 2
+Routed
+192→240
+73.23/.91
+82.21/6.27
+82.18/4.47
+160→240
+70.95/.62
+82.14/5.97
+82.14/4.96
+160→384
+70.62/.62
+83.70/16.15
+83.69/13.29
+192→240 + KD
+76.02/.91
+83.80/6.27
+83.77/4.46
+160→384 + KD
+73.92/.62
+84.90/16.15
+84.87/11.12
+Table 1: Resolution schedules and knowledge-distillation
+(KD) evaluation. Each cell reports top-1 accuracy / aver-
+age GMACs. Routed accuracy denotes an efficient operating
+point with accuracy close to round 2.
+available in timm (Wightman 2019) and contains 24.7M pa-
+rameters. We train for 300 epochs followed by a 10-epoch
+cooldown. We report top-1 accuracy on the ImageNet-1K
+validation set and evaluate the same model without fine-
+tuning on ImageNet-V2, -A, -R, -Sketch, and -C (Recht et al.
+2019; Hendrycks et al. 2021b,a; Wang et al. 2019; Hendrycks
+and Dietterich 2019).
+DINO representations.
+We apply ProgResViT to DINO
+(Caron et al. 2021) and train it on ImageNet-1K. Both Pro-
+gResViT and the fixed ViT-S/16 reference are trained from
+scratch for 100 epochs using the same DINO setup.
+ADE20K segmentation.
+We apply ProgResViT to the
+Segmenter architecture (Strudel et al. 2021) and train the
+resulting model on ADE20K (Zhou et al. 2017) using a lin-
+ear decoder.
+Accuracy–Efficiency Trade-offs for classification
+Resolution and width scheduling.
+Figure 3a compares the
+accuracy–compute frontiers obtained with different resolu-
+tion and width schedules. Among the tested schedules, the
+configuration using a 192×192 input in the first round and a
+240 × 240 input in the second round, denoted by 192→240,
+together with an attention-head schedule of 3 heads in the
+first round and 6 heads in the second round, denoted by 3→6,
+provides the strongest overall trade-off. We therefore use it as
+
+
+1
+6
+121
+6
+12
+Layer
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Mean cosine similarity to final laye
+Round 1
+192 px / 3 heads
+Round 2
+240 px / 6 heads
+Token fusion
+CLS token
+Patch-token mean
+(a) Similarity to round 2’s last layer
+1
+2
+3
+4
+5
+6
+Avg. GMACs per image
+72
+74
+76
+78
+80
+82
+ImageNet top-1 accuracy (%)
+Width progression
+Width and resolution
+progression
+Width and resolution
+progression + PSG
+(b) Model construction.
+2
+4
+6
+8
+10
+12
+Avg. GMACs per image
+72
+74
+76
+78
+80
+82
+ImageNet top-1 accuracy (%)
+ProgResViT
+DVT
+CF-ViT
+LF-ViT
+Fusion-S
+Layer-wise cls.
+A-ViT
+AHT-ViT
+MT-ViT
+MT-DynamicViT
+METR + EViT
+LGViT
+SDN
+PABEE
+ViT-EE
+PCEE
+Fusion-B
+(c) Adaptive-inference baselines.
+Figure 4: (a) Similarity to the final representation generally rises across both rounds, showing that round 2 refines the represen-
+tation developed in round 1. The patch-token decrease at the round transition reflects fusion with fresh higher-resolution tokens.
+(b) Step-by-step ablation of model construction. (c) Adaptive-inference and early-exit comparison. ProgResViT provides the
+strongest high-accuracy frontier.
+87%
+74%
+48%
+0%
+Blurring percentage
+80.0
+80.5
+81.0
+81.5
+82.0
+82.5
+83.0
+Top-1 accuracy (%)
+80.47
+81.76
+82.14
+82.21
+Native 82.21
+87% blur
+74% blur
+48% blur
+0% blur
+(a) Round-1 low-pass intervention.
+0
+5
+10
+15
+Drop in top-1 accuracy
+(percentage points)
+Own tokens
+(CLS + patches)
+Same-class image
+(CLS + patches)
+Other-class image
+(CLS + patches)
+Other-class image
+(CLS only)
+Other-class image
+(Patches only)
+Own patch tokens
+(shuffled positions)
+Mean tokens
+(CLS + patches)
+No round-1 tokens
+(CLS or patches)
+0
+10
+20
+30
+40
+Relative drop in mean correct-class
+confidence (%)
+(b) Token-swap interventions.
+Figure 5: (a) Effect of low-pass filtering the round 1 input on final accuracy. Removing high-frequency information from round
+1 reduces round 2 accuracy, indicating that the first-round representation provides useful context for refinement. (b) Effect of
+replacing or shuffling round 1 tokens on round 2 accuracy and correct-class confidence. Perturbing the patch tokens causes the
+largest drop, indicating that they carry useful semantic and spatial information.
+the default configuration for the remaining analyses and ab-
+lations. The 160 →384 with a 3→6 head schedule requires
+more computation but gives the highest final accuracy.
+Table 1 reports the round 1, round 2, and routed results
+with head schedule of 3 →6. Routed accuracy denotes an
+efficient operating point with accuracy close to round 2.
+For the default 192 →240 configuration, round 1 achieves
+73.23% accuracy at 0.91 GMACs, while the round 2 reaches
+82.21% accuracy at 6.27 GMACs. Entropy-based routing re-
+tains 82.18% accuracy at 4.47 average GMACs, reducing
+computation by 28.7% with a 0.03-point accuracy drop. The
+table also includes the higher-accuracy 160 →384 configu-
+ration, which achieves 83.70% after the second round. Ap-
+pendix D presents results for DeiT-S at different resolutions.
+To maximize performance, we also train ProgResViT
+for 300 epochs using knowledge distillation from a DeiT-
+III-B/384 teacher (Touvron, Cord, and Jégou 2022). The
+160 →384 model achieves 84.90% at 16.15 GMACs and
+retains 84.87% at 11.12 GMACs. Despite using a DeiT-S
+architecture, the 160 →384 configuration achieves 84.90%
+top-1 accuracy, slightly above the reported 84.80% accuracy
+of ImageNet-21K-pretrained DeiT-III-S/384 at 15.5 GMACs.
+For the 192 →240 configuration, distillation increases the
+round 1 accuracy from 73.23% to 76.02% and the round 2
+accuracy from 82.21% to 83.80%. With entropy-based rout-
+ing, the distilled model retains 83.77% at 4.46 GMACs. Dis-
+tillation details are provided in Appendix E.
+To evaluate ProgResViT under challenging distribution
+shifts, we test it without fine-tuning on ImageNet-V2, -
+A, -R, -Sketch, and -C, and report in Figure 7c. These
+benchmarks cover natural distribution shift, adversarially
+filtered images, artistic renditions, sketches, and common
+corruptions, making them substantially more challenging
+than standard ImageNet-1K. ProgResViT maintains efficient
+
+
+1
+2
+3
+4
+5
+6
+Avg. GMACs per image
+72
+74
+76
+78
+80
+82
+ImageNet top-1 accuracy (%)
+ProgResViT
+AdaViT
+DynamicViT
+A-MoD
+MoD
+ToMe
+A-ViT
+DeiT-S
+SuperViT
+MSDeiT-S
+Quadformer-S
+MIA-Former-DeiT-S
+AdaViT-DeiT-S
+ViTAR-S
+(a) Dynamic token baselines.
+2000
+4000
+6000
+8000
+10000 12000
+Throughput (images/s)  →
+70
+72
+74
+76
+78
+80
+82
+ImageNet top-1 accuracy (%)
+ProgResViT
+HydraViT-Base
+HydraViT-Small
+MatFormer-Base
+MatFormer-Small
+(b) Throughput frontier.
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+Avg. GMACs per image
+70
+72
+74
+76
+78
+80
+82
+ImageNet top-1 accuracy (%)
+ProgResViT
+ThinkingViT
+DeiT-Tiny
+DeiT-Small
+DeiT-Base
+DynaBERT-Base
+DynaBERT-Small
+HydraViT-Base
+HydraViT-Small
+MatFormer-Base
+MatFormer-Small
+SortedNet-Base
+SortedNet-Small
+(c) Adaptive-width baselines.
+Figure 6: (a) Dynamic-token comparison. ProgResViT provides the strongest high-accuracy frontier; lines denote one trained
+model, while isolated markers denote separate models. (b) Throughput comparison on one NVIDIA L40 at batch size 512.
+ProgResViT achieves higher accuracy at comparable throughput. (c) Adaptive-width comparison. ProgResViT outperforms the
+evaluated baselines at comparable compute.
+accuracy–compute trade-offs across all five datasets, outper-
+forming DeiT-S throughout and DeiT-B on several variants
+despite using substantially less compute, which shows the
+effectiveness of ProgResViT’s routing mechanism.
+Adaptive-width baselines.
+Figure 6c compares Pro-
+gResViT with adaptive-width baselines across the accu-
+racy–GMACs trade-off points (Haberer, Hojjat, and Land-
+siedel 2024; Devvrit et al. 2024; Hou et al. 2020; Valipour
+et al. 2023). ProgResViT outperforms these adaptive-width
+baselines. Furthermore, ProgResViT outperforms Think-
+ingViT, its primary baseline, across all operating points,
+achieving gains of up to 0.74 percentage points (Hojjat et al.
+2026). These results demonstrate the effectiveness of the pro-
+posed PSG and ProgResViT’s progressive resolution-width
+inference. Figure 6b shows a similar trend for measured
+throughput. Comparisons with FlexiViT (Beyer et al. 2023)
+and memory measurements are provided in Appendix G and
+Appendix H, respectively.
+Dynamic-token and early-exit baselines.
+As ProgResViT
+adapts resolution and width while preserving the underlying
+ViT block structure and retaining the full token grid and
+depth within each round, it is complementary to dynamic-
+token and depth-wise early-exit methods. These mechanisms
+could therefore be incorporated within individual rounds.
+Nevertheless, we compare against both categories: Figures 6a
+and 4c show that ProgResViT provides the strongest high-
+accuracy frontier among the baselines. Further details and
+references are provided in Appendix I.
+Transfer Beyond Supervised Classification
+Self-supervised representations (DINO).
+We apply Pro-
+gResViT to a DINO ViT-S/16 backbone and train it alongside
+fixed-resolution 224 × 224 and 240 × 240 baselines for 100
+epochs using matched recipes (Caron et al. 2021). Under
+20-NN evaluation, ProgResViT outperforms both separately
+trained ViT-S/16 baselines; see Figure 2a. These results show
+that ProgResViT extends effectively to self-supervised rep-
+resentations while preserving accuracy–compute trade-offs.
+Linear-probing results and attention maps are provided in
+Appendix J and Appendix Q, respectively.
+Semantic segmentation.
+We replace Segmenter’s fixed
+ViT encoder with ProgResViT and use one shared linear de-
+coder for both rounds. Round 1 and 2 processes a 448 × 448
+and 576 × 576 input respectively. ProgResViT outperforms
+ThinkingViT and the separately trained DeiT-Tiny, DeiT-
+Small, and DeiT-Base segmentation models; see Figure 2b.
+Segmentation-routing details are provided in Appendix K.
+Analysis of Progress-Conditioned Soft Gating
+To investigate how PSG adapts the shared backbone, Fig-
+ure 3b visualizes its channel-wise attention, MLP, and block-
+output multipliers across all blocks and rounds. Their varia-
+tion across channels, depth, and rounds under a shared color
+scale shows that PSG learns stage-specific amplification and
+suppression rather than uniform scaling. To further investi-
+gate this behavior, we compare its multiplier distributions
+at selected depths in Figure 7a. Round-specific differences
+appear throughout the backbone, showing that PSG learns
+nontrivial, stage-dependent modulation.
+Progressive Refinement
+Ablation of ProgResViT’s construction
+Figure 4b com-
+pares the main stages of the model design. The fixed-
+resolution width baseline with 3→6 head schedule achieves
+81.44% accuracy. Introducing the 192→240 resolution pro-
+gression increases the full-path accuracy to 81.74%. Finally,
+adding PSG improves the accuracy to 82.20% at nearly the
+same GMACs.
+Round 1 Provides Useful Context for Round 2.
+To as-
+sess how information from the low-resolution first round
+contributes to the final prediction, we apply a low-pass inter-
+vention to the round 1 input and measure the resulting round
+2 accuracy; see Figure 5a. Specifically, we remove high-
+frequency information by blurring the round 1 image while
+leaving the round 2 input unchanged. The horizontal axis
+
+
+0
+2
+0
+2
+4
+Attention PSG
+Layer 1
+Round 1
+Round 2
+0.5
+1.0
+1.5
+Layer 4
+1.0
+1.5
+Layer 6
+0.5
+1.0
+1.5
+Layer 8
+1.0
+1.5
+Layer 10
+1.5
+2.0
+2.5
+Layer 12
+0
+2
+4
+0.0
+0.5
+1.0
+MLP PSG
+1.0
+1.5
+2.0
+1
+2
+1
+2
+3
+1
+2
+0.5
+1.0
+1.5
+0
+2
+0
+2
+4
+Layer-output PSG
+0.50
+0.75
+1.00
+0.5
+1.0
+0.50
+0.75
+1.00
+0.75
+1.00
+1.25
+1.0
+1.5
+(a) PSG multiplier distributions for the attention, MLP, and layer-output.
+goldfish
+espresso maker
+fire engine
+suspension bridge
+strawberry
+Round 1: blocks 1–12
+Round 2: blocks 13–24
+Last block of each round
+Round transition: 12→13
+(b) PCA of the CLS trajectories.
+0
+10
+20
+GMACs
+60 66 72
+Top-1 Acc. (%)
+ImageNet-V2
+0
+10
+20
+GMACs
+8 16 24 32
+ImageNet-A
+0
+10
+20
+GMACs
+30 36 42 48
+ImageNet-R
+0
+10
+20
+GMACs
+18 24 30 36
+ImageNet-Sketch
+0
+10
+20
+GMACs
+40 48 56 64
+ImageNet-C
+ProgResViT
+DeiT-T
+DeiT-S
+DeiT-B
+(c) Performance of ProgResViT and DeiT models across five hard ImageNet variants.
+Figure 7: (a) PSG multipliers at selected layers, with the strongest round-specific separation in the final block. (b) PCA trajectories
+of five class-mean CLS representations. Separation begins in round 1 and strengthens in round 2; the dashed line marks token
+fusion. (c) Robustness on five hard ImageNet variants. ProgResViT maintains favorable trade-offs over DeiT baselines.
+reports the blurring percentage, with 0% denoting the native
+image. At approximately 87% blurring, the accuracy of the
+second round drops by 1.74%. This reduction indicates that
+the representations produced in round 1 provide meaningful
+information that supports prediction in round 2. Figure 5b ex-
+amines the contribution of the round 1 representation from
+another perspective. We replace the round 1 tokens with to-
+kens from other images while keeping the round 2 image
+embeddings fixed. Replacing or shuffling the patch tokens
+reduces both round 2 accuracy and correct-class confidence,
+showing that they carry useful semantic and spatial informa-
+tion. Replacing only the class token has the smallest effect,
+especially when it comes from an image of the same class,
+as class tokens from similar images are expected to contain
+similar information. For more analysis, see Appendix L and
+Appendix M, respectively.
+Progressive Representation Refinement Across Rounds.
+Figure 4a shows that block outputs become increasingly sim-
+ilar to the final round 2 representation, indicating that round
+2 refines rather than restarts the representation learned in
+round 1. Patch-token similarity briefly decreases at the tran-
+sition as fusion introduces fresh higher-resolution tokens,
+whereas CLS-token similarity continues to increase across
+both rounds. Figure 7b shows PCA trajectories of class-
+mean CLS representations for five ImageNet classes. Round
+1 moves them from a shared region toward partial separa-
+tion, while the dashed transition marks token fusion. Round
+2 further separates the trajectories, indicating that the higher-
+resolution stage strengthens class-specific representations.
+5
+Limitations
+Although ProgResViT reduces computation for easy images,
+it may spend additional computation on uncertain inputs
+that remain misclassified after the final round. This can oc-
+cur when uncertainty reflects ambiguity or distribution shift
+rather than insufficient computation. The current entropy-
+based router does not explicitly distinguish such cases from
+inputs thatbenefit from refinement. Although rejectionmech-
+anisms can reduce this unnecessary computation, incorpo-
+rating them compromises the fairness of the comparison with
+other baselines.
+6
+Conclusion
+We introduced ProgResViT, an input-adaptive ViT that pro-
+gressively increases input resolution and active model width
+while reusing features across rounds. A cross-resolution
+token projector aligns features between stages, and PSG
+conditions token fusion and shared Transformer blocks on
+the current inference stage. On ImageNet-1K, ProgResViT
+improves accuracy–compute trade-offs over adaptive-width,
+adaptive-depth, and dynamic-token baselines, while the dis-
+tilled model reaches 84.9% top-1 accuracy. The same design
+also transfers effectively to DINO representation learning
+and ADE20K semantic segmentation.
+
+
+Acknowledgments
+This research received funding from the Federal Ministry for
+Digital and Transport under the CAPTN-Förde 5G project
+(grant no. 45FGU139H), the German Ministry of Transport
+and Digital Infrastructure through the CAPTN Förde Areal
+II project (grant no. 45DTWV08D), the Federal Ministry for
+Economic Affairs and Energy under the CAPTN X-FERRY
+project (grant no. 03SX612A), and the Federal Ministry for
+Economic Affairs and Climate Action under the Marispace-
+X project (grant no. 68GX21002E). The work was supported
+in part by high-performance computing resources provided
+by the Kiel University Computing Centre and the Hydra com-
+puting cluster, funded by the German Research Foundation
+(grant no. 442268015) and the Petersen Foundation (grant
+no. 602157).
+References
+Bakhtiarnia, A.; Zhang, Q.; and Iosifidis, A. 2021. Multi-
+Exit Vision Transformer for Dynamic Inference. In British
+Machine Vision Conference, 81.
+Beyer, L.; Izmailov, P.; Kolesnikov, A.; Caron, M.; Kornblith,
+S.; Zhai, X.; Minderer, M.; Tschannen, M.; Alabdulmohsin,
+I.; and Pavetic, F. 2023. Flexivit: One model for all patch
+sizes. In Proceedings of the IEEE/CVF Conference on Com-
+puter Vision and Pattern Recognition, 14496–14506.
+Bolya, D.; Fu, C.-Y.; Dai, X.; Zhang, P.; Feichtenhofer, C.;
+and Hoffman, J. 2023. Token Merging: Your ViT But Faster.
+In The Eleventh International Conference on Learning Rep-
+resentations.
+Caron, M.; Touvron, H.; Misra, I.; Jégou, H.; Mairal, J.;
+Bojanowski, P.; and Joulin, A. 2021. Emerging Properties in
+Self-Supervised Vision Transformers. In Proceedings of the
+IEEE/CVF International Conference on Computer Vision,
+9650–9660.
+Chen, M.; Lin, M.; Li, K.; Shen, Y.; Wu, Y.; Chao, F.; and
+Ji, R. 2023. CF-ViT: A General Coarse-to-Fine Method for
+Vision Transformer. In Proceedings of the AAAI Conference
+on Artificial Intelligence, volume 37, 7042–7052.
+Dehghani, M.; Mustafa, B.; Djolonga, J.; Heek, J.; Minderer,
+M.; Caron, M.; Steiner, A.; Puigcerver, J.; Geirhos, R.; Al-
+abdulmohsin, I.; Oliver, A.; Padlewski, P.; Gritsenko, A.;
+Lučić, M.; and Houlsby, N. 2023. Patch n’ Pack: NaViT, a
+Vision Transformer for Any Aspect Ratio and Resolution.
+In Advances in Neural Information Processing Systems, vol-
+ume 36, 2252–2274.
+Devvrit; Kudugunta, S.; Kusupati, A.; Dettmers, T.; Chen,
+K.; Dhillon, I. S.; Tsvetkov, Y.; Hajishirzi, H.; Jain, P.;
+Kakade, S.; and Farhadi, A. 2024. MatFormer: Nested Trans-
+former for Elastic Inference. In Advances in Neural Informa-
+tion Processing Systems, volume 37, 140535–140564.
+Dosovitskiy, A.; Beyer, L.; Kolesnikov, A.; Weissenborn,
+D.; Zhai, X.; Unterthiner, T.; Dehghani, M.; Minderer, M.;
+Heigold, G.; Gelly, S.; Uszkoreit, J.; and Houlsby, N. 2021.
+An Image is Worth 16x16 Words: Transformers for Image
+Recognition at Scale. In International Conference on Learn-
+ing Representations.
+Fan, Q.; You, Q.; Han, X.; Liu, Y.; Tao, Y.; Huang, H.; He,
+R.; and Yang, H. 2024. ViTAR: Vision Transformer with
+Any Resolution. arXiv preprint arXiv:2403.18361.
+Gadhikar, A.; Majumdar, S. K.; Popp, N.; Saranrittichai, P.;
+Rapp, M.; and Schott, L. 2025. Attention Is All You Need For
+Mixture-of-Depths Routing. In First Workshop on Scalable
+Optimization for Efficient and Adaptive Foundation Models.
+Guidez, M.; Duffner, S.; and Garcia, C. 2026.
+RAViT:
+Resolution-Adaptive Vision Transformer.
+arXiv preprint
+arXiv:2602.24159.
+Haberer, J.; Hojjat, A.; and Landsiedel, O. 2024. HydraViT:
+Stacking Heads for a Scalable ViT. In The Thirty-eighth An-
+nual Conference on Neural Information Processing Systems.
+Havtorn, J. D.; Royer, A.; Blankevoort, T.; and Bejnordi,
+B. E. 2023. MSViT: Dynamic Mixed-Scale Tokenization
+for Vision Transformers. In Proceedings of the IEEE/CVF
+International Conference on Computer Vision Workshops.
+Hendrycks, D.; Basart, S.; Mu, N.; Kadavath, S.; Wang, F.;
+Dorundo, E.; Desai, R.; Zhu, T.; Parajuli, S.; Guo, M.; Song,
+D.; Steinhardt, J.; and Gilmer, J. 2021a. The Many Faces of
+Robustness: A Critical Analysis of Out-of-Distribution Gen-
+eralization. In Proceedings of the IEEE/CVF International
+Conference on Computer Vision, 8340–8349.
+Hendrycks, D.; and Dietterich, T. 2019. Benchmarking Neu-
+ral Network Robustness to Common Corruptions and Pertur-
+bations. In International Conference on Learning Represen-
+tations.
+Hendrycks, D.; Zhao, K.; Basart, S.; Steinhardt, J.; and Song,
+D. 2021b. Natural Adversarial Examples. In Proceedings of
+the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition, 15262–15271.
+Hojjat, A.; Haberer, J.; Pirk, S.; and Landsiedel, O. 2026.
+ThinkingViT: Matryoshka Thinking Vision Transformer for
+Elastic Inference. In Proceedings of the IEEE/CVF Confer-
+ence on Computer Vision and Pattern Recognition, 41923–
+41933.
+Hou, L.; Huang, Z.; Shang, L.; Jiang, X.; Chen, X.; and Liu,
+Q. 2020. Dynabert: Dynamic bert with adaptive width and
+depth. Advances in Neural Information Processing Systems,
+33: 9782–9793.
+Hu, Y.; Cheng, Y.; Lu, A.; Cao, Z.; Wei, D.; Liu, J.; and Li,
+Z. 2024. LF-ViT: Reducing Spatial Redundancy in Vision
+Transformer for Efficient Image Recognition. In Proceedings
+of the AAAI Conference on Artificial Intelligence, volume 38,
+2274–2284.
+Huang, G.; Chen, D.; Li, T.; Wu, F.; van der Maaten, L.;
+and Weinberger, K. Q. 2018. Multi-Scale Dense Networks
+for Resource Efficient Image Classification. In International
+Conference on Learning Representations.
+Jacobs, M.; Fel, T.; Hakim, R.; Brondetta, A.; Ba, D.; and
+Keller, T. A. 2026. Block Recurrent Dynamics in Vision
+Transformers. In International Conference on Learning Rep-
+resentations.
+Jiang, J.; Zhou, J.; and Zhu, Z. 2025. Tracing Representation
+Progression: Analyzing and Enhancing Layer-Wise Similar-
+ity. In International Conference on Learning Representa-
+tions.
+
+
+Kaya, Y.; Hong, S.; and Dumitras, T. 2019. Shallow-deep
+networks: Understanding and mitigating network overthink-
+ing. In International conference on machine learning, 3301–
+3310. PMLR.
+Kusupati, A.; Bhatt, G.; Rege, A.; Wallingford, M.; Sinha,
+A.; Ramanujan, V.; Howard-Snyder, W.; Chen, K.; Kakade,
+S.; Jain, P.; et al. 2022. Matryoshka representation learn-
+ing. Advances in Neural Information Processing Systems,
+35: 30233–30249.
+Liang, Y.; Ge, C.; Tong, Z.; Song, Y.; Wang, J.; and Xie,
+P. 2022. Not All Patches Are What You Need: Expediting
+Vision Transformers via Token Reorganizations. In Interna-
+tional Conference on Learning Representations.
+Lin, M.; Chen, M.; Zhang, Y.; Shen, C.; Ji, R.; and Cao, L.
+2023. Super Vision Transformer. International Journal of
+Computer Vision, 131(12): 3136–3151.
+Liu, D.; Kan, M.; Shan, S.; and Chen, X. 2024. A Sim-
+ple Romance Between Multi-Exit Vision Transformer and
+Token Reduction. In International Conference on Learning
+Representations.
+Meng, L.; Li, H.; Chen, B.-C.; Lan, S.; Wu, Z.; Jiang, Y.-
+G.; and Lim, S.-N. 2022.
+Adavit: Adaptive vision trans-
+formers for efficient image recognition. In Proceedings of
+the IEEE/CVF conference on computer vision and pattern
+recognition, 12309–12318.
+Pradeep, A.; Nazari, S.; Taheri, M.; and Herglotz, C.
+2026.
+Fusion: A Framework for Unified Sequential To-
+ken AdaptatIon in VisiOn TraNsformers.
+arXiv preprint
+arXiv:2607.02612.
+Rao, Y.; Zhao, W.; Liu, B.; Lu, J.; Zhou, J.; and Hsieh, C.-J.
+2021. Dynamicvit: Efficient vision transformers with dy-
+namic token sparsification. Advances in neural information
+processing systems, 34: 13937–13949.
+Raposo, D.; Ritter, S.; Richards, B.; Lillicrap, T.; Humphreys,
+P. C.; and Santoro, A. 2024. Mixture-of-depths: Dynamically
+allocating compute in transformer-based language models.
+arXiv preprint arXiv:2404.02258.
+Recht, B.; Roelofs, R.; Schmidt, L.; and Shankar, V. 2019.
+Do ImageNet Classifiers Generalize to ImageNet? In Inter-
+national Conference on Machine Learning, 5389–5400.
+Ronen, T.; Levy, O.; and Golbert, A. 2023. Vision Transform-
+ers with Mixed-Resolution Tokenization. In Proceedings of
+the IEEE/CVF Conference on Computer Vision and Pattern
+Recognition Workshops, 4613–4622.
+Russakovsky, O.; Deng, J.; Su, H.; Krause, J.; Satheesh, S.;
+Ma, S.; Huang, Z.; Karpathy, A.; Khosla, A.; Bernstein, M.;
+Berg, A. C.; and Fei-Fei, L. 2015. ImageNet Large Scale Vi-
+sual Recognition Challenge. International Journal of Com-
+puter Vision (IJCV), 115(3): 211–252.
+Shutov, V.; and Asadulaev, A. 2025. AHT-ViT: Adaptive
+Halting Transformer with Planned Depth Execution.
+In-
+ternational Journal on Cybernetics & Informatics, 14(4):
+41–50.
+Strudel, R.; Garcia, R.; Laptev, I.; and Schmid, C. 2021. Seg-
+menter: Transformer for semantic segmentation. In Proceed-
+ings of the IEEE/CVF international conference on computer
+vision, 7262–7272.
+Teerapittayanon, S.; McDanel, B.; and Kung, H.-T. 2016.
+Branchynet: Fast inference via early exiting from deep neural
+networks. In 2016 23rd international conference on pattern
+recognition (ICPR), 2464–2469. IEEE.
+Tian, R.; Wu, Z.; Dai, Q.; Hu, H.; Qiao, Y.; and Jiang, Y.-
+G. 2023. ResFormer: Scaling ViTs with Multi-Resolution
+Training. In Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition.
+Touvron, H.; Cord, M.; Douze, M.; Massa, F.; Sablayrolles,
+A.; and Jégou, H. 2021. Training data-efficient image trans-
+formers & distillation through attention. In International
+conference on machine learning, 10347–10357. PMLR.
+Touvron, H.; Cord, M.; and Jégou, H. 2022. Deit iii: Revenge
+of the vit. In European conference on computer vision, 516–
+533. Springer.
+Valipour, M.; Rezagholizadeh, M.; Rajabzadeh, H.; Tahaei,
+M.; Chen, B.; and Ghodsi, A. 2023. Sortednet, a place for
+every network and every network in its place: Towards a gen-
+eralized solution for training many-in-one neural networks.
+arXiv preprint arXiv:2309.00255.
+Wang, H.; Ge, S.; Lipton, Z.; and Xing, E. P. 2019. Learning
+Robust Global Representations by Penalizing Local Predic-
+tive Power. In Advances in Neural Information Processing
+Systems, 10506–10518.
+Wang, Y.; Du, B.; Wang, W.; and Xu, C. 2024. Multi-Tailed
+Vision Transformer for Efficient Inference. Neural Networks,
+174: 106235.
+Wang, Y.; Huang, R.; Song, S.; Huang, Z.; and Huang, G.
+2021.
+Not all images are worth 16x16 words: Dynamic
+transformers for efficient image recognition. Advances in
+neural information processing systems, 34: 11960–11973.
+Wightman, R. 2019. PyTorch Image Models. https://github.
+com/rwightman/pytorch-image-models.
+Xu, G.; Hao, J.; Shen, L.; Hu, H.; Luo, Y.; Lin, H.; and
+Shen, J. 2023. LGViT: Dynamic Early Exiting for Acceler-
+ating Vision Transformer. In Proceedings of the 31st ACM
+International Conference on Multimedia, 9103–9114.
+Yang, L.; Han, Y.; Chen, X.; Song, S.; Dai, J.; and Huang, G.
+2020. Resolution Adaptive Networks for Efficient Inference.
+In Proceedings of the IEEE/CVF Conference on Computer
+Vision and Pattern Recognition, 2369–2378.
+Yin, H.; Vahdat, A.; Alvarez, J. M.; Mallya, A.; Kautz, J.;
+and Molchanov, P. 2022. A-vit: Adaptive tokens for effi-
+cient vision transformer. In Proceedings of the IEEE/CVF
+Conference on Computer Vision and Pattern Recognition,
+10809–10818.
+Yu, Z.; Fu, Y.; Li, S.; Li, C.; and Lin, Y. 2022. MIA-Former:
+Efficient and Robust Vision Transformers via Multi-Grained
+Input-Adaptation. In Proceedings of the AAAI Conference
+on Artificial Intelligence, volume 36, 8962–8970.
+Zhang, Y.; Coskun, H.; Ma, X.; Wang, H.; Ma, K.; Chen,
+S. X.; Hu, D. H.; and Fu, Y. 2024. Slicing Vision Trans-
+former for Flexible Inference. In The Thirty-eighth Annual
+Conference on Neural Information Processing Systems.
+Zhang, Z.; Zhu, W.; Zhang, J.; Wang, P.; Jin, R.; and Chung,
+T.-S. 2022. PCEE-BERT: Accelerating BERT inference via
+
+
+patient and confident early exiting. In Findings of the Associ-
+ation for Computational Linguistics: NAACL 2022, 327–338.
+Zhou, B.; Zhao, H.; Puig, X.; Fidler, S.; Barriuso, A.; and
+Torralba, A. 2017. Scene parsing through ade20k dataset. In
+Proceedings of the IEEE conference on computer vision and
+pattern recognition, 633–641.
+Zhou, W.; Xu, C.; Ge, T.; McAuley, J.; Xu, K.; and Wei, F.
+2020. Bert loses patience: Fast and robust inference with
+early exit. Advances in Neural Information Processing Sys-
+tems, 33: 18330–18341.
+
+
+Appendix
+A
+Token Projector Pipeline
+The token projector aligns the previous-round representation
+with the next round in both grid size and channel width. It
+processes the class token separately from the patch tokens.
+The patch tokens are reshaped to their spatial grid, bilinearly
+resized, refined by an identity-initialized depthwise 3 × 3
+convolution, and expanded by a learned 1×1 projection. A
+separate linear layer expands the class token before all tokens
+are concatenated again. For the default 1922 →2402 model,
+this maps a 12×12 grid with 192 channels to a 15×15 grid
+with 384 channels.
+class TokenProjector(nn.Module):
+def __init__(self, d_in, d_out, source_hw,
+target_hw):
+self.source_hw, self.target_hw = source_hw,
+target_hw
+self.depthwise = Conv2d(
+d_in, d_in, kernel_size=3, padding=1,
+groups=d_in, bias=False)
+self.channel_proj = Conv2d(d_in, d_out,
+kernel_size=1)
+self.class_proj = Linear(d_in, d_out)
+initialize_as_identity(self.depthwise)
+initialize_shared_channels_as_identity(
+self.channel_proj, self.class_proj)
+def forward(self, tokens):
+class_token = tokens[:, :1]
+patch_tokens = tokens[:, 1:]
+patch_grid = reshape_to_grid(patch_tokens,
+self.source_hw)
+patch_grid = interpolate(
+patch_grid, size=self.target_hw,
+mode="bilinear", align_corners=False)
+patch_grid = self.depthwise(patch_grid)
+patch_grid = self.channel_proj(patch_grid)
+patch_tokens = flatten_to_tokens(patch_grid)
+class_token = self.class_proj(class_token)
+return concatenate([class_token, patch_tokens],
+dim=1)
+B
+PSG Architecture
+PSG uses five metadata values: the round index, normalized
+progress through all round–block applications, current res-
+olution, previous resolution, and resolution ratio. A shared
+metadata encoder maps these values to a conditioning vector.
+Five branch-specific heads then produce channel-wise resid-
+ual multipliers for the new-image stream, projected previous-
+round stream, attention update, MLP update, and complete
+block output. The first two multipliers control token fusion at
+a round transition, while the remaining three modulate every
+shared Transformer block. The PyTorch-style pseudocode
+below summarizes this architecture.
+class PSG(nn.Module):
+branches = ["image", "previous", "attention",
+"mlp", "block"]
+def __init__(self, max_width, rounds, blocks):
+self.S, self.D = rounds, blocks
+self.encoder = Sequential(Linear(5, 128),
+SiLU())
+self.heads = ModuleDict({
+b: Sequential(Linear(128, 128), SiLU(),
+Linear(128, max_width))
+for b in self.branches})
+zero_init(last_linear(self.heads))
+self.attn_scale = Parameter(ones(max_width))
+self.mlp_scale = Parameter(ones(max_width))
+def metadata(self, s, b, resolution, previous_res):
+previous_res = resolution if s == 0 else
+previous_res
+progress = (s * self.D + b) / (self.S * self.D
+- 1)
+return tensor([s, progress, log2(resolution /
+224),
+log2(previous_res / 224),
+log2(resolution / previous_res)])
+def multipliers(self, metadata, width):
+condition = self.encoder(metadata)
+return {b: 1 + head(condition)[:width]
+for b, head in self.heads.items()}
+def fuse(self, new_tokens, previous_tokens, gate):
+return (gate["image"] * new_tokens
++ gate["previous"] * previous_tokens)
+def transformer_block(self, x, gate):
+d = x.shape[-1]
+x += gate["attention"] * self.attn_scale[:d] \
+* attention_update(x)
+x += gate["mlp"] * self.mlp_scale[:d] *
+mlp_update(x)
+return gate["block"] * x
+The last linear layer of every conditioned head is zero-
+initialized, so all PSG multipliers initially equal one. The
+PSG-specific attention and MLP scales are also identity-
+initialized and are distinct from backbone LayerScale.
+C
+Entropy Routing Versus a Learned Router
+We test whether a learned continuation rule can select more
+useful images for refinement than prediction entropy. This
+experiment uses the 192 →240 checkpoint without knowl-
+edge distillation. The auxiliary router receives 23 summary
+statistics computed from the frozen round-1 logits, including
+top-10 and full entropy, confidence and logit margins, distri-
+bution moments, and the leading probabilities and logits. A
+23→256→128→1 MLP with 39,681 trainable parameters
+is fitted for six epochs on 50,000 ImageNet training images
+to predict whether round 2 corrects a round-1 error, then
+evaluated on all 50,000 validation images.
+Table A1 reports GMACs and accuracy separately for en-
+tropy and the learned router using their corresponding eval-
+uation records. In every row, both methods send the same
+fraction of images to round 2. The learned router improves
+selection most at constrained budgets. Its largest measured
+gain is 0.214 percentage points when 20% of images con-
+tinue, and the gain remains approximately 0.2 points through
+the 20–40% region. It falls to 0.036 points at 50% continua-
+tion, 0.012 points at 60%, and shows no consistent advantage
+thereafter. Learning can therefore improve routing modestly,
+but the benefit is localized and small. Entropy requires no
+auxiliary training set, learned parameters, feature normal-
+
+
+Entropy
+Learned router
+Continue GMACs Top-1 GMACs Top-1
+∆
+(%) / image
+(%)
+/ image
+(%)
+(p.p.)
+0
+0.912
+73.234
+0.912
+73.234 +0.000
+10
+1.447
+76.234
+1.447
+76.334 +0.100
+20
+1.983
+78.518
+1.983
+78.732 +0.214
+30
+2.518
+80.218
+2.518
+80.394 +0.176
+40
+3.054
+81.234
+3.054
+81.438 +0.204
+50
+3.590
+81.900
+3.590
+81.936 +0.036
+60
+4.125
+82.120
+4.125
+82.132 +0.012
+70
+4.661
+82.200
+4.661
+82.192 −0.008
+80
+5.196
+82.212
+5.196
+82.212 +0.000
+90
+5.732
+82.210
+5.732
+82.210 +0.000
+100
+6.267
+82.210
+6.267
+82.210 +0.000
+Table A1: Entropy and learned routing at matched continua-
+tion rates on ImageNet-1K. GMACs and top-1 accuracy are
+listed separately from the corresponding routing evaluations;
+∆is learned minus entropy accuracy. The equal backbone
+GMACs follow from matching the number of images refined.
+Learned-router overhead is excluded.
+2.5
+5.0
+7.5
+10.0
+12.5
+15.0
+17.5
+Avg. GMACs per image
+72
+74
+76
+78
+80
+82
+ImageNet Acc@1 (%)
+176
+192
+208
+224240
+320
+384
+DeiT-S res scaling
+DeiT-T
+DeiT-S
+DeiT-Base
+ProgResViT
+Figure S1: Joint resolution and width progression compared
+with available fixed-resolution DeiT records.
+ization, or additional deployment path, and therefore we use
+entropy as the simpler default.
+D
+Fixed-Resolution Deployment Context
+Figure S1 places the progressive operating points beside
+fixed-model resolution scaling. The available DeiT-S record
+at 3842 reaches 81.55% at 15.49 GMACs, whereas the full
+ProgResViT path reaches 82.21% at 6.27 GMACs. This is
+0.66 percentage points higher with 59.5% less analytical
+compute.
+E
+Knowledge-Distillation Details
+We train the distilled variants for 300 epochs using hard logit-
+level distillation from a frozen DeiT-III-B/384 teacher pre-
+trained on ImageNet-21K and fine-tuned on ImageNet-1K.
+For each augmented image, the teacher processes the 3842
+Model
+Full
+τ Routed
+Routed Saving
+top-1
+top-1 GMACs
+(%)
+192→240
+82.206
+0.3505 82.178
+4.467
+28.7
+192→240 + KD 83.796 0.20923 83.766
+4.461
+28.8
+160→384
+83.700
+0.2508 83.672
+12.606
+21.9
+160→384 + KD 84.902 0.22911 84.872
+11.124
+31.1
+Table A2: Near-lossless ImageNet operating points. Each
+routed point minimizes compute while remaining within 0.03
+percentage points of its full-path top-1 accuracy.
+view and provides the hard pseudo-label ˆyt = arg max zt.
+The loss for round s is
+Ls = 0.5 CE(zs, y)+0.5 CE(zs, ˆyt),
+L = 1
+2
+ L1+L2
+
+.
+The teacher remains in evaluation mode and receives no gra-
+dients. Because the target is a hard class label, no temperature
+parameter is used.
+F
+Near-Lossless Routing Points
+We select the lowest-compute entropy threshold whose top-
+1 accuracy remains within 0.03 percentage points of full-
+path inference. Table A2 summarizes the resulting operating
+points. They retain essentially the full accuracy while reduc-
+ing average computation by 21.9–31.1%. Table A3 provides
+the complete threshold sweep for every finished two-round
+classification model. Each entry is computed from the full
+50,000-image ImageNet-1K validation set.
+G
+Comparison with Resolution-Flexible
+Inference
+Figure S2 compares the entropy-routed frontiers of the
+1922 →2402 and 1602 →3842 KD models with the FlexiViT
+accuracy–compute operating points (Beyer et al. 2023). The
+methods vary computation differently: ProgResViT routes
+images across progressive rounds, whereas FlexiViT sup-
+ports inference at multiple patch sizes. The 1922 →2402
+model reaches 83.766% at 4.462 GMACs, while the 1602 →
+3842 model reaches 84.902% at 16.152 GMACs; FlexiViT
+reaches 83.2% at 15.39 GMACs.
+H
+Deployment Memory
+Figure S3 reports peak allocated GPU memory at batch size
+128 on a single NVIDIA L40 under the same execution setup
+used for the throughput measurements.
+I
+Dynamic-Token and Early-Exit Baselines
+The dynamic-token comparison in the main paper compares
+ProgResViT with AdaViT, DynamicViT, A-MoD, MoD,
+ToMe, A-ViT, SuperViT, MSDeiT-S, QuadFormer-S, MIA-
+Former, and ViTAR-S, with DeiT-S as a fixed reference
+(Meng et al. 2022; Rao et al. 2021; Gadhikar et al. 2025;
+Raposo et al. 2024; Bolya et al. 2023; Yin et al. 2022; Lin
+et al. 2023; Havtorn et al. 2023; Ronen, Levy, and Golbert
+2023; Yu et al. 2022; Fan et al. 2024; Touvron et al. 2021).
+
+
+192→240
+192→240 + KD
+160→240
+160→384
+160→384 + KD
+τ
+GMACs
+Top-1
+GMACs
+Top-1
+GMACs
+Top-1
+GMACs
+Top-1
+GMACs
+Top-1
+0.0
+6.267
+82.206
+6.267
+83.796
+5.971
+82.144
+16.152
+83.700
+16.152
+84.902
+0.1
+5.805
+82.206
+5.270
+83.798
+5.605
+82.144
+15.089
+83.700
+13.606
+84.900
+0.2
+5.087
+82.206
+4.509
+83.772
+4.963
+82.144
+13.290
+83.686
+11.547
+84.872
+0.3
+4.642
+82.192
+4.056
+83.714
+4.537
+82.122
+12.058
+83.646
+10.279
+84.822
+0.5
+4.030
+82.086
+3.461
+83.576
+3.937
+81.976
+10.364
+83.504
+8.571
+84.606
+0.8
+3.275
+81.606
+2.727
+82.844
+3.201
+81.400
+8.216
+82.834
+6.479
+83.728
+1.0
+2.798
+80.790
+2.316
+82.018
+2.727
+80.512
+6.799
+81.950
+5.224
+82.646
+1.2
+2.386
+79.816
+1.982
+81.030
+2.282
+79.318
+5.537
+80.712
+4.175
+81.372
+1.4
+2.026
+78.682
+1.689
+80.008
+1.896
+77.956
+4.405
+79.052
+3.267
+79.950
+1.6
+1.700
+77.340
+1.443
+78.876
+1.543
+76.462
+3.363
+77.268
+2.469
+78.586
+2.0
+1.129
+74.542
+1.042
+76.816
+0.895
+72.856
+1.438
+72.866
+1.100
+75.328
+5.0
+0.912
+73.226
+0.912
+76.018
+0.615
+70.950
+0.615
+70.624
+0.615
+73.920
+10.0
+0.912
+73.226
+0.912
+76.018
+0.615
+70.950
+0.615
+70.624
+0.615
+73.920
+Table A3: Full entropy-routing sweeps for the two-round ImageNet-1K models. GMACs denote average computation per image,
+and Top-1 is reported in percent.
+0
+5
+10
+15
+20
+25
+Avg. GMACs per image
+67.5
+70.0
+72.5
+75.0
+77.5
+80.0
+82.5
+85.0
+ImageNet top-1 accuracy (%)
+ProgResViT 1602→3842 + KD
+ProgResViT 1922→2402 + KD
+FlexiViT
+Figure S2: Accuracy–compute comparison with FlexiViT.
+The ProgResViT curves vary the entropy thresholds of the
+1922 →2402 and 1602 →3842 KD models; FlexiViT uses
+the supplied resolution-flexible operating points.
+The early-exit comparison in the main paper compares Pro-
+gResViT with DVT, CF-ViT, LF-ViT, Fusion, a layer-wise
+classifier, A-ViT, AHT-ViT, Multi-Tailed ViT, METR with
+EViT, LGViT, SDN, PABEE, ViT-EE, and PCEE (Wang et al.
+2021; Chen et al. 2023; Hu et al. 2024; Pradeep et al. 2026;
+Jiang, Zhou, and Zhu 2025; Yin et al. 2022; Shutov and
+Asadulaev 2025; Wang et al. 2024; Liu et al. 2024; Liang
+et al. 2022; Xu et al. 2023; Kaya, Hong, and Dumitras 2019;
+Zhou et al. 2020; Bakhtiarnia, Zhang, and Iosifidis 2021;
+Zhang et al. 2022). In both figures, connected points denote
+operating points from one trained model, whereas isolated
+markers denote separately trained configurations.
+J
+DINO Linear Probing
+Figure S4 reports linear-probing accuracy using frozenDINO
+encoders. At comparable compute, ProgResViT outperforms
+the separately trained fixed-resolution ViT-S/16 baselines at
+2242 and 2402, showing that progressive resolution–width
+0.4
+0.6
+0.8
+1.0
+Peak VRAM (GiB)
+79
+80
+81
+82
+ImageNet top-1 accuracy (%)
+ProgResViT
+DeiT-S
+DeiT-B
+HydraViT-B
+MatFormer-S
+MatFormer-B
+Figure S3: Figure S3 reports peak allocated GPU memory
+at batch size 128 on a single NVIDIA L40 under the same
+execution setup used for the throughput measurements. For
+ProgResViT, we measure the complete round-1-to-round-2
+inference path.
+inference also benefits self-supervised representations. Pro-
+gResViT and DINO baselines are trained for 100 epochs.
+K
+ADE20K Segmentation Routing
+We adapt entropy-based routing to semantic segmentation,
+where uncertainty must be aggregated across spatial pre-
+dictions. After Round 1, the shared segmentation decoder
+produces a class-probability distribution for every patch. We
+compute the entropy of each distribution, select the most
+uncertain 10% of patches, and average their entropies to ob-
+tain one uncertainty score for the image. Images whose score
+exceeds the routing threshold continue to Round 2 for higher-
+resolution, wider processing; the remaining images exit after
+Round 1. Varying the threshold controls how many images
+receive the second-round computation.
+
+
+1
+2
+3
+4
+5
+6
+Avg. GMACs per image
+66
+68
+70
+72
+74
+ImageNet linear top-1 accuracy (%
+ProgResViT (DINO)
+DINO ViT-S/16 (224)
+DINO ViT-S/16 (240)
+Figure S4: DINO linear-probing accuracy–compute com-
+parison. ProgResViT outperforms fixed-resolution ViT-S/16
+baselines at comparable compute.
+Component
+GMACs
+Round 1: 1922, 3 heads, 192 channels
+ViT path (without PSG)
+0.91
+Block PSG
+0.002
+Round-1 total
+0.91
+Cross-round transition
+Token projector
+0.02
+Token-fusion PSG
+0.0001
+Transition total
+0.02
+Round 2: 2402, 6 heads, 384 channels
+ViT path (without PSG or transition)
+5.34
+Block PSG
+0.002
+Round-2 stack total
+5.34
+Round-2 incremental total
+5.36
+Full two-round path
+6.27
+Table A4: Compute decomposition of the default Pro-
+gResViT configuration. Counts follow the paper’s GMACs
+convention and omit normalization, activations, interpola-
+tion, and elementwise operations.
+L
+Activation-Replacement Accuracy
+In this section, we further investigate the effect of round 1
+on round 2 by replacing the reused round-1 activations with
+Gaussian noise matched to their mean and standard deviation.
+This controls for changes in activation magnitude and helps
+isolate the contribution of the information carried by the
+round-1 representation. Let x denote the round-1 block-12
+output. We define
+xα = (1 −α)x + αϵ,
+α ∈[0, 1],
+(S1)
+where ϵ is Gaussian noise with the scalar mean and standard
+deviation of the current activation tensor, and α controls
+the replacement strength. Figure S5 reports top-1 accuracy
+over all 50,000 validation images at different replacement
+strengths. Accuracy decreases from 82.206% without re-
+placement to 79.610% at full replacement, demonstrating
+0
+25
+50
+75
+100
+Replacement perturbation (%)
+79.0
+79.5
+80.0
+80.5
+81.0
+81.5
+82.0
+82.5
+Round-2 top-1 accuracy (%)
+No perturbation (82.21%)
+Round-1 layer 12
+Figure S5: Top-1 accuracy after replacing the round-1 block-
+12 output with activation-matched Gaussian noise.
+25
+50
+75
+100
+Replacement perturbation (%)
+−10
+0
+10
+20
+30
+Ground-truth confidence drop
+relative to clean model (%)
+Figure S6: Correct-class confidence under activation-
+matched replacement, evaluated on images classified cor-
+rectly.
+that the information propagated from round 1 contributes to
+the accuracy of round 2.
+M
+Activation-Replacement Confidence
+In addition to classification accuracy, the round-1 repre-
+sentation affects the confidence of round 2. Figure S6 re-
+ports correct-class confidence under the same activation-
+replacement intervention described in Appendix L. As the
+replacement strength increases, the confidence distribution
+shifts downward, indicating that removing information from
+the reused representation weakens the certainty of the round-
+2 predictions. This result complements the accuracy reduc-
+tion and provides further evidence that round 2 meaningfully
+builds on the representation produced by round 1.
+N
+Analytical Compute Decomposition
+Table A4 separates the cost of the shared ViT path, block-
+level PSG, and the cross-round transition. In round 1, the
+ViT path accounts for 0.91 of the 0.91 GMACs total, while
+
+
+τ GMACs Top-1 (%) Exit distribution (%)
+/ image
+1282 / 1922 / 2402
+0.00
+7.097
+82.130
+0.0 / 0.0 / 100.0
+0.10
+6.246
+82.130
+1.4 / 14.1 / 84.5
+0.20
+5.353
+82.126
+6.0 / 24.8 / 69.2
+0.30
+4.814
+82.110
+10.2 / 29.4 / 60.4
+0.40
+4.414
+82.038
+13.8 / 32.3 / 53.9
+0.50
+4.074
+81.940
+17.2 / 34.3 / 48.6
+0.60
+3.765
+81.822
+20.5 / 35.7 / 43.8
+0.70
+3.472
+81.608
+23.8 / 37.0 / 39.2
+0.80
+3.158
+81.226
+27.2 / 38.5 / 34.4
+0.90
+2.868
+80.614
+30.9 / 39.0 / 30.1
+1.00
+2.597
+79.886
+34.6 / 39.3 / 26.1
+1.20
+2.105
+78.208
+42.5 / 38.4 / 19.2
+1.40
+1.667
+75.814
+51.2 / 35.3 / 13.5
+1.60
+1.254
+73.002
+60.7 / 30.8 / 8.5
+1.80
+0.872
+69.186
+71.4 / 24.2 / 4.5
+2.00
+0.526
+64.442
+83.6 / 14.8 / 1.6
+2.20
+0.242
+58.970
+96.8 / 3.2 / 0.1
+2.30
+0.188
+57.626
+100.0 / 0.0 / 0.0
+Table A5: Entropy-routed operating points for the three-
+round 1282 →1922 →2402 model.
+block PSG adds 0.002 GMACs. The transition adds 0.02
+GMACs, of which 0.02 comes from token projection and
+0.0001 from the two fusion gates. The round-2 stack costs
+5.34 GMACs, giving an incremental refinement cost of 5.36
+GMACs and a cumulative two-round cost of 6.27 GMACs.
+Thus, the learned conditioning overhead is small relative to
+the transformer computation.
+O
+PSG Specialization Across Depth
+Figure S7 complements the channel-resolved PSG profiles in
+Figure 3b. It summarizes the round-2 multipliers by branch
+and block. Each error bar is the standard deviation across
+active channels within one learned multiplier vector. Both the
+mean values and their channel-wise variation change across
+branches and depth, with particularly distinct modulation in
+the later blocks. These results show that PSG does not learn
+a single uniform rescaling; instead, it adjusts the attention,
+MLP, and block outputs differently according to their role in
+round-2 refinement.
+P
+Three-Round Progression
+To verify that ProgResViT is not restricted to two rounds, we
+train a three-round ImageNet-1K model progressing through
+resolutions of 1282 →1922 →2402 with 2, 4, and 6 heads, re-
+spectively. Executing all three rounds reaches 82.130% top-1
+accuracy at 7.097 GMACs. By varying the entropy thresh-
+old, this configuration provides operating points spanning
+0.188–7.097 average GMACs and 57.626–82.130% accu-
+racy, as reported in Table A5. Although its peak accuracy
+is slightly below the 82.206% achieved by the default two-
+round model, the additional exit point enables finer-grained
+routing across a broader compute range. Compared with the
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10 11 12
+Block
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+Mean PSG multiplier
+(error bars: ±1 channel SD)
+Attention
+MLP
+Output
+Figure S7: Round-2 PSG means across depth. Error bars
+show the standard deviation across channels within each
+learned multiplier vector.
+two-round version, this design is useful when input difficulty
+is highly heterogeneous, as easy samples can exit at sub-
+stantially lower cost while more challenging samples receive
+additional computation.
+Q
+Attention Maps Across Progressive
+Rounds
+Figure S8 qualitatively visualizes the attention heads of Pro-
+gResViT implementation on DINO. Round 1 executes the
+first three heads at the lower resolution. At the higher resolu-
+tion, round 2 reuses these shared prefix heads and activates
+three additional heads. The shared heads refine their round-
+1 attention patterns using the higher-resolution input, while
+heads 4–6 capture complementary information that differs
+from the patterns learned by the first three heads.
+
+
+Figure S8: Attention-map visualization for one ImageNet example from the Matryoshka DINO model. Round 1 uses the first
+three heads at low resolution. Round 2 retains these ordered head prefixes and activates heads 4–6 at higher resolution. Panels
+without an active round-1 head are marked as inactive.
