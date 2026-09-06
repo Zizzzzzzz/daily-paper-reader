@@ -48,17 +48,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-09-05</span>
+      <span class="dpr-home-dashboard-kicker">2026-09-06</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">共 13 篇</strong>
+    <strong class="dpr-home-dashboard-count">共 0 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
     <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>7</dd></div>
-    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>6</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>0</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-09-05 20:59:42 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-09-06 21:34:31 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -69,10 +69,7 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日共生成 13 篇推荐（精读 7 篇，速读 6 篇）</p>
-<p>精读：《Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models》（9.0/10）, 《CoFiE: Coarse-to-Fine Evidence Selection for Efficient Streaming Video Understanding》（9.0/10）</p>
-<p>速读：《Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs》（7.0/10）, 《ProgResViT: Progressive Resolution and Width for Adaptive Vision Transformers》（7.0/10）, 《Towards Continual Test-Time Adaptation of Vision-Language Models in Open-Vocabulary Semantic Segmentation》（6.0/10）</p>
-<p>这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。</p>
+<p>今日无新推荐，系统未产出可展示论文。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -81,12 +78,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">精读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">7 篇</strong>
+    <strong class="dpr-home-dashboard-count">0 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models">Token-Budget Distillation: Transferring Full-Token Semantics to Compressed Video Vision-Language Models</span></li><li><span class="dpr-home-dashboard-paper-title" title="CoFiE: Coarse-to-Fine Evidence Selection for Efficient Streaming Video Understanding">CoFiE: Coarse-to-Fine Evidence Selection for Efficient Streaming Video Understanding</span></li><li><span class="dpr-home-dashboard-paper-title" title="Rethinking Language&#x27;s Role in Efficient VLA for Autonomous Vehicles: Toward Smarter, Trustworthy Driving">Rethinking Language&#x27;s Role in Efficient VLA for Autonomous Vehicles: Toward Smarter, Trustworthy Driving</span></li></ul>
+<p class="dpr-home-dashboard-empty">今日暂无推荐。</p>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>6</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>1</strong></span></div>
+
 </section>
 <section class="dpr-home-dashboard-card dpr-home-skim-card">
   <div class="dpr-home-dashboard-header">
@@ -94,12 +91,12 @@
       <span class="dpr-home-dashboard-kicker">今日累计</span>
       <h3 class="dpr-home-dashboard-title">速读推荐</h3>
     </div>
-    <strong class="dpr-home-dashboard-count">6 篇</strong>
+    <strong class="dpr-home-dashboard-count">0 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs">Semantic Head Specialization Guides Hybrid ViT Attention for Multimodal LLMs</span></li><li><span class="dpr-home-dashboard-paper-title" title="ProgResViT: Progressive Resolution and Width for Adaptive Vision Transformers">ProgResViT: Progressive Resolution and Width for Adaptive Vision Transformers</span></li><li><span class="dpr-home-dashboard-paper-title" title="Towards Continual Test-Time Adaptation of Vision-Language Models in Open-Vocabulary Semantic Segmentation">Towards Continual Test-Time Adaptation of Vision-Language Models in Open-Vocabulary Semantic Segmentation</span></li></ul>
+<p class="dpr-home-dashboard-empty">今日暂无推荐。</p>
   </div>
-  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">evlm <strong>3</strong></span><span class="dpr-home-dashboard-tag">mm-trf <strong>3</strong></span></div>
+
 </section>
 </div>
 
